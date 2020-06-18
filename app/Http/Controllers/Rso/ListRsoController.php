@@ -38,7 +38,8 @@ class ListRsoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data=Listrso::create($request->all());
+        return response(new ListRsoResource($data),response::HTTP_CREATED);
     }
 
     /**
@@ -47,9 +48,9 @@ class ListRsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Listrso $listrso)
     {
-        //
+        return new ListRsoResource($listrso);
     }
 
     /**
@@ -70,9 +71,10 @@ class ListRsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Listrso $listrso)
     {
-        //
+        $listrso->update($request->all());
+        return response('update',response::HTTP_CREATED);
     }
 
     /**
@@ -81,8 +83,9 @@ class ListRsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Listrso $listrso)
     {
-        //
+        $listrso->delete();
+        return response('deleted',response::HTTP_OK);
     }
 }
