@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Divisi;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Model\Divisi\Divisi;
+use App\Http\Resources\DivisiResource;
+use Symfony\Component\HttpFoundation\Response;
 
 class DivisiController extends Controller
 {
@@ -14,7 +17,7 @@ class DivisiController extends Controller
      */
     public function index()
     {
-        //
+        return DivisiResource::collection(Divisi::latest()->get());
     }
 
     /**
@@ -35,7 +38,8 @@ class DivisiController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data=Divisi::create($request->all());
+        return response(new DivisiResource($data),response::HTTP_CREATED);
     }
 
     /**
@@ -44,9 +48,9 @@ class DivisiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Divisi $divisi)
     {
-        //
+        return new DivisiResource($divisi);
     }
 
     /**
@@ -67,9 +71,10 @@ class DivisiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Divisi $divisi)
     {
-        //
+        $divisi->update($request->all());
+        return response('updated',response::HTTP_CREATED);
     }
 
     /**
@@ -78,8 +83,9 @@ class DivisiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Divisi $divisi)
     {
-        //
+        $divisi->delete();
+        return response('deleted',response::HTTP_OK);   
     }
 }
