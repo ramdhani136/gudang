@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Rso;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Model\Rso\Rso;
-use App\Http\Resources\RsoResource;
+use App\Model\Rso\Listrso;
+use App\Http\Resources\ListRsoResource;
 use Symfony\Component\HttpFoundation\Response;
 
-class RsoController extends Controller
+class ListRsoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class RsoController extends Controller
      */
     public function index()
     {
-        return RsoResource::collection(Rso::latest()->get());
+        return ListRsoResource::collection(Listrso::latest()->get());
     }
 
     /**
@@ -38,8 +38,7 @@ class RsoController extends Controller
      */
     public function store(Request $request)
     {
-        $data=Rso::create($request->all());
-        return response(new RsoResource($data),response::HTTP_CREATED);
+        //
     }
 
     /**
@@ -48,9 +47,9 @@ class RsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Rso $rso)
+    public function show($id)
     {
-        return new RsoResource($rso);
+        //
     }
 
     /**
@@ -71,10 +70,9 @@ class RsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Rso $rso)
+    public function update(Request $request, $id)
     {
-        $rso->update($request->all());
-        return response('updated',response::HTTP_CREATED);
+        //
     }
 
     /**
@@ -83,9 +81,8 @@ class RsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Rso $rso)
+    public function destroy($id)
     {
-        $rso->delete();
-        return response('deleted',response::HTTP_OK);
+        //
     }
 }

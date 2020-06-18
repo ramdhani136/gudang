@@ -5,6 +5,7 @@ namespace App\Model\Rso;
 use Illuminate\Database\Eloquent\Model;
 use App\User;
 use App\Model\Customer\Customer;
+use App\Model\Rso\Listrso;
 
 class Rso extends Model
 {
@@ -18,4 +19,9 @@ class Rso extends Model
     public function customer(){
         return $this->belongsTo(Customer::class,'id_customer','id');
     }
+
+    public function listrso(){
+        return $this->hasMany(listrso::class,'id_rso','id');
+    }
+
 }

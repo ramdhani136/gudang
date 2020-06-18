@@ -22,4 +22,6 @@ Route::resource('barang','Barang\BarangController');
 Route::resource('customer','Customer\CustomerController');
 Route::resource('divisi','Divisi\DivisiController');
 Route::resource('rso','Rso\RsoController');
+Route::resource('listrso','Rso\ListRsoController');
+
 
