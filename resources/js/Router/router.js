@@ -7,6 +7,7 @@ import CustomerComponent from '../components/customer/CustomerComponent.vue'
 
 import DivisiComponent from '../components/Divisi/DivisiComponent.vue'
 
+
 const routes=[
     {name:'barang', path:'/barang', component:BarangComponent},
 
