@@ -57,6 +57,20 @@
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/barang" class="dropdown-item" >Barang</router-link>
+                                    <router-link to="/customer" class="dropdown-item" >Customer</router-link>
+                                    <router-link to="/divisi" class="dropdown-item" >Divisi</router-link>
+                                </div>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Transaksi <span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <router-link to="/rso" class="dropdown-item" >Data RSO</router-link>
+                                    <router-link to="/requestrso" class="dropdown-item" >DIC Request</router-link>
+                                    <router-link to="/purchase" class="dropdown-item" >Purchase Orde</router-link>
                                 </div>
                             </li>
                                 

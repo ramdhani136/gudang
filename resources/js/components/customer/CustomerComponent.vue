@@ -1,6 +1,6 @@
 <template>
     <div class="container" >
-        <button class="btn btn-success my-3">+ Tambah Barang</button>
+        <button class="btn btn-success my-3">+ Tambah Customer</button>
         <div class="form-group col-3 my-3 float-right">
             <input  type="text" class="form-control" placeholder="Search">
         </div>
@@ -9,22 +9,16 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Nama Barang</th>
-                <th>Awal</th>
-                <th>Booking</th>
-                <th>Tersedia</th>
-                <th>Satuan</th>
+                <th>Kode</th>
+                <th>Nama</th>
                 <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(br , index) in barang" :key="br">
+            <tr v-for="(cs , index) in customer" :key="cs">
                 <td>{{index+1}}</td>
-                <td>{{br.nama}}</td>
-                <td>{{br.qty}}</td>
-                <td>200</td>
-                <td>800</td>
-                <td>{{br.satuan}}</td>
+                <td>{{cs.kode}}</td>
+                <td>{{cs.nama}}</td>
                 <td>
                     <button class="btn btn-primary">Edit</button>
                     <button class="btn btn-danger">Hapus</button>
@@ -40,17 +34,17 @@
 export default {
     data(){
         return{
-            barang:{}
+            customer:{}
         }
     },
     created(){
-        this.getBarang()
+        this.getCustomer()
     },
     methods:{
-        getBarang(){
-            axios.get("/api/barang")
-            .then(res=>this.barang=res.data.data)
-        },
+        getCustomer(){
+            axios.get("/api/customer")
+            .then(res=>this.customer=res.data.data)
+        }
     }
 }
 </script>
