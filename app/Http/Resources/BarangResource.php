@@ -16,8 +16,6 @@ class BarangResource extends JsonResource
     {
         return 
         [
-            'current_page'=>$this->current_page,
-            'id'=>$this->id,
             'kode'=>$this->kode,
             'nama'=>$this->nama,
             'qty'=>$this->qty,

@@ -56,9 +56,9 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Barang $barang)
+    public function show($barang)
     {
-        return new BarangResource($barang);
+        return BarangResource::collection(Barang::where('kode',$barang)->get());
     }
 
     /**
@@ -79,9 +79,14 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Barang $barang)
+    public function update(Request $request,$barang)
     {
-        $barang->update($request->all());
+        Barang::where('kode',$barang)->update([
+            'kode'=>$request->kode,
+            'nama'=>$request->nama,
+            'qty'=>$request->qty,
+            'satuan'=>$request->satuan,
+        ]);
         return response('update',response::HTTP_CREATED);
     }
 
@@ -91,9 +96,9 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Barang $barang)
+    public function destroy($barang)
     {   
-        $barang->delete();
+        Barang::where('kode',$barang)->delete();
         return response('deleted',response::HTTP_OK);
     }
 }

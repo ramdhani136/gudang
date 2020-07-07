@@ -2224,7 +2224,6 @@ __webpack_require__.r(__webpack_exports__);
       search: '',
       barang: [],
       form: {
-        id: '',
         kode: '',
         nama: '',
         satuan: '',
@@ -2292,7 +2291,7 @@ __webpack_require__.r(__webpack_exports__);
           }
         });
       } else {
-        axios.put("/api/barang/" + this.form.id, this.form).then(function (response) {
+        axios.put("/api/barang/" + this.form.kode, this.form).then(function (response) {
           _this3.getBarang();
 
           _this3.$router.push({
@@ -2325,7 +2324,6 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     updateBarang: function updateBarang(barang) {
-      this.form.id = barang.id;
       this.form.nama = barang.nama;
       this.form.qty = barang.qty;
       this.form.satuan = barang.satuan;
@@ -2339,7 +2337,7 @@ __webpack_require__.r(__webpack_exports__);
       var keputusan = confirm('Apakah anda yakin?');
 
       if (keputusan === true) {
-        axios["delete"]("/api/barang/" + barang.id).then(function (response) {
+        axios["delete"]("/api/barang/" + barang.kode).then(function (response) {
           _this4.getBarang();
         })["catch"](function (error) {
           console.log(error);
@@ -2348,7 +2346,6 @@ __webpack_require__.r(__webpack_exports__);
     },
     resetForm: function resetForm() {
       this.edit = false;
-      this.form.id = "";
       this.form.nama = "";
       this.form.kode = "";
       this.form.qty = "";
@@ -2439,7 +2436,6 @@ __webpack_require__.r(__webpack_exports__);
       search: '',
       customer: [],
       form: {
-        id: '',
         kode: '',
         nama: ''
       },
@@ -2497,7 +2493,7 @@ __webpack_require__.r(__webpack_exports__);
           }
         });
       } else {
-        axios.put("/api/customer/" + this.form.id, this.form).then(function (response) {
+        axios.put("/api/customer/" + this.form.kode, this.form).then(function (response) {
           _this3.getCustomer();
 
           _this3.$router.push({
@@ -2521,7 +2517,6 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     updateCustomer: function updateCustomer(customer) {
-      this.form.id = customer.id;
       this.form.nama = customer.nama;
       this.form.kode = customer.kode;
       this.edit = true;
@@ -2533,7 +2528,7 @@ __webpack_require__.r(__webpack_exports__);
       var keputusan = confirm('Apakah anda yakin?');
 
       if (keputusan === true) {
-        axios["delete"]("/api/customer/" + customer.id).then(function (response) {
+        axios["delete"]("/api/customer/" + customer.kode).then(function (response) {
           _this4.getCustomer();
         })["catch"](function (error) {
           console.log(error);
@@ -2541,7 +2536,6 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     resetForm: function resetForm() {
-      this.form.id = "";
       this.form.nama = "";
       this.form.kode = "";
       this.edit = false;

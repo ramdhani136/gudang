@@ -70,7 +70,6 @@ export default {
             search  : '',
             customer:[],
             form:{
-                id:'',
                 kode:'',
                 nama:'',
             },
@@ -116,7 +115,7 @@ export default {
                     }
             })
             }else{
-                axios.put("/api/customer/"+  this.form.id,this.form)
+                axios.put("/api/customer/"+  this.form.kode,this.form)
                 .then((response)=>{
                     this.getCustomer();
                     this.$router.push({name:'customer'})
@@ -135,7 +134,6 @@ export default {
             }
         },
         updateCustomer(customer){
-            this.form.id=customer.id
             this.form.nama=customer.nama
             this.form.kode=customer.kode
             this.edit=true;
@@ -144,7 +142,7 @@ export default {
         deleteCustomer(customer){
             let keputusan=confirm('Apakah anda yakin?');
             if(keputusan===true){
-                axios.delete("/api/customer/" + customer.id)
+                axios.delete("/api/customer/" + customer.kode)
                 .then(response=>{
                     this.getCustomer();
                 })
@@ -154,7 +152,6 @@ export default {
             }
         },
         resetForm(){
-            this.form.id=""
             this.form.nama=""
             this.form.kode=""
             this.edit=false;

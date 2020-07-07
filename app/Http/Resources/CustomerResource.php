@@ -18,7 +18,6 @@ class CustomerResource extends JsonResource
     {
         return 
         [
-            'id'=>$this->id,
             'kode'=>$this->kode,
             'nama'=>$this->nama,
             'keterangan'=>$this->keterangan,

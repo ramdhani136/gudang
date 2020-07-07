@@ -90,7 +90,6 @@ export default {
             search  : '',
             barang:[],
             form:{
-                id:'',
                 kode:'',
                 nama:'',
                 satuan:'',
@@ -144,7 +143,7 @@ export default {
                     }
             })
             }else{
-                axios.put("/api/barang/"+  this.form.id,this.form)
+                axios.put("/api/barang/"+  this.form.kode,this.form)
                 .then((response)=>{
                     this.getBarang();
                     this.$router.push({name:'barang'})
@@ -170,7 +169,6 @@ export default {
             }
         },
         updateBarang(barang){
-            this.form.id=barang.id
             this.form.nama=barang.nama
             this.form.qty=barang.qty
             this.form.satuan=barang.satuan
@@ -181,7 +179,7 @@ export default {
         deleteBarang(barang){
             let keputusan=confirm('Apakah anda yakin?');
             if(keputusan===true){
-                axios.delete("/api/barang/" + barang.id)
+                axios.delete("/api/barang/" + barang.kode)
                 .then(response=>{
                     this.getBarang();
                 })
@@ -192,7 +190,6 @@ export default {
         },
         resetForm(){
             this.edit=false
-            this.form.id=""
             this.form.nama=""
             this.form.kode=""
             this.form.qty=""

@@ -10,7 +10,7 @@ class Customer extends Model
     protected $guarded=[];
 
     public function rso(){
-        return $this->hasMany(Rso::class,'id_customer','id');
+        return $this->hasMany(Rso::class,'kode_customer','kode');
     }
 }
 

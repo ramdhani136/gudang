@@ -38,6 +38,11 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request,[
+            'kode'=>'required',
+            'nama'=>'required',
+        ]);
+
         $data=Customer::create($request->all());
         return response(new CustomerResource($data),response::HTTP_CREATED);
     }
@@ -48,9 +53,9 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Customer $customer)
+    public function show($customer)
     {
-        return new CustomerResource($customer);
+        return CustomerResource::collection(Customer::where('kode',$customer)->get());
     }
 
     /**
@@ -71,10 +76,19 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Customer $customer)
+    public function update(Request $request, $customer)
     {
-        $customer->update($request->all());
-        return response('updated',response::HTTP_CREATED);
+
+        $this->validate($request,[
+            'kode'=>'required',
+            'nama'=>'required',
+        ]);
+
+        Customer::where('kode',$customer)->update([
+            'kode'=>$request->kode,
+            'nama'=>$request->nama,
+            'keterangan'=>$request->keterangan,
+        ]);
     }
 
     /**
@@ -83,9 +97,9 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Customer $customer)
+    public function destroy($customer)
     {
-        $customer->delete();
+        Customer::where('kode',$customer)->delete();
         return response('Deleted',response::HTTP_OK);
     }
 }
