@@ -1,5 +1,5 @@
 <template>
-    <div class="container" >
+    <div class="container"  @keyup.esc="resetForm()">
         <button @click="showmodal()" class="btn btn-success my-3">+ Tambah Barang</button>
         <div class="form-group col-3 my-3 float-right">
             <input v-model="search"  type="text" class="form-control" placeholder="Search">
@@ -26,50 +26,56 @@
                 <td>800</td>
                 <td>{{br.satuan}}</td>
                 <td>
-                    <button class="btn btn-primary">Edit</button>
-                    <button class="btn btn-danger">Hapus</button>
+                    <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
+                    <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
                 </td>
             </tr>
         </tbody>
     </table>
     </div>
-    <div class="modal fade" id="modal-form" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Form Barang</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div v-if="errors.length > 0 " class="alert alert-danger">
+                        <ul>
+                            <li v-for="(error , index) in errors" :key="index">
+                                {{error}}
+                            </li>
+                        </ul>
+                    </div>
                     <div class="form-group">
                         <label>Kode Barang</label>
-                        <input type="text" name="nama" id="" autocomplete="off" class="form-control">
+                        <input v-model="form.kode" type="text" name="nama" id="" autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Nama</label>
-                        <input type="text" name="Alamat" id="" autocomplete="off" class="form-control">
+                        <input v-model="form.nama" type="text" name="Alamat" id="" autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label>Kategori</label>
-                        <select name="kategori" id="" class="form-control">
-
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Jumah Stok</label>
-                        <input type="text" name="pekerajaan" id="" autocomplete="off" class="form-control">
+                        <label>Jumlah Stok</label>
+                        <input v-model="form.qty" type="number" name="pekerajaan" id="" autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Satuan</label>
-                        <select name="satuan" id="" class="form-control">
+                        <select v-model="form.satuan" name="satuan" id="" class="form-control">
+                            <option value="PCS">PCS</option>
+                            <option value="ROLL">ROLL</option>
+                            <option value="LBR">LBR</option>
+                            <option value="KG">KG</option>
+                            <option value="MTR">MTR</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="createBarang()" class="btn btn-primary">Save changes</button>
                 </div>
                 </div>
             </div>
@@ -82,7 +88,16 @@ export default {
     data(){
         return{
             search  : '',
-            barang:[]
+            barang:[],
+            form:{
+                id:'',
+                kode:'',
+                nama:'',
+                satuan:'',
+                qty:'',
+            },
+            errors:[],
+            edit:false,
         }
     },
     created(){
@@ -101,8 +116,89 @@ export default {
             .then(res=>this.barang=res.data.data)
         },
         showmodal(){
+            this.errors=[];
             $("#modal-form").modal("show");
-        }
+        },
+        createBarang(){
+            if(this.edit===false){
+                axios.post("/api/barang",this.form)
+                .then((response)=>{
+                    this.getBarang();
+                    this.$router.push({name:'barang'})
+                    $("#modal-form").modal("hide");
+                    this.resetForm();
+                })
+                .catch(error=>{
+                    this.errors=[];
+                    if(error.response.data.errors.nama){
+                        this.errors.push(error.response.data.errors.nama[0])
+                    }
+                    if(error.response.data.errors.kode){
+                        this.errors.push(error.response.data.errors.kode[0])
+                    }
+                    if(error.response.data.errors.qty){
+                        this.errors.push(error.response.data.errors.qty[0])
+                    }
+                    if(error.response.data.errors.satuan){
+                        this.errors.push(error.response.data.errors.satuan[0])
+                    }
+            })
+            }else{
+                axios.put("/api/barang/"+  this.form.id,this.form)
+                .then((response)=>{
+                    this.getBarang();
+                    this.$router.push({name:'barang'})
+                    $("#modal-form").modal("hide");
+                    this.edit=false
+                    this.resetForm()
+                })
+                .catch(error=>{
+                    this.errors=[];
+                    if(error.response.data.errors.nama){
+                        this.errors.push(error.response.data.errors.nama[0])
+                    }
+                    if(error.response.data.errors.kode){
+                        this.errors.push(error.response.data.errors.kode[0])
+                    }
+                    if(error.response.data.errors.qty){
+                        this.errors.push(error.response.data.errors.qty[0])
+                    }
+                    if(error.response.data.errors.satuan){
+                        this.errors.push(error.response.data.errors.satuan[0])
+                    }
+            })
+            }
+        },
+        updateBarang(barang){
+            this.form.id=barang.id
+            this.form.nama=barang.nama
+            this.form.qty=barang.qty
+            this.form.satuan=barang.satuan
+            this.form.kode=barang.kode
+            this.edit=true
+            this.showmodal();
+        },
+        deleteBarang(barang){
+            let keputusan=confirm('Apakah anda yakin?');
+            if(keputusan===true){
+                axios.delete("/api/barang/" + barang.id)
+                .then(response=>{
+                    this.getBarang();
+                })
+                .catch(error=>{
+                    console.log(error)
+                })
+            }
+        },
+        resetForm(){
+            this.edit=false
+            this.form.id=""
+            this.form.nama=""
+            this.form.kode=""
+            this.form.qty=""
+            this.form.satuan=""
+
+        },
     }
 }
 </script>

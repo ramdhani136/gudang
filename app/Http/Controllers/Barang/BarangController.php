@@ -38,6 +38,14 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
+
+        $this->validate($request,[
+            'kode'=>'required|min:4',
+            'nama'=>'required',
+            'qty'=>'required',
+            'satuan'=>'required',
+        ]);
+
         $data=Barang::create($request->all());
         return response(new BarangResource($data),response::HTTP_CREATED);
     }

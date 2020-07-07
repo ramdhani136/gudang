@@ -1,8 +1,8 @@
 <template>
-    <div class="container" >
-        <button class="btn btn-success my-3">+ Tambah Customer</button>
+    <div class="container" @keyup.esc="resetForm()">
+        <button @click="showmodal()" class="btn btn-success my-3">+ Tambah Customer</button>
         <div class="form-group col-3 my-3 float-right">
-            <input  type="text" class="form-control" placeholder="Search">
+            <input v-model="search"  type="text" class="form-control" placeholder="Search">
         </div>
         <div id="overflow" class="border-top">
         <table id="thead" class="table table-striped table-bordered" style="width:100%">
@@ -15,18 +15,51 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(cs , index) in customer" :key="cs">
+            <tr v-for="(cs , index) in FilteredCustomer" :key="cs">
                 <td>{{index+1}}</td>
                 <td>{{cs.kode}}</td>
                 <td>{{cs.nama}}</td>
                 <td>
-                    <button class="btn btn-primary">Edit</button>
-                    <button class="btn btn-danger">Hapus</button>
+                    <button @click="updateCustomer(cs)" class="btn btn-primary">Edit</button>
+                    <button @click="deleteCustomer(cs)" class="btn btn-danger">Hapus</button>
                 </td>
             </tr>
         </tbody>
     </table>
     </div>
+    <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Barang</h5>
+                    <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div v-if="errors.length > 0 " class="alert alert-danger">
+                        <ul>
+                            <li v-for="(error , index) in errors" :key="index">
+                                {{error}}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="form-group">
+                        <label>Kode Customer</label>
+                        <input v-model="form.kode" type="text" name="kode" autocomplete="off" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Nama</label>
+                        <input v-model="form.nama" type="text" name="nama"  autocomplete="off" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="createCustomer()" class="btn btn-primary">Save changes</button>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -34,17 +67,98 @@
 export default {
     data(){
         return{
-            customer:{}
+            search  : '',
+            customer:[],
+            form:{
+                id:'',
+                kode:'',
+                nama:'',
+            },
+            errors:[],
+            edit:false,
         }
     },
     created(){
         this.getCustomer()
     },
+    computed:{
+        FilteredCustomer(){
+            return this.customer.filter(elem => {
+            return elem.nama.toLowerCase().includes(this.search);
+            });
+        }
+    },
     methods:{
         getCustomer(){
             axios.get("/api/customer")
             .then(res=>this.customer=res.data.data)
-        }
+        },
+        showmodal(){
+            this.errors=[];
+            $("#modal-form").modal("show");
+        },
+        createCustomer(){
+            if(this.edit===false){
+                axios.post("/api/customer",this.form)
+                .then((response)=>{
+                    this.getCustomer();
+                    this.$router.push({name:'customer'})
+                    $("#modal-form").modal("hide");
+                    this.resetForm();
+                })
+                .catch(error=>{
+                    this.errors=[];
+                    if(error.response.data.errors.nama){
+                        this.errors.push(error.response.data.errors.nama[0])
+                    }
+                    if(error.response.data.errors.kode){
+                        this.errors.push(error.response.data.errors.kode[0])
+                    }
+            })
+            }else{
+                axios.put("/api/customer/"+  this.form.id,this.form)
+                .then((response)=>{
+                    this.getCustomer();
+                    this.$router.push({name:'customer'})
+                    $("#modal-form").modal("hide");
+                    this.resetForm()
+                })
+                .catch(error=>{
+                    this.errors=[];
+                    if(error.response.data.errors.nama){
+                        this.errors.push(error.response.data.errors.nama[0])
+                    }
+                    if(error.response.data.errors.kode){
+                        this.errors.push(error.response.data.errors.kode[0])
+                    }
+            })
+            }
+        },
+        updateCustomer(customer){
+            this.form.id=customer.id
+            this.form.nama=customer.nama
+            this.form.kode=customer.kode
+            this.edit=true;
+            this.showmodal();
+        },
+        deleteCustomer(customer){
+            let keputusan=confirm('Apakah anda yakin?');
+            if(keputusan===true){
+                axios.delete("/api/customer/" + customer.id)
+                .then(response=>{
+                    this.getCustomer();
+                })
+                .catch(error=>{
+                    console.log(error)
+                })
+            }
+        },
+        resetForm(){
+            this.form.id=""
+            this.form.nama=""
+            this.form.kode=""
+            this.edit=false;
+        },
     }
 }
 </script>
@@ -68,6 +182,10 @@ export default {
         inset 0 -1px 0 #dee2e6;
     }
 
-
+    #modal-width{
+    width: 120%;
+    height: auto;
+    right: 13%;
+    }
     
 </style>
