@@ -1940,22 +1940,151 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      divisi: {}
+      search: '',
+      divisi: [],
+      form: {
+        id: '',
+        nama: '',
+        keterangan: ''
+      },
+      errors: [],
+      edit: false
     };
   },
   created: function created() {
     this.getDivisi();
   },
-  methods: {
-    getDivisi: function getDivisi() {
+  computed: {
+    FilteredDivisi: function FilteredDivisi() {
       var _this = this;
 
-      axios.get("/api/divisi").then(function (res) {
-        return _this.divisi = res.data.data;
+      return this.divisi.filter(function (elem) {
+        return elem.nama.toLowerCase().includes(_this.search);
       });
+    }
+  },
+  methods: {
+    getDivisi: function getDivisi() {
+      var _this2 = this;
+
+      axios.get("/api/divisi").then(function (res) {
+        return _this2.divisi = res.data.data;
+      });
+    },
+    showmodal: function showmodal() {
+      this.errors = [];
+      $("#modal-form").modal("show");
+    },
+    createDivisi: function createDivisi() {
+      var _this3 = this;
+
+      if (this.edit === false) {
+        axios.post("/api/divisi", this.form).then(function (response) {
+          _this3.getDivisi();
+
+          _this3.$router.push({
+            name: 'divisi'
+          });
+
+          $("#modal-form").modal("hide");
+
+          _this3.resetForm();
+        })["catch"](function (error) {
+          _this3.errors = [];
+
+          if (error.response.data.errors.nama) {
+            _this3.errors.push(error.response.data.errors.nama[0]);
+          }
+
+          if (error.response.data.errors.keterangan) {
+            _this3.errors.push(error.response.data.errors.keterangan[0]);
+          }
+        });
+      } else {
+        axios.put("/api/divisi/" + this.form.id, this.form).then(function (response) {
+          _this3.getDivisi();
+
+          _this3.$router.push({
+            name: 'divisi'
+          });
+
+          $("#modal-form").modal("hide");
+
+          _this3.resetForm();
+        })["catch"](function (error) {
+          _this3.errors = [];
+
+          if (error.response.data.errors.nama) {
+            _this3.errors.push(error.response.data.errors.nama[0]);
+          }
+
+          if (error.response.data.errors.keterangan) {
+            _this3.errors.push(error.response.data.errors.keterangan[0]);
+          }
+        });
+      }
+    },
+    updateDivisi: function updateDivisi(divisi) {
+      this.form.id = divisi.id;
+      this.form.nama = divisi.nama;
+      this.form.keterangan = divisi.keterangan;
+      this.edit = true;
+      this.showmodal();
+    },
+    deleteDivisi: function deleteDivisi(divisi) {
+      var _this4 = this;
+
+      var keputusan = confirm('Apakah anda yakin?');
+
+      if (keputusan === true) {
+        axios["delete"]("/api/divisi/" + divisi.id).then(function (response) {
+          _this4.getDivisi();
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      }
+    },
+    resetForm: function resetForm() {
+      this.form.id = "";
+      this.form.nama = "";
+      this.form.keterangan = "";
+      this.edit = false;
     }
   }
 });
@@ -6864,7 +6993,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n#overflow{\n    width: 100%;\nheight: 440px;\noverflow-y: scroll;\n}\n#thead thead tr th{\n    text-align: center;\n    border-bottom: none;\n    position: -webkit-sticky;\n    position: sticky; top: 0; \n    background-color: #fff;\n    top: -1px;\n    border-collapse: collapse;\n    box-shadow: inset 0 0 0 #dee2e6,\n    inset 0 -1px 0 #dee2e6;\n}\n\n\n\n", ""]);
+exports.push([module.i, "\n#overflow{\n    width: 100%;\nheight: 440px;\noverflow-y: scroll;\n}\n#thead thead tr th{\n    text-align: center;\n    border-bottom: none;\n    position: -webkit-sticky;\n    position: sticky; top: 0; \n    background-color: #fff;\n    top: -1px;\n    border-collapse: collapse;\n    box-shadow: inset 0 0 0 #dee2e6,\n    inset 0 -1px 0 #dee2e6;\n}\n#modal-width{\nwidth: 120%;\nheight: auto;\nright: 13%;\n}\n\n", ""]);
 
 // exports
 
@@ -38708,56 +38837,293 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container" }, [
-    _c("button", { staticClass: "btn btn-success my-3" }, [
-      _vm._v("+ Tambah Divisi")
-    ]),
-    _vm._v(" "),
-    _vm._m(0),
-    _vm._v(" "),
-    _c("div", { staticClass: "border-top", attrs: { id: "overflow" } }, [
+  return _c(
+    "div",
+    {
+      staticClass: "container",
+      on: {
+        keyup: function($event) {
+          if (
+            !$event.type.indexOf("key") &&
+            _vm._k($event.keyCode, "esc", 27, $event.key, ["Esc", "Escape"])
+          ) {
+            return null
+          }
+          return _vm.resetForm()
+        }
+      }
+    },
+    [
       _c(
-        "table",
+        "button",
         {
-          staticClass: "table table-striped table-bordered",
-          staticStyle: { width: "100%" },
-          attrs: { id: "thead" }
+          staticClass: "btn btn-success my-3",
+          on: {
+            click: function($event) {
+              return _vm.showmodal()
+            }
+          }
+        },
+        [_vm._v("+ Tambah Customer")]
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "form-group col-3 my-3 float-right" }, [
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.search,
+              expression: "search"
+            }
+          ],
+          staticClass: "form-control",
+          attrs: { type: "text", placeholder: "Search" },
+          domProps: { value: _vm.search },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.search = $event.target.value
+            }
+          }
+        })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "border-top", attrs: { id: "overflow" } }, [
+        _c(
+          "table",
+          {
+            staticClass: "table table-striped table-bordered",
+            staticStyle: { width: "100%" },
+            attrs: { id: "thead" }
+          },
+          [
+            _vm._m(0),
+            _vm._v(" "),
+            _c(
+              "tbody",
+              _vm._l(_vm.FilteredDivisi, function(dv, index) {
+                return _c("tr", { key: dv }, [
+                  _c("td", [_vm._v(_vm._s(index + 1))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(dv.nama))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(dv.keterangan))]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        on: {
+                          click: function($event) {
+                            return _vm.updateDivisi(dv)
+                          }
+                        }
+                      },
+                      [_vm._v("Edit")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-danger",
+                        on: {
+                          click: function($event) {
+                            return _vm.deleteDivisi(dv)
+                          }
+                        }
+                      },
+                      [_vm._v("Hapus")]
+                    )
+                  ])
+                ])
+              }),
+              0
+            )
+          ]
+        )
+      ]),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "modal-form",
+            tabindex: "-1",
+            "data-backdrop": "static",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true"
+          }
         },
         [
-          _vm._m(1),
-          _vm._v(" "),
           _c(
-            "tbody",
-            _vm._l(_vm.divisi, function(dv, index) {
-              return _c("tr", { key: dv }, [
-                _c("td", [_vm._v(_vm._s(index + 1))]),
-                _vm._v(" "),
-                _c("td", [_vm._v(_vm._s(dv.nama))]),
-                _vm._v(" "),
-                _c("td", [_vm._v(_vm._s(dv.keterangan))]),
-                _vm._v(" "),
-                _vm._m(2, true)
-              ])
-            }),
-            0
+            "div",
+            { staticClass: "modal-dialog", attrs: { role: "document" } },
+            [
+              _c(
+                "div",
+                { staticClass: "modal-content", attrs: { id: "modal-width" } },
+                [
+                  _c("div", { staticClass: "modal-header" }, [
+                    _c(
+                      "h5",
+                      {
+                        staticClass: "modal-title",
+                        attrs: { id: "exampleModalLabel" }
+                      },
+                      [_vm._v("Form Barang")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "close",
+                        attrs: {
+                          type: "button",
+                          "data-dismiss": "modal",
+                          "aria-label": "Close"
+                        },
+                        on: {
+                          click: function($event) {
+                            return _vm.resetForm()
+                          }
+                        }
+                      },
+                      [
+                        _c("span", { attrs: { "aria-hidden": "true" } }, [
+                          _vm._v("×")
+                        ])
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _vm.errors.length > 0
+                      ? _c("div", { staticClass: "alert alert-danger" }, [
+                          _c(
+                            "ul",
+                            _vm._l(_vm.errors, function(error, index) {
+                              return _c("li", { key: index }, [
+                                _vm._v(
+                                  "\n                            " +
+                                    _vm._s(error) +
+                                    "\n                        "
+                                )
+                              ])
+                            }),
+                            0
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Kode Customer")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.form.nama,
+                            expression: "form.nama"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          name: "nama",
+                          autocomplete: "off"
+                        },
+                        domProps: { value: _vm.form.nama },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.form, "nama", $event.target.value)
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Nama")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.form.keterangan,
+                            expression: "form.keterangan"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          name: "keterangan",
+                          autocomplete: "off"
+                        },
+                        domProps: { value: _vm.form.keterangan },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.form,
+                              "keterangan",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-secondary",
+                        attrs: { type: "button", "data-dismiss": "modal" },
+                        on: {
+                          click: function($event) {
+                            return _vm.resetForm()
+                          }
+                        }
+                      },
+                      [_vm._v("Close")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.createDivisi()
+                          }
+                        }
+                      },
+                      [_vm._v("Save changes")]
+                    )
+                  ])
+                ]
+              )
+            ]
           )
         ]
       )
-    ])
-  ])
+    ]
+  )
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group col-3 my-3 float-right" }, [
-      _c("input", {
-        staticClass: "form-control",
-        attrs: { type: "text", placeholder: "Search" }
-      })
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -38766,22 +39132,12 @@ var staticRenderFns = [
       _c("tr", [
         _c("th", [_vm._v("No")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Nama")]),
+        _c("th", [_vm._v("nama")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Keterangan")]),
+        _c("th", [_vm._v("keterangan")]),
         _vm._v(" "),
         _c("th", [_vm._v("Aksi")])
       ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("button", { staticClass: "btn btn-primary" }, [_vm._v("Edit")]),
-      _vm._v(" "),
-      _c("button", { staticClass: "btn btn-danger" }, [_vm._v("Hapus")])
     ])
   }
 ]
