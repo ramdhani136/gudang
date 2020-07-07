@@ -16,7 +16,7 @@ class RsoResource extends JsonResource
     {
         return 
         [
-            'nomor_so'=>$this->nomor_rso,
+            'nomor_rso'=>$this->nomor_rso,
             'tanggal_rso'=>$this->tanggal_rso,
             'user'=>$this->user->name,
             'customer'=>$this->customer->nama,

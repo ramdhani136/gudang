@@ -12,10 +12,10 @@ class Listrso extends Model
     protected $guarded=[];
 
     public function rso(){
-        return $this->belongsTo(Rso::class,'id_rso','id');
+        return $this->belongsTo(Rso::class,'nomor_rso','nomor_rso');
     }
 
     public function barang(){
-        return $this->belongsTo(barang::class,'id_barang','id');
+        return $this->belongsTo(barang::class,'kode_barang','kode');
     }
 }

@@ -21,7 +21,7 @@ class Rso extends Model
     }
 
     public function listrso(){
-        return $this->hasMany(listrso::class,'id_rso','id');
+        return $this->hasMany(listrso::class,'nomor_rso','nomor_rso');
     }
 
 }

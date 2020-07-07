@@ -19,7 +19,7 @@
                 <td>{{index+1}}</td>
                 <td>{{dv.nama}}</td>
                 <td>{{dv.keterangan}}</td>
-                <td>
+                <td style="text-align:center">
                     <button @click="updateDivisi(dv)" class="btn btn-primary">Edit</button>
                     <button @click="deleteDivisi(dv)" class="btn btn-danger">Hapus</button>
                 </td>

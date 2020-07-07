@@ -11,6 +11,6 @@ class Barang extends Model
     protected $guarded=[];
 
     public function listrso(){
-        return $this->hasMany(listrso::class,'id_barang','id');
+        return $this->hasMany(listrso::class,'kode_barang','kode');
     }
 }

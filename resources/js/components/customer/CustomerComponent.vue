@@ -19,7 +19,7 @@
                 <td>{{index+1}}</td>
                 <td>{{cs.kode}}</td>
                 <td>{{cs.nama}}</td>
-                <td>
+                <td style="text-align:center">
                     <button @click="updateCustomer(cs)" class="btn btn-primary">Edit</button>
                     <button @click="deleteCustomer(cs)" class="btn btn-danger">Hapus</button>
                 </td>
