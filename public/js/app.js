@@ -2642,7 +2642,8 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       search: '',
-      rso: []
+      rso: [],
+      status: 'draft'
     };
   },
   created: function created() {
@@ -39137,7 +39138,9 @@ var render = function() {
               "tbody",
               _vm._l(_vm.filteredMembers, function(br, index) {
                 return _c("tr", { key: br }, [
-                  _c("td", [_vm._v(_vm._s(index + 1))]),
+                  _c("td", { staticStyle: { "text-align": "center" } }, [
+                    _vm._v(_vm._s(index + 1))
+                  ]),
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(br.nama))]),
                   _vm._v(" "),
@@ -39564,7 +39567,9 @@ var render = function() {
               "tbody",
               _vm._l(_vm.FilteredCustomer, function(cs, index) {
                 return _c("tr", { key: cs }, [
-                  _c("td", [_vm._v(_vm._s(index + 1))]),
+                  _c("td", { staticStyle: { "text-align": "center" } }, [
+                    _vm._v(_vm._s(index + 1))
+                  ]),
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(cs.kode))]),
                   _vm._v(" "),
@@ -39633,7 +39638,7 @@ var render = function() {
                         staticClass: "modal-title",
                         attrs: { id: "exampleModalLabel" }
                       },
-                      [_vm._v("Form Barang")]
+                      [_vm._v("Form Customer")]
                     ),
                     _vm._v(" "),
                     _c(
@@ -39843,7 +39848,7 @@ var render = function() {
             }
           }
         },
-        [_vm._v("+ Tambah Customer")]
+        [_vm._v("+ Tambah Divisi")]
       ),
       _vm._v(" "),
       _c("div", { staticClass: "form-group col-3 my-3 float-right" }, [
@@ -39885,7 +39890,9 @@ var render = function() {
               "tbody",
               _vm._l(_vm.FilteredDivisi, function(dv, index) {
                 return _c("tr", { key: dv }, [
-                  _c("td", [_vm._v(_vm._s(index + 1))]),
+                  _c("td", { staticStyle: { "text-align": "center" } }, [
+                    _vm._v(_vm._s(index + 1))
+                  ]),
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(dv.nama))]),
                   _vm._v(" "),
@@ -39954,7 +39961,7 @@ var render = function() {
                         staticClass: "modal-title",
                         attrs: { id: "exampleModalLabel" }
                       },
-                      [_vm._v("Form Barang")]
+                      [_vm._v("Form divisi")]
                     ),
                     _vm._v(" "),
                     _c(
@@ -40234,7 +40241,9 @@ var render = function() {
             "tbody",
             _vm._l(_vm.filterderRso, function(rs, index) {
               return _c("tr", { key: rs }, [
-                _c("td", [_vm._v(_vm._s(index + 1))]),
+                _c("td", { staticStyle: { "text-align": "center" } }, [
+                  _vm._v(_vm._s(index + 1))
+                ]),
                 _vm._v(" "),
                 _c("td", { staticStyle: { "text-align": "center" } }, [
                   _vm._v(_vm._s(rs.nomor_rso))
@@ -40335,7 +40344,7 @@ var staticRenderFns = [
                       staticClass: "modal-title",
                       attrs: { id: "exampleModalLabel" }
                     },
-                    [_vm._v("Form Barang")]
+                    [_vm._v("Form RSO")]
                   ),
                   _vm._v(" "),
                   _c(

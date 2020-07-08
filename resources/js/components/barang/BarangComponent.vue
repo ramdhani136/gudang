@@ -19,7 +19,7 @@
         </thead>
         <tbody>
             <tr v-for="(br , index) in filteredMembers" :key="br">
-                <td>{{index+1}}</td>
+                <td style="text-align:center">{{index+1}}</td>
                 <td>{{br.nama}}</td>
                 <td>{{br.qty}}</td>
                 <td>200</td>

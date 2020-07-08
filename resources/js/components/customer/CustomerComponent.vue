@@ -16,7 +16,7 @@
         </thead>
         <tbody>
             <tr v-for="(cs , index) in FilteredCustomer" :key="cs">
-                <td>{{index+1}}</td>
+                <td style="text-align:center">{{index+1}}</td>
                 <td>{{cs.kode}}</td>
                 <td>{{cs.nama}}</td>
                 <td style="text-align:center">
@@ -31,7 +31,7 @@
             <div class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Form Barang</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Form Customer</h5>
                     <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>

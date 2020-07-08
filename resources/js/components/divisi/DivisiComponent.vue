@@ -1,6 +1,6 @@
 <template>
     <div class="container" @keyup.esc="resetForm()">
-        <button @click="showmodal()" class="btn btn-success my-3">+ Tambah Customer</button>
+        <button @click="showmodal()" class="btn btn-success my-3">+ Tambah Divisi</button>
         <div class="form-group col-3 my-3 float-right">
             <input v-model="search"  type="text" class="form-control" placeholder="Search">
         </div>
@@ -16,7 +16,7 @@
         </thead>
         <tbody>
             <tr v-for="(dv , index) in FilteredDivisi" :key="dv">
-                <td>{{index+1}}</td>
+                <td style="text-align:center">{{index+1}}</td>
                 <td>{{dv.nama}}</td>
                 <td>{{dv.keterangan}}</td>
                 <td style="text-align:center">
@@ -31,7 +31,7 @@
             <div class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Form Barang</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Form divisi</h5>
                     <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
