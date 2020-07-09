@@ -19,9 +19,12 @@ class RsoResource extends JsonResource
             'nomor_rso'=>$this->nomor_rso,
             'tanggal_rso'=>$this->tanggal_rso,
             'user'=>$this->user->name,
+            'id_user'=>$this->user->id,
             'customer'=>$this->customer->nama,
             'keterangan'=>$this->keterangan,
             'status'=>$this->status,
+            'kode_customer'=>$this->kode_customer,
+            
         ];
     }
 }

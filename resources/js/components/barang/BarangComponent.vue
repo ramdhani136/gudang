@@ -106,6 +106,7 @@ export default {
         filteredMembers(){
             return this.barang.filter(elem => {
             return elem.nama.toLowerCase().includes(this.search);
+            
             });
         }
     },

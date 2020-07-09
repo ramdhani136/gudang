@@ -48,9 +48,9 @@ class RsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Rso $rso)
+    public function show($rso)
     {
-        return new RsoResource($rso);
+        return RsoResource::collection(Rso::where('nomor_rso',$rso)->get());
     }
 
     /**
@@ -83,9 +83,8 @@ class RsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Rso $rso)
+    public function destroy($rso)
     {
-        $rso->delete();
-        return response('deleted',response::HTTP_OK);
+        Rso::where('nomor_rso',$rso)->delete();
     }
 }

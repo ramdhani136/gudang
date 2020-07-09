@@ -29,7 +29,9 @@
                             <td style="text-align:center">{{rs.tanggal_rso}}</td>
                             <td>{{rs.customer}}</td>
                             <td style="text-align:center">
-                                <button @click="updateRso(rs)" class="btn btn-primary">Edit</button>
+                                <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
+                                    Pilih RSO
+                                </router-link>
                                 <button @click="deleteRso(rs)" class="btn btn-danger">Hapus</button>
                             </td>
                         </tr>
@@ -48,33 +50,33 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Nomor RSO</label>
-                        <input  type="text" name="nomor_rso" autocomplete="off" class="form-control">
+                        <input v-model="form.nomor_rso"  type="text" name="nomor_rso" autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Tanggal</label>
-                        <input type="date" name="tanggal_rso"  autocomplete="off" class="form-control">
+                        <input v-model="form.tanggal_rso" type="date" name="tanggal_rso"  autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Marketing</label>
-                        <select class="form-control" name="user">
-                            <option value="Rotamba">Rotamba</option>
-                            <option value="Miana">Miana</option>
+                        <select v-model="form.id_user" class="form-control" name="user">
+                            <option value="1">Rotamba</option>
+                            <option value="2">Miana</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Customer</label>
-                        <select class="form-control" name="customer">
-                            <option value=""></option>
+                        <select v-model="form.kode_customer" class="form-control" name="customer">
+                            <option :value="cust.kode" v-for="cust in customer" :key="cust">{{cust.nama}}</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Keterangan</label>
-                        <textarea name="keterangan"  class="form-control"></textarea>
+                        <label>{{keterangan}}</label>
+                        <textarea v-model="form.keterangan" name="keterangan"  class="form-control"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button"  class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button"  class="btn btn-primary">Save RSO</button>
+                    <button type="button" @click="createRso()" class="btn btn-primary">Save RSO</button>
                 </div>
                 </div>
             </div>
@@ -86,20 +88,30 @@
 export default {
     data(){
         return{
+            tombol:'Input Barang',
             search  : '',
             rso:[],
             status:'draft',
+            customer:[],
+            form:{
+                nomor_rso:'',
+                tanggal_rso:'',
+                id_user:'',
+                kode_customer:'',
+                keterangan:''
+            },
         }
     },
     created(){
         this.getRso()
+        this.getCustomer()
     },
     computed:{
         filterderRso(){
             return this.rso.filter(elem => {
             return elem.nomor_rso.toLowerCase().includes(this.search);
             });
-        }
+        },
     },
     methods:{
         getRso(){
@@ -121,6 +133,26 @@ export default {
         showmodal(){
             $("#modal-form").modal("show");
         },
+        getCustomer(){
+            axios.get("/api/customer")
+            .then(res=>this.customer=res.data.data)
+        },
+        createRso(){
+            axios.post("/api/rso",this.form)
+                .then((response)=>{
+                    this.getRso();
+                    this.$router.push({name:'rso'})
+                    $("#modal-form").modal("hide");
+                    this.resetForm();
+                })
+        },
+        resetForm(){
+            this.form.nomor_rso="";
+            this.form.tanggal_rso="";
+            this.form.user="";
+            this.form.customer="";
+            this.form.keterangan="";
+        }
     }
 }
 </script>

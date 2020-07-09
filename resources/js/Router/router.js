@@ -6,6 +6,7 @@ import CustomerComponent from '../components/customer/CustomerComponent.vue'
 import DivisiComponent from '../components/divisi/DivisiComponent.vue'
 
 import RsoComponent from '../components/rso/RsoComponent.vue'
+import ListRsoComponent from '../components/rso/ListRsoComponent.vue'
 
 
 
@@ -16,6 +17,7 @@ const routes=[
     {name:'divisi', path:'/divisi', component:DivisiComponent},
 
     {name:'rso', path:'/rso', component:RsoComponent},
+    {name:'formrso', path:'/formrso/:id', component:ListRsoComponent},
 ]
 
 Vue.use(VueRouter)
