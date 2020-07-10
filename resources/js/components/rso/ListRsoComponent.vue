@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container" @keyup.esc="resetform()">
         <div class="row row-cols-2" v-for="rlist in form" :key="rlist.nomor_rso">
             <div class="col-4">
                 <div class="form-group">
@@ -52,14 +52,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td style="text-align:center">1</td>
-                        <td>KAWAT ULIR 1.7</td>
-                        <td>20.000</td>
-                        <td style="text-align:center">KG</td>
+                    <tr v-for="(list,index) in listrso" :key="list.nomor_rso">
+                        <td style="text-align:center">{{index+1}}</td>
+                        <td>{{list.nama_barang}}</td>
+                        <td>{{list.qty}}</td>
+                        <td style="text-align:center">{{list.satuan}}</td>
                         <td style="text-align:center">
-                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
-                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
+                            <button @click="editListRso(list)"  class="btn btn-primary">Edit</button>
+                            <button @click="deleteListRso(list)"  class="btn btn-danger">Hapus</button>
                         </td>
                     </tr>
                 </tbody>
@@ -76,31 +76,23 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Kode Barang</label>
-                        <input  type="text" name="form.kode" autocomplete="off" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Nama</label>
-                        <input  type="text" name="form.nama"  autocomplete="off" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Jumlah Stok</label>
-                        <input type="number" name="form.qty" autocomplete="off" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Satuan</label>
-                        <select name="satuan"  class="form-control">
-                            <option value="PCS">PCS</option>
-                            <option value="ROLL">ROLL</option>
-                            <option value="LBR">LBR</option>
-                            <option value="KG">KG</option>
-                            <option value="MTR">MTR</option>
+                        <label>Nama Barang</label>
+                        <select v-model="inputlrso.kode_barang" name="barang"  class="form-control">
+                            <option v-for="br in barang" :key="br.kode" :value="br.kode">{{br.nama}}</option>
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah</label>
+                        <input v-model="inputlrso.qty"  type="number" name="qty"  autocomplete="off" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan</label>
+                        <textarea v-model="inputlrso.catatan" name="catatan"  class="form-control"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button"  class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button"  class="btn btn-primary">Save changes</button>
+                    <button type="button" @click="resetform()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button"  @click="createListRso()" class="btn btn-primary">Save changes</button>
                 </div>
                 </div>
             </div>
@@ -117,10 +109,18 @@ export default {
             tombol:'Edit RSO',
             disabled:1,
             customers:{},  
+            listrso:{},
+            inputlrso:{
+                nomor_rso:this.$route.params.id
+            },
+            barang:{},
+            edit:false
         }
     },
     created(){
-        this.getRso()
+        this.getRso();
+        this.getlistRso();
+        this.getBarang();
     },  
     mounted(){
         axios.get("/api/customer")
@@ -152,6 +152,67 @@ export default {
         },
         showmodal(){
             $("#modal-form").modal("show");
+        },
+        getlistRso(){
+            axios.get(`/api/listrso/${this.$route.params.id}`)
+            .then(res=>this.listrso=res.data.data)
+        },
+        getBarang(){
+            axios.get("/api/barang/")
+            .then(res=>this.barang=res.data.data)
+        },
+        createListRso(){
+            if(this.edit===false){
+                axios.post("/api/listrso",this.inputlrso)
+                .then((response)=>{
+                    this.getRso();
+                    this.getlistRso();
+                    this.getBarang();
+                    this.resetform();
+                    $("#modal-form").modal("hide");
+                })
+                
+            }else{
+                axios.put("/api/listrso/"+  this.inputlrso.id,this.inputlrso)
+                .then((response)=>{
+                    this.getRso();
+                    this.getlistRso();
+                    this.getBarang();
+                    $("#modal-form").modal("hide");
+                    this.resetform()
+                })
+            }
+        },
+        editListRso(list){
+            this.getlistRso();
+            this.inputlrso.id=list.id
+            this.inputlrso.nomor_rso=list.lno_rso
+            this.inputlrso.kode_barang=list.lkode_barang
+            this.inputlrso.qty=list.qty
+            this.inputlrso.catatan=list.catatan
+            this.edit=true
+            this.showmodal()
+        },
+        deleteListRso(list){
+            let keputusan=confirm('Apakah anda yakin?');
+            if(keputusan===true){
+                axios.delete("/api/listrso/" + list.id)
+                .then(response=>{
+                    this.getRso();
+                    this.getlistRso();
+                    this.getBarang();
+                })
+                .catch(error=>{
+                    console.log(error)
+                })
+            }
+        },
+        resetform(){
+            this.inputlrso.id=""
+            this.inputlrso.kode_barang=""
+            this.inputlrso.qty=""
+            this.inputlrso.catatan=""
+            this.edit=false
         },
     },
 }

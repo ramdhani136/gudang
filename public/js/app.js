@@ -2656,14 +2656,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2671,11 +2663,19 @@ __webpack_require__.r(__webpack_exports__);
       tbsukses: false,
       tombol: 'Edit RSO',
       disabled: 1,
-      customers: {}
+      customers: {},
+      listrso: {},
+      inputlrso: {
+        nomor_rso: this.$route.params.id
+      },
+      barang: {},
+      edit: false
     };
   },
   created: function created() {
     this.getRso();
+    this.getlistRso();
+    this.getBarang();
   },
   mounted: function mounted() {
     var _this = this;
@@ -2715,6 +2715,83 @@ __webpack_require__.r(__webpack_exports__);
     },
     showmodal: function showmodal() {
       $("#modal-form").modal("show");
+    },
+    getlistRso: function getlistRso() {
+      var _this4 = this;
+
+      axios.get("/api/listrso/".concat(this.$route.params.id)).then(function (res) {
+        return _this4.listrso = res.data.data;
+      });
+    },
+    getBarang: function getBarang() {
+      var _this5 = this;
+
+      axios.get("/api/barang/").then(function (res) {
+        return _this5.barang = res.data.data;
+      });
+    },
+    createListRso: function createListRso() {
+      var _this6 = this;
+
+      if (this.edit === false) {
+        axios.post("/api/listrso", this.inputlrso).then(function (response) {
+          _this6.getRso();
+
+          _this6.getlistRso();
+
+          _this6.getBarang();
+
+          _this6.resetform();
+
+          $("#modal-form").modal("hide");
+        });
+      } else {
+        axios.put("/api/listrso/" + this.inputlrso.id, this.inputlrso).then(function (response) {
+          _this6.getRso();
+
+          _this6.getlistRso();
+
+          _this6.getBarang();
+
+          $("#modal-form").modal("hide");
+
+          _this6.resetform();
+        });
+      }
+    },
+    editListRso: function editListRso(list) {
+      this.getlistRso();
+      this.inputlrso.id = list.id;
+      this.inputlrso.nomor_rso = list.lno_rso;
+      this.inputlrso.kode_barang = list.lkode_barang;
+      this.inputlrso.qty = list.qty;
+      this.inputlrso.catatan = list.catatan;
+      this.edit = true;
+      this.showmodal();
+    },
+    deleteListRso: function deleteListRso(list) {
+      var _this7 = this;
+
+      var keputusan = confirm('Apakah anda yakin?');
+
+      if (keputusan === true) {
+        axios["delete"]("/api/listrso/" + list.id).then(function (response) {
+          _this7.getRso();
+
+          _this7.getlistRso();
+
+          _this7.getBarang();
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      }
+    },
+    resetform: function resetform() {
+      this.inputlrso.id = "";
+      this.inputlrso.kode_barang = "";
+      this.inputlrso.qty = "";
+      this.inputlrso.catatan = "";
+      this.edit = false;
     }
   }
 });
@@ -40413,7 +40490,20 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    { staticClass: "container" },
+    {
+      staticClass: "container",
+      on: {
+        keyup: function($event) {
+          if (
+            !$event.type.indexOf("key") &&
+            _vm._k($event.keyCode, "esc", 27, $event.key, ["Esc", "Escape"])
+          ) {
+            return null
+          }
+          return _vm.resetform()
+        }
+      }
+    },
     [
       _vm._l(_vm.form, function(rlist) {
         return _c(
@@ -40660,55 +40750,226 @@ var render = function() {
             [
               _vm._m(0),
               _vm._v(" "),
-              _c("tbody", [
-                _c("tr", [
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("1")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("KAWAT ULIR 1.7")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("20.000")]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("KG")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        on: {
-                          click: function($event) {
-                            return _vm.updateBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Edit")]
-                    ),
+              _c(
+                "tbody",
+                _vm._l(_vm.listrso, function(list, index) {
+                  return _c("tr", { key: list.nomor_rso }, [
+                    _c("td", { staticStyle: { "text-align": "center" } }, [
+                      _vm._v(_vm._s(index + 1))
+                    ]),
                     _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteBarang(_vm.br)
+                    _c("td", [_vm._v(_vm._s(list.nama_barang))]),
+                    _vm._v(" "),
+                    _c("td", [_vm._v(_vm._s(list.qty))]),
+                    _vm._v(" "),
+                    _c("td", { staticStyle: { "text-align": "center" } }, [
+                      _vm._v(_vm._s(list.satuan))
+                    ]),
+                    _vm._v(" "),
+                    _c("td", { staticStyle: { "text-align": "center" } }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary",
+                          on: {
+                            click: function($event) {
+                              return _vm.editListRso(list)
+                            }
                           }
-                        }
-                      },
-                      [_vm._v("Hapus")]
-                    )
+                        },
+                        [_vm._v("Edit")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-danger",
+                          on: {
+                            click: function($event) {
+                              return _vm.deleteListRso(list)
+                            }
+                          }
+                        },
+                        [_vm._v("Hapus")]
+                      )
+                    ])
                   ])
-                ])
-              ])
+                }),
+                0
+              )
             ]
           )
         ]
       ),
       _vm._v(" "),
-      _vm._m(1)
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "modal-form",
+            tabindex: "-1",
+            "data-backdrop": "static",
+            role: "dialog",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true"
+          }
+        },
+        [
+          _c(
+            "div",
+            { staticClass: "modal-dialog", attrs: { role: "document" } },
+            [
+              _c(
+                "div",
+                { staticClass: "modal-content", attrs: { id: "modal-width" } },
+                [
+                  _vm._m(1),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Nama Barang")]),
+                      _vm._v(" "),
+                      _c(
+                        "select",
+                        {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.inputlrso.kode_barang,
+                              expression: "inputlrso.kode_barang"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { name: "barang" },
+                          on: {
+                            change: function($event) {
+                              var $$selectedVal = Array.prototype.filter
+                                .call($event.target.options, function(o) {
+                                  return o.selected
+                                })
+                                .map(function(o) {
+                                  var val = "_value" in o ? o._value : o.value
+                                  return val
+                                })
+                              _vm.$set(
+                                _vm.inputlrso,
+                                "kode_barang",
+                                $event.target.multiple
+                                  ? $$selectedVal
+                                  : $$selectedVal[0]
+                              )
+                            }
+                          }
+                        },
+                        _vm._l(_vm.barang, function(br) {
+                          return _c(
+                            "option",
+                            { key: br.kode, domProps: { value: br.kode } },
+                            [_vm._v(_vm._s(br.nama))]
+                          )
+                        }),
+                        0
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Jumlah")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.inputlrso.qty,
+                            expression: "inputlrso.qty"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "number",
+                          name: "qty",
+                          autocomplete: "off"
+                        },
+                        domProps: { value: _vm.inputlrso.qty },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.inputlrso, "qty", $event.target.value)
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Catatan")]),
+                      _vm._v(" "),
+                      _c("textarea", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.inputlrso.catatan,
+                            expression: "inputlrso.catatan"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { name: "catatan" },
+                        domProps: { value: _vm.inputlrso.catatan },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.inputlrso,
+                              "catatan",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-secondary",
+                        attrs: { type: "button", "data-dismiss": "modal" },
+                        on: {
+                          click: function($event) {
+                            return _vm.resetform()
+                          }
+                        }
+                      },
+                      [_vm._v("Close")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.createListRso()
+                          }
+                        }
+                      },
+                      [_vm._v("Save changes")]
+                    )
+                  ])
+                ]
+              )
+            ]
+          )
+        ]
+      )
     ],
     2
   )
@@ -40736,155 +40997,26 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c(
-      "div",
-      {
-        staticClass: "modal fade",
-        attrs: {
-          id: "modal-form",
-          tabindex: "-1",
-          "data-backdrop": "static",
-          role: "dialog",
-          "aria-labelledby": "exampleModalLabel",
-          "aria-hidden": "true"
-        }
-      },
-      [
-        _c(
-          "div",
-          { staticClass: "modal-dialog", attrs: { role: "document" } },
-          [
-            _c(
-              "div",
-              { staticClass: "modal-content", attrs: { id: "modal-width" } },
-              [
-                _c("div", { staticClass: "modal-header" }, [
-                  _c(
-                    "h5",
-                    {
-                      staticClass: "modal-title",
-                      attrs: { id: "exampleModalLabel" }
-                    },
-                    [_vm._v("Form Barang")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass: "close",
-                      attrs: {
-                        type: "button",
-                        "data-dismiss": "modal",
-                        "aria-label": "Close"
-                      }
-                    },
-                    [
-                      _c("span", { attrs: { "aria-hidden": "true" } }, [
-                        _vm._v("×")
-                      ])
-                    ]
-                  )
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "modal-body" }, [
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Kode Barang")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        name: "form.kode",
-                        autocomplete: "off"
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Nama")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        name: "form.nama",
-                        autocomplete: "off"
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Jumlah Stok")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "number",
-                        name: "form.qty",
-                        autocomplete: "off"
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Satuan")]),
-                    _vm._v(" "),
-                    _c(
-                      "select",
-                      {
-                        staticClass: "form-control",
-                        attrs: { name: "satuan" }
-                      },
-                      [
-                        _c("option", { attrs: { value: "PCS" } }, [
-                          _vm._v("PCS")
-                        ]),
-                        _vm._v(" "),
-                        _c("option", { attrs: { value: "ROLL" } }, [
-                          _vm._v("ROLL")
-                        ]),
-                        _vm._v(" "),
-                        _c("option", { attrs: { value: "LBR" } }, [
-                          _vm._v("LBR")
-                        ]),
-                        _vm._v(" "),
-                        _c("option", { attrs: { value: "KG" } }, [
-                          _vm._v("KG")
-                        ]),
-                        _vm._v(" "),
-                        _c("option", { attrs: { value: "MTR" } }, [
-                          _vm._v("MTR")
-                        ])
-                      ]
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "modal-footer" }, [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-secondary",
-                      attrs: { type: "button", "data-dismiss": "modal" }
-                    },
-                    [_vm._v("Close")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-primary",
-                      attrs: { type: "button" }
-                    },
-                    [_vm._v("Save changes")]
-                  )
-                ])
-              ]
-            )
-          ]
-        )
-      ]
-    )
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
+        [_vm._v("Form Barang")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
   }
 ]
 render._withStripped = true

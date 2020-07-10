@@ -59,9 +59,9 @@ class ListRsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($listrso)
     {
-        //
+        return ListRsoResource::collection(Listrso::where('id',$listrso)->latest()->get());
     }
 
     /**
@@ -71,9 +71,9 @@ class ListRsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Listrso $listrso)
+    public function update(Request $request,$listrso)
     {
-        $listrso->update($request->all());
+        Listrso::where('id',$listrso)->update($request->all());
         return response('update',response::HTTP_CREATED);
     }
 
@@ -83,9 +83,9 @@ class ListRsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Listrso $listrso)
+    public function destroy($listrso)
     {
-        $listrso->delete();
+        Listrso::where('id',$listrso)->delete();
         return response('deleted',response::HTTP_OK);
     }
 }

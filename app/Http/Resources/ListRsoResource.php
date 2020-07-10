@@ -18,7 +18,6 @@ class ListRsoResource extends JsonResource
         [
             'id'=>$this->id,
             'lno_rso'=>$this->nomor_rso,
-            'no_rso'=>$this->rso->nomor_so,
             'lkode_barang'=>$this->kode_barang,
             'nama_barang'=>$this->barang->nama,
             'qty'=>$this->qty,
