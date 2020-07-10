@@ -152,7 +152,7 @@ export default {
             this.form.user="";
             this.form.customer="";
             this.form.keterangan="";
-        }
+        },
     }
 }
 </script>

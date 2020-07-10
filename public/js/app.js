@@ -2656,6 +2656,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2669,7 +2679,8 @@ __webpack_require__.r(__webpack_exports__);
         nomor_rso: this.$route.params.id
       },
       barang: {},
-      edit: false
+      edit: false,
+      inprso: {}
     };
   },
   created: function created() {
@@ -2685,16 +2696,27 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   methods: {
-    getdisabled: function getdisabled() {
+    getdisabled: function getdisabled(rlist) {
       this.disabled = (this.disabled + 1) % 2;
 
       if (this.disabled == 1) {
         this.tombol = "Edit Rso";
         this.tbsukses = false;
         this.getRso();
+        this.inprso.nomor_rso = rlist.nomor_rso;
+        this.inprso.tanggal_rso = rlist.tanggal_rso;
+        this.inprso.id_user = rlist.id_user;
+        this.inprso.kode_customer = rlist.kode_customer;
+        this.inprso.keterangan = rlist.keterangan;
       } else {
         this.tombol = "Close";
         this.tbsukses = true;
+        this.getRso();
+        this.inprso.nomor_rso = rlist.nomor_rso;
+        this.inprso.tanggal_rso = rlist.tanggal_rso;
+        this.inprso.id_user = rlist.id_user;
+        this.inprso.kode_customer = rlist.kode_customer;
+        this.inprso.keterangan = rlist.keterangan;
       }
     },
     getRso: function getRso() {
@@ -2707,10 +2729,19 @@ __webpack_require__.r(__webpack_exports__);
     updateRso: function updateRso() {
       var _this3 = this;
 
-      axios.put("/api/rso/".concat(this.$route.params.id), this.form).then(function (response) {
-        console.log(_this3.form);
-
+      this.getRso();
+      axios.put("/api/rso/".concat(this.$route.params.id), this.inprso).then(function (response) {
         _this3.getRso();
+
+        _this3.getlistRso();
+
+        _this3.getBarang();
+
+        _this3.$router.push({
+          name: 'rso'
+        });
+
+        _this3.disabled = 1;
       });
     },
     showmodal: function showmodal() {
@@ -2747,6 +2778,8 @@ __webpack_require__.r(__webpack_exports__);
         });
       } else {
         axios.put("/api/listrso/" + this.inputlrso.id, this.inputlrso).then(function (response) {
+          _this6.resetform();
+
           _this6.getRso();
 
           _this6.getlistRso();
@@ -2754,8 +2787,6 @@ __webpack_require__.r(__webpack_exports__);
           _this6.getBarang();
 
           $("#modal-form").modal("hide");
-
-          _this6.resetform();
         });
       }
     },
@@ -2787,6 +2818,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     resetform: function resetform() {
+      this.getlistRso();
       this.inputlrso.id = "";
       this.inputlrso.kode_barang = "";
       this.inputlrso.qty = "";
@@ -40514,53 +40546,109 @@ var render = function() {
               _c("div", { staticClass: "form-group" }, [
                 _c("label", [_vm._v("Nomor Rso :")]),
                 _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: rlist.nomor_rso,
-                      expression: "rlist.nomor_rso"
-                    }
-                  ],
-                  staticClass: "form-control col-12",
-                  attrs: { type: "text", disabled: _vm.disabled == 1 },
-                  domProps: { value: rlist.nomor_rso },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
+                _vm.disabled
+                  ? _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: rlist.nomor_rso,
+                          expression: "rlist.nomor_rso"
+                        }
+                      ],
+                      staticClass: "form-control col-12",
+                      attrs: { type: "text", disabled: _vm.disabled == 1 },
+                      domProps: { value: rlist.nomor_rso },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(rlist, "nomor_rso", $event.target.value)
+                        }
                       }
-                      _vm.$set(rlist, "nomor_rso", $event.target.value)
-                    }
-                  }
-                })
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                !_vm.disabled
+                  ? _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.inprso.nomor_rso,
+                          expression: "inprso.nomor_rso"
+                        }
+                      ],
+                      staticClass: "form-control col-12",
+                      attrs: { type: "text" },
+                      domProps: { value: _vm.inprso.nomor_rso },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(_vm.inprso, "nomor_rso", $event.target.value)
+                        }
+                      }
+                    })
+                  : _vm._e()
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "form-group" }, [
                 _c("label", [_vm._v("Tanggal :")]),
                 _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: rlist.tanggal_rso,
-                      expression: "rlist.tanggal_rso"
-                    }
-                  ],
-                  staticClass: "form-control col-12",
-                  attrs: { type: "date", disabled: _vm.disabled == 1 },
-                  domProps: { value: rlist.tanggal_rso },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
+                _vm.disabled
+                  ? _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: rlist.tanggal_rso,
+                          expression: "rlist.tanggal_rso"
+                        }
+                      ],
+                      staticClass: "form-control col-12",
+                      attrs: { type: "date", disabled: _vm.disabled == 1 },
+                      domProps: { value: rlist.tanggal_rso },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(rlist, "tanggal_rso", $event.target.value)
+                        }
                       }
-                      _vm.$set(rlist, "tanggal_rso", $event.target.value)
-                    }
-                  }
-                })
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                !_vm.disabled
+                  ? _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.inprso.tanggal_rso,
+                          expression: "inprso.tanggal_rso"
+                        }
+                      ],
+                      staticClass: "form-control col-12",
+                      attrs: { type: "date" },
+                      domProps: { value: _vm.inprso.tanggal_rso },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(
+                            _vm.inprso,
+                            "tanggal_rso",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  : _vm._e()
               ])
             ]),
             _vm._v(" "),
@@ -40568,94 +40656,203 @@ var render = function() {
               _c("div", { staticClass: "form-group" }, [
                 _c("label", [_vm._v("Customer")]),
                 _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
+                _vm.disabled
+                  ? _c(
+                      "select",
                       {
-                        name: "model",
-                        rawName: "v-model",
-                        value: rlist.kode_customer,
-                        expression: "rlist.kode_customer"
-                      }
-                    ],
-                    staticClass: "col-12 form-control",
-                    attrs: { name: "customer", disabled: _vm.disabled == 1 },
-                    on: {
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          rlist,
-                          "kode_customer",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: rlist.kode_customer,
+                            expression: "rlist.kode_customer"
+                          }
+                        ],
+                        staticClass: "col-12 form-control",
+                        attrs: {
+                          name: "customer",
+                          disabled: _vm.disabled == 1
+                        },
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.$set(
+                              rlist,
+                              "kode_customer",
+                              $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            )
+                          }
+                        }
+                      },
+                      _vm._l(_vm.customers, function(custom) {
+                        return _c(
+                          "option",
+                          {
+                            key: custom.kode,
+                            domProps: { value: custom.kode }
+                          },
+                          [_vm._v(_vm._s(custom.nama))]
                         )
-                      }
-                    }
-                  },
-                  _vm._l(_vm.customers, function(custom) {
-                    return _c(
-                      "option",
-                      { key: custom.kode, domProps: { value: custom.kode } },
-                      [_vm._v(_vm._s(custom.nama))]
+                      }),
+                      0
                     )
-                  }),
-                  0
-                )
+                  : _vm._e(),
+                _vm._v(" "),
+                !_vm.disabled
+                  ? _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.inprso.kode_customer,
+                            expression: "inprso.kode_customer"
+                          }
+                        ],
+                        staticClass: "col-12 form-control",
+                        attrs: { name: "customer" },
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.$set(
+                              _vm.inprso,
+                              "kode_customer",
+                              $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            )
+                          }
+                        }
+                      },
+                      _vm._l(_vm.customers, function(custom) {
+                        return _c(
+                          "option",
+                          {
+                            key: custom.kode,
+                            domProps: { value: custom.kode }
+                          },
+                          [_vm._v(_vm._s(custom.nama))]
+                        )
+                      }),
+                      0
+                    )
+                  : _vm._e()
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "form-group" }, [
                 _c("label", [_vm._v("Marketing")]),
                 _vm._v(" "),
-                _c(
-                  "select",
-                  {
-                    directives: [
+                _vm.disabled
+                  ? _c(
+                      "select",
                       {
-                        name: "model",
-                        rawName: "v-model",
-                        value: rlist.id_user,
-                        expression: "rlist.id_user"
-                      }
-                    ],
-                    staticClass: "col-12 form-control",
-                    attrs: { name: "marketing", disabled: _vm.disabled == 1 },
-                    on: {
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.$set(
-                          rlist,
-                          "id_user",
-                          $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        )
-                      }
-                    }
-                  },
-                  [
-                    _c("option", { attrs: { value: "1" } }, [
-                      _vm._v("Rotamba")
-                    ]),
-                    _vm._v(" "),
-                    _c("option", { attrs: { value: "2" } }, [_vm._v("Miana")])
-                  ]
-                )
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: rlist.id_user,
+                            expression: "rlist.id_user"
+                          }
+                        ],
+                        staticClass: "col-12 form-control",
+                        attrs: {
+                          name: "marketing",
+                          disabled: _vm.disabled == 1
+                        },
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.$set(
+                              rlist,
+                              "id_user",
+                              $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            )
+                          }
+                        }
+                      },
+                      [
+                        _c("option", { attrs: { value: "1" } }, [
+                          _vm._v("Rotamba")
+                        ]),
+                        _vm._v(" "),
+                        _c("option", { attrs: { value: "2" } }, [
+                          _vm._v("Miana")
+                        ])
+                      ]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                !_vm.disabled
+                  ? _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.inprso.id_user,
+                            expression: "inprso.id_user"
+                          }
+                        ],
+                        staticClass: "col-12 form-control",
+                        attrs: { name: "marketing" },
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.$set(
+                              _vm.inprso,
+                              "id_user",
+                              $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            )
+                          }
+                        }
+                      },
+                      [
+                        _c("option", { attrs: { value: "1" } }, [
+                          _vm._v("Rotamba")
+                        ]),
+                        _vm._v(" "),
+                        _c("option", { attrs: { value: "2" } }, [
+                          _vm._v("Miana")
+                        ])
+                      ]
+                    )
+                  : _vm._e()
               ])
             ]),
             _vm._v(" "),
@@ -40663,27 +40860,60 @@ var render = function() {
               _c("div", { staticClass: "form-group" }, [
                 _c("label", [_vm._v("keterangan")]),
                 _vm._v(" "),
-                _c("textarea", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: rlist.keterangan,
-                      expression: "rlist.keterangan"
-                    }
-                  ],
-                  staticClass: "form-control col-12",
-                  attrs: { name: "keterangan", disabled: _vm.disabled == 1 },
-                  domProps: { value: rlist.keterangan },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
+                _vm.disabled
+                  ? _c("textarea", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: rlist.keterangan,
+                          expression: "rlist.keterangan"
+                        }
+                      ],
+                      staticClass: "form-control col-12",
+                      attrs: {
+                        name: "keterangan",
+                        disabled: _vm.disabled == 1
+                      },
+                      domProps: { value: rlist.keterangan },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(rlist, "keterangan", $event.target.value)
+                        }
                       }
-                      _vm.$set(rlist, "keterangan", $event.target.value)
-                    }
-                  }
-                })
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                !_vm.disabled
+                  ? _c("textarea", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.inprso.keterangan,
+                          expression: "inprso.keterangan"
+                        }
+                      ],
+                      staticClass: "form-control col-12",
+                      attrs: { name: "keterangan" },
+                      domProps: { value: _vm.inprso.keterangan },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(
+                            _vm.inprso,
+                            "keterangan",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  : _vm._e()
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "form-group" }, [
@@ -40693,7 +40923,7 @@ var render = function() {
                     staticClass: "btn btn-primary col-4 ",
                     on: {
                       click: function($event) {
-                        return _vm.getdisabled()
+                        return _vm.getdisabled(rlist)
                       }
                     }
                   },

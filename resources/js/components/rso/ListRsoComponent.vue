@@ -4,23 +4,32 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>Nomor Rso :</label>
-                    <input v-model="rlist.nomor_rso" type="text" class="form-control col-12" :disabled="disabled == 1">
+                    <input v-if="disabled"  v-model="rlist.nomor_rso" type="text" class="form-control col-12" :disabled="disabled == 1">
+                    <input v-if="!disabled"  v-model="inprso.nomor_rso" type="text" class="form-control col-12">
                 </div>
                 <div class="form-group">
                     <label>Tanggal :</label>
-                    <input v-model="rlist.tanggal_rso"  type="date" class="form-control col-12" :disabled="disabled == 1">
+                    <input v-if="disabled" v-model="rlist.tanggal_rso"  type="date" class="form-control col-12" :disabled="disabled == 1">
+                    <input v-if="!disabled" v-model="inprso.tanggal_rso"  type="date" class="form-control col-12" >
                 </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
                     <label>Customer</label>
-                    <select   v-model="rlist.kode_customer" name="customer" class="col-12 form-control" :disabled="disabled == 1">
+                    <select v-if="disabled"  v-model="rlist.kode_customer" name="customer" class="col-12 form-control" :disabled="disabled == 1">
+                        <option v-for="custom in customers" :key="custom.kode" :value="custom.kode" >{{custom.nama}}</option>
+                    </select>
+                    <select v-if="!disabled" v-model="inprso.kode_customer" name="customer" class="col-12 form-control">
                         <option v-for="custom in customers" :key="custom.kode" :value="custom.kode" >{{custom.nama}}</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Marketing</label>
-                    <select v-model="rlist.id_user" name="marketing" class="col-12 form-control" :disabled="disabled == 1">
+                    <select  v-if="disabled"  v-model="rlist.id_user" name="marketing" class="col-12 form-control" :disabled="disabled == 1">
+                        <option value="1">Rotamba</option>
+                        <option value="2">Miana</option>
+                    </select>
+                    <select v-if="!disabled" v-model="inprso.id_user" name="marketing" class="col-12 form-control" >
                         <option value="1">Rotamba</option>
                         <option value="2">Miana</option>
                     </select>
@@ -29,10 +38,11 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>keterangan</label>
-                    <textarea v-model="rlist.keterangan"  name="keterangan" class="form-control col-12" :disabled="disabled == 1"></textarea>
+                    <textarea v-if="disabled" v-model="rlist.keterangan"  name="keterangan" class="form-control col-12" :disabled="disabled == 1"></textarea>
+                    <textarea v-if="!disabled" v-model="inprso.keterangan"  name="keterangan" class="form-control col-12" ></textarea>
                 </div>
                 <div class="form-group">
-                    <button @click="getdisabled()" class="btn btn-primary col-4 ">{{tombol}}</button>
+                    <button @click="getdisabled(rlist)" class="btn btn-primary col-4 ">{{tombol}}</button>
                     <button @click="updateRso()" v-if="tbsukses" class="btn btn-success col-4 ml-1">Update</button>
                 </div>
             </div>
@@ -114,7 +124,8 @@ export default {
                 nomor_rso:this.$route.params.id
             },
             barang:{},
-            edit:false
+            edit:false,
+            inprso:{}
         }
     },
     created(){
@@ -127,16 +138,27 @@ export default {
         .then(res=>this.customers=res.data.data)
     },
     methods:{
-        getdisabled(){
+        getdisabled(rlist){
             this.disabled = (this.disabled + 1) % 2;
             if(this.disabled==1){
                 this.tombol="Edit Rso";
                 this.tbsukses=false;
                 this.getRso()
+                this.inprso.nomor_rso=rlist.nomor_rso
+                this.inprso.tanggal_rso=rlist.tanggal_rso  
+                this.inprso.id_user=rlist.id_user 
+                this.inprso.kode_customer=rlist.kode_customer 
+                this.inprso.keterangan=rlist.keterangan 
     
             }else{
                 this.tombol="Close";
                 this.tbsukses=true;
+                this.getRso()
+                this.inprso.nomor_rso=rlist.nomor_rso
+                this.inprso.tanggal_rso=rlist.tanggal_rso  
+                this.inprso.id_user=rlist.id_user 
+                this.inprso.kode_customer=rlist.kode_customer 
+                this.inprso.keterangan=rlist.keterangan 
             }
         },
         getRso(){
@@ -144,10 +166,14 @@ export default {
             .then(res=>this.form=res.data.data)
         },
         updateRso(){
-            axios.put(`/api/rso/${this.$route.params.id}`,this.form)
+            this.getRso()
+            axios.put(`/api/rso/${this.$route.params.id}`,this.inprso)
             .then((response)=>{
-                    console.log(this.form)
-                    this.getRso()
+                    this.getRso();
+                    this.getlistRso();
+                    this.getBarang();
+                    this.$router.push({name:'rso'})
+                    this.disabled=1;
                 })
         },
         showmodal(){
@@ -175,11 +201,11 @@ export default {
             }else{
                 axios.put("/api/listrso/"+  this.inputlrso.id,this.inputlrso)
                 .then((response)=>{
+                    this.resetform()
                     this.getRso();
                     this.getlistRso();
-                    this.getBarang();
+                    this.getBarang(); 
                     $("#modal-form").modal("hide");
-                    this.resetform()
                 })
             }
         },
@@ -208,6 +234,7 @@ export default {
             }
         },
         resetform(){
+            this.getlistRso()
             this.inputlrso.id=""
             this.inputlrso.kode_barang=""
             this.inputlrso.qty=""
