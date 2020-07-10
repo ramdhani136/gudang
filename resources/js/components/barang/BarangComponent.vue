@@ -18,13 +18,13 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(br , index) in filteredMembers" :key="br">
+            <tr v-for="(br , index) in filteredMembers" :key="br.kode">
                 <td style="text-align:center">{{index+1}}</td>
                 <td>{{br.nama}}</td>
                 <td>{{br.qty}}</td>
                 <td>200</td>
                 <td>800</td>
-                <td>{{br.satuan}}</td>
+                <td>Aksi</td>
                 <td style="text-align:center">
                     <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
                     <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
@@ -52,15 +52,15 @@
                     </div>
                     <div class="form-group">
                         <label>Kode Barang</label>
-                        <input v-model="form.kode" type="text" name="nama" id="" autocomplete="off" class="form-control">
+                        <input v-model="form.kode" type="text" name="form.kode" autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Nama</label>
-                        <input v-model="form.nama" type="text" name="Alamat" id="" autocomplete="off" class="form-control">
+                        <input v-model="form.nama" type="text" name="form.nama"  autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Jumlah Stok</label>
-                        <input v-model="form.qty" type="number" name="pekerajaan" id="" autocomplete="off" class="form-control">
+                        <input v-model="form.qty" type="number" name="form.qty" autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Satuan</label>

@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(cs , index) in FilteredCustomer" :key="cs">
+            <tr v-for="(cs , index) in FilteredCustomer" :key="cs.kode">
                 <td style="text-align:center">{{index+1}}</td>
                 <td>{{cs.kode}}</td>
                 <td>{{cs.nama}}</td>

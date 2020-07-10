@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(dv , index) in FilteredDivisi" :key="dv">
+            <tr v-for="(dv , index) in FilteredDivisi" :key="dv.id">
                 <td style="text-align:center">{{index+1}}</td>
                 <td>{{dv.nama}}</td>
                 <td>{{dv.keterangan}}</td>

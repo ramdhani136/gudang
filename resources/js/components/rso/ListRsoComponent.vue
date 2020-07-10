@@ -1,26 +1,26 @@
 <template>
     <div class="container">
-        <div class="row row-cols-2">
+        <div class="row row-cols-2" v-for="rlist in form" :key="rlist.nomor_rso">
             <div class="col-4">
                 <div class="form-group">
                     <label>Nomor Rso :</label>
-                    <input v-model="data"  type="text" class="form-control col-12" :disabled="disabled == 1">
+                    <input v-model="rlist.nomor_rso" type="text" class="form-control col-12" :disabled="disabled == 1">
                 </div>
                 <div class="form-group">
                     <label>Tanggal :</label>
-                    <input v-model="form.tanggal_rso" type="date" class="form-control col-12" value="07-07-2020" :disabled="disabled == 1">
+                    <input v-model="rlist.tanggal_rso"  type="date" class="form-control col-12" :disabled="disabled == 1">
                 </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
-                    <label>Customer :</label>
-                    <select  v-model="form.kode_customer"  name="customer" class="col-12 form-control" :disabled="disabled == 1">
+                    <label>Customer</label>
+                    <select   v-model="rlist.kode_customer" name="customer" class="col-12 form-control" :disabled="disabled == 1">
                         <option v-for="custom in customers" :key="custom.kode" :value="custom.kode" >{{custom.nama}}</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Marketing :</label>
-                    <select v-model="form.id_user" name="marketing" class="col-12 form-control" :disabled="disabled == 1">
+                    <label>Marketing</label>
+                    <select v-model="rlist.id_user" name="marketing" class="col-12 form-control" :disabled="disabled == 1">
                         <option value="1">Rotamba</option>
                         <option value="2">Miana</option>
                     </select>
@@ -29,13 +29,110 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>keterangan</label>
-                    <textarea v-model="form.keterangan"  name="keterangan" class="form-control col-12" :disabled="disabled == 1"></textarea>
+                    <textarea v-model="rlist.keterangan"  name="keterangan" class="form-control col-12" :disabled="disabled == 1"></textarea>
                 </div>
                 <div class="form-group">
-                    <button @click="getdisabled()" class="btn btn-primary col-4">{{tombol}}</button>
-                    <button v-if="tbsukses" class="btn btn-success col-4 ml-1">Update</button>
+                    <button @click="getdisabled()" class="btn btn-primary col-4 ">{{tombol}}</button>
+                    <button @click="updateRso()" v-if="tbsukses" class="btn btn-success col-4 ml-1">Update</button>
                 </div>
             </div>
+        </div>
+        <div class="row m-auto">
+            <button type="button" class="btn btn-success mt-3">+ Tambah Barang</button>
+        </div>
+        <div id="rsoverflow" class="row mt-2 mx-auto">
+            <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Barang</th>
+                        <th>Jumlah</th>
+                        <th>Satuan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align:center">1</td>
+                        <td>KAWAT ULIR 1.7</td>
+                        <td>20.000</td>
+                        <td style="text-align:center">KG</td>
+                        <td style="text-align:center">
+                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
+                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
+                        </td>
+                    </tr>
+                    
+
+                     <tr>
+                        <td style="text-align:center">2</td>
+                        <td>KAWAT ULIR 1.7</td>
+                        <td>20.000</td>
+                        <td style="text-align:center">KG</td>
+                        <td style="text-align:center">
+                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
+                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
+                        </td>
+                    </tr> <tr>
+                        <td style="text-align:center">3</td>
+                        <td>KAWAT ULIR 1.7</td>
+                        <td>20.000</td>
+                        <td style="text-align:center">KG</td>
+                        <td style="text-align:center">
+                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
+                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
+                        </td>
+                    </tr> <tr>
+                        <td style="text-align:center">4</td>
+                        <td>KAWAT ULIR 1.7</td>
+                        <td>20.000</td>
+                        <td style="text-align:center">KG</td>
+                        <td style="text-align:center">
+                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
+                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
+                        </td>
+                    </tr> <tr>
+                        <td style="text-align:center">5</td>
+                        <td>KAWAT ULIR 1.7</td>
+                        <td>20.000</td>
+                        <td style="text-align:center">KG</td>
+                        <td style="text-align:center">
+                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
+                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
+                        </td>
+                    </tr> <tr>
+                        <td style="text-align:center">6</td>
+                        <td>KAWAT ULIR 1.7</td>
+                        <td>20.000</td>
+                        <td style="text-align:center">KG</td>
+                        <td style="text-align:center">
+                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
+                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
+                        </td>
+                    </tr> <tr>
+                        <td style="text-align:center">7</td>
+                        <td>KAWAT ULIR 1.7</td>
+                        <td>20.000</td>
+                        <td style="text-align:center">KG</td>
+                        <td style="text-align:center">
+                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
+                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
+                        </td>
+                    </tr> <tr>
+                        <td style="text-align:center">8</td>
+                        <td>KAWAT ULIR 1.7</td>
+                        <td>20.000</td>
+                        <td style="text-align:center">KG</td>
+                        <td style="text-align:center">
+                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
+                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
+                        </td>
+                    </tr>
+
+
+
+                </tbody>
+            </table>
         </div>
     </div>   
 </template>
@@ -44,19 +141,16 @@
 export default {
     data(){
         return {
-            data:'',
             form:{},
             tbsukses:false,
             tombol:'Edit RSO',
             disabled:1,
-            customers:[],
-            
+            customers:{},  
         }
     },
     created(){
-        axios.get(`/api/rso/${this.$route.params.id}`)
-        .then(res=>this.form=res.data.data)
-    },
+        this.getRso()
+    },  
     mounted(){
         axios.get("/api/customer")
         .then(res=>this.customers=res.data.data)
@@ -67,15 +161,45 @@ export default {
             if(this.disabled==1){
                 this.tombol="Edit Rso";
                 this.tbsukses=false;
+                this.getRso()
+    
             }else{
                 this.tombol="Close";
                 this.tbsukses=true;
             }
         },
+        getRso(){
+            axios.get(`/api/rso/${this.$route.params.id}`)
+            .then(res=>this.form=res.data.data)
+        },
+        updateRso(){
+            axios.put(`/api/rso/${this.$route.params.id}`,this.form)
+            .then((response)=>{
+                    console.log(this.form)
+                    this.getRso()
+                })
+        }
     },
 }
 </script>
 
-<style scoped>
+<style>
+    #rsoverflow{
+    width: 100%;
+    max-height: 280px;
+    overflow-y: scroll;
+    border-top:solid 1px #dee2e6;
+    }
 
+    #rsthead thead tr th{
+        text-align: center;
+        border-bottom: none;
+        position: sticky; top: 0; 
+        background-color: #fff;
+        top: -1px;
+        border-collapse: collapse;
+        box-shadow: inset 0 0 0 #dee2e6,
+        inset 0 -1px 0 #dee2e6;
+    }
+    
 </style>

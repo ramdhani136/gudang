@@ -23,7 +23,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(rs , index) in filterderRso" :key="rs">
+                        <tr v-for="(rs , index) in filterderRso" :key="rs.nomor_rso">
                             <td style="text-align:center">{{index+1}}</td>
                             <td style="text-align:center">{{rs.nomor_rso}}</td>
                             <td style="text-align:center">{{rs.tanggal_rso}}</td>
@@ -66,11 +66,11 @@
                     <div class="form-group">
                         <label>Customer</label>
                         <select v-model="form.kode_customer" class="form-control" name="customer">
-                            <option :value="cust.kode" v-for="cust in customer" :key="cust">{{cust.nama}}</option>
+                            <option :value="cust.kode" v-for="cust in customer" :key="cust.kode_customer">{{cust.nama}}</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>{{keterangan}}</label>
+                        <label>Keterangan</label>
                         <textarea v-model="form.keterangan" name="keterangan"  class="form-control"></textarea>
                     </div>
                 </div>
