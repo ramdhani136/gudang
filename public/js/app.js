@@ -2664,35 +2664,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2741,6 +2712,9 @@ __webpack_require__.r(__webpack_exports__);
 
         _this3.getRso();
       });
+    },
+    showmodal: function showmodal() {
+      $("#modal-form").modal("show");
     }
   }
 });
@@ -40656,7 +40630,21 @@ var render = function() {
         )
       }),
       _vm._v(" "),
-      _vm._m(0),
+      _c("div", { staticClass: "row m-auto" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-success mt-3",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                return _vm.showmodal()
+              }
+            }
+          },
+          [_vm._v("+ Tambah Barang")]
+        )
+      ]),
       _vm._v(" "),
       _c(
         "div",
@@ -40670,7 +40658,7 @@ var render = function() {
               attrs: { id: "rsthead" }
             },
             [
-              _vm._m(1),
+              _vm._m(0),
               _vm._v(" "),
               _c("tbody", [
                 _c("tr", [
@@ -40713,323 +40701,19 @@ var render = function() {
                       [_vm._v("Hapus")]
                     )
                   ])
-                ]),
-                _vm._v(" "),
-                _c("tr", [
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("2")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("KAWAT ULIR 1.7")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("20.000")]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("KG")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        on: {
-                          click: function($event) {
-                            return _vm.updateBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Edit")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Hapus")]
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("tr", [
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("3")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("KAWAT ULIR 1.7")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("20.000")]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("KG")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        on: {
-                          click: function($event) {
-                            return _vm.updateBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Edit")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Hapus")]
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("tr", [
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("4")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("KAWAT ULIR 1.7")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("20.000")]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("KG")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        on: {
-                          click: function($event) {
-                            return _vm.updateBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Edit")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Hapus")]
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("tr", [
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("5")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("KAWAT ULIR 1.7")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("20.000")]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("KG")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        on: {
-                          click: function($event) {
-                            return _vm.updateBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Edit")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Hapus")]
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("tr", [
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("6")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("KAWAT ULIR 1.7")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("20.000")]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("KG")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        on: {
-                          click: function($event) {
-                            return _vm.updateBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Edit")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Hapus")]
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("tr", [
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("7")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("KAWAT ULIR 1.7")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("20.000")]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("KG")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        on: {
-                          click: function($event) {
-                            return _vm.updateBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Edit")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Hapus")]
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("tr", [
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("8")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("KAWAT ULIR 1.7")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("20.000")]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _vm._v("KG")
-                  ]),
-                  _vm._v(" "),
-                  _c("td", { staticStyle: { "text-align": "center" } }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        on: {
-                          click: function($event) {
-                            return _vm.updateBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Edit")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteBarang(_vm.br)
-                          }
-                        }
-                      },
-                      [_vm._v("Hapus")]
-                    )
-                  ])
                 ])
               ])
             ]
           )
         ]
-      )
+      ),
+      _vm._v(" "),
+      _vm._m(1)
     ],
     2
   )
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row m-auto" }, [
-      _c(
-        "button",
-        { staticClass: "btn btn-success mt-3", attrs: { type: "button" } },
-        [_vm._v("+ Tambah Barang")]
-      )
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -41047,6 +40731,160 @@ var staticRenderFns = [
         _c("th", [_vm._v("Aksi")])
       ])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "modal-form",
+          tabindex: "-1",
+          "data-backdrop": "static",
+          role: "dialog",
+          "aria-labelledby": "exampleModalLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          { staticClass: "modal-dialog", attrs: { role: "document" } },
+          [
+            _c(
+              "div",
+              { staticClass: "modal-content", attrs: { id: "modal-width" } },
+              [
+                _c("div", { staticClass: "modal-header" }, [
+                  _c(
+                    "h5",
+                    {
+                      staticClass: "modal-title",
+                      attrs: { id: "exampleModalLabel" }
+                    },
+                    [_vm._v("Form Barang")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "close",
+                      attrs: {
+                        type: "button",
+                        "data-dismiss": "modal",
+                        "aria-label": "Close"
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("×")
+                      ])
+                    ]
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", [_vm._v("Kode Barang")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: {
+                        type: "text",
+                        name: "form.kode",
+                        autocomplete: "off"
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", [_vm._v("Nama")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: {
+                        type: "text",
+                        name: "form.nama",
+                        autocomplete: "off"
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", [_vm._v("Jumlah Stok")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: {
+                        type: "number",
+                        name: "form.qty",
+                        autocomplete: "off"
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", [_vm._v("Satuan")]),
+                    _vm._v(" "),
+                    _c(
+                      "select",
+                      {
+                        staticClass: "form-control",
+                        attrs: { name: "satuan" }
+                      },
+                      [
+                        _c("option", { attrs: { value: "PCS" } }, [
+                          _vm._v("PCS")
+                        ]),
+                        _vm._v(" "),
+                        _c("option", { attrs: { value: "ROLL" } }, [
+                          _vm._v("ROLL")
+                        ]),
+                        _vm._v(" "),
+                        _c("option", { attrs: { value: "LBR" } }, [
+                          _vm._v("LBR")
+                        ]),
+                        _vm._v(" "),
+                        _c("option", { attrs: { value: "KG" } }, [
+                          _vm._v("KG")
+                        ]),
+                        _vm._v(" "),
+                        _c("option", { attrs: { value: "MTR" } }, [
+                          _vm._v("MTR")
+                        ])
+                      ]
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-secondary",
+                      attrs: { type: "button", "data-dismiss": "modal" }
+                    },
+                    [_vm._v("Close")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary",
+                      attrs: { type: "button" }
+                    },
+                    [_vm._v("Save changes")]
+                  )
+                ])
+              ]
+            )
+          ]
+        )
+      ]
+    )
   }
 ]
 render._withStripped = true

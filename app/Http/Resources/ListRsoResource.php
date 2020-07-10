@@ -17,14 +17,16 @@ class ListRsoResource extends JsonResource
         return 
         [
             'id'=>$this->id,
-            'id_rso'=>$this->id_rso,
+            'lno_rso'=>$this->nomor_rso,
             'no_rso'=>$this->rso->nomor_so,
-            'id_barang'=>$this->id_barang,
+            'lkode_barang'=>$this->kode_barang,
             'nama_barang'=>$this->barang->nama,
             'qty'=>$this->qty,
-            'status_stok'=>$this->status_stok,
-            'tgl_datang'=>$this->tgl_data,
+            'satuan'=>$this->barang->satuan,
             'status'=>$this->status,
+            'tgl_datang'=>$this->tanggal_datang,
+            'acc'=>$this->acc,
+            'catatan'=>$this->catatan,
 
         ];
     }

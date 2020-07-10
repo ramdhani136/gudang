@@ -17,7 +17,7 @@ class ListRsoController extends Controller
      */
     public function index()
     {
-        return ListRsoResource::collection(Listrso::latest()->get());
+        return ListRsoResource::collection(Listrso::get());
     }
 
     /**
@@ -48,9 +48,9 @@ class ListRsoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Listrso $listrso)
+    public function show($listrso)
     {
-        return new ListRsoResource($listrso);
+        return ListRsoResource::collection(Listrso::where('nomor_rso',$listrso)->latest()->get());
     }
 
     /**

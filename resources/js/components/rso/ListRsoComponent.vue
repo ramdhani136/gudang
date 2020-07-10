@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="row m-auto">
-            <button type="button" class="btn btn-success mt-3">+ Tambah Barang</button>
+            <button @click="showmodal()" type="button" class="btn btn-success mt-3">+ Tambah Barang</button>
         </div>
         <div id="rsoverflow" class="row mt-2 mx-auto">
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -62,77 +62,48 @@
                             <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
                         </td>
                     </tr>
-                    
-
-                     <tr>
-                        <td style="text-align:center">2</td>
-                        <td>KAWAT ULIR 1.7</td>
-                        <td>20.000</td>
-                        <td style="text-align:center">KG</td>
-                        <td style="text-align:center">
-                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
-                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
-                        </td>
-                    </tr> <tr>
-                        <td style="text-align:center">3</td>
-                        <td>KAWAT ULIR 1.7</td>
-                        <td>20.000</td>
-                        <td style="text-align:center">KG</td>
-                        <td style="text-align:center">
-                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
-                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
-                        </td>
-                    </tr> <tr>
-                        <td style="text-align:center">4</td>
-                        <td>KAWAT ULIR 1.7</td>
-                        <td>20.000</td>
-                        <td style="text-align:center">KG</td>
-                        <td style="text-align:center">
-                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
-                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
-                        </td>
-                    </tr> <tr>
-                        <td style="text-align:center">5</td>
-                        <td>KAWAT ULIR 1.7</td>
-                        <td>20.000</td>
-                        <td style="text-align:center">KG</td>
-                        <td style="text-align:center">
-                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
-                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
-                        </td>
-                    </tr> <tr>
-                        <td style="text-align:center">6</td>
-                        <td>KAWAT ULIR 1.7</td>
-                        <td>20.000</td>
-                        <td style="text-align:center">KG</td>
-                        <td style="text-align:center">
-                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
-                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
-                        </td>
-                    </tr> <tr>
-                        <td style="text-align:center">7</td>
-                        <td>KAWAT ULIR 1.7</td>
-                        <td>20.000</td>
-                        <td style="text-align:center">KG</td>
-                        <td style="text-align:center">
-                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
-                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
-                        </td>
-                    </tr> <tr>
-                        <td style="text-align:center">8</td>
-                        <td>KAWAT ULIR 1.7</td>
-                        <td>20.000</td>
-                        <td style="text-align:center">KG</td>
-                        <td style="text-align:center">
-                            <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
-                            <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
-                        </td>
-                    </tr>
-
-
-
                 </tbody>
             </table>
+        </div>
+        <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div  class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Barang</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Kode Barang</label>
+                        <input  type="text" name="form.kode" autocomplete="off" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Nama</label>
+                        <input  type="text" name="form.nama"  autocomplete="off" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah Stok</label>
+                        <input type="number" name="form.qty" autocomplete="off" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Satuan</label>
+                        <select name="satuan"  class="form-control">
+                            <option value="PCS">PCS</option>
+                            <option value="ROLL">ROLL</option>
+                            <option value="LBR">LBR</option>
+                            <option value="KG">KG</option>
+                            <option value="MTR">MTR</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"  class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button"  class="btn btn-primary">Save changes</button>
+                </div>
+                </div>
+            </div>
         </div>
     </div>   
 </template>
@@ -178,7 +149,10 @@ export default {
                     console.log(this.form)
                     this.getRso()
                 })
-        }
+        },
+        showmodal(){
+            $("#modal-form").modal("show");
+        },
     },
 }
 </script>
