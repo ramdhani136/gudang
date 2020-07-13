@@ -24,7 +24,7 @@
                 <td>{{br.qty}}</td>
                 <td>200</td>
                 <td>800</td>
-                <td>Aksi</td>
+                <td>{{br.satuan}}</td>
                 <td style="text-align:center">
                     <button @click="updateBarang(br)" class="btn btn-primary">Edit</button>
                     <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>

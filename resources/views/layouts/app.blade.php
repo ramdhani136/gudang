@@ -69,7 +69,7 @@
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/rso" class="dropdown-item" >Data RSO</router-link>
-                                    <router-link to="/requestrso" class="dropdown-item" >DIC Request</router-link>
+                                    <router-link to="/dic" class="dropdown-item" >DIC Request</router-link>
                                     <router-link to="/purchase" class="dropdown-item" >Purchase Orde</router-link>
                                 </div>
                             </li>

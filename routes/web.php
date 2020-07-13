@@ -19,7 +19,9 @@ Route::get('/', function () {
 
 Auth::routes();
 
+
 Route::view('/','home')->middleware('auth');
+
 Route::view('/{any}','home')->middleware('auth');
 Route::view('/{any}/{any1}/{any2}','home')->middleware('auth');
 Route::view('/{any}/{any3}','home')->middleware('auth');

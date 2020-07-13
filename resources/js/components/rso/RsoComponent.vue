@@ -6,9 +6,9 @@
         </div>
         <div class="form-group col-3 my-3 float-right">
             <select name="status" v-model="status" class="form-control">
-                <option value="draft">Draft</option>
-                <option value="sent">Sent</option>
-                <option value="confirmed">Confirmed</option>
+                <option value="Draft">Draft</option>
+                <option value="Sent">Sent</option>
+                <option value="Confirmed">Confirmed</option>
             </select>
         </div>
             <div id="overflow" class="border-top">
@@ -19,18 +19,20 @@
                             <th>Nomor RSO</th>
                             <th>Tanggal</th>
                             <th>Customer</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(rs , index) in filterderRso" :key="rs.nomor_rso">
+                        <tr v-for="(rs , index) in FilterKategori" :key="rs.nomor_rso">
                             <td style="text-align:center">{{index+1}}</td>
                             <td style="text-align:center">{{rs.nomor_rso}}</td>
                             <td style="text-align:center">{{rs.tanggal_rso}}</td>
                             <td>{{rs.customer}}</td>
+                            <td style="text-align:center">{{rs.status}}</td>
                             <td style="text-align:center">
                                 <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
-                                    Pilih RSO
+                                    {{tombol}}
                                 </router-link>
                                 <button @click="deleteRso(rs)" class="btn btn-danger">Hapus</button>
                             </td>
@@ -88,17 +90,18 @@
 export default {
     data(){
         return{
-            tombol:'Input Barang',
+            tombol:'Pilih RSO',
             search  : '',
             rso:[],
-            status:'draft',
+            status:'Draft',
             customer:[],
             form:{
                 nomor_rso:'',
                 tanggal_rso:'',
                 id_user:'',
                 kode_customer:'',
-                keterangan:''
+                keterangan:'',
+                status:'Draft'
             },
         }
     },
@@ -107,11 +110,21 @@ export default {
         this.getCustomer()
     },
     computed:{
-        filterderRso(){
-            return this.rso.filter(elem => {
-            return elem.nomor_rso.toLowerCase().includes(this.search);
+        FilterKategori(){
+            if(this.search===""){
+                if(this.status==="Draft"){
+                    return this.rso.filter(elem=> elem.status==="Draft")
+                }else if(this.status==="Sent"){
+                    return this.rso.filter(elem=> elem.status==="Sent")
+                }else if(this.status==="Confirmed"){
+                    return this.rso.filter(elem=> elem.status==="Confirmed")
+                }
+            }else{
+                return this.rso.filter(elem => {
+                return elem.nomor_rso.toLowerCase().includes(this.search);
             });
-        },
+            }
+        }
     },
     methods:{
         getRso(){
@@ -143,16 +156,17 @@ export default {
                     this.getRso();
                     this.$router.push({name:'rso'})
                     $("#modal-form").modal("hide");
-                    this.resetForm();
+                    this.resetForm()
                 })
         },
         resetForm(){
             this.form.nomor_rso="";
             this.form.tanggal_rso="";
-            this.form.user="";
-            this.form.customer="";
+            this.form.id_user="";
+            this.form.kode_customer="";
             this.form.keterangan="";
         },
+
     }
 }
 </script>

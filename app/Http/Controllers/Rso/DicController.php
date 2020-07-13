@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Barang;
+namespace App\Http\Controllers\Rso;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Model\Barang\Barang;
-use App\Http\Resources\BarangResource;
+use App\Model\Rso\Rso;
+use App\Http\Resources\RsoResource;
 use Symfony\Component\HttpFoundation\Response;
 
-class BarangController extends Controller
+class DicController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,8 @@ class BarangController extends Controller
      */
     public function index()
     {
-        return BarangResource::collection(Barang::latest()->get());
+        $status="Sent";
+        return RsoResource::collection(Rso::where('status',$status)->get());
     }
 
     /**
@@ -38,16 +39,7 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-
-        $this->validate($request,[
-            'kode'=>'required|min:4',
-            'nama'=>'required',
-            'qty'=>'required',
-            'satuan'=>'required',
-        ]);
-
-        $data=Barang::create($request->all());
-        return response(new BarangResource($data),response::HTTP_CREATED);
+        //
     }
 
     /**
@@ -56,9 +48,9 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($barang)
+    public function show($id)
     {
-        return BarangResource::collection(Barang::where('kode',$barang)->get());
+        //
     }
 
     /**
@@ -79,15 +71,9 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,$barang)
+    public function update(Request $request, $id)
     {
-        Barang::where('kode',$barang)->update([
-            'kode'=>$request->kode,
-            'nama'=>$request->nama,
-            'qty'=>$request->qty,
-            'satuan'=>$request->satuan,
-        ]);
-        return response('update',response::HTTP_CREATED);
+        //
     }
 
     /**
@@ -96,10 +82,8 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($barang)
-    {   
-        Barang::where('kode',$barang)->delete();
-        return response('deleted',response::HTTP_OK);
+    public function destroy($id)
+    {
+        //
     }
-
 }

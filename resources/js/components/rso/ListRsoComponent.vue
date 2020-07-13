@@ -2,6 +2,8 @@
     <div class="container" @keyup.esc="resetform()">
         <div class="row row-cols-2" v-for="rlist in form" :key="rlist.nomor_rso">
             <div class="col-4">
+                    <input v-if="disabled"  v-model="rlist.status" type="hidden"  :disabled="disabled == 1">
+                    <input v-if="!disabled"  v-model="inprso.status" type="hidden" >
                 <div class="form-group">
                     <label>Nomor Rso :</label>
                     <input v-if="disabled"  v-model="rlist.nomor_rso" type="text" class="form-control col-12" :disabled="disabled == 1">
@@ -121,11 +123,12 @@ export default {
             customers:{},  
             listrso:{},
             inputlrso:{
-                nomor_rso:this.$route.params.id
+                nomor_rso:this.$route.params.id,
             },
             barang:{},
             edit:false,
-            inprso:{}
+            inprso:{
+            }
         }
     },
     created(){
@@ -154,6 +157,7 @@ export default {
                 this.tombol="Close";
                 this.tbsukses=true;
                 this.getRso()
+                this.inprso.status=rlist.status
                 this.inprso.nomor_rso=rlist.nomor_rso
                 this.inprso.tanggal_rso=rlist.tanggal_rso  
                 this.inprso.id_user=rlist.id_user 
@@ -169,11 +173,13 @@ export default {
             this.getRso()
             axios.put(`/api/rso/${this.$route.params.id}`,this.inprso)
             .then((response)=>{
-                    this.getRso();
-                    this.getlistRso();
-                    this.getBarang();
-                    this.$router.push({name:'rso'})
-                    this.disabled=1;
+                    this.getRso()
+                    this.getlistRso()
+                    this.getBarang()
+                    this.tbsukses=false
+                    this.disabled=1
+                    this.tombol="Edit RSO"
+                    this.$router.push({path:'/formrso/'+this.inprso.nomor_rso})
                 })
         },
         showmodal(){
@@ -235,6 +241,7 @@ export default {
         },
         resetform(){
             this.getlistRso()
+            this.inputlrso.status=""
             this.inputlrso.id=""
             this.inputlrso.kode_barang=""
             this.inputlrso.qty=""

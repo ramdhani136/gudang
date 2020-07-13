@@ -26,6 +26,7 @@ class ListRsoResource extends JsonResource
             'tgl_datang'=>$this->tanggal_datang,
             'acc'=>$this->acc,
             'catatan'=>$this->catatan,
+            'qty_tersedia'=>$this->qty_tersedia,
 
         ];
     }

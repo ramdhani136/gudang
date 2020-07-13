@@ -8,6 +8,9 @@ import DivisiComponent from '../components/divisi/DivisiComponent.vue'
 import RsoComponent from '../components/rso/RsoComponent.vue'
 import ListRsoComponent from '../components/rso/ListRsoComponent.vue'
 
+import DicComponent from '../components/rso/DicCOmponent.vue'
+import RequestRsoComponent from '../components/rso/RequestRsoComponent.vue'
+
 
 
 
@@ -18,6 +21,9 @@ const routes=[
 
     {name:'rso', path:'/rso', component:RsoComponent},
     {name:'formrso', path:'/formrso/:id', component:ListRsoComponent},
+
+    {name:'dic', path:'/dic', component:DicComponent},
+    {name:'dicform', path:'/dic/view/:id', component:RequestRsoComponent},
 ]
 
 Vue.use(VueRouter)
