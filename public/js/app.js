@@ -2787,6 +2787,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2864,7 +2870,7 @@ __webpack_require__.r(__webpack_exports__);
         _this3.tombol = "Edit RSO";
 
         _this3.$router.push({
-          path: '/formrso/' + _this3.inprso.nomor_rso
+          name: 'rso'
         });
       });
     },
@@ -41674,121 +41680,191 @@ var render = function() {
                   : _vm._e()
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "form-group" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-primary col-4 ",
-                    on: {
-                      click: function($event) {
-                        return _vm.getdisabled(rlist)
-                      }
-                    }
-                  },
-                  [_vm._v(_vm._s(_vm.tombol))]
-                ),
-                _vm._v(" "),
-                _vm.tbsukses
-                  ? _c(
+              rlist.status == "Draft"
+                ? _c("div", { staticClass: "form-group" }, [
+                    _c(
                       "button",
                       {
-                        staticClass: "btn btn-success col-4 ml-1",
+                        staticClass: "btn btn-primary col-4 ",
                         on: {
                           click: function($event) {
-                            return _vm.updateRso()
+                            return _vm.getdisabled(rlist)
                           }
                         }
                       },
-                      [_vm._v("Update")]
-                    )
-                  : _vm._e()
-              ])
+                      [_vm._v(_vm._s(_vm.tombol))]
+                    ),
+                    _vm._v(" "),
+                    _vm.tbsukses
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-success col-4 ml-1",
+                            on: {
+                              click: function($event) {
+                                return _vm.updateRso()
+                              }
+                            }
+                          },
+                          [_vm._v("Update")]
+                        )
+                      : _vm._e()
+                  ])
+                : _vm._e()
             ])
           ]
         )
       }),
       _vm._v(" "),
-      _c("div", { staticClass: "row m-auto" }, [
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-success mt-3",
-            attrs: { type: "button" },
-            on: {
-              click: function($event) {
-                return _vm.showmodal()
-              }
-            }
-          },
-          [_vm._v("+ Tambah Barang")]
-        )
-      ]),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "row mt-2 mx-auto", attrs: { id: "rsoverflow" } },
-        [
-          _c(
-            "table",
-            {
-              staticClass: "table mt-2 table-striped table-bordered",
-              staticStyle: { width: "100%" },
-              attrs: { id: "rsthead" }
-            },
-            [
-              _vm._m(0),
-              _vm._v(" "),
-              _c(
-                "tbody",
-                _vm._l(_vm.listrso, function(list, index) {
-                  return _c("tr", { key: list.nomor_rso }, [
-                    _c("td", { staticStyle: { "text-align": "center" } }, [
-                      _vm._v(_vm._s(index + 1))
-                    ]),
-                    _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(list.nama_barang))]),
-                    _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(list.qty))]),
-                    _vm._v(" "),
-                    _c("td", { staticStyle: { "text-align": "center" } }, [
-                      _vm._v(_vm._s(list.satuan))
-                    ]),
-                    _vm._v(" "),
-                    _c("td", { staticStyle: { "text-align": "center" } }, [
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-primary",
-                          on: {
-                            click: function($event) {
-                              return _vm.editListRso(list)
-                            }
-                          }
-                        },
-                        [_vm._v("Edit")]
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-danger",
-                          on: {
-                            click: function($event) {
-                              return _vm.deleteListRso(list)
-                            }
-                          }
-                        },
-                        [_vm._v("Hapus")]
-                      )
-                    ])
-                  ])
-                }),
-                0
+      _vm._l(_vm.form, function(rlist) {
+        return _c("div", { key: rlist.id, staticClass: "row m-auto" }, [
+          rlist.status == "Draft"
+            ? _c(
+                "button",
+                {
+                  staticClass: "btn btn-success mt-3",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      return _vm.showmodal()
+                    }
+                  }
+                },
+                [_vm._v("+ Tambah Barang")]
               )
-            ]
-          )
-        ]
-      ),
+            : _vm._e()
+        ])
+      }),
+      _vm._v(" "),
+      _vm._l(_vm.form, function(rlist) {
+        return _c(
+          "div",
+          {
+            key: rlist.id,
+            staticClass: "row mt-2 mx-auto",
+            attrs: { id: "rsoverflow" }
+          },
+          [
+            _c(
+              "table",
+              {
+                staticClass: "table mt-2 table-striped table-bordered",
+                staticStyle: { width: "100%" },
+                attrs: { id: "rsthead" }
+              },
+              [
+                _c("thead", [
+                  _c("tr", [
+                    _c("th", [_vm._v("No")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Nama Barang")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Booking")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Satuan")]),
+                    _vm._v(" "),
+                    rlist.status == "Sent"
+                      ? _c("th", [_vm._v("Catatan")])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    rlist.status == "Confirmed"
+                      ? _c("th", [_vm._v("Status")])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    rlist.status == "Confirmed"
+                      ? _c("th", [_vm._v("Qty")])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    rlist.status !== "Sent"
+                      ? _c("th", [_vm._v("Aksi")])
+                      : _vm._e()
+                  ])
+                ]),
+                _vm._v(" "),
+                _c(
+                  "tbody",
+                  _vm._l(_vm.listrso, function(list, index) {
+                    return _c("tr", { key: list.nomor_rso }, [
+                      _c("td", { staticStyle: { "text-align": "center" } }, [
+                        _vm._v(_vm._s(index + 1))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(list.nama_barang))]),
+                      _vm._v(" "),
+                      _c("td", { staticStyle: { "text-align": "center" } }, [
+                        _vm._v(_vm._s(list.qty))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { staticStyle: { "text-align": "center" } }, [
+                        _vm._v(_vm._s(list.satuan))
+                      ]),
+                      _vm._v(" "),
+                      rlist.status == "Confirmed"
+                        ? _c(
+                            "td",
+                            { staticStyle: { "text-align": "center" } },
+                            [_vm._v(_vm._s(list.status))]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      rlist.status == "Confirmed"
+                        ? _c(
+                            "td",
+                            { staticStyle: { "text-align": "center" } },
+                            [_vm._v(_vm._s(list.qty_tersedia))]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      rlist.status == "Sent"
+                        ? _c(
+                            "td",
+                            { staticStyle: { "text-align": "center" } },
+                            [_vm._v(_vm._s(list.catatan))]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      rlist.status !== "Sent"
+                        ? _c(
+                            "td",
+                            { staticStyle: { "text-align": "center" } },
+                            [
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-primary",
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.editListRso(list)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Edit")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-danger",
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.deleteListRso(list)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Hapus")]
+                              )
+                            ]
+                          )
+                        : _vm._e()
+                    ])
+                  }),
+                  0
+                )
+              ]
+            )
+          ]
+        )
+      }),
       _vm._v(" "),
       _c(
         "div",
@@ -41812,7 +41888,7 @@ var render = function() {
                 "div",
                 { staticClass: "modal-content", attrs: { id: "modal-width" } },
                 [
-                  _vm._m(1),
+                  _vm._m(0),
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-body" }, [
                     _c("div", { staticClass: "form-group" }, [
@@ -41963,24 +42039,6 @@ var render = function() {
   )
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("No")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Nama Barang")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Jumlah")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Satuan")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Aksi")])
-      ])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -42891,7 +42949,7 @@ var render = function() {
                           },
                           [
                             _vm._v(
-                              "\n                                Input Barang\n                            "
+                              "\n                                Input Detail\n                            "
                             )
                           ]
                         ),
@@ -42958,7 +43016,7 @@ var render = function() {
                           },
                           [
                             _vm._v(
-                              "\n                                Update Detail\n                            "
+                              "\n                                Create SO\n                            "
                             )
                           ]
                         ),

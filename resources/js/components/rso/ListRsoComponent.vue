@@ -43,33 +43,39 @@
                     <textarea v-if="disabled" v-model="rlist.keterangan"  name="keterangan" class="form-control col-12" :disabled="disabled == 1"></textarea>
                     <textarea v-if="!disabled" v-model="inprso.keterangan"  name="keterangan" class="form-control col-12" ></textarea>
                 </div>
-                <div class="form-group">
+                <div v-if="rlist.status=='Draft'" class="form-group">
                     <button @click="getdisabled(rlist)" class="btn btn-primary col-4 ">{{tombol}}</button>
                     <button @click="updateRso()" v-if="tbsukses" class="btn btn-success col-4 ml-1">Update</button>
                 </div>
             </div>
         </div>
-        <div class="row m-auto">
-            <button @click="showmodal()" type="button" class="btn btn-success mt-3">+ Tambah Barang</button>
+        <div class="row m-auto" v-for="rlist in form" :key="rlist.id">
+            <button v-if="rlist.status=='Draft'" @click="showmodal()" type="button" class="btn btn-success mt-3">+ Tambah Barang</button>
         </div>
-        <div id="rsoverflow" class="row mt-2 mx-auto">
+        <div id="rsoverflow" class="row mt-2 mx-auto" v-for="rlist in form" :key="rlist.id">
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
                 <thead>
                     <tr>
                         <th>No</th>
                         <th>Nama Barang</th>
-                        <th>Jumlah</th>
+                        <th>Booking</th>
                         <th>Satuan</th>
-                        <th>Aksi</th>
+                        <th v-if="rlist.status=='Sent'">Catatan</th>
+                        <th v-if="rlist.status=='Confirmed'">Status</th>
+                        <th v-if="rlist.status=='Confirmed'">Qty</th>
+                        <th v-if="rlist.status!=='Sent'">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(list,index) in listrso" :key="list.nomor_rso">
                         <td style="text-align:center">{{index+1}}</td>
                         <td>{{list.nama_barang}}</td>
-                        <td>{{list.qty}}</td>
+                        <td style="text-align:center">{{list.qty}}</td>
                         <td style="text-align:center">{{list.satuan}}</td>
-                        <td style="text-align:center">
+                        <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.status}}</td>
+                        <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tersedia}}</td>
+                        <td v-if="rlist.status=='Sent'" style="text-align:center">{{list.catatan}}</td>
+                        <td  v-if="rlist.status!=='Sent'" style="text-align:center">
                             <button @click="editListRso(list)"  class="btn btn-primary">Edit</button>
                             <button @click="deleteListRso(list)"  class="btn btn-danger">Hapus</button>
                         </td>
@@ -179,7 +185,7 @@ export default {
                     this.tbsukses=false
                     this.disabled=1
                     this.tombol="Edit RSO"
-                    this.$router.push({path:'/formrso/'+this.inprso.nomor_rso})
+                    this.$router.push({name:'rso'})
                 })
         },
         showmodal(){

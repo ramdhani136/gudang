@@ -30,7 +30,7 @@
                             <td>{{rs.customer}}</td>
                             <td v-if="rs.status=='Draft'" style="text-align:center">
                                 <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
-                                    Input Barang
+                                    Input Detail
                                 </router-link>
                                 <button @click="deleteRso(rs)" class="btn btn-danger">Hapus</button>
                             </td>
@@ -41,7 +41,7 @@
                             </td>
                             <td v-if="rs.status=='Confirmed'" style="text-align:center">
                                 <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
-                                    Update Detail
+                                    Create SO
                                 </router-link>
                                 <button @click="deleteRso(rs)" class="btn btn-danger">Hapus</button>
                             </td>
