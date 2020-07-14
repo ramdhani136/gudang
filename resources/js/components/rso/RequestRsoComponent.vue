@@ -36,41 +36,49 @@
         <div id="dicoverflow" class="row mt-2 mx-auto">
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
                 <thead>
-                    <tr>
+                    <tr v-for="u in form" :key="u.id">
                         <th>No</th>
-                        <th>Nama Barang</th>
+                        <th>Item</th>
                         <th>Jumlah</th>
                         <th>Satuan</th>
                         <th>Status</th>
+                        <th v-if="u.status=='Confirmed'">Tanggal Perkiraan</th>
                         <th>Jumlah Tersedia</th>
-                        <th>Aksi</th>
+                        <th v-if="u.status=='Sent'">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody v-for="u in form" :key="u.id">
                     <tr v-for="(list,index) in listrso" :key="list.nomor_rso">
                         <td style="text-align:center">{{index+1}}</td>
                         <td>{{list.nama_barang}}</td>
                         <td>{{list.qty}}</td>
                         <td style="text-align:center">{{list.satuan}}</td>
-                        <td style="text-align:center">
+                        <td  style="text-align:center">
                             <select  v-model="list.status" name="change" class="form-control" disabled>
                                 <option value="Tersedia">Tersedia</option>
                                 <option value="Tidak Tersedia">Tidak Tersedia</option>
                             </select>
+                        </td>
+                        <td v-if="u.status=='Confirmed'">
+                            <div class="form-group">
+                                <input style="text-align:center" v-model="list.tgl_datang" type="text" class="form-control col-12 z1 " disabled>
+                            </div>
                         </td>
                         <td>
                             <div class="form-group">
                                 <input v-model="list.qty_tersedia" type="number" class="form-control col-12 z1 " disabled>
                             </div>
                         </td>
-                        <td>
+                        <td v-if="u.status=='Sent'">
                             <button @click="showModal(list)" class="btn btn-primary">Update</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <button class="btn btn-success mt-2 ">Konfirmasi RSO</button>
+        <div v-for="up in form"  :key="up.id">
+        <button v-if="up.status=='Sent'"  @click="ConfirmRso(up)" class="btn btn-success mt-2" >Konfirmasi</button>
+        </div>
         <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
@@ -134,7 +142,8 @@ export default {
             },
             dic:{},
             status:'',
-            update:{}
+            update:{},
+            urso:{}
         }
     },
     created(){
@@ -199,6 +208,20 @@ export default {
             this.update.qty_tersedia=""
             this.dic.jumlahrso=""
             this.dic.satuan=""
+        },
+        ConfirmRso(up){
+            let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
+            if(keputusan===true){
+                this.urso.kode_customer=up.kode_customer
+                this.urso.status="Confirmed"
+                this.urso.nomor_rso=up.nomor_rso
+                this.urso.id_user=up.id_user
+                this.urso.tanggal_rso=up.tanggal_rso
+                axios.put(`/api/rso/`+this.urso.nomor_rso, this.urso)
+                .then((response)=>{
+                    this.$router.push({name:'dic'})
+                })
+            }
         }
     },
 }

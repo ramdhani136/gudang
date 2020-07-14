@@ -24,7 +24,6 @@ class RsoResource extends JsonResource
             'keterangan'=>$this->keterangan,
             'status'=>$this->status,
             'kode_customer'=>$this->kode_customer,
-            
         ];
     }
 }

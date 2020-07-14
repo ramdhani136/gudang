@@ -26,11 +26,16 @@
                                 <td style="text-align:center">{{rs.nomor_rso}}</td>
                                 <td style="text-align:center">{{rs.tanggal_rso}}</td>
                                 <td>{{rs.customer}}</td>
-                                <td style="text-align:center">
+                                <td v-if="status=='Sent'" style="text-align:center">
                                     <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
                                         Detail RSO
                                     </router-link>
                                     <button @click="ConfirmRso(rs)" class="btn btn-success">Confirm</button>
+                                </td>
+                                <td v-if="status=='Confirmed'" style="text-align:center">
+                                    <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
+                                        Lihat RSO
+                                    </router-link>
                                 </td>
                             </tr>
                         </tbody>
@@ -46,7 +51,8 @@ export default {
             search  : '',
             rso:[],
             status:'Sent',
-            urso:{}
+            urso:{},
+            ya:false
         }
     },
     created(){
@@ -73,14 +79,19 @@ export default {
             .then(res=>this.rso=res.data.data)
         },
         ConfirmRso(rs){
-            this.getRso()
-            this.urso.kode_customer=rs.kode_customer
-            this.urso.status="Confirmed"
-            this.urso.nomor_rso=rs.nomor_rso
-            this.urso.id_user=rs.id_user
-            this.urso.tanggal_rso=rs.tanggal_rso
-            axios.put(`/api/rso/`+this.urso.nomor_rso, this.urso)
-            .then(console.log("berhasil"))
+            let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
+            if(keputusan===true){
+                this.getRso()
+                this.urso.kode_customer=rs.kode_customer
+                this.urso.status="Confirmed"
+                this.urso.nomor_rso=rs.nomor_rso
+                this.urso.id_user=rs.id_user
+                this.urso.tanggal_rso=rs.tanggal_rso
+                axios.put(`/api/rso/`+this.urso.nomor_rso, this.urso)
+                .then((response)=>{
+                    this.getRso()
+                })
+            }
         }
     }
 }

@@ -2595,13 +2595,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       search: '',
       rso: [],
       status: 'Sent',
-      urso: {}
+      urso: {},
+      ya: false
     };
   },
   created: function created() {
@@ -2637,13 +2643,21 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     ConfirmRso: function ConfirmRso(rs) {
-      this.getRso();
-      this.urso.kode_customer = rs.kode_customer;
-      this.urso.status = "Confirmed";
-      this.urso.nomor_rso = rs.nomor_rso;
-      this.urso.id_user = rs.id_user;
-      this.urso.tanggal_rso = rs.tanggal_rso;
-      axios.put("/api/rso/" + this.urso.nomor_rso, this.urso).then(console.log("berhasil"));
+      var _this3 = this;
+
+      var keputusan = confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
+
+      if (keputusan === true) {
+        this.getRso();
+        this.urso.kode_customer = rs.kode_customer;
+        this.urso.status = "Confirmed";
+        this.urso.nomor_rso = rs.nomor_rso;
+        this.urso.id_user = rs.id_user;
+        this.urso.tanggal_rso = rs.tanggal_rso;
+        axios.put("/api/rso/" + this.urso.nomor_rso, this.urso).then(function (response) {
+          _this3.getRso();
+        });
+      }
     }
   }
 });
@@ -3075,6 +3089,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -3089,7 +3111,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       },
       dic: {},
       status: '',
-      update: {}
+      update: {},
+      urso: {}
     };
   },
   created: function created() {
@@ -3161,6 +3184,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.update.qty_tersedia = "";
     this.dic.jumlahrso = "";
     this.dic.satuan = "";
+  }), _defineProperty(_methods, "ConfirmRso", function ConfirmRso(up) {
+    var _this6 = this;
+
+    var keputusan = confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
+
+    if (keputusan === true) {
+      this.urso.kode_customer = up.kode_customer;
+      this.urso.status = "Confirmed";
+      this.urso.nomor_rso = up.nomor_rso;
+      this.urso.id_user = up.id_user;
+      this.urso.tanggal_rso = up.tanggal_rso;
+      axios.put("/api/rso/" + this.urso.nomor_rso, this.urso).then(function (response) {
+        _this6.$router.push({
+          name: 'dic'
+        });
+      });
+    }
   }), _methods)
 });
 
@@ -41067,40 +41107,72 @@ var render = function() {
                 _vm._v(" "),
                 _c("td", [_vm._v(_vm._s(rs.customer))]),
                 _vm._v(" "),
-                _c(
-                  "td",
-                  { staticStyle: { "text-align": "center" } },
-                  [
-                    _c(
-                      "router-link",
-                      {
-                        staticClass: "btn btn-primary",
-                        attrs: {
-                          to: { name: "dicform", params: { id: rs.nomor_rso } }
-                        }
-                      },
+                _vm.status == "Sent"
+                  ? _c(
+                      "td",
+                      { staticStyle: { "text-align": "center" } },
                       [
-                        _vm._v(
-                          "\n                                    Detail RSO\n                                "
+                        _c(
+                          "router-link",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: {
+                              to: {
+                                name: "dicform",
+                                params: { id: rs.nomor_rso }
+                              }
+                            }
+                          },
+                          [
+                            _vm._v(
+                              "\n                                    Detail RSO\n                                "
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-success",
+                            on: {
+                              click: function($event) {
+                                return _vm.ConfirmRso(rs)
+                              }
+                            }
+                          },
+                          [_vm._v("Confirm")]
                         )
-                      ]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-success",
-                        on: {
-                          click: function($event) {
-                            return _vm.ConfirmRso(rs)
-                          }
-                        }
-                      },
-                      [_vm._v("Confirm")]
+                      ],
+                      1
                     )
-                  ],
-                  1
-                )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.status == "Confirmed"
+                  ? _c(
+                      "td",
+                      { staticStyle: { "text-align": "center" } },
+                      [
+                        _c(
+                          "router-link",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: {
+                              to: {
+                                name: "dicform",
+                                params: { id: rs.nomor_rso }
+                              }
+                            }
+                          },
+                          [
+                            _vm._v(
+                              "\n                                    Lihat RSO\n                                "
+                            )
+                          ]
+                        )
+                      ],
+                      1
+                    )
+                  : _vm._e()
               ])
             }),
             0
@@ -42161,126 +42233,206 @@ var render = function() {
               attrs: { id: "rsthead" }
             },
             [
-              _vm._m(0),
-              _vm._v(" "),
               _c(
-                "tbody",
-                _vm._l(_vm.listrso, function(list, index) {
-                  return _c("tr", { key: list.nomor_rso }, [
-                    _c("td", { staticStyle: { "text-align": "center" } }, [
-                      _vm._v(_vm._s(index + 1))
-                    ]),
+                "thead",
+                _vm._l(_vm.form, function(u) {
+                  return _c("tr", { key: u.id }, [
+                    _c("th", [_vm._v("No")]),
                     _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(list.nama_barang))]),
+                    _c("th", [_vm._v("Item")]),
                     _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(list.qty))]),
+                    _c("th", [_vm._v("Jumlah")]),
                     _vm._v(" "),
-                    _c("td", { staticStyle: { "text-align": "center" } }, [
-                      _vm._v(_vm._s(list.satuan))
-                    ]),
+                    _c("th", [_vm._v("Satuan")]),
                     _vm._v(" "),
-                    _c("td", { staticStyle: { "text-align": "center" } }, [
-                      _c(
-                        "select",
-                        {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: list.status,
-                              expression: "list.status"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: { name: "change", disabled: "" },
-                          on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.$set(
-                                list,
-                                "status",
-                                $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              )
-                            }
-                          }
-                        },
-                        [
-                          _c("option", { attrs: { value: "Tersedia" } }, [
-                            _vm._v("Tersedia")
-                          ]),
-                          _vm._v(" "),
-                          _c("option", { attrs: { value: "Tidak Tersedia" } }, [
-                            _vm._v("Tidak Tersedia")
-                          ])
-                        ]
-                      )
-                    ]),
+                    _c("th", [_vm._v("Status")]),
                     _vm._v(" "),
-                    _c("td", [
-                      _c("div", { staticClass: "form-group" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: list.qty_tersedia,
-                              expression: "list.qty_tersedia"
-                            }
-                          ],
-                          staticClass: "form-control col-12 z1 ",
-                          attrs: { type: "number", disabled: "" },
-                          domProps: { value: list.qty_tersedia },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(
-                                list,
-                                "qty_tersedia",
-                                $event.target.value
-                              )
-                            }
-                          }
-                        })
-                      ])
-                    ]),
+                    u.status == "Confirmed"
+                      ? _c("th", [_vm._v("Tanggal Perkiraan")])
+                      : _vm._e(),
                     _vm._v(" "),
-                    _c("td", [
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-primary",
-                          on: {
-                            click: function($event) {
-                              return _vm.showModal(list)
-                            }
-                          }
-                        },
-                        [_vm._v("Update")]
-                      )
-                    ])
+                    _c("th", [_vm._v("Jumlah Tersedia")]),
+                    _vm._v(" "),
+                    u.status == "Sent" ? _c("th", [_vm._v("Aksi")]) : _vm._e()
                   ])
                 }),
                 0
-              )
-            ]
+              ),
+              _vm._v(" "),
+              _vm._l(_vm.form, function(u) {
+                return _c(
+                  "tbody",
+                  { key: u.id },
+                  _vm._l(_vm.listrso, function(list, index) {
+                    return _c("tr", { key: list.nomor_rso }, [
+                      _c("td", { staticStyle: { "text-align": "center" } }, [
+                        _vm._v(_vm._s(index + 1))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(list.nama_barang))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(list.qty))]),
+                      _vm._v(" "),
+                      _c("td", { staticStyle: { "text-align": "center" } }, [
+                        _vm._v(_vm._s(list.satuan))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { staticStyle: { "text-align": "center" } }, [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: list.status,
+                                expression: "list.status"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { name: "change", disabled: "" },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  list,
+                                  "status",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c("option", { attrs: { value: "Tersedia" } }, [
+                              _vm._v("Tersedia")
+                            ]),
+                            _vm._v(" "),
+                            _c(
+                              "option",
+                              { attrs: { value: "Tidak Tersedia" } },
+                              [_vm._v("Tidak Tersedia")]
+                            )
+                          ]
+                        )
+                      ]),
+                      _vm._v(" "),
+                      u.status == "Confirmed"
+                        ? _c("td", [
+                            _c("div", { staticClass: "form-group" }, [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: list.tgl_datang,
+                                    expression: "list.tgl_datang"
+                                  }
+                                ],
+                                staticClass: "form-control col-12 z1 ",
+                                staticStyle: { "text-align": "center" },
+                                attrs: { type: "text", disabled: "" },
+                                domProps: { value: list.tgl_datang },
+                                on: {
+                                  input: function($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.$set(
+                                      list,
+                                      "tgl_datang",
+                                      $event.target.value
+                                    )
+                                  }
+                                }
+                              })
+                            ])
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c("td", [
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: list.qty_tersedia,
+                                expression: "list.qty_tersedia"
+                              }
+                            ],
+                            staticClass: "form-control col-12 z1 ",
+                            attrs: { type: "number", disabled: "" },
+                            domProps: { value: list.qty_tersedia },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  list,
+                                  "qty_tersedia",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      u.status == "Sent"
+                        ? _c("td", [
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-primary",
+                                on: {
+                                  click: function($event) {
+                                    return _vm.showModal(list)
+                                  }
+                                }
+                              },
+                              [_vm._v("Update")]
+                            )
+                          ])
+                        : _vm._e()
+                    ])
+                  }),
+                  0
+                )
+              })
+            ],
+            2
           )
         ]
       ),
       _vm._v(" "),
-      _c("button", { staticClass: "btn btn-success mt-2 " }, [
-        _vm._v("Konfirmasi RSO")
-      ]),
+      _vm._l(_vm.form, function(up) {
+        return _c("div", { key: up.id }, [
+          up.status == "Sent"
+            ? _c(
+                "button",
+                {
+                  staticClass: "btn btn-success mt-2",
+                  on: {
+                    click: function($event) {
+                      return _vm.ConfirmRso(up)
+                    }
+                  }
+                },
+                [_vm._v("Konfirmasi")]
+              )
+            : _vm._e()
+        ])
+      }),
       _vm._v(" "),
       _c(
         "div",
@@ -42583,30 +42735,7 @@ var render = function() {
     2
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("No")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Nama Barang")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Jumlah")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Satuan")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Status")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Jumlah Tersedia")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Aksi")])
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
