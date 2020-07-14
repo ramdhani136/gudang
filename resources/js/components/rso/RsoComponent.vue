@@ -19,7 +19,6 @@
                             <th>Nomor RSO</th>
                             <th>Tanggal</th>
                             <th>Customer</th>
-                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -29,10 +28,20 @@
                             <td style="text-align:center">{{rs.nomor_rso}}</td>
                             <td style="text-align:center">{{rs.tanggal_rso}}</td>
                             <td>{{rs.customer}}</td>
-                            <td style="text-align:center">{{rs.status}}</td>
-                            <td style="text-align:center">
+                            <td v-if="rs.status=='Draft'" style="text-align:center">
                                 <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
-                                    {{tombol}}
+                                    Input Barang
+                                </router-link>
+                                <button @click="deleteRso(rs)" class="btn btn-danger">Hapus</button>
+                            </td>
+                            <td v-if="rs.status=='Sent'" style="text-align:center">
+                                <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
+                                    Lihat Detail
+                                </router-link>
+                            </td>
+                            <td v-if="rs.status=='Confirmed'" style="text-align:center">
+                                <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
+                                    Update Detail
                                 </router-link>
                                 <button @click="deleteRso(rs)" class="btn btn-danger">Hapus</button>
                             </td>
@@ -90,7 +99,6 @@
 export default {
     data(){
         return{
-            tombol:'Pilih RSO',
             search  : '',
             rso:[],
             status:'Draft',

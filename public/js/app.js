@@ -3303,10 +3303,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      tombol: 'Pilih RSO',
       search: '',
       rso: [],
       status: 'Draft',
@@ -41089,95 +41097,96 @@ var render = function() {
         [
           _vm._m(0),
           _vm._v(" "),
-          _c(
-            "tbody",
-            _vm._l(_vm.FilterKategori, function(rs, index) {
-              return _c("tr", { key: rs.nomor_rso }, [
-                _c("td", { staticStyle: { "text-align": "center" } }, [
-                  _vm._v(_vm._s(index + 1))
-                ]),
-                _vm._v(" "),
-                _c("td", { staticStyle: { "text-align": "center" } }, [
-                  _vm._v(_vm._s(rs.nomor_rso))
-                ]),
-                _vm._v(" "),
-                _c("td", { staticStyle: { "text-align": "center" } }, [
-                  _vm._v(_vm._s(rs.tanggal_rso))
-                ]),
-                _vm._v(" "),
-                _c("td", [_vm._v(_vm._s(rs.customer))]),
-                _vm._v(" "),
-                _vm.status == "Sent"
-                  ? _c(
-                      "td",
-                      { staticStyle: { "text-align": "center" } },
-                      [
-                        _c(
-                          "router-link",
-                          {
-                            staticClass: "btn btn-primary",
-                            attrs: {
-                              to: {
-                                name: "dicform",
-                                params: { id: rs.nomor_rso }
-                              }
-                            }
-                          },
+          _vm._l(_vm.FilterKategori, function(rs, index) {
+            return _c("tbody", { key: rs.nomor_rso }, [
+              rs.status !== "Draft"
+                ? _c("tr", [
+                    _c("td", { staticStyle: { "text-align": "center" } }, [
+                      _vm._v(_vm._s(index + 1))
+                    ]),
+                    _vm._v(" "),
+                    _c("td", { staticStyle: { "text-align": "center" } }, [
+                      _vm._v(_vm._s(rs.nomor_rso))
+                    ]),
+                    _vm._v(" "),
+                    _c("td", { staticStyle: { "text-align": "center" } }, [
+                      _vm._v(_vm._s(rs.tanggal_rso))
+                    ]),
+                    _vm._v(" "),
+                    _c("td", [_vm._v(_vm._s(rs.customer))]),
+                    _vm._v(" "),
+                    rs.status == "Sent"
+                      ? _c(
+                          "td",
+                          { staticStyle: { "text-align": "center" } },
                           [
-                            _vm._v(
-                              "\n                                    Detail RSO\n                                "
+                            _c(
+                              "router-link",
+                              {
+                                staticClass: "btn btn-primary",
+                                attrs: {
+                                  to: {
+                                    name: "dicform",
+                                    params: { id: rs.nomor_rso }
+                                  }
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                                    Detail RSO\n                                "
+                                )
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-success",
+                                on: {
+                                  click: function($event) {
+                                    return _vm.ConfirmRso(rs)
+                                  }
+                                }
+                              },
+                              [_vm._v("Confirm")]
                             )
-                          ]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-success",
-                            on: {
-                              click: function($event) {
-                                return _vm.ConfirmRso(rs)
-                              }
-                            }
-                          },
-                          [_vm._v("Confirm")]
+                          ],
+                          1
                         )
-                      ],
-                      1
-                    )
-                  : _vm._e(),
-                _vm._v(" "),
-                _vm.status == "Confirmed"
-                  ? _c(
-                      "td",
-                      { staticStyle: { "text-align": "center" } },
-                      [
-                        _c(
-                          "router-link",
-                          {
-                            staticClass: "btn btn-primary",
-                            attrs: {
-                              to: {
-                                name: "dicform",
-                                params: { id: rs.nomor_rso }
-                              }
-                            }
-                          },
+                      : _vm._e(),
+                    _vm._v(" "),
+                    rs.status == "Confirmed"
+                      ? _c(
+                          "td",
+                          { staticStyle: { "text-align": "center" } },
                           [
-                            _vm._v(
-                              "\n                                    Lihat RSO\n                                "
+                            _c(
+                              "router-link",
+                              {
+                                staticClass: "btn btn-primary",
+                                attrs: {
+                                  to: {
+                                    name: "dicform",
+                                    params: { id: rs.nomor_rso }
+                                  }
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                                    Lihat RSO\n                                "
+                                )
+                              ]
                             )
-                          ]
+                          ],
+                          1
                         )
-                      ],
-                      1
-                    )
-                  : _vm._e()
-              ])
-            }),
-            0
-          )
-        ]
+                      : _vm._e()
+                  ])
+                : _vm._e()
+            ])
+          })
+        ],
+        2
       )
     ])
   ])
@@ -42864,46 +42873,112 @@ var render = function() {
                 _vm._v(" "),
                 _c("td", [_vm._v(_vm._s(rs.customer))]),
                 _vm._v(" "),
-                _c("td", { staticStyle: { "text-align": "center" } }, [
-                  _vm._v(_vm._s(rs.status))
-                ]),
-                _vm._v(" "),
-                _c(
-                  "td",
-                  { staticStyle: { "text-align": "center" } },
-                  [
-                    _c(
-                      "router-link",
-                      {
-                        staticClass: "btn btn-primary",
-                        attrs: {
-                          to: { name: "formrso", params: { id: rs.nomor_rso } }
-                        }
-                      },
+                rs.status == "Draft"
+                  ? _c(
+                      "td",
+                      { staticStyle: { "text-align": "center" } },
                       [
-                        _vm._v(
-                          "\n                                " +
-                            _vm._s(_vm.tombol) +
-                            "\n                            "
+                        _c(
+                          "router-link",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: {
+                              to: {
+                                name: "formrso",
+                                params: { id: rs.nomor_rso }
+                              }
+                            }
+                          },
+                          [
+                            _vm._v(
+                              "\n                                Input Barang\n                            "
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger",
+                            on: {
+                              click: function($event) {
+                                return _vm.deleteRso(rs)
+                              }
+                            }
+                          },
+                          [_vm._v("Hapus")]
                         )
-                      ]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-danger",
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteRso(rs)
-                          }
-                        }
-                      },
-                      [_vm._v("Hapus")]
+                      ],
+                      1
                     )
-                  ],
-                  1
-                )
+                  : _vm._e(),
+                _vm._v(" "),
+                rs.status == "Sent"
+                  ? _c(
+                      "td",
+                      { staticStyle: { "text-align": "center" } },
+                      [
+                        _c(
+                          "router-link",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: {
+                              to: {
+                                name: "formrso",
+                                params: { id: rs.nomor_rso }
+                              }
+                            }
+                          },
+                          [
+                            _vm._v(
+                              "\n                                Lihat Detail\n                            "
+                            )
+                          ]
+                        )
+                      ],
+                      1
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                rs.status == "Confirmed"
+                  ? _c(
+                      "td",
+                      { staticStyle: { "text-align": "center" } },
+                      [
+                        _c(
+                          "router-link",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: {
+                              to: {
+                                name: "formrso",
+                                params: { id: rs.nomor_rso }
+                              }
+                            }
+                          },
+                          [
+                            _vm._v(
+                              "\n                                Update Detail\n                            "
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger",
+                            on: {
+                              click: function($event) {
+                                return _vm.deleteRso(rs)
+                              }
+                            }
+                          },
+                          [_vm._v("Hapus")]
+                        )
+                      ],
+                      1
+                    )
+                  : _vm._e()
               ])
             }),
             0
@@ -43167,8 +43242,6 @@ var staticRenderFns = [
         _c("th", [_vm._v("Tanggal")]),
         _vm._v(" "),
         _c("th", [_vm._v("Customer")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Status")]),
         _vm._v(" "),
         _c("th", [_vm._v("Aksi")])
       ])
