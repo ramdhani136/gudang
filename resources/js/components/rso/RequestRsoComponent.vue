@@ -43,7 +43,8 @@
                         <th>Satuan</th>
                         <th>Status</th>
                         <th v-if="u.status=='Confirmed'">Tanggal Perkiraan</th>
-                        <th>Jumlah Tersedia</th>
+                        <th>Tersedia</th>
+                        <th>Tidak Tersedia</th>
                         <th v-if="u.status=='Sent'">Aksi</th>
                     </tr>
                 </thead>
@@ -56,6 +57,7 @@
                         <td  style="text-align:center">
                             <select  v-model="list.status" name="change" class="form-control" disabled>
                                 <option value="Tersedia">Tersedia</option>
+                                <option value="Tersedia Sebagian">Tersedia Sebagian</option>
                                 <option value="Tidak Tersedia">Tidak Tersedia</option>
                             </select>
                         </td>
@@ -69,6 +71,11 @@
                                 <input v-model="list.qty_tersedia" type="number" class="form-control col-12 z1 " disabled>
                             </div>
                         </td>
+                        <td>
+                            <div class="form-group">
+                                <input v-model="list.qty_tdktersedia" type="number" class="form-control col-12 z1 " disabled>
+                            </div>
+                        </td>
                         <td v-if="u.status=='Sent'">
                             <button @click="showModal(list)" class="btn btn-primary">Update</button>
                         </td>
@@ -79,6 +86,7 @@
         <div v-for="up in form"  :key="up.id">
         <button v-if="up.status=='Sent'"  @click="ConfirmRso(up)" class="btn btn-success mt-2" >Konfirmasi</button>
         </div>
+        <div v-for="list in listrso" :key="list.nomor_rso">
         <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
@@ -107,22 +115,24 @@
                     </div>
                     <div class="form-group">
                         <label>Status Barang</label>
-                        <select @change="updateStatus()" v-model="update.status" name="status" class="form-control">
+                        <select @change="updateStatus(list)" v-model="update.status" name="status" class="form-control">
                             <option value="Tersedia">Tersedia</option>
+                            <option value="Tersedia Sebagian">Tersedia Sebagian</option>
                             <option value="Tidak Tersedia">Tidak Tersedia</option>
                         </select>
                     </div>
-                    <div v-if="update.status=='Tersedia'" class="form-group">
+                    <div v-if="update.status=='Tersedia Sebagian'" class="form-group">
                         <label>Jumlah Tersedia</label>
-                        <input  v-model="update.qty_tersedia" type="number"   autocomplete="off" class="form-control">
+                        <input  v-model="update.qty_tersedia" type="number"  placeholder="Jumlah Barang Tersedia"  autocomplete="off" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="updateStatusklik()" class="btn btn-primary">Save changes</button>
+                    <button type="button" @click="updateStatusklik(list)" class="btn btn-primary">Save changes</button>
                 </div>
                 </div>
             </div>
+        </div>
         </div>
     </div>   
 </template>
@@ -172,32 +182,49 @@ export default {
             this.dic.id=list.id
             this.dic.nama_barang=list.nama_barang
             this.update.status=list.status
-            this.update.qty_tersedia=list.qty_tersedia
             this.dic.jumlahrso=list.qty
             this.dic.satuan=list.satuan
             $("#modal-form").modal("show");
         },
-        updateStatus(){
-            this.getlistRso()
+        updateStatus(list){
             axios.put(`/api/listrso/`+this.dic.id,this.update)
             .then((response)=>{
+                this.getlistRso()
                 if(this.update.status==="Tidak Tersedia"){
                     this.update.qty_tersedia=''
+                    this.update.qty_tdktersedia=this.dic.jumlahrso
                     axios.put(`/api/listrso/`+this.dic.id,this.update)
+                }else  if(this.update.status==="Tersedia"){
+                    this.getlistRso()
+                    this.update.qty_tersedia=this.dic.jumlahrso
+                    this.update.qty_tdktersedia=''
+                    axios.put(`/api/listrso/`+this.dic.id,this.update)
+                    .then((response)=>{
+                    this.getlistRso()
+                    })
+                }else if(this.update.status==="Tersedia Sebagian"){
+                    this.getlistRso()
                 }
-            })
-
-            
+            })     
         },
-        updateStatusklik(){
-            this.getlistRso()
-            axios.put(`/api/listrso/`+this.dic.id,this.update)
-            .then((response)=>{
+        updateStatusklik(list){
+                if(this.update.status==="Tersedia Sebagian"){
+                    this.getlistRso()
+                    this.update.qty_tdktersedia=this.dic.jumlahrso - this.update.qty_tersedia;
+                    axios.put(`/api/listrso/`+this.dic.id,this.update)
+                    .then((response)=>{
+                    this.resetForm()
+                    $("#modal-form").modal("hide");
+                })
+            }else if(this.update.status==="Tersedia"){
                 this.resetForm()
-                this.getlistRso()
                 $("#modal-form").modal("hide");
-            })
-            
+                
+            }else if(this.update.status==="Tidak Tersedia"){
+                this.resetForm()
+                $("#modal-form").modal("hide");
+                
+            }
         },
         resetForm(){
             this.getlistRso()
@@ -206,6 +233,7 @@ export default {
             this.dic.nama_barang=""
             this.update.status=""
             this.update.qty_tersedia=""
+            this.update.qty_tdktersedia=""
             this.dic.jumlahrso=""
             this.dic.satuan=""
         },

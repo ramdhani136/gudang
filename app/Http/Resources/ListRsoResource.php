@@ -20,6 +20,7 @@ class ListRsoResource extends JsonResource
             'lno_rso'=>$this->nomor_rso,
             'lkode_barang'=>$this->kode_barang,
             'nama_barang'=>$this->barang->nama,
+            'nama_customer'=>$this->rso->customer->nama,
             'qty'=>$this->qty,
             'satuan'=>$this->barang->satuan,
             'status'=>$this->status,
@@ -27,6 +28,7 @@ class ListRsoResource extends JsonResource
             'acc'=>$this->acc,
             'catatan'=>$this->catatan,
             'qty_tersedia'=>$this->qty_tersedia,
+            'qty_tdktersedia'=>$this->qty_tdktersedia,
 
         ];
     }
