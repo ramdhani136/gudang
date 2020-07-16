@@ -10,35 +10,35 @@
             </select>
         </div>
             <div id="overflow" class="border-top">
-                <table id="thead" class="table table-striped table-bordered" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Nomor RSO</th>
-                                <th>Tanggal</th>
-                                <th>Customer</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody v-for="(rs , index) in FilterKategori" :key="rs.nomor_rso">
-                            <tr v-if="rs.status!=='Draft'">
-                                <td style="text-align:center">{{index+1}}</td>
-                                <td style="text-align:center">{{rs.nomor_rso}}</td>
-                                <td style="text-align:center">{{rs.tanggal_rso}}</td>
-                                <td>{{rs.customer}}</td>
-                                <td v-if="rs.status=='Sent'" style="text-align:center">
-                                    <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
-                                        Detail RSO
-                                    </router-link>
-                                    <button @click="ConfirmRso(rs)" class="btn btn-success">Confirm</button>
-                                </td>
-                                <td v-if="rs.status=='Confirmed'" style="text-align:center">
-                                    <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
-                                        Lihat RSO
-                                    </router-link>
-                                </td>
-                            </tr>
-                        </tbody>
+                <table id="thead" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nomor RSO</th>
+                            <th>Tanggal</th>
+                            <th>Customer</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="rs.status!=='Draft'" v-for="(rs , index) in FilterKategori" :key="rs.nomor_rso">
+                            <td style="text-align:center">{{index+1}}</td>
+                            <td style="text-align:center">{{rs.nomor_rso}}</td>
+                            <td style="text-align:center">{{rs.tanggal_rso}}</td>
+                            <td>{{rs.customer}}</td>
+                            <td v-if="rs.status=='Sent'" style="text-align:center">
+                                <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
+                                    Detail RSO
+                                </router-link>
+                                <button @click="ConfirmRso(rs)" class="btn btn-success">Confirm</button>
+                            </td>
+                            <td v-if="rs.status=='Confirmed'" style="text-align:center">
+                                <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
+                                    Lihat RSO
+                                </router-link>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>

@@ -62,7 +62,9 @@
                         <th>Satuan</th>
                         <th v-if="rlist.status=='Sent'">Catatan</th>
                         <th v-if="rlist.status=='Confirmed'">Status</th>
-                        <th v-if="rlist.status=='Confirmed'">Qty</th>
+                        <th v-if="rlist.status=='Confirmed'">Tersedia</th>
+                        <th v-if="rlist.status=='Confirmed'">Tidak Tersedia</th>
+                        <th v-if="rlist.status=='Confirmed'">Estimasi Kedatangan</th>
                         <th v-if="rlist.status!=='Sent'">Aksi</th>
                     </tr>
                 </thead>
@@ -74,6 +76,8 @@
                         <td style="text-align:center">{{list.satuan}}</td>
                         <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.status}}</td>
                         <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tersedia}}</td>
+                        <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tdktersedia}}</td>
+                        <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.tgl_datang}}</td>
                         <td v-if="rlist.status=='Sent'" style="text-align:center">{{list.catatan}}</td>
                         <td  v-if="rlist.status!=='Sent'" style="text-align:center">
                             <button @click="editListRso(list)"  class="btn btn-primary">Edit</button>

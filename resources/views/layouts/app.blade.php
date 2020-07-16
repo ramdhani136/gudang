@@ -60,6 +60,7 @@
                                     <router-link to="/customer" class="dropdown-item" >Customer</router-link>
                                     <router-link to="/divisi" class="dropdown-item" >Divisi</router-link>
                                     <router-link to="/supplier" class="dropdown-item" >Supplier</router-link>
+                                    <router-link to="/sales" class="dropdown-item" >Sales</router-link>
                                 </div>
                             </li>
 

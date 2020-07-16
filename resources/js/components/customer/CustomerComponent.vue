@@ -52,6 +52,23 @@
                         <label>Nama</label>
                         <input v-model="form.nama" type="text" name="nama"  autocomplete="off" class="form-control">
                     </div>
+                    <div class="form-group">
+                        <label>Sales</label>
+                        <select v-model="form.nip_sales" class="form-control">
+                            <option v-for="sl in sales" :key="sl.nip" :value="sl.nip">{{sl.nama}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <textarea v-model="form.keterangan" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select v-model="form.status" class="form-control">
+                            <option value="Aktif">Aktif</option>
+                            <option value="Non Aktif">Non Aktif</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -72,13 +89,17 @@ export default {
             form:{
                 kode:'',
                 nama:'',
+                status:'Aktif'
             },
             errors:[],
             edit:false,
+            sales:{},
+            target:''
         }
     },
     created(){
         this.getCustomer()
+        this.getSales()
     },
     computed:{
         FilteredCustomer(){
@@ -101,7 +122,6 @@ export default {
                 axios.post("/api/customer",this.form)
                 .then((response)=>{
                     this.getCustomer();
-                    this.$router.push({name:'customer'})
                     $("#modal-form").modal("hide");
                     this.resetForm();
                 })
@@ -115,10 +135,9 @@ export default {
                     }
             })
             }else{
-                axios.put("/api/customer/"+  this.form.kode,this.form)
+                axios.put("/api/customer/"+  this.target,this.form)
                 .then((response)=>{
                     this.getCustomer();
-                    this.$router.push({name:'customer'})
                     $("#modal-form").modal("hide");
                     this.resetForm()
                 })
@@ -136,6 +155,10 @@ export default {
         updateCustomer(customer){
             this.form.nama=customer.nama
             this.form.kode=customer.kode
+            this.target=customer.kode
+            this.form.status=customer.status
+            this.form.nip_sales=customer.nip_sales 
+            this.form.keterangan=customer.keterangan 
             this.edit=true;
             this.showmodal();
         },
@@ -151,9 +174,17 @@ export default {
                 })
             }
         },
+        getSales(){
+            axios.get("/api/sales")
+            .then(res=>this.sales=res.data.data)
+        },
         resetForm(){
             this.form.nama=""
             this.form.kode=""
+            this.form.status="Aktif"
+            this.target=""
+            this.form.nip_sales=""
+            this.form.keterangan="" 
             this.edit=false;
         },
     }

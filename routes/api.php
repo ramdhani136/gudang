@@ -25,5 +25,6 @@ Route::resource('rso','Rso\RsoController');
 Route::resource('supplier','Supplier\SupplierController');
 Route::resource('listrso','Rso\ListRsoController');
 Route::resource('listrso','Rso\ListRsoController');
+Route::resource('sales','Sales\SalesController');
 
 

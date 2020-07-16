@@ -5,6 +5,7 @@ import BarangComponent from '../components/barang/BarangComponent.vue'
 import CustomerComponent from '../components/customer/CustomerComponent.vue'
 import DivisiComponent from '../components/divisi/DivisiComponent.vue'
 import SupplierComponent from '../components/supplier/SupplierComponent.vue'
+import SalesComponent from '../components/sales/SalesComponent.vue'
 
 import RsoComponent from '../components/rso/RsoComponent.vue'
 import ListRsoComponent from '../components/rso/ListRsoComponent.vue'
@@ -21,6 +22,7 @@ const routes=[
     {name:'customer', path:'/customer', component:CustomerComponent},
     {name:'divisi', path:'/divisi', component:DivisiComponent},
     {name:'supplier', path:'/supplier', component:SupplierComponent},
+    {name:'sales', path:'/sales', component:SalesComponent},
 
     {name:'rso', path:'/rso', component:RsoComponent},
     {name:'formrso', path:'/formrso/:id', component:ListRsoComponent},

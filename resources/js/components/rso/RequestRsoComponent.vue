@@ -42,7 +42,7 @@
                         <th>Jumlah</th>
                         <th>Satuan</th>
                         <th>Status</th>
-                        <th v-if="u.status=='Confirmed'">Tanggal Perkiraan</th>
+                        <th v-if="u.status=='Confirmed'">Estimasi Kedatangan</th>
                         <th>Tersedia</th>
                         <th>Tidak Tersedia</th>
                         <th v-if="u.status=='Sent'">Aksi</th>
@@ -182,6 +182,7 @@ export default {
             this.dic.id=list.id
             this.dic.nama_barang=list.nama_barang
             this.update.status=list.status
+            this.update.qty_tersedia=list.qty_tersedia
             this.dic.jumlahrso=list.qty
             this.dic.satuan=list.satuan
             $("#modal-form").modal("show");

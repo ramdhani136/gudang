@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Customer;
+namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Model\Customer\Customer;
-use App\Http\Resources\CustomerResource;
+use App\Model\Sales\Sales;
+use App\Http\Resources\SalesResource;
 use Symfony\Component\HttpFoundation\Response;
 
-class CustomerController extends Controller
+class SalesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        return CustomerResource::collection(Customer::latest()->get());
+        return SalesResource::collection(Sales::latest()->get());
     }
 
     /**
@@ -38,14 +38,11 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
-            'kode'=>'required',
-            'nama'=>'required',
-        ]);
 
-        $data=Customer::create($request->all());
-        return response(new CustomerResource($data),response::HTTP_CREATED);
+        $data=Sales::create($request->all());
+        return response(new SalesResource($data),response::HTTP_CREATED);
     }
+
 
     /**
      * Display the specified resource.
@@ -53,9 +50,9 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($customer)
+    public function show($sales)
     {
-        return CustomerResource::collection(Customer::where('kode',$customer)->get());
+        return SalesResource::collection(Sales::where('nip',$sales)->get());
     }
 
     /**
@@ -76,16 +73,14 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $customer)
+    public function update(Request $request,$sales)
     {
-
-        Customer::where('kode',$customer)->update([
-            'kode'=>$request->kode,
+        Sales::where('nip',$sales)->update([
+            'nip'=>$request->nip,
             'nama'=>$request->nama,
-            'nip_sales'=>$request->nip_sales,
             'status'=>$request->status,
-            'keterangan'=>$request->keterangan,
         ]);
+        return response('update',response::HTTP_CREATED);
     }
 
     /**
@@ -94,9 +89,9 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($customer)
-    {
-        Customer::where('kode',$customer)->delete();
-        return response('Deleted',response::HTTP_OK);
+    public function destroy($sales)
+    {   
+        Sales::where('nip',$sales)->delete();
+        return response('deleted',response::HTTP_OK);
     }
 }

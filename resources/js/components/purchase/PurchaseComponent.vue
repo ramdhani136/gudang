@@ -17,6 +17,10 @@
                                 <th>Nomor RSO</th>
                                 <th>Tanggal</th>
                                 <th>Customer</th>
+                                <th>Kode</th>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Satuan</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -26,6 +30,10 @@
                                 <td style="text-align:center">{{rs.nomor_rso}}</td>
                                 <td style="text-align:center">{{rs.tanggal_rso}}</td>
                                 <td>{{rs.customer}}</td>
+                                <td>KQ-0087</td>
+                                <td>Kain Quilting</td>
+                                <td>100000</td>
+                                <td style="text-align:center">MTR</td>
                                 <td v-if="rs.status=='Sent'" style="text-align:center">
                                     <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
                                         Detail RSO
