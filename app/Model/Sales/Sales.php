@@ -4,6 +4,7 @@ namespace App\Model\Sales;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Customer\Customer;
+use App\Model\Rso\Rso;
 
 class Sales extends Model
 {
@@ -13,4 +14,9 @@ class Sales extends Model
     public function customer(){
         return $this->hasMany(Customer::class,'nip_sales','nip');
     }
+
+        public function rso(){
+            return $this->hasMany(Rso::class,'nip_sales','nip');
+    }
+    
 }

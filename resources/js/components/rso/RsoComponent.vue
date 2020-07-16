@@ -41,7 +41,7 @@
                             </td>
                             <td v-if="rs.status=='Confirmed'" style="text-align:center">
                                 <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
-                                    Create SO
+                                    Lihat Status
                                 </router-link>
                                 <button @click="deleteRso(rs)" class="btn btn-danger">Hapus</button>
                             </td>
@@ -69,9 +69,8 @@
                     </div>
                     <div class="form-group">
                         <label>Marketing</label>
-                        <select v-model="form.id_user" class="form-control" name="user">
-                            <option value="1">Rotamba</option>
-                            <option value="2">Miana</option>
+                        <select v-model="form.nip_sales" class="form-control" name="user">
+                            <option v-for="sl in sales" :key="sl.nip" :value="sl.nip">{{sl.nama}}</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -104,18 +103,20 @@ export default {
             status:'Draft',
             customer:[],
             form:{
-                nomor_rso:'',
+                nomor_rso:'RSO-2020-',
                 tanggal_rso:'',
-                id_user:'',
+                nip_sales:'',
                 kode_customer:'',
                 keterangan:'',
                 status:'Draft'
             },
+            sales:{}
         }
     },
     created(){
         this.getRso()
         this.getCustomer()
+        this.getSales()
     },
     computed:{
         FilterKategori(){
@@ -167,10 +168,14 @@ export default {
                     this.resetForm()
                 })
         },
+        getSales(){
+            axios.get("/api/sales")
+            .then(res=>this.sales=res.data.data)
+        },
         resetForm(){
-            this.form.nomor_rso="";
+            this.form.nomor_rso="RSO-2020-";
             this.form.tanggal_rso="";
-            this.form.id_user="";
+            this.form.nip_sales="";
             this.form.kode_customer="";
             this.form.keterangan="";
         },

@@ -22,7 +22,6 @@ class CustomerResource extends JsonResource
             'nama'=>$this->nama,
             'status'=>$this->status,
             'nip_sales'=>$this->nip_sales,
-            'sales'=>$this->sales->nama,
             'keterangan'=>$this->keterangan,
         ];
     }

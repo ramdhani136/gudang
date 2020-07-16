@@ -73,14 +73,7 @@ class RsoController extends Controller
      */
     public function update(Request $request,$rso)
     {
-        Rso::where('nomor_rso',$rso)->update([
-            'nomor_rso'=>$request->nomor_rso,
-            'tanggal_rso'=>$request->tanggal_rso,
-            'id_user'=>$request->id_user,
-            'kode_customer'=>$request->kode_customer,
-            'keterangan'=>$request->keterangan,
-            'status'=>$request->status,
-        ]);
+        Rso::where('nomor_rso',$rso)->update($request->all());
         return response('updated',response::HTTP_CREATED);
     }
 

@@ -53,12 +53,6 @@
                         <input v-model="form.nama" type="text" name="nama"  autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label>Sales</label>
-                        <select v-model="form.nip_sales" class="form-control">
-                            <option v-for="sl in sales" :key="sl.nip" :value="sl.nip">{{sl.nama}}</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label>Keterangan</label>
                         <textarea v-model="form.keterangan" class="form-control"></textarea>
                     </div>
@@ -93,13 +87,11 @@ export default {
             },
             errors:[],
             edit:false,
-            sales:{},
             target:''
         }
     },
     created(){
         this.getCustomer()
-        this.getSales()
     },
     computed:{
         FilteredCustomer(){
@@ -157,7 +149,6 @@ export default {
             this.form.kode=customer.kode
             this.target=customer.kode
             this.form.status=customer.status
-            this.form.nip_sales=customer.nip_sales 
             this.form.keterangan=customer.keterangan 
             this.edit=true;
             this.showmodal();
@@ -174,16 +165,11 @@ export default {
                 })
             }
         },
-        getSales(){
-            axios.get("/api/sales")
-            .then(res=>this.sales=res.data.data)
-        },
         resetForm(){
             this.form.nama=""
             this.form.kode=""
             this.form.status="Aktif"
             this.target=""
-            this.form.nip_sales=""
             this.form.keterangan="" 
             this.edit=false;
         },

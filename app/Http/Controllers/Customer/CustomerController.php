@@ -79,13 +79,7 @@ class CustomerController extends Controller
     public function update(Request $request, $customer)
     {
 
-        Customer::where('kode',$customer)->update([
-            'kode'=>$request->kode,
-            'nama'=>$request->nama,
-            'nip_sales'=>$request->nip_sales,
-            'status'=>$request->status,
-            'keterangan'=>$request->keterangan,
-        ]);
+        Customer::where('kode',$customer)->update($request->all());
     }
 
     /**

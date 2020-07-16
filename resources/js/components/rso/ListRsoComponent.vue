@@ -27,13 +27,11 @@
                 </div>
                 <div class="form-group">
                     <label>Marketing</label>
-                    <select  v-if="disabled"  v-model="rlist.id_user" name="marketing" class="col-12 form-control" :disabled="disabled == 1">
-                        <option value="1">Rotamba</option>
-                        <option value="2">Miana</option>
+                    <select  v-if="disabled"  v-model="rlist.nip_sales" name="marketing" class="col-12 form-control" :disabled="disabled == 1">
+                        <option v-for="sl in sales" :key="sl.nip" :value="sl.nip">{{sl.nama}}</option>
                     </select>
-                    <select v-if="!disabled" v-model="inprso.id_user" name="marketing" class="col-12 form-control" >
-                        <option value="1">Rotamba</option>
-                        <option value="2">Miana</option>
+                    <select v-if="!disabled" v-model="inprso.nip_sales" name="marketing" class="col-12 form-control" >
+                        <option v-for="sl in sales" :key="sl.nip" :value="sl.nip">{{sl.nama}}</option>
                     </select>
                 </div>
             </div>
@@ -58,7 +56,7 @@
                     <tr>
                         <th>No</th>
                         <th>Nama Barang</th>
-                        <th>Booking</th>
+                        <th>Diminta</th>
                         <th>Satuan</th>
                         <th v-if="rlist.status=='Sent'">Catatan</th>
                         <th v-if="rlist.status=='Confirmed'">Status</th>
@@ -87,6 +85,9 @@
                 </tbody>
             </table>
         </div>
+        <div class="row mt-2"  v-for="rlist in form" :key="rlist.id">
+            <button v-if="rlist.status=='Draft'"  @click="updateStatus()" class="btn-orange btn ml-3">Kirim RSO</button>
+        </div>
         <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
@@ -106,6 +107,10 @@
                     <div class="form-group">
                         <label>Jumlah</label>
                         <input v-model="inputlrso.qty"  type="number" name="qty"  autocomplete="off" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Satuan</label>
+                        <input v-model="ket.satuan"  type="text"  class="form-control" disabled>
                     </div>
                     <div class="form-group">
                         <label>Catatan</label>
@@ -137,14 +142,17 @@ export default {
             },
             barang:{},
             edit:false,
-            inprso:{
-            }
+            inprso:{},
+            sales:{},
+            urso:{},
+            ket:{}
         }
     },
     created(){
         this.getRso();
         this.getlistRso();
         this.getBarang();
+        this.getSales();
     },  
     mounted(){
         axios.get("/api/customer")
@@ -159,7 +167,7 @@ export default {
                 this.getRso()
                 this.inprso.nomor_rso=rlist.nomor_rso
                 this.inprso.tanggal_rso=rlist.tanggal_rso  
-                this.inprso.id_user=rlist.id_user 
+                this.inprso.nip_sales=rlist.nip_sales 
                 this.inprso.kode_customer=rlist.kode_customer 
                 this.inprso.keterangan=rlist.keterangan 
     
@@ -170,7 +178,7 @@ export default {
                 this.inprso.status=rlist.status
                 this.inprso.nomor_rso=rlist.nomor_rso
                 this.inprso.tanggal_rso=rlist.tanggal_rso  
-                this.inprso.id_user=rlist.id_user 
+                this.inprso.nip_sales=rlist.nip_sales 
                 this.inprso.kode_customer=rlist.kode_customer 
                 this.inprso.keterangan=rlist.keterangan 
             }
@@ -228,6 +236,7 @@ export default {
         editListRso(list){
             this.getlistRso();
             this.inputlrso.id=list.id
+            this.ket.satuan=list.satuan
             this.inputlrso.nomor_rso=list.lno_rso
             this.inputlrso.kode_barang=list.lkode_barang
             this.inputlrso.qty=list.qty
@@ -249,10 +258,24 @@ export default {
                 })
             }
         },
+        getSales(){
+            axios.get("/api/sales")
+            .then(res=>this.sales=res.data.data)
+        },
+        updateStatus(){
+            let tanya=confirm('Apakah yakin ingin mengirim RSO ini ke DIC?');
+            if(tanya===true){
+                this.urso.status="Sent"
+                axios.put(`/api/rso/${this.$route.params.id}`,this.urso)
+                .then((response)=>{
+                    this.$router.push({name:'rso'}) 
+                })
+            }
+        },
         resetform(){
             this.getlistRso()
-            this.inputlrso.status=""
             this.inputlrso.id=""
+            this.ket.satuan=""
             this.inputlrso.kode_barang=""
             this.inputlrso.qty=""
             this.inputlrso.catatan=""
@@ -265,7 +288,7 @@ export default {
 <style>
     #rsoverflow{
     width: 100%;
-    max-height: 280px;
+    max-height: 240px;
     overflow-y: scroll;
     border-top:solid 1px #dee2e6;
     }
@@ -279,6 +302,18 @@ export default {
         border-collapse: collapse;
         box-shadow: inset 0 0 0 #dee2e6,
         inset 0 -1px 0 #dee2e6;
+    }
+
+    .btn-orange{
+        background-color: lightsalmon;
+        border:solid 1px rgb(247, 141, 99);
+        color: white;
+    }
+
+      .btn-orange:hover{
+        background-color: rgb(253, 143, 100);
+        border:solid 1px rgb(243, 127, 81);
+        color: white;
     }
     
 </style>

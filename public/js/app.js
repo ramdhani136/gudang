@@ -2249,12 +2249,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2267,13 +2261,11 @@ __webpack_require__.r(__webpack_exports__);
       },
       errors: [],
       edit: false,
-      sales: {},
       target: ''
     };
   },
   created: function created() {
     this.getCustomer();
-    this.getSales();
   },
   computed: {
     FilteredCustomer: function FilteredCustomer() {
@@ -2342,7 +2334,6 @@ __webpack_require__.r(__webpack_exports__);
       this.form.kode = customer.kode;
       this.target = customer.kode;
       this.form.status = customer.status;
-      this.form.nip_sales = customer.nip_sales;
       this.form.keterangan = customer.keterangan;
       this.edit = true;
       this.showmodal();
@@ -2360,19 +2351,11 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
-    getSales: function getSales() {
-      var _this5 = this;
-
-      axios.get("/api/sales").then(function (res) {
-        return _this5.sales = res.data.data;
-      });
-    },
     resetForm: function resetForm() {
       this.form.nama = "";
       this.form.kode = "";
       this.form.status = "Aktif";
       this.target = "";
-      this.form.nip_sales = "";
       this.form.keterangan = "";
       this.edit = false;
     }
@@ -2952,6 +2935,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2966,13 +2954,17 @@ __webpack_require__.r(__webpack_exports__);
       },
       barang: {},
       edit: false,
-      inprso: {}
+      inprso: {},
+      sales: {},
+      urso: {},
+      ket: {}
     };
   },
   created: function created() {
     this.getRso();
     this.getlistRso();
     this.getBarang();
+    this.getSales();
   },
   mounted: function mounted() {
     var _this = this;
@@ -2991,7 +2983,7 @@ __webpack_require__.r(__webpack_exports__);
         this.getRso();
         this.inprso.nomor_rso = rlist.nomor_rso;
         this.inprso.tanggal_rso = rlist.tanggal_rso;
-        this.inprso.id_user = rlist.id_user;
+        this.inprso.nip_sales = rlist.nip_sales;
         this.inprso.kode_customer = rlist.kode_customer;
         this.inprso.keterangan = rlist.keterangan;
       } else {
@@ -3001,7 +2993,7 @@ __webpack_require__.r(__webpack_exports__);
         this.inprso.status = rlist.status;
         this.inprso.nomor_rso = rlist.nomor_rso;
         this.inprso.tanggal_rso = rlist.tanggal_rso;
-        this.inprso.id_user = rlist.id_user;
+        this.inprso.nip_sales = rlist.nip_sales;
         this.inprso.kode_customer = rlist.kode_customer;
         this.inprso.keterangan = rlist.keterangan;
       }
@@ -3082,6 +3074,7 @@ __webpack_require__.r(__webpack_exports__);
     editListRso: function editListRso(list) {
       this.getlistRso();
       this.inputlrso.id = list.id;
+      this.ket.satuan = list.satuan;
       this.inputlrso.nomor_rso = list.lno_rso;
       this.inputlrso.kode_barang = list.lkode_barang;
       this.inputlrso.qty = list.qty;
@@ -3106,10 +3099,31 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
+    getSales: function getSales() {
+      var _this8 = this;
+
+      axios.get("/api/sales").then(function (res) {
+        return _this8.sales = res.data.data;
+      });
+    },
+    updateStatus: function updateStatus() {
+      var _this9 = this;
+
+      var tanya = confirm('Apakah yakin ingin mengirim RSO ini ke DIC?');
+
+      if (tanya === true) {
+        this.urso.status = "Sent";
+        axios.put("/api/rso/".concat(this.$route.params.id), this.urso).then(function (response) {
+          _this9.$router.push({
+            name: 'rso'
+          });
+        });
+      }
+    },
     resetform: function resetform() {
       this.getlistRso();
-      this.inputlrso.status = "";
       this.inputlrso.id = "";
+      this.ket.satuan = "";
       this.inputlrso.kode_barang = "";
       this.inputlrso.qty = "";
       this.inputlrso.catatan = "";
@@ -3506,7 +3520,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -3515,18 +3528,20 @@ __webpack_require__.r(__webpack_exports__);
       status: 'Draft',
       customer: [],
       form: {
-        nomor_rso: '',
+        nomor_rso: 'RSO-2020-',
         tanggal_rso: '',
-        id_user: '',
+        nip_sales: '',
         kode_customer: '',
         keterangan: '',
         status: 'Draft'
-      }
+      },
+      sales: {}
     };
   },
   created: function created() {
     this.getRso();
     this.getCustomer();
+    this.getSales();
   },
   computed: {
     FilterKategori: function FilterKategori() {
@@ -3599,10 +3614,17 @@ __webpack_require__.r(__webpack_exports__);
         _this5.resetForm();
       });
     },
+    getSales: function getSales() {
+      var _this6 = this;
+
+      axios.get("/api/sales").then(function (res) {
+        return _this6.sales = res.data.data;
+      });
+    },
     resetForm: function resetForm() {
-      this.form.nomor_rso = "";
+      this.form.nomor_rso = "RSO-2020-";
       this.form.tanggal_rso = "";
-      this.form.id_user = "";
+      this.form.nip_sales = "";
       this.form.kode_customer = "";
       this.form.keterangan = "";
     }
@@ -8529,7 +8551,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n#rsoverflow{\nwidth: 100%;\nmax-height: 280px;\noverflow-y: scroll;\nborder-top:solid 1px #dee2e6;\n}\n#rsthead thead tr th{\n    text-align: center;\n    border-bottom: none;\n    position: -webkit-sticky;\n    position: sticky; top: 0; \n    background-color: #fff;\n    top: -1px;\n    border-collapse: collapse;\n    box-shadow: inset 0 0 0 #dee2e6,\n    inset 0 -1px 0 #dee2e6;\n}\n\n", ""]);
+exports.push([module.i, "\n#rsoverflow{\nwidth: 100%;\nmax-height: 240px;\noverflow-y: scroll;\nborder-top:solid 1px #dee2e6;\n}\n#rsthead thead tr th{\n    text-align: center;\n    border-bottom: none;\n    position: -webkit-sticky;\n    position: sticky; top: 0; \n    background-color: #fff;\n    top: -1px;\n    border-collapse: collapse;\n    box-shadow: inset 0 0 0 #dee2e6,\n    inset 0 -1px 0 #dee2e6;\n}\n.btn-orange{\n    background-color: lightsalmon;\n    border:solid 1px rgb(247, 141, 99);\n    color: white;\n}\n.btn-orange:hover{\n    background-color: rgb(253, 143, 100);\n    border:solid 1px rgb(243, 127, 81);\n    color: white;\n}\n\n", ""]);
 
 // exports
 
@@ -41340,52 +41362,6 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group" }, [
-                      _c("label", [_vm._v("Sales")]),
-                      _vm._v(" "),
-                      _c(
-                        "select",
-                        {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.form.nip_sales,
-                              expression: "form.nip_sales"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.$set(
-                                _vm.form,
-                                "nip_sales",
-                                $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              )
-                            }
-                          }
-                        },
-                        _vm._l(_vm.sales, function(sl) {
-                          return _c(
-                            "option",
-                            { key: sl.nip, domProps: { value: sl.nip } },
-                            [_vm._v(_vm._s(sl.nama))]
-                          )
-                        }),
-                        0
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group" }, [
                       _c("label", [_vm._v("Keterangan")]),
                       _vm._v(" "),
                       _c("textarea", {
@@ -42599,8 +42575,8 @@ var render = function() {
                           {
                             name: "model",
                             rawName: "v-model",
-                            value: rlist.id_user,
-                            expression: "rlist.id_user"
+                            value: rlist.nip_sales,
+                            expression: "rlist.nip_sales"
                           }
                         ],
                         staticClass: "col-12 form-control",
@@ -42620,7 +42596,7 @@ var render = function() {
                               })
                             _vm.$set(
                               rlist,
-                              "id_user",
+                              "nip_sales",
                               $event.target.multiple
                                 ? $$selectedVal
                                 : $$selectedVal[0]
@@ -42628,15 +42604,14 @@ var render = function() {
                           }
                         }
                       },
-                      [
-                        _c("option", { attrs: { value: "1" } }, [
-                          _vm._v("Rotamba")
-                        ]),
-                        _vm._v(" "),
-                        _c("option", { attrs: { value: "2" } }, [
-                          _vm._v("Miana")
-                        ])
-                      ]
+                      _vm._l(_vm.sales, function(sl) {
+                        return _c(
+                          "option",
+                          { key: sl.nip, domProps: { value: sl.nip } },
+                          [_vm._v(_vm._s(sl.nama))]
+                        )
+                      }),
+                      0
                     )
                   : _vm._e(),
                 _vm._v(" "),
@@ -42648,8 +42623,8 @@ var render = function() {
                           {
                             name: "model",
                             rawName: "v-model",
-                            value: _vm.inprso.id_user,
-                            expression: "inprso.id_user"
+                            value: _vm.inprso.nip_sales,
+                            expression: "inprso.nip_sales"
                           }
                         ],
                         staticClass: "col-12 form-control",
@@ -42666,7 +42641,7 @@ var render = function() {
                               })
                             _vm.$set(
                               _vm.inprso,
-                              "id_user",
+                              "nip_sales",
                               $event.target.multiple
                                 ? $$selectedVal
                                 : $$selectedVal[0]
@@ -42674,15 +42649,14 @@ var render = function() {
                           }
                         }
                       },
-                      [
-                        _c("option", { attrs: { value: "1" } }, [
-                          _vm._v("Rotamba")
-                        ]),
-                        _vm._v(" "),
-                        _c("option", { attrs: { value: "2" } }, [
-                          _vm._v("Miana")
-                        ])
-                      ]
+                      _vm._l(_vm.sales, function(sl) {
+                        return _c(
+                          "option",
+                          { key: sl.nip, domProps: { value: sl.nip } },
+                          [_vm._v(_vm._s(sl.nama))]
+                        )
+                      }),
+                      0
                     )
                   : _vm._e()
               ])
@@ -42827,7 +42801,7 @@ var render = function() {
                     _vm._v(" "),
                     _c("th", [_vm._v("Nama Barang")]),
                     _vm._v(" "),
-                    _c("th", [_vm._v("Booking")]),
+                    _c("th", [_vm._v("Diminta")]),
                     _vm._v(" "),
                     _c("th", [_vm._v("Satuan")]),
                     _vm._v(" "),
@@ -42958,6 +42932,25 @@ var render = function() {
         )
       }),
       _vm._v(" "),
+      _vm._l(_vm.form, function(rlist) {
+        return _c("div", { key: rlist.id, staticClass: "row mt-2" }, [
+          rlist.status == "Draft"
+            ? _c(
+                "button",
+                {
+                  staticClass: "btn-orange btn ml-3",
+                  on: {
+                    click: function($event) {
+                      return _vm.updateStatus()
+                    }
+                  }
+                },
+                [_vm._v("Kirim RSO")]
+              )
+            : _vm._e()
+        ])
+      }),
+      _vm._v(" "),
       _c(
         "div",
         {
@@ -43055,6 +43048,32 @@ var render = function() {
                               return
                             }
                             _vm.$set(_vm.inputlrso, "qty", $event.target.value)
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Satuan")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.ket.satuan,
+                            expression: "ket.satuan"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", disabled: "" },
+                        domProps: { value: _vm.ket.satuan },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.ket, "satuan", $event.target.value)
                           }
                         }
                       })
@@ -44174,7 +44193,7 @@ var render = function() {
                           },
                           [
                             _vm._v(
-                              "\n                                Create SO\n                            "
+                              "\n                                Lihat Status\n                            "
                             )
                           ]
                         ),
@@ -44297,8 +44316,8 @@ var render = function() {
                           {
                             name: "model",
                             rawName: "v-model",
-                            value: _vm.form.id_user,
-                            expression: "form.id_user"
+                            value: _vm.form.nip_sales,
+                            expression: "form.nip_sales"
                           }
                         ],
                         staticClass: "form-control",
@@ -44315,7 +44334,7 @@ var render = function() {
                               })
                             _vm.$set(
                               _vm.form,
-                              "id_user",
+                              "nip_sales",
                               $event.target.multiple
                                 ? $$selectedVal
                                 : $$selectedVal[0]
@@ -44323,15 +44342,14 @@ var render = function() {
                           }
                         }
                       },
-                      [
-                        _c("option", { attrs: { value: "1" } }, [
-                          _vm._v("Rotamba")
-                        ]),
-                        _vm._v(" "),
-                        _c("option", { attrs: { value: "2" } }, [
-                          _vm._v("Miana")
-                        ])
-                      ]
+                      _vm._l(_vm.sales, function(sl) {
+                        return _c(
+                          "option",
+                          { key: sl.nip, domProps: { value: sl.nip } },
+                          [_vm._v(_vm._s(sl.nama))]
+                        )
+                      }),
+                      0
                     )
                   ]),
                   _vm._v(" "),
