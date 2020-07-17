@@ -1,133 +1,166 @@
 <template>
-    <div class="container">
-        <div class="form-group col-3 my-3 float-right">
-            <input v-model="search"  type="text" class="form-control" placeholder="Search">
+    <div class="autocomplete">
+        <div class="input" @click="toggleVisible" v-text="oncom ? oncom.nama:''"></div>
+        <div class="placeholder" v-if="oncom == null"> Select One ..</div>
+        <div class="form-group">
+            <input type="text" class="form-control" :value="oncom ? oncom.kode:''">
         </div>
-        <div class="form-group col-3 my-3 ml-n3 float-left">
-            <select name="status" v-model="status" class="form-control">
-                <option value="Sent">Request Masuk</option>
-                <option value="Confirmed">Confirm DIC</option>
-            </select>
+        <div class="form-group">
+            <input type="text" class="form-control" :value="oncom ? oncom.satuan:''">
         </div>
-            <div id="overflow" class="border-top">
-                <table id="thead" class="table table-striped table-bordered" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Nomor RSO</th>
-                                <th>Tanggal</th>
-                                <th>Customer</th>
-                                <th>Kode</th>
-                                <th>Item</th>
-                                <th>Qty</th>
-                                <th>Satuan</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody v-for="(rs , index) in FilterKategori" :key="rs.nomor_rso">
-                            <tr v-if="rs.status!=='Draft'">
-                                <td style="text-align:center">{{index+1}}</td>
-                                <td style="text-align:center">{{rs.nomor_rso}}</td>
-                                <td style="text-align:center">{{rs.tanggal_rso}}</td>
-                                <td>{{rs.customer}}</td>
-                                <td>KQ-0087</td>
-                                <td>Kain Quilting</td>
-                                <td>100000</td>
-                                <td style="text-align:center">MTR</td>
-                                <td v-if="rs.status=='Sent'" style="text-align:center">
-                                    <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
-                                        Detail RSO
-                                    </router-link>
-                                    <button @click="ConfirmRso(rs)" class="btn btn-success">Confirm</button>
-                                </td>
-                                <td v-if="rs.status=='Confirmed'" style="text-align:center">
-                                    <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
-                                        Lihat RSO
-                                    </router-link>
-                                </td>
-                            </tr>
-                        </tbody>
-                </table>
-            </div>
+        <div class="popover" v-show="visible">
+            <input type="text"
+            @keydown.up="up"
+            @keydown.down="down"
+            @keydown.enter="selectedItem"
+            v-model="query"
+            placeholder="Start Typing ...">
+                <div class="option" ref="optionList">
+                    <ul>
+                        <li v-for="(match,index) in matches" 
+                        :key="match.nama"
+                        @click="itemClicked(index)"
+                        :class="{'selected': (selected==index)}"
+                        v-text="match.nama"></li>
+                    </ul>
+                </div>
         </div>
+    </div>
 </template>
 
 <script>
 export default {
     data(){
-        return{
-            search  : '',
-            rso:[],
-            status:'Sent',
-            urso:{},
-            ya:false
+        return {
+            itemHeight:39,
+            user:[],
+            visible:false,
+            query:'',
+            selected:0,
+            oncom:null
         }
     },
     created(){
-        this.getRso()
-    },
-    computed:{
-        FilterKategori(){
-            if(this.search===""){
-                if(this.status==="Sent"){
-                    return this.rso.filter(elem=> elem.status==="Sent")
-                }else if(this.status==="Confirmed"){
-                    return this.rso.filter(elem=> elem.status==="Confirmed")
-                }
-            }else{
-                return this.rso.filter(elem => {
-                return elem.nomor_rso.toLowerCase().includes(this.search);
-            });
-            }
-        }
+        this.getBarang()
     },
     methods:{
-        getRso(){
-            axios.get("/api/rso")
-            .then(res=>this.rso=res.data.data)
+        toggleVisible(){
+            this.visible= !this.visible;
         },
-        ConfirmRso(rs){
-            let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
-            if(keputusan===true){
-                this.getRso()
-                this.urso.kode_customer=rs.kode_customer
-                this.urso.status="Confirmed"
-                this.urso.nomor_rso=rs.nomor_rso
-                this.urso.id_user=rs.id_user
-                this.urso.tanggal_rso=rs.tanggal_rso
-                axios.put(`/api/rso/`+this.urso.nomor_rso, this.urso)
-                .then((response)=>{
-                    this.getRso()
-                })
+        itemClicked(index){
+            this.selected=index;
+            this.selectedItem();
+        },
+        selectedItem(){
+            this.oncom= this.matches[this.selected];
+            this.visible=false;
+        },
+        getBarang(){
+            axios.get("/api/barang")
+            .then(res=>this.user=res.data.data)
+        },
+        up(){
+            if(this.selected==0){
+                return;
             }
+            this.selected -= 1;
+            this.scrollToItem();
+        },
+        down(){
+            if(this.selected >= this.matches.length -1 ){
+                return;
+            }
+            this.selected += 1;
+            this.scrollToItem();
+        },
+        scrollToItem(){
+            this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
+        }
+    },
+    computed:{
+        matches(){
+            if(this.query==''){
+                return [];
+            }
+            return this.user.filter((item)=>item.nama.toLowerCase().includes(this.query.toLowerCase()))
         }
     }
 }
 </script>
 
+<style   scoped>
 
-<style>
-    #overflow{
+    .autocomplete{
         width: 100%;
-    height: 440px;
-    overflow-y: scroll;
+        position: relative;
     }
 
-    #thead thead tr th{
-        text-align: center;
-        border-bottom: none;
-        position: sticky; top: 0; 
+    .input{
+        min-height: 40px;
+        border-radius: 3px;
+        border: 2px solid lightgray;
+        box-shadow: 0 0 10px #eceaea;
+        font-size: 25px;
+        padding-left: 10px;
+        padding-top: 5px;
+        cursor: text;
+    }
+
+    .popover{
+        min-height: 50px;
+        border:2px solid lightgray;
+        position: absolute;
+        top:46px;
+        left: 0;
+        right: 0;
         background-color: #fff;
-        top: -1px;
-        border-collapse: collapse;
-        box-shadow: inset 0 0 0 #dee2e6,
-        inset 0 -1px 0 #dee2e6;
+        border-radius: 3px;
+        text-align: center;
     }
 
-    #modal-width{
-    width: 120%;
-    height: auto;
-    right: 13%;
+    .popover input{
+        width:95%;
+        margin-top: 5px;
+        height: 40px;
+        font-size: 16px;
+        border-radius: 3px;
+        border:solid 1px lightgray;
+        padding-left: 8px;
     }
+
+    .option{
+        max-height: 150px;
+        overflow-y: scroll;
+        margin-top: 5px;
+    }
+
+    .option ul{
+        list-style-type:none;
+        text-align: left;
+        padding-left:0;
+    }
+
+    .option ul li{
+        border-bottom: 1px solid lightgrey;
+        padding:10px;
+        cursor: pointer;
+        background-color: #f1f1f1;
+    }
+
+    .option ul li.selected{
+        background-color: #58bd4c;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .placeholder{
+        position: absolute;
+        top:2px;
+        left: 10px;
+        font-size: 25px;
+        color: #d0d0d0;
+        pointer-events: none;
+    }
+
     
 </style>

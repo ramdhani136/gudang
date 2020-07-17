@@ -75,9 +75,27 @@
                     </div>
                     <div class="form-group">
                         <label>Customer</label>
-                        <select v-model="form.kode_customer" class="form-control" name="customer">
-                            <option :value="cust.kode" v-for="cust in customer" :key="cust.kode_customer">{{cust.nama}}</option>
-                        </select>
+                        <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisible" v-text="custom ? custom.nama:''"></div>
+                        <div class="placeholder" v-if="custom==null">Pilih Customer</div>
+                        <div class="popover" v-show="visible">
+                            <input type="text"
+                            @keydown.up="up"
+                            @keydown.down="down"
+                            @keydown.enter="selectItem"
+                            v-model="query"
+                            placeholder="Masukan nama customer .."
+                            >
+                            <div class="option" ref="optionList">
+                                <ul>
+                                    <li v-for="(match,index) in matches" 
+                                    :key="match.kode"
+                                    v-text="match.nama"
+                                    :class="{'selected':(selected==index)}"
+                                    @click="itemClicked(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Keterangan</label>
@@ -110,7 +128,12 @@ export default {
                 keterangan:'',
                 status:'Draft'
             },
-            sales:{}
+            sales:{},
+            visible:false,
+            query:'',
+            selected:0,
+            custom:null,
+            itemHeight:39,
         }
     },
     created(){
@@ -133,6 +156,12 @@ export default {
                 return elem.nomor_rso.toLowerCase().includes(this.search);
             });
             }
+        },
+        matches(){
+            if(this.query==''){
+                return [];
+            }
+            return this.customer.filter((item)=> item.nama.toLowerCase().includes(this.query.toLowerCase()))
         }
     },
     methods:{
@@ -178,8 +207,37 @@ export default {
             this.form.nip_sales="";
             this.form.kode_customer="";
             this.form.keterangan="";
+            this.custom=null
         },
-
+        toggleVisible(){
+            this.visible = !this.visible;
+        },
+        itemClicked(index){
+            this.selected=index;
+            this.selectItem();
+        },
+        selectItem(){
+            this.custom = this.matches[this.selected];
+            this.form.kode_customer= this.custom.kode
+            this.visible=false;
+        },
+        up(){
+            if(this.selected==0){
+                return;
+            }
+            this.selected -= 1;
+            this.scrollToItem();
+        },
+        down(){
+            if(this.selected >= this.matches.length -1 ){
+                return;
+            }
+            this.selected += 1;
+            this.scrollToItem();
+        },
+        scrollToItem(){
+            this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
+        }
     }
 }
 </script>
@@ -207,6 +265,77 @@ export default {
     width: 120%;
     height: auto;
     right: 13%;
+    }
+
+
+    .autocomplete{
+        width: 100%;
+        position: relative;
+    }
+
+    .input{
+        min-height: 40px;
+        border-radius: 3px;
+        border: 1px solid lightgray;
+        box-shadow: 0 0 10px #eceaea;
+        padding-left: 10px;
+        padding-top: 10px;
+        cursor: text;
+    }
+
+    .popover{
+        min-width: 100%;
+        min-height: 50px;
+        border:1px solid lightgray;
+        position: relative;
+        top:4px;
+        left: 0;
+        right: 0;
+        background-color: #fff;
+        border-radius: 3px;
+        text-align: center;
+    }
+
+    .popover input{
+        width:95%;
+        margin-top: 5px;
+        height: 40px;
+        font-size: 14px;
+        border-radius: 3px;
+        border:solid 1px lightgray;
+        padding-left: 8px;
+    }
+
+    .option{
+        max-height: 150px;
+        overflow-y: scroll;
+        margin-top: 5px;
+    }
+
+    .option ul{
+        list-style-type:none;
+        text-align: left;
+        padding-left:0;
+    }
+
+    .option ul li{
+        border-bottom: 1px solid lightgrey;
+        padding:10px;
+        cursor: pointer;
+        background-color: #f1f1f1;
+    }
+
+    .option ul li.selected{
+        background-color: #58bd4c;
+        color: #fff;
+    }
+
+    .placeholder{
+        position: relative;
+        color: #d0d0d0;
+        pointer-events: none;
+        margin-top: -30px;
+        margin-left: 3%;
     }
     
 </style>
