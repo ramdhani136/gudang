@@ -2922,6 +2922,44 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2939,7 +2977,18 @@ __webpack_require__.r(__webpack_exports__);
       inprso: {},
       sales: {},
       urso: {},
-      ket: {}
+      ket: {
+        nama: "Pilih Barang"
+      },
+      visible: false,
+      visiblecust: false,
+      query: '',
+      query2: '',
+      selected: 0,
+      custom: null,
+      custom2: null,
+      itemHeight: 39,
+      ketcust: {}
     };
   },
   created: function created() {
@@ -2954,6 +3003,30 @@ __webpack_require__.r(__webpack_exports__);
     axios.get("/api/customer").then(function (res) {
       return _this.customers = res.data.data;
     });
+  },
+  computed: {
+    matches: function matches() {
+      var _this2 = this;
+
+      if (this.query == '') {
+        return [];
+      }
+
+      return this.barang.filter(function (item) {
+        return item.nama.toLowerCase().includes(_this2.query.toLowerCase());
+      });
+    },
+    custmatches: function custmatches() {
+      var _this3 = this;
+
+      if (this.query2 == '') {
+        return [];
+      }
+
+      return this.customers.filter(function (item) {
+        return item.nama.toLowerCase().includes(_this3.query2.toLowerCase());
+      });
+    }
   },
   methods: {
     getdisabled: function getdisabled(rlist) {
@@ -2978,31 +3051,33 @@ __webpack_require__.r(__webpack_exports__);
         this.inprso.nip_sales = rlist.nip_sales;
         this.inprso.kode_customer = rlist.kode_customer;
         this.inprso.keterangan = rlist.keterangan;
+        this.inprso.kode_customer = rlist.kode_customer;
+        this.ketcust.customer = rlist.customer;
       }
     },
     getRso: function getRso() {
-      var _this2 = this;
+      var _this4 = this;
 
       axios.get("/api/rso/".concat(this.$route.params.id)).then(function (res) {
-        return _this2.form = res.data.data;
+        return _this4.form = res.data.data;
       });
     },
     updateRso: function updateRso() {
-      var _this3 = this;
+      var _this5 = this;
 
       this.getRso();
       axios.put("/api/rso/".concat(this.$route.params.id), this.inprso).then(function (response) {
-        _this3.getRso();
+        _this5.getRso();
 
-        _this3.getlistRso();
+        _this5.getlistRso();
 
-        _this3.getBarang();
+        _this5.getBarang();
 
-        _this3.tbsukses = false;
-        _this3.disabled = 1;
-        _this3.tombol = "Edit RSO";
+        _this5.tbsukses = false;
+        _this5.disabled = 1;
+        _this5.tombol = "Edit RSO";
 
-        _this3.$router.push({
+        _this5.$router.push({
           name: 'rso'
         });
       });
@@ -3011,43 +3086,43 @@ __webpack_require__.r(__webpack_exports__);
       $("#modal-form").modal("show");
     },
     getlistRso: function getlistRso() {
-      var _this4 = this;
+      var _this6 = this;
 
       axios.get("/api/listrso/".concat(this.$route.params.id)).then(function (res) {
-        return _this4.listrso = res.data.data;
+        return _this6.listrso = res.data.data;
       });
     },
     getBarang: function getBarang() {
-      var _this5 = this;
+      var _this7 = this;
 
       axios.get("/api/barang/").then(function (res) {
-        return _this5.barang = res.data.data;
+        return _this7.barang = res.data.data;
       });
     },
     createListRso: function createListRso() {
-      var _this6 = this;
+      var _this8 = this;
 
       if (this.edit === false) {
         axios.post("/api/listrso", this.inputlrso).then(function (response) {
-          _this6.getRso();
+          _this8.getRso();
 
-          _this6.getlistRso();
+          _this8.getlistRso();
 
-          _this6.getBarang();
+          _this8.getBarang();
 
-          _this6.resetform();
+          _this8.resetform();
 
           $("#modal-form").modal("hide");
         });
       } else {
         axios.put("/api/listrso/" + this.inputlrso.id, this.inputlrso).then(function (response) {
-          _this6.resetform();
+          _this8.resetform();
 
-          _this6.getRso();
+          _this8.getRso();
 
-          _this6.getlistRso();
+          _this8.getlistRso();
 
-          _this6.getBarang();
+          _this8.getBarang();
 
           $("#modal-form").modal("hide");
         });
@@ -3057,6 +3132,7 @@ __webpack_require__.r(__webpack_exports__);
       this.getlistRso();
       this.inputlrso.id = list.id;
       this.ket.satuan = list.satuan;
+      this.ket.nama = list.nama_barang;
       this.inputlrso.nomor_rso = list.lno_rso;
       this.inputlrso.kode_barang = list.lkode_barang;
       this.inputlrso.qty = list.qty;
@@ -3065,38 +3141,38 @@ __webpack_require__.r(__webpack_exports__);
       this.showmodal();
     },
     deleteListRso: function deleteListRso(list) {
-      var _this7 = this;
+      var _this9 = this;
 
       var keputusan = confirm('Apakah anda yakin?');
 
       if (keputusan === true) {
         axios["delete"]("/api/listrso/" + list.id).then(function (response) {
-          _this7.getRso();
+          _this9.getRso();
 
-          _this7.getlistRso();
+          _this9.getlistRso();
 
-          _this7.getBarang();
+          _this9.getBarang();
         })["catch"](function (error) {
           console.log(error);
         });
       }
     },
     getSales: function getSales() {
-      var _this8 = this;
+      var _this10 = this;
 
       axios.get("/api/sales").then(function (res) {
-        return _this8.sales = res.data.data;
+        return _this10.sales = res.data.data;
       });
     },
     updateStatus: function updateStatus() {
-      var _this9 = this;
+      var _this11 = this;
 
       var tanya = confirm('Apakah yakin ingin mengirim RSO ini ke DIC?');
 
       if (tanya === true) {
         this.urso.status = "Sent";
         axios.put("/api/rso/".concat(this.$route.params.id), this.urso).then(function (response) {
-          _this9.$router.push({
+          _this11.$router.push({
             name: 'rso'
           });
         });
@@ -3109,7 +3185,72 @@ __webpack_require__.r(__webpack_exports__);
       this.inputlrso.kode_barang = "";
       this.inputlrso.qty = "";
       this.inputlrso.catatan = "";
+      this.ket.nama = "Pilih Barang";
+      this.custom = null;
       this.edit = false;
+    },
+    toggleVisible: function toggleVisible() {
+      this.visible = !this.visible;
+    },
+    toggleVisiblecust: function toggleVisiblecust() {
+      this.visiblecust = !this.visiblecust;
+    },
+    itemClicked: function itemClicked(index) {
+      this.selected = index;
+      this.selectItem();
+    },
+    selectItem: function selectItem() {
+      this.custom = this.matches[this.selected];
+      this.inputlrso.kode_barang = this.custom.kode;
+      this.ket.satuan = this.custom.satuan;
+      this.visible = false;
+    },
+    up: function up() {
+      if (this.selected == 0) {
+        return;
+      }
+
+      this.selected -= 1;
+      this.scrollToItem();
+    },
+    down: function down() {
+      if (this.selected >= this.matches.length - 1) {
+        return;
+      }
+
+      this.selected += 1;
+      this.scrollToItem();
+    },
+    scrollToItem: function scrollToItem() {
+      this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
+    },
+    itemClickedCust: function itemClickedCust(index) {
+      this.selected = index;
+      this.selectItemCust();
+    },
+    selectItemCust: function selectItemCust() {
+      this.custom2 = this.custmatches[this.selected];
+      this.inprso.kode_customer = this.custom2.kode;
+      this.visiblecust = false;
+    },
+    upcust: function upcust() {
+      if (this.selected == 0) {
+        return;
+      }
+
+      this.selected -= 1;
+      this.scrollToItem();
+    },
+    downcust: function downcust() {
+      if (this.selected >= this.custmatches.length - 1) {
+        return;
+      }
+
+      this.selected += 1;
+      this.scrollToItem();
+    },
+    scrollToItemcust: function scrollToItemcust() {
+      this.$refs.optionListCust.scrollTop = this.selected * this.itemHeight;
     }
   }
 });
@@ -8599,7 +8740,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n#rsoverflow{\nwidth: 100%;\nmax-height: 240px;\noverflow-y: scroll;\nborder-top:solid 1px #dee2e6;\n}\n#rsthead thead tr th{\n    text-align: center;\n    border-bottom: none;\n    position: -webkit-sticky;\n    position: sticky; top: 0; \n    background-color: #fff;\n    top: -1px;\n    border-collapse: collapse;\n    box-shadow: inset 0 0 0 #dee2e6,\n    inset 0 -1px 0 #dee2e6;\n}\n.btn-orange{\n    background-color: lightsalmon;\n    border:solid 1px rgb(247, 141, 99);\n    color: white;\n}\n.btn-orange:hover{\n    background-color: rgb(253, 143, 100);\n    border:solid 1px rgb(243, 127, 81);\n    color: white;\n}\n\n", ""]);
+exports.push([module.i, "\n#rsoverflow{\nwidth: 100%;\nmax-height: 240px;\noverflow-y: scroll;\nborder-top:solid 1px #dee2e6;\n}\n#rsthead thead tr th{\n    text-align: center;\n    border-bottom: none;\n    position: -webkit-sticky;\n    position: sticky; top: 0; \n    background-color: #fff;\n    top: -1px;\n    border-collapse: collapse;\n    box-shadow: inset 0 0 0 #dee2e6,\n    inset 0 -1px 0 #dee2e6;\n}\n.btn-orange{\n    background-color: lightsalmon;\n    border:solid 1px rgb(247, 141, 99);\n    color: white;\n}\n.btn-orange:hover{\n    background-color: rgb(253, 143, 100);\n    border:solid 1px rgb(243, 127, 81);\n    color: white;\n}\n.optionbr{\n    max-height: 350px;\n    overflow-y: scroll;\n    margin-top: 5px;\n}\n.optionbr ul{\n    list-style-type:none;\n    text-align: left;\n    padding-left:0;\n}\n.optionbr ul li{\n    border-bottom: 1px solid lightgrey;\n    padding:10px;\n    cursor: pointer;\n    background-color: #f1f1f1;\n}\n.optionbr ul li.selected{\n    background-color: #58bd4c;\n    color: #fff;\n}\n.popovercs{\n    max-width: 92%;\n    min-height: 50px;\n    border:1px solid lightgray;\n    position: absolute;\n    z-index: 800;\n    top:70px;\n    left: 4%;\n    right: 0;\n    background-color: #fff;\n    border-radius: 3px;\n    text-align: center;\n}\n.popovercs input{\n    width:95%;\n    margin-top: 5px;\n    height: 40px;\n    font-size: 14px;\n    border-radius: 3px;\n    border:solid 1px lightgray;\n    padding-left: 8px;\n}\n\n\n", ""]);
 
 // exports
 
@@ -42476,51 +42617,148 @@ var render = function() {
                   : _vm._e(),
                 _vm._v(" "),
                 !_vm.disabled
-                  ? _c(
-                      "select",
-                      {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.inprso.kode_customer,
-                            expression: "inprso.kode_customer"
-                          }
-                        ],
-                        staticClass: "col-12 form-control",
-                        attrs: { name: "customer" },
-                        on: {
-                          change: function($event) {
-                            var $$selectedVal = Array.prototype.filter
-                              .call($event.target.options, function(o) {
-                                return o.selected
-                              })
-                              .map(function(o) {
-                                var val = "_value" in o ? o._value : o.value
-                                return val
-                              })
-                            _vm.$set(
-                              _vm.inprso,
-                              "kode_customer",
-                              $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
-                            )
-                          }
-                        }
-                      },
-                      _vm._l(_vm.customers, function(custom) {
-                        return _c(
-                          "option",
-                          {
-                            key: custom.kode,
-                            domProps: { value: custom.kode }
-                          },
-                          [_vm._v(_vm._s(custom.nama))]
-                        )
+                  ? _c("div", [
+                      _c("div", { staticClass: "autocomplete" }),
+                      _vm._v(" "),
+                      _c("div", {
+                        staticClass: "input",
+                        domProps: {
+                          textContent: _vm._s(
+                            _vm.custom2 ? _vm.custom2.nama : ""
+                          )
+                        },
+                        on: { click: _vm.toggleVisiblecust }
                       }),
-                      0
-                    )
+                      _vm._v(" "),
+                      _vm.custom2 == null
+                        ? _c(
+                            "div",
+                            {
+                              staticClass: "placeholder",
+                              domProps: {
+                                textContent: _vm._s(_vm.ketcust.customer)
+                              }
+                            },
+                            [_vm._v("Pilih Customer")]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          directives: [
+                            {
+                              name: "show",
+                              rawName: "v-show",
+                              value: _vm.visiblecust,
+                              expression: "visiblecust"
+                            }
+                          ],
+                          staticClass: "popovercs"
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.query2,
+                                expression: "query2"
+                              }
+                            ],
+                            attrs: {
+                              type: "text",
+                              placeholder: "Masukan nama customer .."
+                            },
+                            domProps: { value: _vm.query2 },
+                            on: {
+                              keydown: [
+                                function($event) {
+                                  if (
+                                    !$event.type.indexOf("key") &&
+                                    _vm._k(
+                                      $event.keyCode,
+                                      "up",
+                                      38,
+                                      $event.key,
+                                      ["Up", "ArrowUp"]
+                                    )
+                                  ) {
+                                    return null
+                                  }
+                                  return _vm.upcust($event)
+                                },
+                                function($event) {
+                                  if (
+                                    !$event.type.indexOf("key") &&
+                                    _vm._k(
+                                      $event.keyCode,
+                                      "down",
+                                      40,
+                                      $event.key,
+                                      ["Down", "ArrowDown"]
+                                    )
+                                  ) {
+                                    return null
+                                  }
+                                  return _vm.downcust($event)
+                                },
+                                function($event) {
+                                  if (
+                                    !$event.type.indexOf("key") &&
+                                    _vm._k(
+                                      $event.keyCode,
+                                      "enter",
+                                      13,
+                                      $event.key,
+                                      "Enter"
+                                    )
+                                  ) {
+                                    return null
+                                  }
+                                  return _vm.selectItemCust($event)
+                                }
+                              ],
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.query2 = $event.target.value
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            {
+                              ref: "optionListcust",
+                              refInFor: true,
+                              staticClass: "optionbr"
+                            },
+                            [
+                              _c(
+                                "ul",
+                                _vm._l(_vm.custmatches, function(match, index) {
+                                  return _c("li", {
+                                    key: match.kode,
+                                    class: { selected: _vm.selected == index },
+                                    domProps: {
+                                      textContent: _vm._s(match.nama)
+                                    },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.itemClickedCust(index)
+                                      }
+                                    }
+                                  })
+                                }),
+                                0
+                              )
+                            ]
+                          )
+                        ]
+                      )
+                    ])
                   : _vm._e()
               ]),
               _vm._v(" "),
@@ -42939,47 +43177,137 @@ var render = function() {
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", [_vm._v("Nama Barang")]),
                       _vm._v(" "),
+                      _c("div", { staticClass: "autocomplete" }),
+                      _vm._v(" "),
+                      _c("div", {
+                        staticClass: "input",
+                        domProps: {
+                          textContent: _vm._s(_vm.custom ? _vm.custom.nama : "")
+                        },
+                        on: { click: _vm.toggleVisible }
+                      }),
+                      _vm._v(" "),
+                      _vm.custom == null
+                        ? _c(
+                            "div",
+                            {
+                              staticClass: "placeholder",
+                              domProps: { textContent: _vm._s(_vm.ket.nama) }
+                            },
+                            [_vm._v("Pilih Barang")]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
                       _c(
-                        "select",
+                        "div",
                         {
                           directives: [
                             {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.inputlrso.kode_barang,
-                              expression: "inputlrso.kode_barang"
+                              name: "show",
+                              rawName: "v-show",
+                              value: _vm.visible,
+                              expression: "visible"
                             }
                           ],
-                          staticClass: "form-control",
-                          attrs: { name: "barang" },
-                          on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.$set(
-                                _vm.inputlrso,
-                                "kode_barang",
-                                $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              )
-                            }
-                          }
+                          staticClass: "popover"
                         },
-                        _vm._l(_vm.barang, function(br) {
-                          return _c(
-                            "option",
-                            { key: br.kode, domProps: { value: br.kode } },
-                            [_vm._v(_vm._s(br.nama))]
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.query,
+                                expression: "query"
+                              }
+                            ],
+                            attrs: {
+                              type: "text",
+                              placeholder: "Masukan nama barang .."
+                            },
+                            domProps: { value: _vm.query },
+                            on: {
+                              keydown: [
+                                function($event) {
+                                  if (
+                                    !$event.type.indexOf("key") &&
+                                    _vm._k(
+                                      $event.keyCode,
+                                      "up",
+                                      38,
+                                      $event.key,
+                                      ["Up", "ArrowUp"]
+                                    )
+                                  ) {
+                                    return null
+                                  }
+                                  return _vm.up($event)
+                                },
+                                function($event) {
+                                  if (
+                                    !$event.type.indexOf("key") &&
+                                    _vm._k(
+                                      $event.keyCode,
+                                      "down",
+                                      40,
+                                      $event.key,
+                                      ["Down", "ArrowDown"]
+                                    )
+                                  ) {
+                                    return null
+                                  }
+                                  return _vm.down($event)
+                                },
+                                function($event) {
+                                  if (
+                                    !$event.type.indexOf("key") &&
+                                    _vm._k(
+                                      $event.keyCode,
+                                      "enter",
+                                      13,
+                                      $event.key,
+                                      "Enter"
+                                    )
+                                  ) {
+                                    return null
+                                  }
+                                  return _vm.selectItem($event)
+                                }
+                              ],
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.query = $event.target.value
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { ref: "optionList", staticClass: "optionbr" },
+                            [
+                              _c(
+                                "ul",
+                                _vm._l(_vm.matches, function(match, index) {
+                                  return _c("li", {
+                                    key: match.kode,
+                                    class: { selected: _vm.selected == index },
+                                    domProps: {
+                                      textContent: _vm._s(match.nama)
+                                    },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.itemClicked(index)
+                                      }
+                                    }
+                                  })
+                                }),
+                                0
+                              )
+                            ]
                           )
-                        }),
-                        0
+                        ]
                       )
                     ]),
                     _vm._v(" "),

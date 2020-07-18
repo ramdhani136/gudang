@@ -207,7 +207,7 @@ export default {
             this.form.nip_sales="";
             this.form.kode_customer="";
             this.form.keterangan="";
-            this.custom=null
+            this.custom=null;
         },
         toggleVisible(){
             this.visible = !this.visible;

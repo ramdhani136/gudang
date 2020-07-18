@@ -21,9 +21,29 @@
                     <select v-if="disabled"  v-model="rlist.kode_customer" name="customer" class="col-12 form-control" :disabled="disabled == 1">
                         <option v-for="custom in customers" :key="custom.kode" :value="custom.kode" >{{custom.nama}}</option>
                     </select>
-                    <select v-if="!disabled" v-model="inprso.kode_customer" name="customer" class="col-12 form-control">
-                        <option v-for="custom in customers" :key="custom.kode" :value="custom.kode" >{{custom.nama}}</option>
-                    </select>
+                    <div v-if="!disabled">
+                    <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisiblecust" v-text="custom2 ? custom2.nama:''"></div>
+                        <div class="placeholder" v-if="custom2==null" v-text="ketcust.customer">Pilih Customer</div>
+                        <div class="popovercs" v-show="visiblecust">
+                            <input type="text"
+                            @keydown.up="upcust"
+                            @keydown.down="downcust"
+                            @keydown.enter="selectItemCust"
+                            v-model="query2"
+                            placeholder="Masukan nama customer .."
+                            >
+                            <div class="optionbr" ref="optionListcust">
+                                <ul>
+                                    <li v-for="(match,index) in custmatches" 
+                                    :key="match.kode"
+                                    v-text="match.nama"
+                                    :class="{'selected':(selected==index)}"
+                                    @click="itemClickedCust(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Marketing</label>
@@ -100,9 +120,27 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Nama Barang</label>
-                        <select v-model="inputlrso.kode_barang" name="barang"  class="form-control">
-                            <option v-for="br in barang" :key="br.kode" :value="br.kode">{{br.nama}}</option>
-                        </select>
+                        <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisible" v-text="custom ? custom.nama:''"></div>
+                        <div class="placeholder" v-if="custom==null" v-text="ket.nama">Pilih Barang</div>
+                        <div class="popover" v-show="visible">
+                            <input type="text"
+                            @keydown.up="up"
+                            @keydown.down="down"
+                            @keydown.enter="selectItem"
+                            v-model="query"
+                            placeholder="Masukan nama barang .."
+                            >
+                            <div class="optionbr" ref="optionList">
+                                <ul>
+                                    <li v-for="(match,index) in matches" 
+                                    :key="match.kode"
+                                    v-text="match.nama"
+                                    :class="{'selected':(selected==index)}"
+                                    @click="itemClicked(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Jumlah</label>
@@ -145,7 +183,18 @@ export default {
             inprso:{},
             sales:{},
             urso:{},
-            ket:{}
+            ket:{
+                nama:"Pilih Barang"
+            },
+            visible:false,
+            visiblecust:false,
+            query:'',
+            query2:'',
+            selected:0,
+            custom:null,
+            custom2:null,
+            itemHeight:39,
+            ketcust:{}
         }
     },
     created(){
@@ -157,6 +206,21 @@ export default {
     mounted(){
         axios.get("/api/customer")
         .then(res=>this.customers=res.data.data)
+    },
+    computed:{
+        matches(){
+            if(this.query==''){
+                return [];
+            }
+            return this.barang.filter((item)=> item.nama.toLowerCase().includes(this.query.toLowerCase()))
+        },
+        custmatches(){
+            if(this.query2==''){
+                return [];
+            }
+            return this.customers.filter((item)=> item.nama.toLowerCase().includes(this.query2.toLowerCase()))
+        }
+        
     },
     methods:{
         getdisabled(rlist){
@@ -181,6 +245,8 @@ export default {
                 this.inprso.nip_sales=rlist.nip_sales 
                 this.inprso.kode_customer=rlist.kode_customer 
                 this.inprso.keterangan=rlist.keterangan 
+                this.inprso.kode_customer=rlist.kode_customer
+                this.ketcust.customer=rlist.customer
             }
         },
         getRso(){
@@ -237,6 +303,7 @@ export default {
             this.getlistRso();
             this.inputlrso.id=list.id
             this.ket.satuan=list.satuan
+            this.ket.nama=list.nama_barang
             this.inputlrso.nomor_rso=list.lno_rso
             this.inputlrso.kode_barang=list.lkode_barang
             this.inputlrso.qty=list.qty
@@ -279,8 +346,71 @@ export default {
             this.inputlrso.kode_barang=""
             this.inputlrso.qty=""
             this.inputlrso.catatan=""
+            this.ket.nama="Pilih Barang"
+            this.custom=null
             this.edit=false
         },
+        toggleVisible(){
+            this.visible = !this.visible;
+        },
+        toggleVisiblecust(){
+            this.visiblecust = !this.visiblecust;
+        },
+        itemClicked(index){
+            this.selected=index;
+            this.selectItem();
+        },
+        selectItem(){
+            this.custom = this.matches[this.selected];
+            this.inputlrso.kode_barang= this.custom.kode;
+            this.ket.satuan= this.custom.satuan;
+            this.visible=false;
+        },
+        up(){
+            if(this.selected==0){
+                return;
+            }
+            this.selected -= 1;
+            this.scrollToItem();
+        },
+        down(){
+            if(this.selected >= this.matches.length -1 ){
+                return;
+            }
+            this.selected += 1;
+            this.scrollToItem();
+        },
+        scrollToItem(){
+            this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
+        },
+        
+        itemClickedCust(index){
+            this.selected=index;
+            this.selectItemCust();
+        },
+        selectItemCust(){
+            this.custom2 = this.custmatches[this.selected];
+            this.inprso.kode_customer=this.custom2.kode
+            this.visiblecust=false;
+        },
+        upcust(){
+            if(this.selected==0){
+                return;
+            }
+            this.selected -= 1;
+            this.scrollToItem();
+        },
+        downcust(){
+            if(this.selected >= this.custmatches.length -1 ){
+                return;
+            }
+            this.selected += 1;
+            this.scrollToItem();
+        },
+        scrollToItemcust(){
+            this.$refs.optionListCust.scrollTop = this.selected * this.itemHeight;
+        }
+
     },
 }
 </script>
@@ -310,10 +440,60 @@ export default {
         color: white;
     }
 
-      .btn-orange:hover{
+    .btn-orange:hover{
         background-color: rgb(253, 143, 100);
         border:solid 1px rgb(243, 127, 81);
         color: white;
     }
+
+
+    .optionbr{
+        max-height: 350px;
+        overflow-y: scroll;
+        margin-top: 5px;
+    }
+
+    .optionbr ul{
+        list-style-type:none;
+        text-align: left;
+        padding-left:0;
+    }
+
+    .optionbr ul li{
+        border-bottom: 1px solid lightgrey;
+        padding:10px;
+        cursor: pointer;
+        background-color: #f1f1f1;
+    }
+
+    .optionbr ul li.selected{
+        background-color: #58bd4c;
+        color: #fff;
+    }
+
+    .popovercs{
+        max-width: 92%;
+        min-height: 50px;
+        border:1px solid lightgray;
+        position: absolute;
+        z-index: 800;
+        top:70px;
+        left: 4%;
+        right: 0;
+        background-color: #fff;
+        border-radius: 3px;
+        text-align: center;
+    }
+
+    .popovercs input{
+        width:95%;
+        margin-top: 5px;
+        height: 40px;
+        font-size: 14px;
+        border-radius: 3px;
+        border:solid 1px lightgray;
+        padding-left: 8px;
+    }
+
     
 </style>
