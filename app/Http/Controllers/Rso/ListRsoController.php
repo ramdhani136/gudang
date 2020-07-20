@@ -88,4 +88,9 @@ class ListRsoController extends Controller
         Listrso::where('id',$listrso)->delete();
         return response('deleted',response::HTTP_OK);
     }
+
+    public function purch($id){
+        return ListRsoResource::collection(Listrso::where('nomor_rso',$id)->where('qty_tdktersedia', '>', 0)->get());
+    }
+
 }

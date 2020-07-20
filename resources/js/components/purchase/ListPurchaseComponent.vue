@@ -3,7 +3,7 @@
         <div class="row row-cols-2" v-for="rlist in form" :key="rlist.nomor_rso">
             <div class="col-4">
                 <div class="form-group">
-                    <label>Nomor Rso:</label>
+                    <label>Nomor Rso :</label>
                     <input  v-model="rlist.nomor_rso" type="text" class="form-control col-12" disabled>
                 </div>
                 <div class="form-group">
@@ -35,55 +35,35 @@
         <div id="dicoverflow" class="row mt-2 mx-auto">
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
                 <thead>
-                    <tr v-for="u in form" :key="u.id">
+                    <tr>
                         <th>No</th>
                         <th>Item</th>
                         <th>Jumlah</th>
                         <th>Satuan</th>
-                        <th>Status</th>
-                        <th v-if="u.status=='Confirmed'">Estimasi Kedatangan</th>
-                        <th>Tersedia</th>
-                        <th>Tidak Tersedia</th>
-                        <th v-if="u.status=='Sent'">Aksi</th>
+                        <th>Estimasi Kedatangan</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
-                <tbody v-for="u in form" :key="u.id">
+                <tbody>
                     <tr v-for="(list,index) in listrso" :key="list.nomor_rso">
                         <td style="text-align:center">{{index+1}}</td>
                         <td>{{list.nama_barang}}</td>
-                        <td>{{list.qty}}</td>
+                        <td style="text-align:center">{{list.qty_tdktersedia}}</td>
                         <td style="text-align:center">{{list.satuan}}</td>
-                        <td  style="text-align:center">
-                            <select  v-model="list.status" name="change" class="form-control" disabled>
-                                <option value="Tersedia">Tersedia</option>
-                                <option value="Tersedia Sebagian">Tersedia Sebagian</option>
-                                <option value="Tidak Tersedia">Tidak Tersedia</option>
-                            </select>
-                        </td>
-                        <td v-if="u.status=='Confirmed'">
+                        <td >
                             <div class="form-group">
-                                <input style="text-align:center" v-model="list.tgl_datang" type="text" class="form-control col-12 z1 " disabled>
+                                <input style="text-align:center" v-model="list.tgl_datang" type="text" class="form-control" disabled>
                             </div>
                         </td>
                         <td>
-                            <div class="form-group">
-                                <input v-model="list.qty_tersedia" type="number" class="form-control col-12 z1 " disabled>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group">
-                                <input v-model="list.qty_tdktersedia" type="number" class="form-control col-12 z1 " disabled>
-                            </div>
-                        </td>
-                        <td  v-if="u.status=='Sent'">
                             <button @click="showModal(list)" class="btn btn-primary">Update</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <div v-for="up in form"  :key="up.id">
-        <button v-if="up.status=='Sent'"  @click="ConfirmRso(up)" class="btn btn-success mt-2" >Konfirmasi</button>
+        <div v-for="rs in form" :key="rs.nomor_id">
+        <button @click="ConfirmRso(rs)" class="btn btn-success mt-2" >Konfirmasi</button>
         </div>
         <div v-for="list in listrso" :key="list.nomor_rso">
         <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -113,21 +93,13 @@
                         <textarea v-model="dic.catatan" name="catatan" class="form-control" disabled></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Status Barang</label>
-                        <select @change="updateStatus(list)" v-model="update.status" name="status" class="form-control">
-                            <option value="Tersedia">Tersedia</option>
-                            <option value="Tersedia Sebagian">Tersedia Sebagian</option>
-                            <option value="Tidak Tersedia">Tidak Tersedia</option>
-                        </select>
-                    </div>
-                    <div v-if="update.status=='Tersedia Sebagian'" class="form-group">
-                        <label>Jumlah Tersedia</label>
-                        <input  v-model="update.qty_tersedia" type="number"  placeholder="Jumlah Barang Tersedia"  autocomplete="off" class="form-control">
+                        <label>Estimasi Datang</label>
+                        <input v-model="dic.tanggal_datang" type="date" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="updateStatusklik(list)" class="btn btn-primary">Save changes</button>
+                    <button type="button" @click="updateStatusklik()" class="btn btn-primary">Save changes</button>
                 </div>
                 </div>
             </div>
@@ -142,26 +114,17 @@ export default {
         return {
             form:{},
             customers:{},  
-            listrso:[],
-            inputlrso:{
-                status:"Confirmed"
-            },
-            inprso:{
-                status:'Draft'
-            },
+            listrso:{},
             dic:{},
-            status:'',
+            konfirm:{},
             update:{},
-            urso:{},
-            coba:0,
-            akses:''
+            urso:{}
         }
     },
     created(){
         this.getRso();
         this.getlistRso();
-        this.tujuanConfirm();
-    }, 
+    },  
     mounted(){
         axios.get("/api/customer")
         .then(res=>this.customers=res.data.data)
@@ -171,11 +134,8 @@ export default {
             axios.get(`/api/rso/${this.$route.params.id}`)
             .then(res=>this.form=res.data.data)
         },
-        showModal(){
-            $("#modal-form").modal("show");
-        },
         getlistRso(){
-            axios.get(`/api/listrso/${this.$route.params.id}`)
+            axios.get(`/api/listrso/data/purch/${this.$route.params.id}`)
             .then(res=>this.listrso=res.data.data)
         },
         showModal(list){
@@ -183,99 +143,56 @@ export default {
             this.dic.catatan=list.catatan
             this.dic.id=list.id
             this.dic.nama_barang=list.nama_barang
-            this.update.status=list.status
-            this.update.qty_tersedia=list.qty_tersedia
-            this.dic.jumlahrso=list.qty
+            this.dic.jumlahrso=list.qty_tdktersedia
             this.dic.satuan=list.satuan
+            this.dic.tanggal_datang=list.tgl_datang
+            this.update.nomor_rso=list.nomor_rso
+            this.update.tanggal_rso=list.tanggal_rso
+            this.update.kode_barang=list.kode_barang
+            this.update.qty=list.qty
+            this.update.qty_tersedia=list.qty_tersedia
+            this.update.qty_tdktersedia=list.qty_tdktersedia
+            this.update.status=list.status
             $("#modal-form").modal("show");
         },
-        updateStatus(list){
+        updateStatusklik(){
+            this.update.tanggal_datang=this.dic.tanggal_datang
             axios.put(`/api/listrso/`+this.dic.id,this.update)
             .then((response)=>{
-                this.getlistRso()
-                if(this.update.status==="Tidak Tersedia"){
-                    this.update.qty_tersedia=''
-                    this.update.qty_tdktersedia=this.dic.jumlahrso
-                    axios.put(`/api/listrso/`+this.dic.id,this.update)
-                    this.tujuanConfirm()
-                }else  if(this.update.status==="Tersedia"){
-                    this.getlistRso()
-                    this.update.qty_tersedia=this.dic.jumlahrso
-                    this.update.qty_tdktersedia=''
-                    axios.put(`/api/listrso/`+this.dic.id,this.update)
-                    .then((response)=>{
-                    this.tujuanConfirm()
-                    })
-                }else if(this.update.status==="Tersedia Sebagian"){
-                    this.tujuanConfirm()
-                }
+                this.resetForm()
+                $("#modal-form").modal("hide");
             })     
         },
-        updateStatusklik(list){
-                if(this.update.status==="Tersedia Sebagian"){
-                    this.getlistRso()
-                    this.update.qty_tdktersedia=this.dic.jumlahrso - this.update.qty_tersedia;
-                    axios.put(`/api/listrso/`+this.dic.id,this.update)
+        ConfirmRso(rs){
+            this.konfirm.status='Confirmed';
+            this.konfirm.tanggal_rso=rs.tanggal_rso;
+            this.konfirm.nip_sales=rs.nip_sales;
+            this.konfirm.kode_customer=rs.kode_customer;
+            this.konfirm.keterangan=rs.keterangan;
+            this.konfirm.status="Confirmed";
+
+
+            let keputusan=confirm('Apakah anda yakin?');
+            if(keputusan===true){
+                axios.put(`/api/rso/`+rs.nomor_rso,this.konfirm)
                     .then((response)=>{
-                    this.resetForm()
-                    this.tujuanConfirm()
-                    $("#modal-form").modal("hide");
+                    this.getRso();
+                    this.$router.push({name:'purchase'});
+            })
+                .catch(error=>{
+                    console.log(error)
                 })
-            }else if(this.update.status==="Tersedia"){
-                this.resetForm()
-                this.tujuanConfirm()
-                $("#modal-form").modal("hide");
-                
-            }else if(this.update.status==="Tidak Tersedia"){
-                this.resetForm()
-                this.tujuanConfirm()
-                $("#modal-form").modal("hide");
-                
-            }
+            }  
         },
         resetForm(){
             this.getlistRso()
             this.dic.catatan=""
             this.dic.id=""
             this.dic.nama_barang=""
-            this.update.status=""
-            this.update.qty_tersedia=""
-            this.update.qty_tdktersedia=""
             this.dic.jumlahrso=""
             this.dic.satuan=""
-            this.coba=0
+            this.dic.tanggal_datang=""
         },
-        ConfirmRso(up){
-            let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
-            if(keputusan===true){
-                this.urso.kode_customer=up.kode_customer
-                this.urso.status=this.akses
-                this.urso.nomor_rso=up.nomor_rso
-                this.urso.id_user=up.id_user
-                this.urso.tanggal_rso=up.tanggal_rso
-                axios.put(`/api/rso/`+this.urso.nomor_rso, this.urso)
-                .then((response)=>{
-                    this.$router.push({name:'dic'})
-                })
-            }
-        },
-        tujuanConfirm(){
-            axios.get(`/api/listrso/${this.$route.params.id}`)
-            .then(res => { 
-                this.listrso = res.data.data;
-                
-                for (let index = 0; index < this.listrso.length; index++) {
-
-                    this.coba += this.listrso[index].qty_tdktersedia 
-                }
-                if(this.coba>0){
-                    this.akses="Purch"
-                }if(this.coba<=0){
-                    this.akses="Confirmed"
-                }
-                
-            })
-        }
     },
 }
 </script>

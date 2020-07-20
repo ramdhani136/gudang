@@ -1,166 +1,116 @@
 <template>
-    <div class="autocomplete">
-        <div class="input" @click="toggleVisible" v-text="oncom ? oncom.nama:''"></div>
-        <div class="placeholder" v-if="oncom == null"> Select One ..</div>
-        <div class="form-group">
-            <input type="text" class="form-control" :value="oncom ? oncom.kode:''">
+    <div class="container">
+        <div class="form-group col-3 my-3 float-right">
+            <input v-model="search"  type="text" class="form-control" placeholder="Search">
         </div>
-        <div class="form-group">
-            <input type="text" class="form-control" :value="oncom ? oncom.satuan:''">
+        <div class="form-group col-3 my-3 ml-n3 float-left">
+            <select name="status" v-model="status" class="form-control">
+                <option value="Purch">Request Barang</option>
+            </select>
         </div>
-        <div class="popover" v-show="visible">
-            <input type="text"
-            @keydown.up="up"
-            @keydown.down="down"
-            @keydown.enter="selectedItem"
-            v-model="query"
-            placeholder="Start Typing ...">
-                <div class="option" ref="optionList">
-                    <ul>
-                        <li v-for="(match,index) in matches" 
-                        :key="match.nama"
-                        @click="itemClicked(index)"
-                        :class="{'selected': (selected==index)}"
-                        v-text="match.nama"></li>
-                    </ul>
-                </div>
+            <div id="overflow" class="border-top">
+                <table id="thead" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nomor RSO</th>
+                            <th>Tanggal</th>
+                            <th>Customer</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="rs.status!=='Draft'" v-for="(rs , index) in FilterKategori" :key="rs.nomor_rso">
+                            <td style="text-align:center">{{index+1}}</td>
+                            <td style="text-align:center">{{rs.nomor_rso}}</td>
+                            <td style="text-align:center">{{rs.tanggal_rso}}</td>
+                            <td>{{rs.customer}}</td>
+                            <td v-if="rs.status=='Purch'" style="text-align:center">
+                                <router-link :to="{name:'listpurchase',params:{id:rs.nomor_rso}}" class="btn btn-success" >
+                                    Input Rencana
+                                </router-link>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 </template>
 
 <script>
 export default {
     data(){
-        return {
-            itemHeight:39,
-            user:[],
-            visible:false,
-            query:'',
-            selected:0,
-            oncom:null
+        return{
+            search  : '',
+            rso:[],
+            status:'Purch',
+            urso:{},
+            ya:false,
         }
     },
     created(){
-        this.getBarang()
-    },
-    methods:{
-        toggleVisible(){
-            this.visible= !this.visible;
-        },
-        itemClicked(index){
-            this.selected=index;
-            this.selectedItem();
-        },
-        selectedItem(){
-            this.oncom= this.matches[this.selected];
-            this.visible=false;
-        },
-        getBarang(){
-            axios.get("/api/barang")
-            .then(res=>this.user=res.data.data)
-        },
-        up(){
-            if(this.selected==0){
-                return;
-            }
-            this.selected -= 1;
-            this.scrollToItem();
-        },
-        down(){
-            if(this.selected >= this.matches.length -1 ){
-                return;
-            }
-            this.selected += 1;
-            this.scrollToItem();
-        },
-        scrollToItem(){
-            this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
-        }
+        this.getRso()
     },
     computed:{
-        matches(){
-            if(this.query==''){
-                return [];
+        FilterKategori(){
+            if(this.search===""){
+                if(this.status==="Purch"){
+                    return this.rso.filter(elem=> elem.status==="Purch")
+                }
+            }else{
+                return this.rso.filter(elem => {
+                return elem.nomor_rso.toLowerCase().includes(this.search);
+            });
             }
-            return this.user.filter((item)=>item.nama.toLowerCase().includes(this.query.toLowerCase()))
         }
+    },
+    methods:{
+        getRso(){
+            axios.get("/api/rso/data/purch")
+            .then(res=>this.rso=res.data.data)
+        },
+        ConfirmRso(rs){
+            let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
+            if(keputusan===true){
+                this.getRso()
+                this.urso.kode_customer=rs.kode_customer
+                this.urso.status="Confirmed"
+                this.urso.nomor_rso=rs.nomor_rso
+                this.urso.id_user=rs.id_user
+                this.urso.tanggal_rso=rs.tanggal_rso
+                axios.put(`/api/rso/`+this.urso.nomor_rso, this.urso)
+                .then((response)=>{
+                    this.getRso()
+                })
+            }
+        },
     }
 }
 </script>
 
-<style   scoped>
 
-    .autocomplete{
+<style>
+    #overflow{
         width: 100%;
-        position: relative;
+    height: 440px;
+    overflow-y: scroll;
     }
 
-    .input{
-        min-height: 40px;
-        border-radius: 3px;
-        border: 2px solid lightgray;
-        box-shadow: 0 0 10px #eceaea;
-        font-size: 25px;
-        padding-left: 10px;
-        padding-top: 5px;
-        cursor: text;
-    }
-
-    .popover{
-        min-height: 50px;
-        border:2px solid lightgray;
-        position: absolute;
-        top:46px;
-        left: 0;
-        right: 0;
-        background-color: #fff;
-        border-radius: 3px;
+    #thead thead tr th{
         text-align: center;
+        border-bottom: none;
+        position: sticky; top: 0; 
+        background-color: #fff;
+        top: -1px;
+        border-collapse: collapse;
+        box-shadow: inset 0 0 0 #dee2e6,
+        inset 0 -1px 0 #dee2e6;
     }
 
-    .popover input{
-        width:95%;
-        margin-top: 5px;
-        height: 40px;
-        font-size: 16px;
-        border-radius: 3px;
-        border:solid 1px lightgray;
-        padding-left: 8px;
+    #modal-width{
+    width: 120%;
+    height: auto;
+    right: 13%;
     }
-
-    .option{
-        max-height: 150px;
-        overflow-y: scroll;
-        margin-top: 5px;
-    }
-
-    .option ul{
-        list-style-type:none;
-        text-align: left;
-        padding-left:0;
-    }
-
-    .option ul li{
-        border-bottom: 1px solid lightgrey;
-        padding:10px;
-        cursor: pointer;
-        background-color: #f1f1f1;
-    }
-
-    .option ul li.selected{
-        background-color: #58bd4c;
-        color: #fff;
-        font-weight: 600;
-    }
-
-    .placeholder{
-        position: absolute;
-        top:2px;
-        left: 10px;
-        font-size: 25px;
-        color: #d0d0d0;
-        pointer-events: none;
-    }
-
     
 </style>

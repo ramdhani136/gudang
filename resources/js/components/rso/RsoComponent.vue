@@ -43,7 +43,7 @@
                                 <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
                                     Lihat Status
                                 </router-link>
-                                <button @click="deleteRso(rs)" class="btn btn-danger">Hapus</button>
+                                <button @click="deleteRso(rs)" class="btn btn-danger">Batalkan</button>
                             </td>
                         </tr>
                     </tbody>

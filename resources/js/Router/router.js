@@ -13,6 +13,9 @@ import ListRsoComponent from '../components/rso/ListRsoComponent.vue'
 import DicComponent from '../components/rso/DicCOmponent.vue'
 import RequestRsoComponent from '../components/rso/RequestRsoComponent.vue'
 import PurchaseComponent from '../components/purchase/PurchaseComponent.vue'
+import ListPurchaseComponent from '../components/purchase/ListPurchaseComponent.vue'
+
+
 
 
 
@@ -31,6 +34,7 @@ const routes=[
     {name:'dicform', path:'/dic/view/:id', component:RequestRsoComponent},
 
     {name:'purchase', path:'/purchase', component:PurchaseComponent},
+    {name:'listpurchase', path:'/purchase/view/:id', component:ListPurchaseComponent},
 ]
 
 Vue.use(VueRouter)

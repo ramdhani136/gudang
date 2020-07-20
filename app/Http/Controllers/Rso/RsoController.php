@@ -17,7 +17,7 @@ class RsoController extends Controller
      */
     public function index()
     {
-        return RsoResource::collection(Rso::latest()->get());
+        return RsoResource::collection(Rso::orderBy('updated_at','ASC')->get());
     }
 
     /**
@@ -87,4 +87,9 @@ class RsoController extends Controller
     {
         Rso::where('nomor_rso',$rso)->delete();
     }
+
+    public function purch(){
+        return RsoResource::collection(Rso::where('status','Purch')->orderBy('updated_at','ASC')->get());
+    }
+
 }

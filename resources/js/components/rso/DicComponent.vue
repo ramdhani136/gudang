@@ -6,7 +6,8 @@
         <div class="form-group col-3 my-3 ml-n3 float-left">
             <select name="status" v-model="status" class="form-control">
                 <option value="Sent">Request Masuk</option>
-                <option value="Confirmed">Confirm DIC</option>
+                <option value="Purch">Sent Purchase</option>
+                <option value="Confirmed">Sent Marketig</option>
             </select>
         </div>
             <div id="overflow" class="border-top">
@@ -27,12 +28,11 @@
                             <td style="text-align:center">{{rs.tanggal_rso}}</td>
                             <td>{{rs.customer}}</td>
                             <td v-if="rs.status=='Sent'" style="text-align:center">
-                                <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
+                                <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-success" >
                                     Detail RSO
                                 </router-link>
-                                <button @click="ConfirmRso(rs)" class="btn btn-success">Confirm</button>
                             </td>
-                            <td v-if="rs.status=='Confirmed'" style="text-align:center">
+                            <td v-if="rs.status!=='Sent'" style="text-align:center">
                                 <router-link :to="{name:'dicform',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
                                     Lihat RSO
                                 </router-link>
@@ -52,7 +52,7 @@ export default {
             rso:[],
             status:'Sent',
             urso:{},
-            ya:false
+            ya:false,
         }
     },
     created(){
@@ -65,6 +65,8 @@ export default {
                     return this.rso.filter(elem=> elem.status==="Sent")
                 }else if(this.status==="Confirmed"){
                     return this.rso.filter(elem=> elem.status==="Confirmed")
+                }else if(this.status==="Purch"){
+                    return this.rso.filter(elem=> elem.status==="Purch")
                 }
             }else{
                 return this.rso.filter(elem => {
@@ -92,7 +94,7 @@ export default {
                     this.getRso()
                 })
             }
-        }
+        },
     }
 }
 </script>

@@ -12,7 +12,7 @@
                 <div class="form-group">
                     <label>Tanggal :</label>
                     <input v-if="disabled" v-model="rlist.tanggal_rso"  type="date" class="form-control col-12" :disabled="disabled == 1">
-                    <input v-if="!disabled" v-model="inprso.tanggal_rso"  type="date" class="form-control col-12" >
+                    <input v-if="!disabled" v-model="inprso.tanggal_rso"  type="date" class="form-control col-12" :disabled="disabled == 0" >
                 </div>
             </div>
             <div class="col-4">
@@ -155,9 +155,9 @@
                         <textarea v-model="inputlrso.catatan" name="catatan"  class="form-control"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" v-for="rlist in form" :key="rlist.nomor_rso">
                     <button type="button" @click="resetform()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button"  @click="createListRso()" class="btn btn-primary">Save changes</button>
+                    <button type="button"  @click="createListRso(rlist)" class="btn btn-primary">Save changes</button>
                 </div>
                 </div>
             </div>
@@ -247,6 +247,7 @@ export default {
                 this.inprso.keterangan=rlist.keterangan 
                 this.inprso.kode_customer=rlist.kode_customer
                 this.ketcust.customer=rlist.customer
+                this.visiblecust=false
             }
         },
         getRso(){
@@ -277,8 +278,9 @@ export default {
             axios.get("/api/barang/")
             .then(res=>this.barang=res.data.data)
         },
-        createListRso(){
+        createListRso(rlist){
             if(this.edit===false){
+                this.inputlrso.tanggal_rso=rlist.tanggal_rso
                 axios.post("/api/listrso",this.inputlrso)
                 .then((response)=>{
                     this.getRso();
@@ -289,6 +291,7 @@ export default {
                 })
                 
             }else{
+                this.inputlrso.tanggal_rso=rlist.tanggal_rso
                 axios.put("/api/listrso/"+  this.inputlrso.id,this.inputlrso)
                 .then((response)=>{
                     this.resetform()
@@ -349,6 +352,7 @@ export default {
             this.ket.nama="Pilih Barang"
             this.custom=null
             this.edit=false
+            this.visible=false
         },
         toggleVisible(){
             this.visible = !this.visible;

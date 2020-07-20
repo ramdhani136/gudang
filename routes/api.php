@@ -22,8 +22,9 @@ Route::resource('barang','Barang\BarangController');
 Route::resource('customer','Customer\CustomerController');
 Route::resource('divisi','Divisi\DivisiController');
 Route::resource('rso','Rso\RsoController');
+Route::get('rso/data/purch/','Rso\RsoController@purch');
+Route::get('listrso/data/purch/{id}','Rso\ListRsoController@purch');
 Route::resource('supplier','Supplier\SupplierController');
-Route::resource('listrso','Rso\ListRsoController');
 Route::resource('listrso','Rso\ListRsoController');
 Route::resource('sales','Sales\SalesController');
 
