@@ -45291,7 +45291,9 @@ var render = function() {
         [
           _c("option", { attrs: { value: "Draft" } }, [_vm._v("Draft")]),
           _vm._v(" "),
-          _c("option", { attrs: { value: "Sent" } }, [_vm._v("Sent")]),
+          _c("option", { attrs: { value: "Sent" } }, [
+            _vm._v("Menunggu Konfirmasi")
+          ]),
           _vm._v(" "),
           _c("option", { attrs: { value: "Confirmed" } }, [_vm._v("Confirmed")])
         ]

@@ -7,7 +7,7 @@
         <div class="form-group col-3 my-3 float-right">
             <select name="status" v-model="status" class="form-control">
                 <option value="Draft">Draft</option>
-                <option value="Sent">Sent</option>
+                <option value="Sent">Menunggu Konfirmasi</option>
                 <option value="Confirmed">Confirmed</option>
             </select>
         </div>
