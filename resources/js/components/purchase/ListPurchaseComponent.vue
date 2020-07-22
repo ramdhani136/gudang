@@ -93,8 +93,8 @@
                         <textarea v-model="dic.catatan" name="catatan" class="form-control" disabled></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Estimasi Datang</label>
-                        <input v-model="dic.tanggal_datang" type="date" class="form-control">
+                        <label>{{dic.tanggal_datang}}</label>
+                        <input v-model="dic.tanggal_datang"  @change="validate()" :min="now()" type="date" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -156,7 +156,7 @@ export default {
             $("#modal-form").modal("show");
         },
         updateStatusklik(){
-            this.update.tanggal_datang=this.dic.tanggal_datang
+            this.update.tanggal_datang=this.dic.tanggal_datang;
             axios.put(`/api/listrso/`+this.dic.id,this.update)
             .then((response)=>{
                 this.resetForm()
@@ -193,6 +193,19 @@ export default {
             this.dic.satuan=""
             this.dic.tanggal_datang=""
         },
+        now(){
+            var d = new Date();
+            var month = d.getMonth()+1;
+            var day = d.getDate();
+
+            var output = d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" + (day<10 ? '0' : '') + day;
+            return output
+            },
+        validate(){
+            if(this.dic.tanggal_datang < this.now()){
+                this.dic.tanggal_datang=this.now();
+            }
+        }    
     },
 }
 </script>

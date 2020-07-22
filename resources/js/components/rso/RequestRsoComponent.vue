@@ -154,7 +154,8 @@ export default {
             update:{},
             urso:{},
             coba:0,
-            akses:''
+            akses:'',
+            up:{}
         }
     },
     created(){
@@ -255,6 +256,10 @@ export default {
                 this.urso.tanggal_rso=up.tanggal_rso
                 axios.put(`/api/rso/`+this.urso.nomor_rso, this.urso)
                 .then((response)=>{
+                    this.up.booking="Y";
+                    axios.put(`/api/listrso/data/booking/`+this.urso.nomor_rso, this.up)
+                    .then((response)=>{
+                    }) 
                     this.$router.push({name:'dic'})
                 })
             }

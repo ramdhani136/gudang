@@ -15,6 +15,8 @@ import RequestRsoComponent from '../components/rso/RequestRsoComponent.vue'
 import PurchaseComponent from '../components/purchase/PurchaseComponent.vue'
 import ListPurchaseComponent from '../components/purchase/ListPurchaseComponent.vue'
 
+import CreateSoComponent from '../components/so/CreateSoComponent.vue'
+
 
 
 
@@ -35,6 +37,8 @@ const routes=[
 
     {name:'purchase', path:'/purchase', component:PurchaseComponent},
     {name:'listpurchase', path:'/purchase/view/:id', component:ListPurchaseComponent},
+
+    {name:'createso', path:'/so/create/:id', component:CreateSoComponent},
 ]
 
 Vue.use(VueRouter)

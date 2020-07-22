@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Model\Rso\Listrso;
 
 class ListRsoResource extends JsonResource
 {
@@ -12,8 +13,15 @@ class ListRsoResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+    
     public function toArray($request)
     {
+
+        $data=Listrso::all();
+            $oncom= Listrso::where('kode_barang',$this->kode_barang)->sum('qty');
+        
+
+
         return 
         [
             'id'=>$this->id,
@@ -26,12 +34,11 @@ class ListRsoResource extends JsonResource
             'satuan'=>$this->barang->satuan,
             'status'=>$this->status,
             'tgl_datang'=>$this->tanggal_datang,
-            'acc'=>$this->acc,
             'catatan'=>$this->catatan,
             'qty_tersedia'=>$this->qty_tersedia,
             'qty_tdktersedia'=>$this->qty_tdktersedia,
-            'pucrh'=>$this->purch,
-
+            'acc_purch'=>$this->acc_purch,
+            'jumlah'=>$oncom
         ];
     }
 }

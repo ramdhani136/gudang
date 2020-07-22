@@ -93,4 +93,13 @@ class ListRsoController extends Controller
         return ListRsoResource::collection(Listrso::where('nomor_rso',$id)->where('qty_tdktersedia', '>', 0)->get());
     }
 
+    public function booking(Request $request, $no){
+        Listrso::where('nomor_rso',$no)->update($request->all());
+        return response('update',response::HTTP_CREATED);
+    }
+
+    public function purchacc($no){
+        return  ListRsoResource::collection(Listrso::where('nomor_rso',$no)->where('acc_purch','Y')->where('qty_tdktersedia','>',0)->get());
+    }
+
 }

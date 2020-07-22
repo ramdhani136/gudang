@@ -7,7 +7,7 @@
             <select name="status" v-model="status" class="form-control">
                 <option value="Sent">Request Masuk</option>
                 <option value="Purch">Sent Purchase</option>
-                <option value="Confirmed">Sent Marketig</option>
+                <option value="Confirmed">Sent Marketing</option>
             </select>
         </div>
             <div id="overflow" class="border-top">

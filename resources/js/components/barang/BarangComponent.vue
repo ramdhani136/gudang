@@ -10,8 +10,9 @@
             <tr>
                 <th>No</th>
                 <th>Nama Barang</th>
-                <th>Awal</th>
+                <th>Stok</th>
                 <th>Booking</th>
+                <th>Order</th>
                 <th>Tersedia</th>
                 <th>Satuan</th>
                 <th>Aksi</th>
@@ -22,7 +23,8 @@
                 <td style="text-align:center">{{index+1}}</td>
                 <td>{{br.nama}}</td>
                 <td>{{br.qty}}</td>
-                <td>200</td>
+                <td>{{br.dibooking}}</td>
+                <td>800</td>
                 <td>800</td>
                 <td>{{br.satuan}}</td>
                 <td style="text-align:center">

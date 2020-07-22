@@ -83,7 +83,7 @@
                         <th v-if="rlist.status=='Confirmed'">Tersedia</th>
                         <th v-if="rlist.status=='Confirmed'">Tidak Tersedia</th>
                         <th v-if="rlist.status=='Confirmed'">Estimasi Kedatangan</th>
-                        <th v-if="rlist.status!=='Sent'">Aksi</th>
+                        <th v-if="rlist.status=='Draft'">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -97,13 +97,18 @@
                         <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tdktersedia}}</td>
                         <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.tgl_datang}}</td>
                         <td v-if="rlist.status=='Sent'" style="text-align:center">{{list.catatan}}</td>
-                        <td  v-if="rlist.status!=='Sent'" style="text-align:center">
+                        <td  v-if="rlist.status=='Draft'" style="text-align:center">
                             <button @click="editListRso(list)"  class="btn btn-primary">Edit</button>
                             <button @click="deleteListRso(list)"  class="btn btn-danger">Hapus</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div  class="row mt-2"  v-for="rlist in form" :key="rlist.id">
+                <router-link :to="{name:'createso',params:{id:rlist.nomor_rso}}" v-if="rlist.status=='Confirmed'" class="btn-orange btn ml-3" >
+                    Create SO
+                </router-link>
         </div>
         <div class="row mt-2"  v-for="rlist in form" :key="rlist.id">
             <button v-if="rlist.status=='Draft'"  @click="updateStatus()" class="btn-orange btn ml-3">Kirim RSO</button>
@@ -199,14 +204,12 @@ export default {
     },
     created(){
         this.getRso();
+        this.getCustomer();
+        this.getSales();
         this.getlistRso();
         this.getBarang();
         this.getSales();
     },  
-    mounted(){
-        axios.get("/api/customer")
-        .then(res=>this.customers=res.data.data)
-    },
     computed:{
         matches(){
             if(this.query==''){
@@ -413,6 +416,10 @@ export default {
         },
         scrollToItemcust(){
             this.$refs.optionListCust.scrollTop = this.selected * this.itemHeight;
+        },
+        getCustomer(){
+            axios.get("/api/customer")
+            .then(res=>this.customers=res.data.data)
         }
 
     },

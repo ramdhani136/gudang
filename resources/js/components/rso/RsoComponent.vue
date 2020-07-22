@@ -15,7 +15,7 @@
             <table id="thead" class="table table-striped table-bordered" style="width:100%">
                     <thead>
                         <tr>
-                            <th>No</th>
+                            <th>no</th>
                             <th>Nomor RSO</th>
                             <th>Tanggal</th>
                             <th>Customer</th>
@@ -65,7 +65,7 @@
                     </div>
                     <div class="form-group">
                         <label>Tanggal</label>
-                        <input v-model="form.tanggal_rso" type="date" name="tanggal_rso"  autocomplete="off" class="form-control">
+                        <input v-model="form.tanggal_rso" @change="validate()" type="date" :min="now()" name="tanggal_rso"  autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Marketing</label>
@@ -121,8 +121,8 @@ export default {
             status:'Draft',
             customer:[],
             form:{
-                nomor_rso:'RSO-2020-',
-                tanggal_rso:'',
+                nomor_rso:this.rso_nomor(),
+                tanggal_rso:this.now(),
                 nip_sales:'',
                 kode_customer:'',
                 keterangan:'',
@@ -202,8 +202,8 @@ export default {
             .then(res=>this.sales=res.data.data)
         },
         resetForm(){
-            this.form.nomor_rso="RSO-2020-";
-            this.form.tanggal_rso="";
+            this.form.nomor_rso=this.rso_nomor();
+            this.form.tanggal_rso=this.now();
             this.form.nip_sales="";
             this.form.kode_customer="";
             this.form.keterangan="";
@@ -237,7 +237,27 @@ export default {
         },
         scrollToItem(){
             this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
-        }
+        },
+        now(){
+            var d = new Date();
+            var month = d.getMonth()+1;
+            var day = d.getDate();
+
+            var output = d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" + (day<10 ? '0' : '') + day;
+            return output
+            },
+        validate(){
+            if(this.form.tanggal_rso < this.now()){
+                this.form.tanggal_rso=this.now();
+            }
+        },
+        rso_nomor(){
+            var d = new Date();
+            var month = d.getMonth()+1;
+
+            var output = "RSO-" + d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" ;
+            return output
+        }      
     }
 }
 </script>
