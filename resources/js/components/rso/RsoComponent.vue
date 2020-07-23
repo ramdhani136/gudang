@@ -7,8 +7,10 @@
         <div class="form-group col-3 my-3 float-right">
             <select name="status" v-model="status" class="form-control">
                 <option value="Draft">Draft</option>
-                <option value="Sent">Menunggu Konfirmasi</option>
+                <option value="Sent">Inventory Control</option>
+                <option value="Purch">Purchasing</option>
                 <option value="Confirmed">Confirmed</option>
+                <option value="So">Sales Order</option>
             </select>
         </div>
             <div id="overflow" class="border-top">
@@ -39,11 +41,21 @@
                                     Lihat Detail
                                 </router-link>
                             </td>
+                            <td v-if="rs.status=='Purch'" style="text-align:center">
+                                <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
+                                    Lihat Detail
+                                </router-link>
+                            </td>
                             <td v-if="rs.status=='Confirmed'" style="text-align:center">
                                 <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
                                     Lihat Status
                                 </router-link>
                                 <button @click="deleteRso(rs)" class="btn btn-danger">Batalkan</button>
+                            </td>
+                            <td v-if="rs.status=='So'" style="text-align:center">
+                                <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
+                                    Lihat Status
+                                </router-link>
                             </td>
                         </tr>
                     </tbody>
@@ -148,9 +160,15 @@ export default {
                     return this.rso.filter(elem=> elem.status==="Draft")
                 }else if(this.status==="Sent"){
                     return this.rso.filter(elem=> elem.status==="Sent")
+                }else if(this.status==="Purch"){
+                    return this.rso.filter(elem=> elem.status==="Purch")
                 }else if(this.status==="Confirmed"){
                     return this.rso.filter(elem=> elem.status==="Confirmed")
                 }
+                else if(this.status==="So"){
+                    return this.rso.filter(elem=> elem.status==="So")
+                }
+                
             }else{
                 return this.rso.filter(elem => {
                 return elem.nomor_rso.toLowerCase().includes(this.search);

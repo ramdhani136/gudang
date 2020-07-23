@@ -16,6 +16,8 @@ import PurchaseComponent from '../components/purchase/PurchaseComponent.vue'
 import ListPurchaseComponent from '../components/purchase/ListPurchaseComponent.vue'
 
 import CreateSoComponent from '../components/so/CreateSoComponent.vue'
+import SoComponent from '../components/so/SoComponent.vue'
+import FormSoComponent from '../components/so/FormSoComponent.vue'
 
 
 
@@ -39,6 +41,8 @@ const routes=[
     {name:'listpurchase', path:'/purchase/view/:id', component:ListPurchaseComponent},
 
     {name:'createso', path:'/so/create/:id', component:CreateSoComponent},
+    {name:'so', path:'/so', component:SoComponent},
+    {name:'formso', path:'/so/form/:id', component:FormSoComponent},
 ]
 
 Vue.use(VueRouter)

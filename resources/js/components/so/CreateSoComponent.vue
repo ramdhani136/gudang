@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="row row-cols-2" v-for="rlist in form" :key="rlist.nomor_rso">
+        <div v-if="rlist.status=='Confirmed'" class="row row-cols-2" v-for="rlist in form" :key="rlist.nomor_rso">
             <div class="col-4">
                 <div class="form-group">
                     <label>Nomor SO :</label>
@@ -27,12 +27,16 @@
             </div>
             <div class="col-4">
                 <div class="form-group">
+                    <label>Tanggal Kirim :</label>
+                    <input v-model="so.tanggal_kirim" type="date" @change="validateKirim()" :min="tglKirim()" class="form-control col-12">
+                </div>
+                <div class="form-group">
                     <label>keterangan</label>
-                    <textarea  name="keterangan" class="form-control col-12"></textarea>
+                    <textarea v-model="so.keterangan"  name="keterangan" class="form-control col-12"></textarea>
                 </div>
             </div>
         </div>
-        <div id="rsoverflowso" class="row mt-2 mx-auto">
+        <div v-if="rlist.status=='Confirmed'" v-for="rlist in form" :key="rlist.id" id="rsoverflowso" class="row mt-2 mx-auto">
             <div class="row float-left  ml-3 mt-4 label">Item Tersedia</div>
             <div class="row mt-1 mx-auto col-12" v-for="rlist in form" :key="rlist.id">
                 <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -91,11 +95,29 @@
             </div>
         </div>   
         <div  class="row mt-2"  v-for="rlist in form" :key="rlist.id">
-                <button v-if="rlist.status=='Confirmed'" class="btn-orange btn ml-3" >
-                    Kirim SO
+                <button  @click="CreateSo(rlist)" v-if="rlist.status=='Confirmed'" class="btn-orange btn ml-3" >
+                    Create SO
                 </button>
         </div>
-    </div>   
+        <div class="row"  v-if="rlist.status!=='Confirmed'" v-for="rlist in form" :key="rlist.id">
+        <div class="col-md-12">
+            <div class="error-template">
+                <h1>
+                    Oops!</h1>
+                <h2>
+                    Gak bisa buka halaman ini broh</h2>
+                <div class="error-details">
+                    Data RSO ini belum di Konfirmasi atau sudah digunakan untuk penerbitan SO Lainnya
+                </div>
+                <div class="error-actions">
+                        <router-link to="/so"  class="btn btn-primary btn-lg">
+                                Lihat Data SO
+                        </router-link>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
 </template>
 
 <script>
@@ -115,7 +137,10 @@ export default {
             so:{
                 nomor_so:this.so_nomor(),
                 tanggal_so:this.now(),
+                tanggal_kirim:this.tglKirim(),
             },
+            statusso:{},
+            nomorrso:'',
         }
     },
     created(){
@@ -146,7 +171,7 @@ export default {
             .then(res=>this.form=res.data.data)
         },
         getlistRso(){
-            axios.get(`/api/listrso/${this.$route.params.id}`)
+            axios.get(`/api/listrso/data/dic/${this.$route.params.id}`)
             .then(res=>this.listrso=res.data.data)
         },
         getlistTdktersedia(){
@@ -156,45 +181,61 @@ export default {
         deleteTersedia(list){
             let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
             if(keputusan===true){
-                this.urso.id=list.id;
-                this.urso.nomor_rso=list.nomor_rso;
-                this.urso.tanggal_rso=list.tanggal_rso;
-                this.urso.kode_barang=list.kode_barang;
-                this.urso.qty=list.qty;
-                this.urso.qty_tersedia="";
-                this.urso.qty_tdktersedia=list.qty_tdktersedia;
-                this.urso.tangga_datang=list.tangga_datang;
-                this.urso.acc_purch=list.acc_purch;
-                this.urso.status=list.status;
-                this.urso.catatan=list.catatan;
-                this.urso.booking=list.booking;
-                axios.put("/api/listrso/"+  this.urso.id,this.urso)
-                .then((response)=>{
+                if(list.qty_tdktersedia>0){
+                    this.urso.id=list.id;
+                    this.urso.nomor_rso=list.nomor_rso;
+                    this.urso.tanggal_rso=list.tanggal_rso;
+                    this.urso.kode_barang=list.kode_barang;
+                    this.urso.qty=list.qty-list.qty_tdktersedia;
+                    this.urso.qty_tersedia="";
+                    this.urso.qty_tdktersedia=list.qty_tdktersedia;
+                    this.urso.tangga_datang=list.tangga_datang;
+                    this.urso.acc_purch=list.acc_purch;
+                    this.urso.status="Tidak Tersedia";
+                    this.urso.catatan=list.catatan;
+                    this.urso.booking=list.booking;
+                    axios.put("/api/listrso/"+  this.urso.id,this.urso)
+                    .then((response)=>{
+                        this.getlistRso();
+                        this.getlistTdktersedia();
+                    })
+                }else{
+                    axios.delete("/api/listrso/" + list.id)
+                    .then(response=>{
                     this.getlistRso();
                     this.getlistTdktersedia();
                 })
+                } 
             }
         },
         deleteTdkTersedia(list){
             let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
             if(keputusan===true){
-                this.urso.id=list.id;
-                this.urso.nomor_rso=list.nomor_rso;
-                this.urso.tanggal_rso=list.tanggal_rso;
-                this.urso.kode_barang=list.kode_barang;
-                this.urso.qty=list.qty;
-                this.urso.qty_tersedia=list.qty_tersedia;
-                this.urso.qty_tdktersedia=list.qty_tersedia;
-                this.urso.tanggal_datang="";
-                this.urso.acc_purch="";
-                this.urso.status=list.status;
-                this.urso.catatan=list.catatan;
-                this.urso.booking=list.booking;
-                axios.put("/api/listrso/"+  this.urso.id,this.urso)
-                .then((response)=>{
+                if(list.qty_tersedia>0){
+                    this.urso.id=list.id;
+                    this.urso.nomor_rso=list.nomor_rso;
+                    this.urso.tanggal_rso=list.tanggal_rso;
+                    this.urso.kode_barang=list.kode_barang;
+                    this.urso.qty=list.qty-lis.qty_tdktersedia;
+                    this.urso.qty_tersedia=list.qty_tersedia;
+                    this.urso.qty_tdktersedia="";
+                    this.urso.tanggal_datang="";
+                    this.urso.acc_purch="";
+                    this.urso.status="Tersedia";
+                    this.urso.catatan=list.catatan;
+                    this.urso.booking=list.booking;
+                    axios.put("/api/listrso/"+  this.urso.id,this.urso)
+                    .then((response)=>{
+                        this.getlistRso();
+                        this.getlistTdktersedia();
+                    })
+                }else{
+                    axios.delete("/api/listrso/" + list.id)
+                    .then(response=>{
                     this.getlistRso();
                     this.getlistTdktersedia();
                 })
+                }       
             }
         },
         getSales(){
@@ -228,13 +269,47 @@ export default {
                 this.so.tanggal_so=this.now();
             }
         },
+        tglKirim(){
+            var d = new Date();
+            var month = d.getMonth()+1;
+            var day = d.getDate()+2;
+
+            var output = d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" + (day<10 ? '0' : '') + day;
+            return output
+            },
+        validateKirim(){
+            if(this.so.tanggal_kirim < this.tglKirim()){
+                this.so.tanggal_kirim=this.tglKirim();
+            }
+        },
         so_nomor(){
             var d = new Date();
             var month = d.getMonth()+1;
 
             var output = "SO-" + d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" ;
             return output
-        }    
+        },
+        CreateSo(rlist){
+            let tanya=confirm('Apakah yakin ingin mengirim RSO ini ke DIC?');
+            if(tanya===true){
+            this.so.nomor_rso=rlist.nomor_rso;
+            axios.post("/api/so",this.so)
+            .then((response)=>{
+                this.nomorrso=rlist.nomor_rso;
+                this.statusso.nomor_rso=rlist.nomor_rso;
+                this.statusso.tanggal_rso=rlist.tanggal_rso;
+                this.statusso.nip_sales=rlist.nip_sales;
+                this.statusso.kode_customer=rlist.kode_customer;
+                this.statusso.keterangan=rlist.keterangan;
+                this.statusso.status="So";
+                
+                axios.put("/api/rso/"+  this.nomorrso,this.statusso)
+                .then((response)=>{
+                    this.$router.push({name:'rso'}) 
+                })        
+            })
+            }
+        },   
     },
 }
 </script>
@@ -242,7 +317,7 @@ export default {
 <style>
     #rsoverflowso{
     width: 100%;
-    max-height: 290px;
+    max-height: 275px;
     overflow-y: scroll;
     border-top:solid 1px #dee2e6;
     }
@@ -268,6 +343,11 @@ export default {
         padding-right: 1%;
         color:#fff;
     }
+
+    .error-template {padding: 40px 15px;text-align: center;}
+    .error-actions {margin-top:15px;margin-bottom:15px;}
+    .error-actions .btn { margin-right:10px; }
+
 
 
 </style>

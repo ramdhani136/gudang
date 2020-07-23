@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Model\Sales\Sales;
 use App\Model\Customer\Customer;
 use App\Model\Rso\Listrso;
+use App\Model\So\So;
 
 class Rso extends Model
 {
@@ -22,6 +23,10 @@ class Rso extends Model
 
     public function listrso(){
         return $this->hasMany(listrso::class,'nomor_rso','nomor_rso');
+    }
+
+    public function so(){
+        return $this->hasMany(So::class,'nomor_rso','nomor_rso');
     }
 
 }

@@ -73,6 +73,7 @@
                                     <router-link to="/rso" class="dropdown-item" >Data RSO</router-link>
                                     <router-link to="/dic" class="dropdown-item" >Inventory Control</router-link>
                                     <router-link to="/purchase" class="dropdown-item" >Estimation Request</router-link>
+                                    <router-link to="/so" class="dropdown-item" >Sales Order</router-link>
                                 </div>
                             </li>
                                 

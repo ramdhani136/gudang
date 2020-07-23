@@ -107,7 +107,12 @@
         </div>
         <div  class="row mt-2"  v-for="rlist in form" :key="rlist.id">
                 <router-link :to="{name:'createso',params:{id:rlist.nomor_rso}}" v-if="rlist.status=='Confirmed'" class="btn-orange btn ml-3" >
-                    Create SO
+                    Proses SO
+                </router-link>
+        </div>
+        <div  class="row mt-2"  v-for="rlist in form" :key="rlist.id">
+                <router-link :to="{name:'createso',params:{id:rlist.nomor_rso}}" v-if="rlist.status=='So'" class="btn-orange btn ml-3" >
+                    Lihat Sales Order
                 </router-link>
         </div>
         <div class="row mt-2"  v-for="rlist in form" :key="rlist.id">

@@ -1,0 +1,83 @@
+<template>
+    <div class="container">
+        <div class="form-group col-3 my-3 float-right">
+            <input v-model="search"  type="text" class="form-control" placeholder="Search">
+        </div>
+        <div class="form-group col-3 my-3 ml-n3 float-left">
+            <select name="status" v-model="status" class="form-control">
+                <option value="Draft">Waiting list</option>
+                <option value="Acc">Accept</option>
+            </select>
+        </div>
+            <div id="overflow" class="border-top">
+            <table id="thead" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nomor SO</th>
+                            <th>Tanggal</th>
+                            <th>Customer</th>
+                            <th>Tanggal Kirim</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(rs , index) in FilterKategori" :key="rs.nomor_so">
+                            <td style="text-align:center">{{index+1}}</td>
+                            <td style="text-align:center">{{rs.nomor_so}}</td>
+                            <td style="text-align:center">{{rs.tanggal_so}}</td>
+                            <td>{{rs.customer}}</td>
+                            <td style="text-align:center">{{rs.tanggal_kirim}}</td>
+                            <td v-if="rs.status=='Draft'" style="text-align:center">
+                                <router-link :to="{name:'formso',params:{id:rs.nomor_so,rso:rs.nomor_rso}}" class="btn btn-primary" >
+                                    Lihat Detail
+                                </router-link>
+                                <button class="btn btn-danger">Hapus</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</template>
+
+<script>
+export default {
+    data(){
+        return{
+            search  : '',
+            status:'Draft',
+            so:[],
+        }
+    },
+    created(){
+        this.getSo();
+    },
+    computed:{
+        FilterKategori(){
+            if(this.search===""){
+                if(this.status==="Draft"){
+                    return this.so.filter(elem=> elem.status==="Draft")
+                }else if(this.status==="Sent"){
+                    return this.so.filter(elem=> elem.status==="Sent")
+                }
+            }else{
+                return this.so.filter(elem => {
+                return elem.nomor_so.toLowerCase().includes(this.search);
+            });
+            }
+        },
+    },
+    methods:{
+        getSo(){
+            axios.get("/api/so")
+            .then(res=>this.so=res.data.data)
+        },
+    }
+}
+</script>
+
+
+<style>
+
+</style>

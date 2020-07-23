@@ -25,9 +25,11 @@ Route::resource('rso','Rso\RsoController');
 Route::get('rso/data/purch/','Rso\RsoController@purch');
 Route::get('listrso/data/purch/{id}','Rso\ListRsoController@purch');
 Route::get('listrso/data/acc/{no}','Rso\ListRsoController@purchacc');
+Route::get('listrso/data/dic/{no}','Rso\ListRsoController@dicacc');
 Route::put('listrso/data/booking/{no}','Rso\ListRsoController@booking');
 Route::resource('supplier','Supplier\SupplierController');
 Route::resource('listrso','Rso\ListRsoController');
 Route::resource('sales','Sales\SalesController');
+Route::resource('so','So\SoController');
 
 
