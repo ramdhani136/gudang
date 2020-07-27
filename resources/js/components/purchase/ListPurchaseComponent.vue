@@ -51,11 +51,12 @@
                         <td style="text-align:center">{{list.qty_tdktersedia}}</td>
                         <td style="text-align:center">{{list.satuan}}</td>
                         <td >
-                            <div class="form-group">
-                                <input style="text-align:center" v-model="list.tgl_datang" type="text" class="form-control" disabled>
+                            <div style="text-align:center" class="form-group">
+                                <input v-if="list.acc_purch=='Y'" style="text-align:center" v-model="list.tgl_datang" type="text" class="form-control" disabled>
+                                <button  v-if="list.acc_purch=='N'" class="btn btn-orange">Detail Penolakan</button>
                             </div>
                         </td>
-                        <td>
+                        <td style="text-align:center"> 
                             <button @click="showModal(list)" class="btn btn-primary">Update</button>
                         </td>
                     </tr>
@@ -93,8 +94,19 @@
                         <textarea v-model="dic.catatan" name="catatan" class="form-control" disabled></textarea>
                     </div>
                     <div class="form-group">
-                        <label>{{dic.tanggal_datang}}</label>
-                        <input v-model="dic.tanggal_datang"  @change="validate()" :min="now()" type="date" class="form-control">
+                        <label>Konfirmasi</label>
+                        <select v-model="update.acc_purch" @change="updateAcc(list)" class="form-control">
+                            <option value="Y">Terima Permintaan</option>
+                            <option value="N">Tolak Permintaan</option>
+                        </select>
+                    </div>
+                    <div v-if="list.acc_purch=='Y'" class="form-group">
+                        <label>Tanggal Estimasi</label>
+                        <input v-model="update.tanggal_datang"  @change="validate()" :min="now()" type="date" class="form-control">
+                    </div>
+                    <div v-if="list.acc_purch=='N'" class="form-group">
+                        <label>Alasan Penolakan</label>
+                        <textarea v-model="update.alastolak" class="form-control"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -118,7 +130,8 @@ export default {
             dic:{},
             konfirm:{},
             update:{},
-            urso:{}
+            urso:{},
+            aksi:{}
         }
     },
     created(){
@@ -153,10 +166,12 @@ export default {
             this.update.qty_tersedia=list.qty_tersedia
             this.update.qty_tdktersedia=list.qty_tdktersedia
             this.update.status=list.status
+            this.update.acc_purch=list.acc_purch
+            this.update.alastolak=list.alastolak
+            this.update.tanggal_datang=list.tgl_datang
             $("#modal-form").modal("show");
         },
         updateStatusklik(){
-            this.update.tanggal_datang=this.dic.tanggal_datang;
             axios.put(`/api/listrso/`+this.dic.id,this.update)
             .then((response)=>{
                 this.resetForm()
@@ -170,8 +185,6 @@ export default {
             this.konfirm.kode_customer=rs.kode_customer;
             this.konfirm.keterangan=rs.keterangan;
             this.konfirm.status="Confirmed";
-
-
             let keputusan=confirm('Apakah anda yakin?');
             if(keputusan===true){
                 axios.put(`/api/rso/`+rs.nomor_rso,this.konfirm)
@@ -205,6 +218,26 @@ export default {
             if(this.dic.tanggal_datang < this.now()){
                 this.dic.tanggal_datang=this.now();
             }
+        },
+        updateAcc(list){
+            axios.put(`/api/listrso/`+this.dic.id,this.update)
+            .then((response)=>{
+                this.getlistRso()
+                if(list.acc_purch=="N"){
+                    this.update.alastolak="";
+                    axios.put(`/api/listrso/`+this.dic.id,this.update)
+                    .then((response)=>{
+                        this.getlistRso()
+                })
+                }else if(list.acc_purch=="Y"){
+                    this.update.tanggal_datang="";
+                    axios.put(`/api/listrso/`+this.dic.id,this.update)
+                    .then((response)=>{
+                        this.getlistRso()
+                    })
+                }
+            })
+
         }    
     },
 }

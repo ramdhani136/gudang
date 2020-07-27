@@ -38,6 +38,7 @@ class ListRsoResource extends JsonResource
             'qty_tersedia'=>$this->qty_tersedia,
             'qty_tdktersedia'=>$this->qty_tdktersedia,
             'acc_purch'=>$this->acc_purch,
+            'alastolak'=>$this->alastolak,
             'jumlah'=>$oncom
         ];
     }

@@ -47,7 +47,6 @@
                             <th>Qty</th>
                             <th>Satuan</th>
                             <th>Catatan</th>
-                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,9 +56,6 @@
                             <td style="text-align:center">{{ts.qty_tersedia}}</td>
                             <td style="text-align:center">{{ts.satuan}}</td>
                             <td style="text-align:center">{{ts.catatan}}</td>
-                            <td style="text-align:center">
-                                <button class="btn btn-danger">Hapus</button>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -75,7 +71,6 @@
                             <th>Satuan</th>
                             <th>Estimasi Kedatangan</th>
                             <th>Catatan</th>
-                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -86,14 +81,16 @@
                             <td style="text-align:center">{{ltt.satuan}}</td>
                             <td style="text-align:center">{{ltt.tgl_datang}}</td>
                             <td style="text-align:center">{{ltt.catatan}}</td>
-                            <td style="text-align:center">
-                                <button class="btn btn-danger">Hapus</button>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>   
+        <div class="row mt-2" v-for="(lso,index) in so" :key="index">
+                <button v-if="lso.status=='Draft'" @click="confirmSO(lso)" class="btn-orange btn ml-3" >
+                    Konfirmasi SO
+                </button>
+        </div>
     </div>
 </template>
 
@@ -106,6 +103,7 @@ export default {
             Ltersedia:{},
             LTTersedia:{},
             tujuan:'',
+            up:{}
         }
     },
     created(){
@@ -164,6 +162,21 @@ export default {
                 this.so.tanggal_kirim=this.tglKirim();
             }
         },
+        confirmSO(lso){
+            let keputusan=confirm('Apakah anda yakin?');
+            if(keputusan===true){
+                this.up.nomor_so=lso.nomor_so;
+                this.up.tanggal_so=lso.tanggal_so;
+                this.up.tanggal_kirim=lso.tanggal_kirim;
+                this.up.nomor_rso=lso.nomor_rso;
+                this.up.keterangan=lso.keterangan;
+                this.up.status="Acc";
+                axios.put("/api/so/"+this.up.nomor_so,this.up)
+                .then((response)=>{
+                    this.$router.push({name:'soconfirm'})
+                })
+            }
+        }
     },
 }
 </script>

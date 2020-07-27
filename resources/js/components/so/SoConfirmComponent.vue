@@ -5,7 +5,7 @@
         </div>
         <div class="form-group col-3 my-3 ml-n3 float-left">
             <select name="status" v-model="status" class="form-control">
-                <option value="Draft">Waiting list</option>
+                <option value="Draft">Request SO</option>
                 <option value="Acc">Accept</option>
             </select>
         </div>
@@ -28,12 +28,10 @@
                             <td style="text-align:center">{{rs.tanggal_so}}</td>
                             <td>{{rs.customer}}</td>
                             <td style="text-align:center">{{rs.tanggal_kirim}}</td>
-                            <td  style="text-align:center">
-                                <router-link :to="{name:'formso',params:{id:rs.nomor_so,rso:rs.nomor_rso}}" class="btn btn-primary" >
+                            <td style="text-align:center">
+                                <router-link :to="{name:'viewso',params:{id:rs.nomor_so}}" class="btn btn-primary" >
                                     Lihat Detail
                                 </router-link>
-                                <button @click="deleteSo(rs)" v-if="rs.status=='Draft'" class="btn btn-danger">Hapus</button>
-                                <button v-if="rs.status=='Acc'" class="btn btn-orange">Request Edit</button>
                             </td>
                         </tr>
                     </tbody>
@@ -74,18 +72,6 @@ export default {
             axios.get("/api/so")
             .then(res=>this.so=res.data.data)
         },
-        deleteSo(rs){
-            let keputusan=confirm('yakin ingin menghapus SO ini?');
-            if(keputusan==true){
-                axios.delete("/api/rso/"+rs.nomor_rso)
-                .then(response=>{
-                    axios.delete("/api/so/"+rs.nomor_so)
-                    .then(response=>{
-                        this.$router.push({name:'so'})
-                    })
-                });
-            }
-        }
     }
 }
 </script>
