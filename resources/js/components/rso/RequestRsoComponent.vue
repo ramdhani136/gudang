@@ -75,8 +75,8 @@
                                 <input v-model="list.qty_tdktersedia" type="number" class="form-control col-12 z1 " disabled>
                             </div>
                         </td>
-                        <td  v-if="u.status=='Sent'">
-                            <button @click="showModal(list)" class="btn btn-primary">Update</button>
+                        <td >
+                            <button v-if="u.status=='Sent' && list.booking=='N'" @click="showModal(list)" class="btn btn-primary">Update</button>
                         </td>
                     </tr>
                 </tbody>

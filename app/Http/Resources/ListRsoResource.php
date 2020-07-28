@@ -39,7 +39,11 @@ class ListRsoResource extends JsonResource
             'qty_tdktersedia'=>$this->qty_tdktersedia,
             'acc_purch'=>$this->acc_purch,
             'alastolak'=>$this->alastolak,
-            'jumlah'=>$oncom
+            'jumlah'=>$oncom,
+            'nip_sales'=>$this->rso->nip_sales,
+            'kode_customer'=>$this->rso->kode_customer,
+            'so_ket'=>$this->rso->keterangan,
+            'booking'=>$this->booking,
         ];
     }
 }

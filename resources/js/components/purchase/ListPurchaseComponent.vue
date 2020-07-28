@@ -53,7 +53,7 @@
                         <td >
                             <div style="text-align:center" class="form-group">
                                 <input v-if="list.acc_purch=='Y'" style="text-align:center" v-model="list.tgl_datang" type="text" class="form-control" disabled>
-                                <button  v-if="list.acc_purch=='N'" class="btn btn-orange">Detail Penolakan</button>
+                                <button  v-if="list.acc_purch=='N'" class="btn btn-orange">Permintaan di tolak</button>
                             </div>
                         </td>
                         <td style="text-align:center"> 
@@ -94,7 +94,7 @@
                         <textarea v-model="dic.catatan" name="catatan" class="form-control" disabled></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Konfirmasi</label>
+                        <label>Status</label>
                         <select v-model="update.acc_purch" @change="updateAcc(list)" class="form-control">
                             <option value="Y">Terima Permintaan</option>
                             <option value="N">Tolak Permintaan</option>

@@ -95,7 +95,10 @@
                         <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.status}}</td>
                         <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tersedia}}</td>
                         <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tdktersedia}}</td>
-                        <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.tgl_datang}}</td>
+                        <td style="text-align:center" v-if="rlist.status=='Confirmed'" >
+                            {{list.tgl_datang}}
+                            <button v-if="list.acc_purch=='N'" @click="aksiDetail(list)" class="btn btn-orange">Detail Penolakan</button>
+                        </td>
                         <td v-if="rlist.status=='Sent'" style="text-align:center">{{list.catatan}}</td>
                         <td  v-if="rlist.status=='Draft'" style="text-align:center">
                             <button @click="editListRso(list)"  class="btn btn-primary">Edit</button>
@@ -106,7 +109,7 @@
             </table>
         </div>
         <div  class="row mt-2"  v-for="rlist in form" :key="rlist.id">
-                <router-link :to="{name:'createso',params:{id:rlist.nomor_rso}}" v-if="rlist.status=='Confirmed'" class="btn-orange btn ml-3" >
+                <router-link :to="{name:'createso',params:{id:rlist.nomor_rso}}" v-if="rlist.status=='Confirmed'" class="btn-success btn ml-3" >
                     Proses SO
                 </router-link>
         </div>
@@ -172,6 +175,65 @@
                 </div>
             </div>
         </div>
+        
+
+
+        <div  v-for="list in listrso" :key="list.nomor_rso">
+        <div class="modal fade" id="modal-detail" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div  class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Penolakan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nama Barang</label>
+                        <input v-model="detail.nama_barang" type="text"  class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah</label>
+                        <input  v-model="detail.qty"  type="number" name="qty"  autocomplete="off" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Satuan</label>
+                        <input v-model="detail.satuan" type="text"  class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Alasan Penolakan</label>
+                        <textarea v-model="detail.alastolak" name="catatan"  class="form-control" disabled></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Aksi</label>
+                        <select v-model="aksi" class="form-control">
+                            <option value="N">Tidak Ada</option>
+                            <option value="Y">Request Ulang</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label v-if="aksi=='Y'">Jumlah</label>
+                        <input v-model="upDetail.qty_tdktersedia"  v-if="aksi=='Y'" type="number" name="qty"  autocomplete="off" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button v-if="aksi=='Y'" type="button" @click="kirimPurch(list)"  class="btn btn-primary">Kirim Permintaan</button>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
     </div>   
 </template>
 
@@ -204,7 +266,14 @@ export default {
             custom:null,
             custom2:null,
             itemHeight:39,
-            ketcust:{}
+            ketcust:{},
+            aksi:'N',
+            detail:{},
+            upDetail:{
+                qty:0,
+            },
+            qtyupdate:0,
+            statusup:{}
         }
     },
     created(){
@@ -277,6 +346,9 @@ export default {
         },
         showmodal(){
             $("#modal-form").modal("show");
+        },
+        showDetail(){
+            $("#modal-detail").modal("show");
         },
         getlistRso(){
             axios.get(`/api/listrso/${this.$route.params.id}`)
@@ -425,9 +497,53 @@ export default {
         getCustomer(){
             axios.get("/api/customer")
             .then(res=>this.customers=res.data.data)
+        },
+        aksiDetail(list){
+            this.getlistRso();
+            this.upDetail.id=list.id
+            this.upDetail.nomor_rso=list.lno_rso;
+            this.upDetail.tanggal_rso=list.tanggal_rso;
+            this.upDetail.kode_barang=list.lkode_barang;
+            this.upDetail.qty_tersedia=list.qty_tersedia;
+            this.upDetail.status=list.status;
+            this.upDetail.alastolak="";
+            this.upDetail.acc_purch="";
+            this.upDetail.booking="N";
+            this.detail.nama_barang=list.nama_barang;
+            this.detail.qty=list.qty_tdktersedia;
+            this.detail.satuan=list.satuan;
+            this.detail.kode_barang=list.lkode_barang;
+            this.detail.alastolak=list.alastolak;
+            this.statusup.status="Sent";
+            this.statusup.nomor_rso=list.lno_rso;
+            this.statusup.tanggal_rso=list.tanggal_rso;
+            this.statusup.nip_sales=list.nip_sales;
+            this.statusup.kode_customer=list.kode_customer;
+            this.statusup.keterangan=list.so_ket;
+            this.showDetail(); 
+        },
+        kirimPurch(list){
+            let tanya=confirm('Yakin kirim ulang permintaan?');
+            if(tanya==true){
+                if(this.upDetail.qty_tersedia===null){
+                this.qtyupdate=0;
+                }else{
+                this.qtyupdate=this.upDetail.qty_tersedia;
+                }
+                this.upDetail.qty=parseInt(this.upDetail.qty_tdktersedia)+parseInt(this.qtyupdate);
+            
+                axios.put("/api/listrso/"+this.upDetail.id,this.upDetail)
+                .then(response=>{
+                    axios.put("/api/rso/"+this.upDetail.nomor_rso,this.statusup)
+                    .then(response=>{
+                        $("#modal-detail").modal("hide");
+                        this.$router.push({name:'rso'})
+                    })
+                })
+            }
         }
-
     },
+
 }
 </script>
 

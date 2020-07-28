@@ -179,14 +179,14 @@ export default {
             .then(res=>this.tidaktersedia=res.data.data)
         },
         deleteTersedia(list){
-            let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
+            let keputusan=confirm('Apakah anda yakin ingin menghapus barang ini?');
             if(keputusan===true){
                 if(list.qty_tdktersedia>0){
                     this.urso.id=list.id;
                     this.urso.nomor_rso=list.nomor_rso;
                     this.urso.tanggal_rso=list.tanggal_rso;
                     this.urso.kode_barang=list.kode_barang;
-                    this.urso.qty=list.qty-list.qty_tdktersedia;
+                    this.urso.qty=list.qty-list.qty_tersedia;
                     this.urso.qty_tersedia="";
                     this.urso.qty_tdktersedia=list.qty_tdktersedia;
                     this.urso.tangga_datang=list.tangga_datang;
@@ -209,14 +209,14 @@ export default {
             }
         },
         deleteTdkTersedia(list){
-            let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
+            let keputusan=confirm('Apakah anda yakin ingin menghapus barang ini?');
             if(keputusan===true){
                 if(list.qty_tersedia>0){
                     this.urso.id=list.id;
                     this.urso.nomor_rso=list.nomor_rso;
                     this.urso.tanggal_rso=list.tanggal_rso;
                     this.urso.kode_barang=list.kode_barang;
-                    this.urso.qty=list.qty-lis.qty_tdktersedia;
+                    this.urso.qty=list.qty-list.qty_tdktersedia;
                     this.urso.qty_tersedia=list.qty_tersedia;
                     this.urso.qty_tdktersedia="";
                     this.urso.tanggal_datang="";
