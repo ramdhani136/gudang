@@ -39,7 +39,7 @@ class CustpriceController extends Controller
     public function store(Request $request)
     {
         $data=Custprice::create($request->all());
-        return response(new BarangResource($data),response::HTTP_CREATED);
+        return response(new CustpriceResource($data),response::HTTP_CREATED);
     }
 
     /**
