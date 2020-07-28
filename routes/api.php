@@ -31,5 +31,6 @@ Route::resource('supplier','Supplier\SupplierController');
 Route::resource('listrso','Rso\ListRsoController');
 Route::resource('sales','Sales\SalesController');
 Route::resource('so','So\SoController');
+Route::resource('custprice','sales\CustpriceController');
 
 

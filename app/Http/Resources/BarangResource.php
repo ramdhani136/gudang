@@ -17,7 +17,7 @@ class BarangResource extends JsonResource
     {
 
         $data=Listrso::all();
-        $oncom= Listrso::where('kode_barang',$this->kode)->where('booking','Y')->sum('qty_tersedia');
+        $book= Listrso::where('kode_barang',$this->kode)->where('booking','Y')->sum('qty_tersedia');
         
 
         return 
@@ -26,7 +26,12 @@ class BarangResource extends JsonResource
             'nama'=>$this->nama,
             'qty'=>$this->qty,
             'satuan'=>$this->satuan,
-            'dibooking'=>($oncom) 
+            'dibooking'=>$book,
+            'harga'=>$this->harga, 
+            'min_stok'=>$this->min_stok, 
+            'max_stok'=>$this->max_stok, 
+            'kubikasi'=>$this->kubikasi, 
+            'kg'=>$this->kg, 
         ];
     }
 }

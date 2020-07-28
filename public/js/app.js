@@ -2028,6 +2028,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2102,11 +2122,11 @@ __webpack_require__.r(__webpack_exports__);
         });
       } else {
         axios.put("/api/barang/" + this.form.kode, this.form).then(function (response) {
-          _this3.getBarang();
-
           _this3.$router.push({
             name: 'barang'
           });
+
+          _this3.getBarang();
 
           $("#modal-form").modal("hide");
           _this3.edit = false;
@@ -2138,6 +2158,11 @@ __webpack_require__.r(__webpack_exports__);
       this.form.qty = barang.qty;
       this.form.satuan = barang.satuan;
       this.form.kode = barang.kode;
+      this.form.harga = barang.harga;
+      this.form.min_stok = barang.min_stok;
+      this.form.max_stok = barang.max_stok;
+      this.form.kubikasi = barang.kubikasi;
+      this.form.kg = barang.kg;
       this.edit = true;
       this.showmodal();
     },
@@ -2160,6 +2185,11 @@ __webpack_require__.r(__webpack_exports__);
       this.form.kode = "";
       this.form.qty = "";
       this.form.satuan = "";
+      this.form.harga = "";
+      this.form.min_stok = "";
+      this.form.max_stok = "";
+      this.form.kubikasi = "";
+      this.form.kg = "";
     }
   }
 });
@@ -42757,6 +42787,32 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Harga")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.form.harga,
+                            expression: "form.harga"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "number", autocomplete: "off" },
+                        domProps: { value: _vm.form.harga },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.form, "harga", $event.target.value)
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
                       _c("label", [_vm._v("Jumlah Stok")]),
                       _vm._v(" "),
                       _c("input", {
@@ -42843,7 +42899,123 @@ var render = function() {
                             _vm._v("MTR")
                           ])
                         ]
-                      )
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Minimal Stok")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.min_stok,
+                              expression: "form.min_stok"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "number", autocomplete: "off" },
+                          domProps: { value: _vm.form.min_stok },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form,
+                                "min_stok",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Maksimal Stok")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.max_stok,
+                              expression: "form.max_stok"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "number", autocomplete: "off" },
+                          domProps: { value: _vm.form.max_stok },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form,
+                                "max_stok",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Kubikasi (M3)")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.kubikasi,
+                              expression: "form.kubikasi"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "number", autocomplete: "off" },
+                          domProps: { value: _vm.form.kubikasi },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form,
+                                "kubikasi",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Tonase (KG)")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.kg,
+                              expression: "form.kg"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "number", autocomplete: "off" },
+                          domProps: { value: _vm.form.kg },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(_vm.form, "kg", $event.target.value)
+                            }
+                          }
+                        })
+                      ])
                     ])
                   ]),
                   _vm._v(" "),

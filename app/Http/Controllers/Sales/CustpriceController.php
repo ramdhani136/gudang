@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Barang;
+namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Model\Barang\Barang;
-use App\Http\Resources\BarangResource;
+use App\Model\Sales\Custprice;
+use App\Http\Resources\CustpriceResource;
 use Symfony\Component\HttpFoundation\Response;
 
-class BarangController extends Controller
+class CustpriceController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class BarangController extends Controller
      */
     public function index()
     {
-        return BarangResource::collection(Barang::latest()->get());
+        return CustpriceResource::collection(Custprice::latest()->get());
     }
 
     /**
@@ -38,15 +38,7 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-
-        $this->validate($request,[
-            'kode'=>'required|min:4',
-            'nama'=>'required',
-            'qty'=>'required',
-            'satuan'=>'required',
-        ]);
-
-        $data=Barang::create($request->all());
+        $data=Custprice::create($request->all());
         return response(new BarangResource($data),response::HTTP_CREATED);
     }
 
@@ -56,9 +48,9 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($barang)
+    public function show($id)
     {
-        return BarangResource::collection(Barang::where('kode',$barang)->get());
+        return  CustpriceResource::collection(Custprice::where('id',$id)->get());
     }
 
     /**
@@ -79,9 +71,9 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,$barang)
+    public function update(Request $request, $id)
     {
-        Barang::where('kode',$barang)->update($request->all());
+        Custprice::where('id',$id)->update($request->all());
         return response('update',response::HTTP_CREATED);
     }
 
@@ -91,10 +83,9 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($barang)
-    {   
-        Barang::where('kode',$barang)->delete();
+    public function destroy($id)
+    {
+        Custprice::where('id',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
-
 }

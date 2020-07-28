@@ -5,6 +5,7 @@ namespace App\Model\Sales;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Customer\Customer;
 use App\Model\Rso\Rso;
+use App\Model\Sales\Custprice;
 
 class Sales extends Model
 {
@@ -19,4 +20,7 @@ class Sales extends Model
             return $this->hasMany(Rso::class,'nip_sales','nip');
     }
     
+    public function custprice(){
+        return $this->hasMany(Custprice::class,'nip_sales','nip');
+    }
 }

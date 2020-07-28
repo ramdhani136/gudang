@@ -4,6 +4,7 @@ namespace App\Model\Barang;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Rso\Listrso;
+use App\Model\Sales\Custprice;
 
 class Barang extends Model
 {
@@ -12,5 +13,9 @@ class Barang extends Model
 
     public function listrso(){
         return $this->hasMany(listrso::class,'kode_barang','kode');
+    }
+
+    public function custprice(){
+        return $this->hasMany(Custprice::class,'kode_barang','kode');
     }
 }

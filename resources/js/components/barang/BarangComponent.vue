@@ -61,6 +61,10 @@
                         <input v-model="form.nama" type="text" name="form.nama"  autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
+                        <label>Harga</label>
+                        <input v-model="form.harga" type="number"  autocomplete="off" class="form-control">
+                    </div>
+                    <div class="form-group">
                         <label>Jumlah Stok</label>
                         <input v-model="form.qty" type="number" name="form.qty" autocomplete="off" class="form-control">
                     </div>
@@ -73,7 +77,23 @@
                             <option value="KG">KG</option>
                             <option value="MTR">MTR</option>
                         </select>
+                    <div class="form-group">
+                        <label>Minimal Stok</label>
+                        <input v-model="form.min_stok" type="number"  autocomplete="off" class="form-control">
                     </div>
+                    <div class="form-group">
+                        <label>Maksimal Stok</label>
+                        <input v-model="form.max_stok" type="number"  autocomplete="off" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Kubikasi (M3)</label>
+                        <input v-model="form.kubikasi" type="number"  autocomplete="off" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Tonase (KG)</label>
+                        <input v-model="form.kg" type="number"  autocomplete="off" class="form-control">
+                    </div>
+                </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -148,8 +168,8 @@ export default {
             }else{
                 axios.put("/api/barang/"+  this.form.kode,this.form)
                 .then((response)=>{
-                    this.getBarang();
                     this.$router.push({name:'barang'})
+                    this.getBarang();
                     $("#modal-form").modal("hide");
                     this.edit=false
                     this.resetForm()
@@ -176,6 +196,11 @@ export default {
             this.form.qty=barang.qty
             this.form.satuan=barang.satuan
             this.form.kode=barang.kode
+            this.form.harga=barang.harga
+            this.form.min_stok=barang.min_stok
+            this.form.max_stok=barang.max_stok
+            this.form.kubikasi=barang.kubikasi
+            this.form.kg=barang.kg
             this.edit=true
             this.showmodal();
         },
@@ -192,12 +217,16 @@ export default {
             }
         },
         resetForm(){
-            this.edit=false
-            this.form.nama=""
-            this.form.kode=""
-            this.form.qty=""
-            this.form.satuan=""
-
+            this.edit=false;
+            this.form.nama="";
+            this.form.kode="";
+            this.form.qty="";
+            this.form.satuan="";
+            this.form.harga="";
+            this.form.min_stok="";
+            this.form.max_stok="";
+            this.form.kubikasi="";
+            this.form.kg="";
         },
     }
 }

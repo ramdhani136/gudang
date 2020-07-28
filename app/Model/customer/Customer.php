@@ -5,6 +5,7 @@ namespace App\Model\customer;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Rso\Rso;
 use App\Model\Sales\Sales;
+use App\Model\Sales\Custprice;
 
 class Customer extends Model
 {
@@ -16,6 +17,10 @@ class Customer extends Model
 
     public function Sales(){
         return $this->belongsTo(Sales::class,'nip_sales','nip');
+    }
+
+    public function custprice(){
+        return $this->hasMany(Custprice::class,'kode_customer','kode');
     }
 }
 
