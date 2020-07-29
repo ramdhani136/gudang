@@ -32,5 +32,6 @@ Route::resource('listrso','Rso\ListRsoController');
 Route::resource('sales','Sales\SalesController');
 Route::resource('so','So\SoController');
 Route::resource('custprice','sales\CustpriceController');
+Route::get('data/price/{customer}/{barang}','Sales\CustpriceController@viewprice');
 
 

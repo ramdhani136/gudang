@@ -22,6 +22,11 @@ import SoConfirmComponent from '../components/so/SoConfirmComponent.vue'
 import ViewSoConfirmComponent from '../components/so/ViewSoConfirmComponent.vue'
 
 
+import CustPriceComponent from '../components/customer/CustPriceComponent.vue'
+import ItemPriceComponent from '../components/customer/ItemPriceComponent.vue'
+import viewPriceComponent from '../components/customer/viewPriceComponent.vue'
+
+
 
 
 
@@ -47,6 +52,10 @@ const routes=[
     {name:'viewso', path:'/so/confirm/:id', component:ViewSoConfirmComponent},
     {name:'so', path:'/so', component:SoComponent},
     {name:'formso', path:'/so/form/:id', component:FormSoComponent},
+
+    {name:'datacust', path:'/price/customer', component:CustPriceComponent},
+    {name:'dataItem', path:'/price/:id', component:ItemPriceComponent},
+    {name:'viewItem', path:'/price/:customer/:barang', component:viewPriceComponent},
 ]
 
 Vue.use(VueRouter)

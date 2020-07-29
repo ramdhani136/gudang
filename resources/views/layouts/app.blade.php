@@ -70,9 +70,10 @@
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <router-link to="/rso" class="dropdown-item" >Data RSO</router-link>
-                                    <router-link to="/confirmso" class="dropdown-item" >Request SO</router-link>
-                                    <router-link to="/so" class="dropdown-item" >Data SO</router-link>
+                                    <router-link to="/rso" class="dropdown-item" >Request Sales Order</router-link>
+                                    <router-link to="/confirmso" class="dropdown-item" >SO Confirmation</router-link>
+                                    <router-link to="/so" class="dropdown-item" >Sales Order</router-link>
+                                    <router-link to="/price/customer" class="dropdown-item" >Special Price</router-link>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -81,7 +82,7 @@
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <router-link to="/dic" class="dropdown-item" >Request RSO</router-link>
+                                    <router-link to="/dic" class="dropdown-item" >Request Sales Order</router-link>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">

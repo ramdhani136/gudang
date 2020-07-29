@@ -88,4 +88,8 @@ class CustpriceController extends Controller
         Custprice::where('id',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
+
+    public function viewprice($customer,$barang){
+        return  CustpriceResource::collection(Custprice::where('kode_customer',$customer)->where('kode_barang',$barang)->get());
+    }
 }
