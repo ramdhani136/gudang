@@ -9,7 +9,17 @@ require('./bootstrap');
 window.Vue = require('vue');
 import Vue from 'vue'
 import router from './Router/router.js'
-import {RotateSquare2} from 'vue-loading-spinner'
+import VueCurrencyFilter from 'vue-currency-filter'
+
+Vue.use(VueCurrencyFilter,
+    {
+        symbol : 'Rp.',
+        thousandsSeparator: '.',
+        fractionCount: 0,
+        fractionSeparator: ',',
+        symbolPosition: 'front',
+        symbolSpacing: true
+    })
 
 
 
