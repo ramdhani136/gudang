@@ -39,6 +39,7 @@
         <div id="rsoverflowso" class="row mt-2 mx-auto">
             <div class="row float-left  ml-3 mt-4 label">Item Tersedia</div>
             <div class="row mt-1 mx-auto col-12">
+                <Circle5 id="load3" v-if="load"></Circle5>
                 <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
                     <thead>
                         <tr>
@@ -77,7 +78,7 @@
                         <tr v-for="(ltt,index) in LTTersedia " :key="ltt.id">
                             <td style="text-align:center">{{index+1}}</td>
                             <td>{{ltt.nama_barang}}</td>
-                            <td style="text-align:center">{{ltt.qty_tersedia}}</td>
+                            <td style="text-align:center">{{ltt.qty_tdktersedia}}</td>
                             <td style="text-align:center">{{ltt.satuan}}</td>
                             <td style="text-align:center">{{ltt.tgl_datang}}</td>
                             <td style="text-align:center">{{ltt.catatan}}</td>
@@ -95,7 +96,11 @@
 </template>
 
 <script>
+import {Circle5} from 'vue-loading-spinner'
 export default {
+    components: {
+        Circle5
+    },
     data(){
         return {
             so:{},
@@ -103,7 +108,8 @@ export default {
             Ltersedia:{},
             LTTersedia:{},
             tujuan:'',
-            up:{}
+            up:{},
+            load:true,
         }
     },
     created(){
@@ -133,7 +139,9 @@ export default {
                 this.so=res.data.data;
                 this.tujuan=this.so[0].nomor_rso;
                 axios.get(`/api/listrso/data/acc/`+this.tujuan)
-                .then(res=>this.LTTersedia=res.data.data)
+                .then(res=>{this.LTTersedia=res.data.data
+                    this.load=false;
+                });
             });
         },
         now(){

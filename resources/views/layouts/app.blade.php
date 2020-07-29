@@ -66,15 +66,31 @@
 
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    Transaksi <span class="caret"></span>
+                                    Marketing <span class="caret"></span>
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/rso" class="dropdown-item" >Data RSO</router-link>
-                                    <router-link to="/dic" class="dropdown-item" >Inventory Control</router-link>
-                                    <router-link to="/purchase" class="dropdown-item" >Estimation Request</router-link>
                                     <router-link to="/confirmso" class="dropdown-item" >Request SO</router-link>
-                                    <router-link to="/so" class="dropdown-item" >Sales Order</router-link>
+                                    <router-link to="/so" class="dropdown-item" >Data SO</router-link>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Inventory Control <span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <router-link to="/dic" class="dropdown-item" >Request RSO</router-link>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Purchasing <span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <router-link to="/purchase" class="dropdown-item" >Estimation Request RSO</router-link>
                                 </div>
                             </li>
                                 

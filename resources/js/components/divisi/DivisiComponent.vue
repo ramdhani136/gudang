@@ -26,6 +26,7 @@
             </tr>
         </tbody>
     </table>
+    <Circle5 id="load" v-if="load"></Circle5>
     </div>
     <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -64,7 +65,11 @@
 </template>
 
 <script>
+import {Circle5} from 'vue-loading-spinner'
 export default {
+    components: {
+        Circle5
+    },
     data(){
         return{
             search  : '',
@@ -76,6 +81,7 @@ export default {
             },
             errors:[],
             edit:false,
+            load:true,
         }
     },
     created(){
@@ -91,7 +97,9 @@ export default {
     methods:{
         getDivisi(){
             axios.get("/api/divisi")
-            .then(res=>this.divisi=res.data.data)
+            .then(res=>{this.divisi=res.data.data;
+            this.load=false;
+            })
         },
         showmodal(){
             this.errors=[];
@@ -165,6 +173,12 @@ export default {
 
 
 <style>
+    #load{
+        position: relative;
+        margin: 0 auto; 
+        margin-top:170px ;  
+    }
+
     #overflow{
         width: 100%;
     height: 440px;

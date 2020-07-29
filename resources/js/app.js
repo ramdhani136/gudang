@@ -9,6 +9,7 @@ require('./bootstrap');
 window.Vue = require('vue');
 import Vue from 'vue'
 import router from './Router/router.js'
+import {RotateSquare2} from 'vue-loading-spinner'
 
 
 
@@ -34,5 +35,6 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 
 const app = new Vue({
     el: '#app',
-    router
+    router,
 });
+

@@ -33,12 +33,17 @@
                         </tr>
                     </tbody>
                 </table>
+                <Circle5 id="load" v-if="load"></Circle5>
             </div>
         </div>
 </template>
 
 <script>
+import {Circle5} from 'vue-loading-spinner'
 export default {
+    components: {
+        Circle5
+    },
     data(){
         return{
             search  : '',
@@ -46,6 +51,7 @@ export default {
             status:'Purch',
             urso:{},
             ya:false,
+            load:true,
         }
     },
     created(){
@@ -67,7 +73,9 @@ export default {
     methods:{
         getRso(){
             axios.get("/api/rso/data/purch")
-            .then(res=>this.rso=res.data.data)
+            .then(res=>{this.rso=res.data.data
+                this.load=false;
+            });
         },
         ConfirmRso(rs){
             let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');

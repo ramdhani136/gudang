@@ -107,6 +107,7 @@
                     </tr>
                 </tbody>
             </table>
+            <Circle5 id="load2" v-if="load"></Circle5>
         </div>
         <div  class="row mt-2"  v-for="rlist in form" :key="rlist.id">
                 <router-link :to="{name:'createso',params:{id:rlist.nomor_rso}}" v-if="rlist.status=='Confirmed'" class="btn-success btn ml-3" >
@@ -225,20 +226,15 @@
             </div>
             </div>
         </div>
-
-
-
-
-
-
-
-
-
     </div>   
 </template>
 
 <script>
+import {Circle5} from 'vue-loading-spinner'
 export default {
+    components: {
+        Circle5
+    },
     data(){
         return {
             form:{},
@@ -273,7 +269,8 @@ export default {
                 qty:0,
             },
             qtyupdate:0,
-            statusup:{}
+            statusup:{},
+            load:true,
         }
     },
     created(){
@@ -329,7 +326,7 @@ export default {
         },
         getRso(){
             axios.get(`/api/rso/${this.$route.params.id}`)
-            .then(res=>this.form=res.data.data)
+            .then(res=>this.form=res.data.data);
         },
         updateRso(){
             this.getRso()
@@ -352,7 +349,9 @@ export default {
         },
         getlistRso(){
             axios.get(`/api/listrso/${this.$route.params.id}`)
-            .then(res=>this.listrso=res.data.data)
+            .then(res=>{this.listrso=res.data.data
+                this.load=false;
+            });
         },
         getBarang(){
             axios.get("/api/barang/")
@@ -548,6 +547,12 @@ export default {
 </script>
 
 <style>
+    #load2{
+        position: relative;
+        margin: 0 auto; 
+        margin-top:60px ;  
+    }
+
     #rsoverflow{
     width: 100%;
     max-height: 240px;

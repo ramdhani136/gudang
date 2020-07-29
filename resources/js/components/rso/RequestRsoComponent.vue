@@ -81,6 +81,7 @@
                     </tr>
                 </tbody>
             </table>
+            <Circle5 id="load2" v-if="load"></Circle5>
         </div>
         <div v-for="up in form"  :key="up.id">
         <button v-if="up.status=='Sent'"  @click="ConfirmRso(up)" class="btn btn-success mt-2" >Konfirmasi</button>
@@ -137,7 +138,11 @@
 </template>
 
 <script>
+import {Circle5} from 'vue-loading-spinner'
 export default {
+    components: {
+        Circle5
+    },
     data(){
         return {
             form:{},
@@ -155,7 +160,8 @@ export default {
             urso:{},
             coba:0,
             akses:'',
-            up:{}
+            up:{},
+            load:true,
         }
     },
     created(){
@@ -177,7 +183,9 @@ export default {
         },
         getlistRso(){
             axios.get(`/api/listrso/${this.$route.params.id}`)
-            .then(res=>this.listrso=res.data.data)
+            .then(res=>{this.listrso=res.data.data
+                this.load=false;
+            });
         },
         showModal(list){
             this.getlistRso()

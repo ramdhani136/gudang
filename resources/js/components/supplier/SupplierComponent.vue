@@ -26,6 +26,7 @@
             </tr>
         </tbody>
     </table>
+    <Circle5 id="load" v-if="load"></Circle5>
     </div>
     <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
@@ -80,7 +81,11 @@
 </template>
 
 <script>
+import {Circle5} from 'vue-loading-spinner'
 export default {
+    components: {
+        Circle5
+    },
     data(){
         return{
             search  : '',
@@ -88,7 +93,8 @@ export default {
             form:{},
             errors:[],
             edit:false,
-            links:{}
+            links:{},
+            load:true,
         }
     },
     created(){
@@ -97,8 +103,7 @@ export default {
     computed:{
         filteredCustomer(){
             return this.supplier.filter(elem => {
-            return elem.nama.toLowerCase().includes(this.search);
-            
+            return elem.nama.toLowerCase().includes(this.search); 
             });
         }
     },

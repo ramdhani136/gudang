@@ -38,17 +38,23 @@
                         </tr>
                     </tbody>
                 </table>
+                <Circle5 id="load" v-if="load"></Circle5>
             </div>
         </div>
 </template>
 
 <script>
+import {Circle5} from 'vue-loading-spinner'
 export default {
+    components: {
+        Circle5
+    },
     data(){
         return{
             search  : '',
             status:'Draft',
             so:[],
+            load:true,
         }
     },
     created(){
@@ -72,7 +78,9 @@ export default {
     methods:{
         getSo(){
             axios.get("/api/so")
-            .then(res=>this.so=res.data.data)
+            .then(res=>{this.so=res.data.data
+                this.load=false;
+            });
         },
         deleteSo(rs){
             let keputusan=confirm('yakin ingin menghapus SO ini?');

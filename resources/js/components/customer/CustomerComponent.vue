@@ -26,6 +26,7 @@
             </tr>
         </tbody>
     </table>
+    <Circle5 id="load" v-if="load"></Circle5>
     </div>
     <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -75,7 +76,11 @@
 </template>
 
 <script>
+import {Circle5} from 'vue-loading-spinner'
 export default {
+    components: {
+        Circle5
+    },
     data(){
         return{
             search  : '',
@@ -87,7 +92,8 @@ export default {
             },
             errors:[],
             edit:false,
-            target:''
+            target:'',
+            load:true,
         }
     },
     created(){
@@ -103,7 +109,9 @@ export default {
     methods:{
         getCustomer(){
             axios.get("/api/customer")
-            .then(res=>this.customer=res.data.data)
+            .then(res=>{this.customer=res.data.data
+                this.load=false;
+            });
         },
         showmodal(){
             this.errors=[];

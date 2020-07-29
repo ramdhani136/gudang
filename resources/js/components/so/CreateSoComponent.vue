@@ -39,6 +39,7 @@
         <div v-if="rlist.status=='Confirmed'" v-for="rlist in form" :key="rlist.id" id="rsoverflowso" class="row mt-2 mx-auto">
             <div class="row float-left  ml-3 mt-4 label">Item Tersedia</div>
             <div class="row mt-1 mx-auto col-12" v-for="rlist in form" :key="rlist.id">
+                <Circle5 id="load3" v-if="load"></Circle5>
                 <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
                     <thead>
                         <tr>
@@ -121,7 +122,11 @@
 </template>
 
 <script>
+import {Circle5} from 'vue-loading-spinner'
 export default {
+    components: {
+        Circle5
+    },
     data(){
         return {
             form:{},
@@ -141,6 +146,7 @@ export default {
             },
             statusso:{},
             nomorrso:'',
+            load:true,
         }
     },
     created(){
@@ -172,7 +178,9 @@ export default {
         },
         getlistRso(){
             axios.get(`/api/listrso/data/dic/${this.$route.params.id}`)
-            .then(res=>this.listrso=res.data.data)
+            .then(res=>{this.listrso=res.data.data
+                this.load=false;
+            });
         },
         getlistTdktersedia(){
             axios.get(`/api/listrso/data/acc/${this.$route.params.id}`)
@@ -320,6 +328,12 @@ export default {
     max-height: 275px;
     overflow-y: scroll;
     border-top:solid 1px #dee2e6;
+    }
+
+    #load3{
+        position: relative;
+        margin: 0 auto; 
+        margin-bottom:10px ; 
     }
 
     .label{

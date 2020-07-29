@@ -60,6 +60,7 @@
                         </tr>
                     </tbody>
             </table>
+            <Circle5 id="load" v-if="load"></Circle5>
             </div>
             <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -125,7 +126,11 @@
 </template>
 
 <script>
+import {Circle5} from 'vue-loading-spinner'
 export default {
+    components: {
+        Circle5
+    },
     data(){
         return{
             search  : '',
@@ -146,6 +151,7 @@ export default {
             selected:0,
             custom:null,
             itemHeight:39,
+            load:true,
         }
     },
     created(){
@@ -185,7 +191,9 @@ export default {
     methods:{
         getRso(){
             axios.get("/api/rso")
-            .then(res=>this.rso=res.data.data)
+            .then(res=>{this.rso=res.data.data
+                this.load=false;
+            });
         },
         deleteRso(rso){
             let keputusan=confirm('Apakah anda yakin?');
