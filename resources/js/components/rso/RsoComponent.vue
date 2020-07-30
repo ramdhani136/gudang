@@ -5,7 +5,7 @@
             <input v-model="search"  type="text" class="form-control" placeholder="Search">
         </div>
         <div class="form-group col-3 my-3 float-right">
-            <select name="status" v-model="status" class="form-control">
+            <select @change="statusData()" name="status" v-model="status" class="form-control">
                 <option value="Draft">Draft</option>
                 <option value="Sent">Inventory Control</option>
                 <option value="Purch">Purchasing</option>
@@ -59,6 +59,13 @@
                             </td>
                         </tr>
                     </tbody>
+                    <div>
+                        <div v-if="status=='Draft' && tampil" id="nocontentRso">Tidak ada data yang tersimpan</div>
+                        <div v-if="status=='Sent' && tampil " id="nocontentRso">Tidak ada data yang tersimpan</div>
+                        <div v-if="status=='Purch' && tampil" id="nocontentRso">Tidak ada data yang tersimpan</div>
+                        <div v-if="status=='Confirmed' && tampil" id="nocontentRso">Tidak ada data yang tersimpan</div>
+                        <div v-if="status=='So' && tampil" id="nocontentRso">Tidak ada data yang tersimpan</div>
+                    </div>
             </table>
             <Circle5 id="load" v-if="load"></Circle5>
             </div>
@@ -152,12 +159,14 @@ export default {
             custom:null,
             itemHeight:39,
             load:true,
+            tampil:false,
         }
     },
     created(){
-        this.getRso()
-        this.getCustomer()
-        this.getSales()
+        this.getRso();
+        this.getCustomer();
+        this.getSales();
+        this.statusData();
     },
     computed:{
         FilterKategori(){
@@ -192,6 +201,7 @@ export default {
         getRso(){
             axios.get("/api/rso")
             .then(res=>{this.rso=res.data.data
+                this.statusData();
                 this.load=false;
             });
         },
@@ -283,13 +293,66 @@ export default {
 
             var output = "RSO-" + d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" ;
             return output
-        }      
+        },
+        statusData(){
+            if(this.search===""){
+                if(this.status==="Draft"){
+                    this.draft=this.rso.filter(elem=> elem.status==="Draft")
+                    if(this.draft.length<1){
+                        this.tampil=true;
+                    }else{
+                        this.tampil=false;
+                    }
+                }else if(this.status==="Sent"){
+                    this.sent=this.rso.filter(elem=> elem.status==="Sent")
+                    if(this.sent.length<1){
+                        this.tampil=true;
+                    }else{
+                        this.tampil=false;
+                    }
+                }
+                else if(this.status==="Purch"){
+                    this.purch=this.rso.filter(elem=> elem.status==="Purch")
+                    if(this.purch.length<1){
+                        this.tampil=true;
+                    }else{
+                        this.tampil=false;
+                    }
+                }
+                else if(this.status==="Confirmed"){
+                    this.confirmed=this.rso.filter(elem=> elem.status==="Confirmed")
+                    if(this.confirmed.length<1){
+                        this.tampil=true;
+                    }else{
+                        this.tampil=false;
+                    }
+                }
+                    else if(this.status==="So"){
+                    this.So=this.rso.filter(elem=> elem.status==="So")
+                    if(this.So.length<1){
+                        this.tampil=true;
+                    }else{
+                        this.tampil=false;
+                    }
+                }
+            }
+        },      
     }
 }
 </script>
 
 
 <style>
+
+    #nocontentRso{
+        position: absolute;
+        width: 90%;
+        text-align: center;
+        color: rgb(175, 173, 173);
+        top: 300px;
+        letter-spacing: 0.5px;
+    }
+
     #overflow{
         width: 100%;
     height: 440px;

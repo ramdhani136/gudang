@@ -38,9 +38,7 @@
         </div>
         <div id="rsoverflowso" class="row mt-2 mx-auto">
             <div class="row float-left  ml-3 mt-4 label">Item Tersedia</div>
-
             <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{totalt+totald | currency}}</div>
-
             <div class="row mt-1 mx-auto col-12">
                 <Circle5 id="load3" v-if="load"></Circle5>
                 <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -96,11 +94,38 @@
         </div>   
         <div class="row mt-2" v-for="(lso,index) in so" :key="index">
                 <button v-if="lso.status=='Draft'" @click="confirmSO(lso)" class="btn-orange btn ml-3" >
-                    Konfirmasi SO
+                    Terima SO
                 </button>
-                <button v-if="lso.status=='Draft'"  class="btn-danger btn ml-1" >
+                <button @click="showModal()" v-if="lso.status=='Draft'"  class="btn-danger btn ml-1" >
                     Tolak SO
                 </button>
+        </div>
+        <div v-if="vso.status=='Tolak'" v-for="vso in so" :key="vso.nomor_so" id="alastolak">
+            <div v-for="(lso,index) in so" :key="index">
+                <b>{{lso.alastolak}}</b> 
+            </div>    
+        </div>
+        <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div  class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Penolakan SO</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Alasan Penolakan</label>
+                        <textarea v-model="up.alastolak" class="form-control"></textarea>
+                    </div>               
+                </div>
+                <div v-for="(lso,index) in so" :key="index" class="modal-footer">
+                    <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="tolakSo(lso)" class="btn btn-primary">Konfirmasi Tolak</button>
+                </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -134,6 +159,9 @@ export default {
     computed:{       
     },
     methods:{
+        showModal(){
+            $("#modal-form").modal("show");
+        },
         getSo(){
             axios.get(`/api/so/${this.$route.params.id}`)
             .then(res=>this.so=res.data.data);
@@ -197,7 +225,7 @@ export default {
             }
         },
         confirmSO(lso){
-            let keputusan=confirm('Apakah anda yakin?');
+            let keputusan=confirm('Apakah anda yakin ingin menerima SO ini?');
             if(keputusan===true){
                 this.up.nomor_so=lso.nomor_so;
                 this.up.tanggal_so=lso.tanggal_so;
@@ -210,12 +238,41 @@ export default {
                     this.$router.push({name:'soconfirm'})
                 })
             }
+        },
+        tolakSo(lso){
+            let keputusan=confirm('Apakah anda yakin ingin menolak SO ini?');
+            if(keputusan===true){
+                this.up.nomor_so=lso.nomor_so;
+                this.up.tanggal_so=lso.tanggal_so;
+                this.up.tanggal_kirim=lso.tanggal_kirim;
+                this.up.nomor_rso=lso.nomor_rso;
+                this.up.keterangan=lso.keterangan;
+                this.up.status="Tolak";
+                axios.put("/api/so/"+this.up.nomor_so,this.up)
+                .then((response)=>{
+                    $("#modal-form").modal("hide");
+                    this.$router.push({name:'soconfirm'})
+                })
+            }
         }
     },
 }
 </script>
 
 <style>
+    #alastolak{
+        width: 100%;
+        padding: 1%;
+        border:solid 1px rgb(253, 98, 98);
+        text-align: center;
+        align-content: center;
+        margin-top: 5px;
+        background-color: rgb(252, 156, 156) ;
+        border-radius: 3px;
+        font-size: 1.1em;
+        color: rgb(255, 68, 68);
+    }
+
     #rsoverflowso{
     width: 100%;
     max-height: 275px;

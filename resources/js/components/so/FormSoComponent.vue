@@ -38,6 +38,7 @@
         </div>
         <div id="rsoverflowso" class="row mt-2 mx-auto">
             <div class="row float-left  ml-3 mt-4 label">Item Tersedia</div>
+            <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{totalt+totald | currency}}</div>
             <div class="row mt-1 mx-auto col-12">
                 <Circle5 id="load3" v-if="load"></Circle5>
                 <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -47,8 +48,9 @@
                             <th>Nama Barang</th>
                             <th>Qty</th>
                             <th>Satuan</th>
-                            <th>Catatan</th>
-                            <th>Aksi</th>
+                            <th>Harga</th>
+                            <th>Sub Total</th>
+                            <th v-for="vso in so" :key="vso.nomor_so"  v-if="vso.status=='Draft' || vso.status=='Tolak'" >Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,9 +59,10 @@
                             <td>{{ts.nama_barang}}</td>
                             <td style="text-align:center">{{ts.qty_tersedia}}</td>
                             <td style="text-align:center">{{ts.satuan}}</td>
-                            <td style="text-align:center">{{ts.catatan}}</td>
-                            <td style="text-align:center">
-                                <button class="btn btn-danger">Hapus</button>
+                            <td style="text-align:center">{{ts.harga | currency}}</td>
+                            <td style="text-align:center">{{ts.harga*ts.qty_tersedia | currency}}</td>
+                            <td v-if="vso.status=='Draft' || vso.status=='Tolak'"  v-for="vso in so" :key="vso.nomor_so" style="text-align:center">
+                                <button @click="deleteTersedia(ts)" class="btn btn-danger">Hapus</button>
                             </td>
                         </tr>
                     </tbody>
@@ -74,9 +77,10 @@
                             <th>Nama Barang</th>
                             <th>Qty</th>
                             <th>Satuan</th>
+                            <th>Harga</th>
+                            <th>Sub Total</th>
                             <th>Estimasi Kedatangan</th>
-                            <th>Catatan</th>
-                            <th>Aksi</th>
+                            <th v-for="vso in so" :key="vso.nomor_so"  v-if="vso.status=='Draft' || vso.status=='Tolak'">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,16 +89,24 @@
                             <td>{{ltt.nama_barang}}</td>
                             <td style="text-align:center">{{ltt.qty_tdktersedia}}</td>
                             <td style="text-align:center">{{ltt.satuan}}</td>
+                            <td style="text-align:center">{{ltt.harga | currency}}</td>
+                            <td style="text-align:center">{{ltt.harga*ltt.qty_tdktersedia | currency}}</td>
                             <td style="text-align:center">{{ltt.tgl_datang}}</td>
-                            <td style="text-align:center">{{ltt.catatan}}</td>
-                            <td style="text-align:center">
-                                <button class="btn btn-danger">Hapus</button>
+                            <td v-for="vso in so" :key="vso.nomor_so"  v-if="vso.status=='Draft' || vso.status=='Tolak'" style="text-align:center">
+                                <button @click="deleteTdkTersedia(ltt)"  class="btn btn-danger">Hapus</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>   
+        <div class="row mt-2" v-for="(lso,index) in so" :key="index">
+            <div v-if="vso.status=='Tolak'" v-for="vso in so" :key="vso.nomor_so" id="alastolak">
+                <div v-for="(lso,index) in so" :key="index">
+                    <b>{{lso.alastolak}}</b> 
+                </div>                
+            </div>
+        </div>
     </div>
 </template>
 
@@ -112,6 +124,11 @@ export default {
             LTTersedia:{},
             tujuan:'',
             load:true,
+            totalt:0,
+            subTotalt:0,
+            totald:0,
+            subTotald:0,
+            urso:{}
         }
     },
     created(){
@@ -132,16 +149,27 @@ export default {
                 this.so=res.data.data;
                 this.tujuan=this.so[0].nomor_rso;
                 axios.get(`/api/listrso/data/dic/`+this.tujuan)
-                .then(res=>this.Ltersedia=res.data.data)});  
+                .then(res=>{this.Ltersedia=res.data.data
+                    this.totalt=0;
+                    for (let i = 0; i < this.Ltersedia.length; i++) {
+                    this.subTotalt=parseInt(this.Ltersedia[i].qty_tersedia)*parseInt(this.Ltersedia[i].harga);
+                    this.totalt += this.subTotalt;     
+                    }
+                })
+            });  
         },
         ListTdkTersedia(){
-
             axios.get(`/api/so/${this.$route.params.id}`)
             .then(res=>{
                 this.so=res.data.data;
                 this.tujuan=this.so[0].nomor_rso;
                 axios.get(`/api/listrso/data/acc/`+this.tujuan)
                 .then(res=>{this.LTTersedia=res.data.data
+                    this.totald=0;
+                    for (let i = 0; i < this.LTTersedia.length; i++) {
+                    this.subTotald=parseInt(this.LTTersedia[i].qty_tdktersedia)*parseInt(this.LTTersedia[i].harga);
+                    this.totald += this.subTotald;     
+                    }
                     this.load=false;
                 });
             });
@@ -170,6 +198,66 @@ export default {
         validateKirim(){
             if(this.so.tanggal_kirim < this.tglKirim()){
                 this.so.tanggal_kirim=this.tglKirim();
+            }
+        },
+        deleteTersedia(ts){
+            let keputusan=confirm('Apakah anda yakin ingin menghapus barang ini?');
+            if(keputusan===true){
+                if(ts.qty_tdktersedia>0){
+                    this.urso.id=ts.id;
+                    this.urso.nomor_rso=ts.nomor_rso;
+                    this.urso.tanggal_rso=ts.tanggal_rso;
+                    this.urso.kode_barang=ts.kode_barang;
+                    this.urso.qty=ts.qty-ts.qty_tersedia;
+                    this.urso.qty_tersedia="";
+                    this.urso.qty_tdktersedia=ts.qty_tdktersedia;
+                    this.urso.tangga_datang=ts.tangga_datang;
+                    this.urso.acc_purch=ts.acc_purch;
+                    this.urso.status="Tidak Tersedia";
+                    this.urso.catatan=ts.catatan;
+                    this.urso.booking=ts.booking;
+                    axios.put("/api/listrso/"+  this.urso.id,this.urso)
+                    .then((response)=>{
+                        this.ListTersedia();
+                        this.ListTdkTersedia();
+                    })
+                }else{
+                    axios.delete("/api/listrso/" + ts.id)
+                    .then(response=>{
+                    this.ListTersedia();
+                    this.ListTdkTersedia();
+                })
+                } 
+            }
+        },
+        deleteTdkTersedia(ltt){
+            let keputusan=confirm('Apakah anda yakin ingin menghapus barang ini?');
+            if(keputusan===true){
+                if(ltt.qty_tersedia>0){
+                    this.urso.id=ltt.id;
+                    this.urso.nomor_rso=ltt.nomor_rso;
+                    this.urso.tanggal_rso=ltt.tanggal_rso;
+                    this.urso.kode_barang=ltt.kode_barang;
+                    this.urso.qty=ltt.qty-ltt.qty_tdktersedia;
+                    this.urso.qty_tersedia=ltt.qty_tersedia;
+                    this.urso.qty_tdktersedia="";
+                    this.urso.tanggal_datang="";
+                    this.urso.acc_purch="";
+                    this.urso.status="Tersedia";
+                    this.urso.catatan=ltt.catatan;
+                    this.urso.booking=ltt.booking;
+                    axios.put("/api/listrso/"+  this.urso.id,this.urso)
+                    .then((response)=>{
+                        this.ListTersedia();
+                        this.ListTdkTersedia();
+                    })
+                }else{
+                    axios.delete("/api/listrso/" + ltt.id)
+                    .then(response=>{
+                    this.ListTersedia();
+                    this.ListTdkTersedia();
+                })
+                }       
             }
         },
     },

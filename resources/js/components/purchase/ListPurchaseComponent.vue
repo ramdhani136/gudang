@@ -45,7 +45,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(list,index) in listrso" :key="list.nomor_rso">
+                    <tr v-for="(list,index) in listrso" :key="index">
                         <td style="text-align:center">{{index+1}}</td>
                         <td>{{list.nama_barang}}</td>
                         <td style="text-align:center">{{list.qty_tdktersedia}}</td>
@@ -67,7 +67,7 @@
         <div v-for="rs in form" :key="rs.nomor_id">
         <button @click="ConfirmRso(rs)" class="btn btn-success mt-2" >Konfirmasi</button>
         </div>
-        <div v-for="list in listrso" :key="list.nomor_rso">
+        <div v-for="(list,index) in listrso" :key="index">
         <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
@@ -101,11 +101,11 @@
                             <option value="N">Tolak Permintaan</option>
                         </select>
                     </div>
-                    <div v-if="list.acc_purch=='Y'" class="form-group">
+                    <div v-if="update.acc_purch=='Y'" class="form-group">
                         <label>Tanggal Estimasi</label>
                         <input v-model="update.tanggal_datang"  @change="validate()" :min="now()" type="date" class="form-control">
                     </div>
-                    <div v-if="list.acc_purch=='N'" class="form-group">
+                    <div v-if="update.acc_purch=='N'" class="form-group">
                         <label>Alasan Penolakan</label>
                         <textarea v-model="update.alastolak" class="form-control"></textarea>
                     </div>
@@ -235,12 +235,14 @@ export default {
                     this.update.alastolak="";
                     axios.put(`/api/listrso/`+this.dic.id,this.update)
                     .then((response)=>{
+                        this.list.acc_purch="Y";
                         this.getlistRso()
                 })
                 }else if(list.acc_purch=="Y"){
                     this.update.tanggal_datang="";
                     axios.put(`/api/listrso/`+this.dic.id,this.update)
                     .then((response)=>{
+                        this.list.acc_purch="N";
                         this.getlistRso()
                     })
                 }

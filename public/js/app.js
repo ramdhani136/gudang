@@ -3226,11 +3226,15 @@ __webpack_require__.r(__webpack_exports__);
         if (list.acc_purch == "N") {
           _this6.update.alastolak = "";
           axios.put("/api/listrso/" + _this6.dic.id, _this6.update).then(function (response) {
+            _this6.list.acc_purch = "Y";
+
             _this6.getlistRso();
           });
         } else if (list.acc_purch == "Y") {
           _this6.update.tanggal_datang = "";
           axios.put("/api/listrso/" + _this6.dic.id, _this6.update).then(function (response) {
+            _this6.list.acc_purch = "N";
+
             _this6.getlistRso();
           });
         }
@@ -4619,6 +4623,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -4644,13 +4655,15 @@ __webpack_require__.r(__webpack_exports__);
       selected: 0,
       custom: null,
       itemHeight: 39,
-      load: true
+      load: true,
+      tampil: false
     };
   },
   created: function created() {
     this.getRso();
     this.getCustomer();
     this.getSales();
+    this.statusData();
   },
   computed: {
     FilterKategori: function FilterKategori() {
@@ -4702,6 +4715,9 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("/api/rso").then(function (res) {
         _this3.rso = res.data.data;
+
+        _this3.statusData();
+
         _this3.load = false;
       });
     },
@@ -4806,6 +4822,61 @@ __webpack_require__.r(__webpack_exports__);
       var month = d.getMonth() + 1;
       var output = "RSO-" + d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-";
       return output;
+    },
+    statusData: function statusData() {
+      if (this.search === "") {
+        if (this.status === "Draft") {
+          this.draft = this.rso.filter(function (elem) {
+            return elem.status === "Draft";
+          });
+
+          if (this.draft.length < 1) {
+            this.tampil = true;
+          } else {
+            this.tampil = false;
+          }
+        } else if (this.status === "Sent") {
+          this.sent = this.rso.filter(function (elem) {
+            return elem.status === "Sent";
+          });
+
+          if (this.sent.length < 1) {
+            this.tampil = true;
+          } else {
+            this.tampil = false;
+          }
+        } else if (this.status === "Purch") {
+          this.purch = this.rso.filter(function (elem) {
+            return elem.status === "Purch";
+          });
+
+          if (this.purch.length < 1) {
+            this.tampil = true;
+          } else {
+            this.tampil = false;
+          }
+        } else if (this.status === "Confirmed") {
+          this.confirmed = this.rso.filter(function (elem) {
+            return elem.status === "Confirmed";
+          });
+
+          if (this.confirmed.length < 1) {
+            this.tampil = true;
+          } else {
+            this.tampil = false;
+          }
+        } else if (this.status === "So") {
+          this.So = this.rso.filter(function (elem) {
+            return elem.status === "So";
+          });
+
+          if (this.So.length < 1) {
+            this.tampil = true;
+          } else {
+            this.tampil = false;
+          }
+        }
+      }
     }
   }
 });
@@ -5505,6 +5576,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -5517,7 +5600,12 @@ __webpack_require__.r(__webpack_exports__);
       Ltersedia: {},
       LTTersedia: {},
       tujuan: '',
-      load: true
+      load: true,
+      totalt: 0,
+      subTotalt: 0,
+      totald: 0,
+      subTotald: 0,
+      urso: {}
     };
   },
   created: function created() {
@@ -5541,7 +5629,13 @@ __webpack_require__.r(__webpack_exports__);
         _this2.so = res.data.data;
         _this2.tujuan = _this2.so[0].nomor_rso;
         axios.get("/api/listrso/data/dic/" + _this2.tujuan).then(function (res) {
-          return _this2.Ltersedia = res.data.data;
+          _this2.Ltersedia = res.data.data;
+          _this2.totalt = 0;
+
+          for (var i = 0; i < _this2.Ltersedia.length; i++) {
+            _this2.subTotalt = parseInt(_this2.Ltersedia[i].qty_tersedia) * parseInt(_this2.Ltersedia[i].harga);
+            _this2.totalt += _this2.subTotalt;
+          }
         });
       });
     },
@@ -5553,6 +5647,13 @@ __webpack_require__.r(__webpack_exports__);
         _this3.tujuan = _this3.so[0].nomor_rso;
         axios.get("/api/listrso/data/acc/" + _this3.tujuan).then(function (res) {
           _this3.LTTersedia = res.data.data;
+          _this3.totald = 0;
+
+          for (var i = 0; i < _this3.LTTersedia.length; i++) {
+            _this3.subTotald = parseInt(_this3.LTTersedia[i].qty_tdktersedia) * parseInt(_this3.LTTersedia[i].harga);
+            _this3.totald += _this3.subTotald;
+          }
+
           _this3.load = false;
         });
       });
@@ -5580,6 +5681,72 @@ __webpack_require__.r(__webpack_exports__);
       if (this.so.tanggal_kirim < this.tglKirim()) {
         this.so.tanggal_kirim = this.tglKirim();
       }
+    },
+    deleteTersedia: function deleteTersedia(ts) {
+      var _this4 = this;
+
+      var keputusan = confirm('Apakah anda yakin ingin menghapus barang ini?');
+
+      if (keputusan === true) {
+        if (ts.qty_tdktersedia > 0) {
+          this.urso.id = ts.id;
+          this.urso.nomor_rso = ts.nomor_rso;
+          this.urso.tanggal_rso = ts.tanggal_rso;
+          this.urso.kode_barang = ts.kode_barang;
+          this.urso.qty = ts.qty - ts.qty_tersedia;
+          this.urso.qty_tersedia = "";
+          this.urso.qty_tdktersedia = ts.qty_tdktersedia;
+          this.urso.tangga_datang = ts.tangga_datang;
+          this.urso.acc_purch = ts.acc_purch;
+          this.urso.status = "Tidak Tersedia";
+          this.urso.catatan = ts.catatan;
+          this.urso.booking = ts.booking;
+          axios.put("/api/listrso/" + this.urso.id, this.urso).then(function (response) {
+            _this4.ListTersedia();
+
+            _this4.ListTdkTersedia();
+          });
+        } else {
+          axios["delete"]("/api/listrso/" + ts.id).then(function (response) {
+            _this4.ListTersedia();
+
+            _this4.ListTdkTersedia();
+          });
+        }
+      }
+    },
+    deleteTdkTersedia: function deleteTdkTersedia(ltt) {
+      var _this5 = this;
+
+      var keputusan = confirm('Apakah anda yakin ingin menghapus barang ini?');
+
+      if (keputusan === true) {
+        if (ltt.qty_tersedia > 0) {
+          this.urso.id = ltt.id;
+          this.urso.nomor_rso = ltt.nomor_rso;
+          this.urso.tanggal_rso = ltt.tanggal_rso;
+          this.urso.kode_barang = ltt.kode_barang;
+          this.urso.qty = ltt.qty - ltt.qty_tdktersedia;
+          this.urso.qty_tersedia = ltt.qty_tersedia;
+          this.urso.qty_tdktersedia = "";
+          this.urso.tanggal_datang = "";
+          this.urso.acc_purch = "";
+          this.urso.status = "Tersedia";
+          this.urso.catatan = ltt.catatan;
+          this.urso.booking = ltt.booking;
+          axios.put("/api/listrso/" + this.urso.id, this.urso).then(function (response) {
+            _this5.ListTersedia();
+
+            _this5.ListTdkTersedia();
+          });
+        } else {
+          axios["delete"]("/api/listrso/" + ltt.id).then(function (response) {
+            _this5.ListTersedia();
+
+            _this5.ListTdkTersedia();
+          });
+        }
+      }
     }
   }
 });
@@ -5596,6 +5763,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_loading_spinner__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-loading-spinner */ "./node_modules/vue-loading-spinner/src/index.js");
+//
+//
 //
 //
 //
@@ -5669,6 +5838,10 @@ __webpack_require__.r(__webpack_exports__);
         } else if (this.status === "Acc") {
           return this.so.filter(function (elem) {
             return elem.status === "Acc";
+          });
+        } else if (this.status === "Tolak") {
+          return this.so.filter(function (elem) {
+            return elem.status === "Tolak";
           });
         }
       } else {
@@ -5760,6 +5933,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -5788,6 +5962,10 @@ __webpack_require__.r(__webpack_exports__);
         } else if (this.status === "Acc") {
           return this.so.filter(function (elem) {
             return elem.status === "Acc";
+          });
+        } else if (this.status === "Tolak") {
+          return this.so.filter(function (elem) {
+            return elem.status === "Tolak";
           });
         }
       } else {
@@ -5928,6 +6106,31 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -5955,6 +6158,9 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {},
   methods: {
+    showModal: function showModal() {
+      $("#modal-form").modal("show");
+    },
     getSo: function getSo() {
       var _this = this;
 
@@ -6025,7 +6231,7 @@ __webpack_require__.r(__webpack_exports__);
     confirmSO: function confirmSO(lso) {
       var _this4 = this;
 
-      var keputusan = confirm('Apakah anda yakin?');
+      var keputusan = confirm('Apakah anda yakin ingin menerima SO ini?');
 
       if (keputusan === true) {
         this.up.nomor_so = lso.nomor_so;
@@ -6036,6 +6242,27 @@ __webpack_require__.r(__webpack_exports__);
         this.up.status = "Acc";
         axios.put("/api/so/" + this.up.nomor_so, this.up).then(function (response) {
           _this4.$router.push({
+            name: 'soconfirm'
+          });
+        });
+      }
+    },
+    tolakSo: function tolakSo(lso) {
+      var _this5 = this;
+
+      var keputusan = confirm('Apakah anda yakin ingin menolak SO ini?');
+
+      if (keputusan === true) {
+        this.up.nomor_so = lso.nomor_so;
+        this.up.tanggal_so = lso.tanggal_so;
+        this.up.tanggal_kirim = lso.tanggal_kirim;
+        this.up.nomor_rso = lso.nomor_rso;
+        this.up.keterangan = lso.keterangan;
+        this.up.status = "Tolak";
+        axios.put("/api/so/" + this.up.nomor_so, this.up).then(function (response) {
+          $("#modal-form").modal("hide");
+
+          _this5.$router.push({
             name: 'soconfirm'
           });
         });
@@ -11491,7 +11718,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.btn-none{\n    background-color:#666;\n    border:solid 1px rgb(85, 85, 85);\n    color:#fff;\n}\n#viewprice{\n    width: 100%;\n}\n.tinggi{\n    max-height: 350px;\n}\n#load6{\n    position: relative;\n    margin:0 auto;\n    margin-top: 100px;\n}\n#nocontent{\n    position: absolute;\n    width: 90%;\n    text-align: center;\n    color: rgb(175, 173, 173);\n    top: 350px;\n}\n", ""]);
+exports.push([module.i, "\n.btn-none{\n    background-color:#666;\n    border:solid 1px rgb(85, 85, 85);\n    color:#fff;\n}\n#viewprice{\n    width: 100%;\n}\n.tinggi{\n    max-height: 350px;\n}\n#load6{\n    position: relative;\n    margin:0 auto;\n    margin-top: 100px;\n}\n#nocontent{\n    position: absolute;\n    width: 90%;\n    text-align: center;\n    color: rgb(197, 196, 196);\n    top: 350px;\n    letter-spacing: 0.5px;\n}\n", ""]);
 
 // exports
 
@@ -11624,7 +11851,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n#overflow{\n    width: 100%;\nheight: 440px;\noverflow-y: scroll;\n}\n#thead thead tr th{\n    text-align: center;\n    border-bottom: none;\n    position: -webkit-sticky;\n    position: sticky; top: 0; \n    background-color: #fff;\n    top: -1px;\n    border-collapse: collapse;\n    box-shadow: inset 0 0 0 #dee2e6,\n    inset 0 -1px 0 #dee2e6;\n}\n#modal-width{\nwidth: 120%;\nheight: auto;\nright: 13%;\n}\n.autocomplete{\n    width: 100%;\n    position: relative;\n}\n.input{\n    min-height: 40px;\n    border-radius: 3px;\n    border: 1px solid lightgray;\n    box-shadow: 0 0 10px #eceaea;\n    padding-left: 10px;\n    padding-top: 10px;\n    cursor: text;\n}\n.popover{\n    min-width: 100%;\n    min-height: 50px;\n    border:1px solid lightgray;\n    position: relative;\n    top:4px;\n    left: 0;\n    right: 0;\n    background-color: #fff;\n    border-radius: 3px;\n    text-align: center;\n}\n.popover input{\n    width:95%;\n    margin-top: 5px;\n    height: 40px;\n    font-size: 14px;\n    border-radius: 3px;\n    border:solid 1px lightgray;\n    padding-left: 8px;\n}\n.option{\n    max-height: 150px;\n    overflow-y: scroll;\n    margin-top: 5px;\n}\n.option ul{\n    list-style-type:none;\n    text-align: left;\n    padding-left:0;\n}\n.option ul li{\n    border-bottom: 1px solid lightgrey;\n    padding:10px;\n    cursor: pointer;\n    background-color: #f1f1f1;\n}\n.option ul li.selected{\n    background-color: #58bd4c;\n    color: #fff;\n}\n.placeholder{\n    position: relative;\n    color: #d0d0d0;\n    pointer-events: none;\n    margin-top: -30px;\n    margin-left: 3%;\n}\n\n", ""]);
+exports.push([module.i, "\n#nocontentRso{\n    position: absolute;\n    width: 90%;\n    text-align: center;\n    color: rgb(175, 173, 173);\n    top: 300px;\n    letter-spacing: 0.5px;\n}\n#overflow{\n    width: 100%;\nheight: 440px;\noverflow-y: scroll;\n}\n#thead thead tr th{\n    text-align: center;\n    border-bottom: none;\n    position: -webkit-sticky;\n    position: sticky; top: 0; \n    background-color: #fff;\n    top: -1px;\n    border-collapse: collapse;\n    box-shadow: inset 0 0 0 #dee2e6,\n    inset 0 -1px 0 #dee2e6;\n}\n#modal-width{\nwidth: 120%;\nheight: auto;\nright: 13%;\n}\n.autocomplete{\n    width: 100%;\n    position: relative;\n}\n.input{\n    min-height: 40px;\n    border-radius: 3px;\n    border: 1px solid lightgray;\n    box-shadow: 0 0 10px #eceaea;\n    padding-left: 10px;\n    padding-top: 10px;\n    cursor: text;\n}\n.popover{\n    min-width: 100%;\n    min-height: 50px;\n    border:1px solid lightgray;\n    position: relative;\n    top:4px;\n    left: 0;\n    right: 0;\n    background-color: #fff;\n    border-radius: 3px;\n    text-align: center;\n}\n.popover input{\n    width:95%;\n    margin-top: 5px;\n    height: 40px;\n    font-size: 14px;\n    border-radius: 3px;\n    border:solid 1px lightgray;\n    padding-left: 8px;\n}\n.option{\n    max-height: 150px;\n    overflow-y: scroll;\n    margin-top: 5px;\n}\n.option ul{\n    list-style-type:none;\n    text-align: left;\n    padding-left:0;\n}\n.option ul li{\n    border-bottom: 1px solid lightgrey;\n    padding:10px;\n    cursor: pointer;\n    background-color: #f1f1f1;\n}\n.option ul li.selected{\n    background-color: #58bd4c;\n    color: #fff;\n}\n.placeholder{\n    position: relative;\n    color: #d0d0d0;\n    pointer-events: none;\n    margin-top: -30px;\n    margin-left: 3%;\n}\n\n", ""]);
 
 // exports
 
@@ -11700,7 +11927,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n#rsoverflowso{\nwidth: 100%;\nmax-height: 275px;\noverflow-y: scroll;\nborder-top:solid 1px #dee2e6;\n}\n.label{\n    border:solid 1px rgb(42, 199, 42);\n    background-color: rgb(104, 226, 104);\n    font-size: 16px;\n    border-radius: 3px;\n    padding: 5px;\n    padding-left:1%;\n    padding-right: 1%;\n    color:#fff;\n}\n.labelt{\n    border:solid 1px rgb(40, 131, 206);\n    background-color: rgb(75, 161, 231);\n    font-size: 16px;\n    border-radius: 3px;\n    padding: 5px;\n    padding-left:1%;\n    padding-right: 1%;\n    color:#fff;\n}\n.error-template {padding: 40px 15px;text-align: center;}\n.error-actions {margin-top:15px;margin-bottom:15px;}\n.error-actions .btn { margin-right:10px;\n}\n\n\n\n", ""]);
+exports.push([module.i, "\n#alastolak{\n    width: 100%;\n    padding: 1%;\n    border:solid 1px rgb(253, 98, 98);\n    text-align: center;\n    align-content: center;\n    margin-top: 5px;\n    background-color: rgb(252, 156, 156) ;\n    border-radius: 3px;\n    font-size: 1.1em;\n    color: rgb(255, 68, 68);\n}\n#rsoverflowso{\nwidth: 100%;\nmax-height: 275px;\noverflow-y: scroll;\nborder-top:solid 1px #dee2e6;\n}\n.label{\n    border:solid 1px rgb(42, 199, 42);\n    background-color: rgb(104, 226, 104);\n    font-size: 16px;\n    border-radius: 3px;\n    padding: 5px;\n    padding-left:1%;\n    padding-right: 1%;\n    color:#fff;\n}\n.labelt{\n    border:solid 1px rgb(40, 131, 206);\n    background-color: rgb(75, 161, 231);\n    font-size: 16px;\n    border-radius: 3px;\n    padding: 5px;\n    padding-left:1%;\n    padding-right: 1%;\n    color:#fff;\n}\n.error-template {padding: 40px 15px;text-align: center;}\n.error-actions {margin-top:15px;margin-bottom:15px;}\n.error-actions .btn { margin-right:10px;\n}\n\n\n\n", ""]);
 
 // exports
 
@@ -51418,7 +51645,7 @@ var render = function() {
               _c(
                 "tbody",
                 _vm._l(_vm.listrso, function(list, index) {
-                  return _c("tr", { key: list.nomor_rso }, [
+                  return _c("tr", { key: index }, [
                     _c("td", { staticStyle: { "text-align": "center" } }, [
                       _vm._v(_vm._s(index + 1))
                     ]),
@@ -51522,8 +51749,8 @@ var render = function() {
         ])
       }),
       _vm._v(" "),
-      _vm._l(_vm.listrso, function(list) {
-        return _c("div", { key: list.nomor_rso }, [
+      _vm._l(_vm.listrso, function(list, index) {
+        return _c("div", { key: index }, [
           _c(
             "div",
             {
@@ -51764,7 +51991,7 @@ var render = function() {
                           )
                         ]),
                         _vm._v(" "),
-                        list.acc_purch == "Y"
+                        _vm.update.acc_purch == "Y"
                           ? _c("div", { staticClass: "form-group" }, [
                               _c("label", [_vm._v("Tanggal Estimasi")]),
                               _vm._v(" "),
@@ -51799,7 +52026,7 @@ var render = function() {
                             ])
                           : _vm._e(),
                         _vm._v(" "),
-                        list.acc_purch == "N"
+                        _vm.update.acc_purch == "N"
                           ? _c("div", { staticClass: "form-group" }, [
                               _c("label", [_vm._v("Alasan Penolakan")]),
                               _vm._v(" "),
@@ -54732,19 +54959,24 @@ var render = function() {
           staticClass: "form-control",
           attrs: { name: "status" },
           on: {
-            change: function($event) {
-              var $$selectedVal = Array.prototype.filter
-                .call($event.target.options, function(o) {
-                  return o.selected
-                })
-                .map(function(o) {
-                  var val = "_value" in o ? o._value : o.value
-                  return val
-                })
-              _vm.status = $event.target.multiple
-                ? $$selectedVal
-                : $$selectedVal[0]
-            }
+            change: [
+              function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.status = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              },
+              function($event) {
+                return _vm.statusData()
+              }
+            ]
           }
         },
         [
@@ -54960,7 +55192,39 @@ var render = function() {
                 ])
               }),
               0
-            )
+            ),
+            _vm._v(" "),
+            _c("div", [
+              _vm.status == "Draft" && _vm.tampil
+                ? _c("div", { attrs: { id: "nocontentRso" } }, [
+                    _vm._v("Tidak ada data yang tersimpan")
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.status == "Sent" && _vm.tampil
+                ? _c("div", { attrs: { id: "nocontentRso" } }, [
+                    _vm._v("Tidak ada data yang tersimpan")
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.status == "Purch" && _vm.tampil
+                ? _c("div", { attrs: { id: "nocontentRso" } }, [
+                    _vm._v("Tidak ada data yang tersimpan")
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.status == "Confirmed" && _vm.tampil
+                ? _c("div", { attrs: { id: "nocontentRso" } }, [
+                    _vm._v("Tidak ada data yang tersimpan")
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.status == "So" && _vm.tampil
+                ? _c("div", { attrs: { id: "nocontentRso" } }, [
+                    _vm._v("Tidak ada data yang tersimpan")
+                  ])
+                : _vm._e()
+            ])
           ]
         ),
         _vm._v(" "),
@@ -56598,6 +56862,17 @@ var render = function() {
           _vm._v(" "),
           _c(
             "div",
+            { staticClass: "mt-3 ml-auto mr-3", attrs: { id: "total" } },
+            [
+              _vm._v(
+                "Total Invoice :  " +
+                  _vm._s(_vm._f("currency")(_vm.totalt + _vm.totald))
+              )
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
             { staticClass: "row mt-1 mx-auto col-12" },
             [
               _vm.load ? _c("Circle5", { attrs: { id: "load3" } }) : _vm._e(),
@@ -56610,32 +56885,106 @@ var render = function() {
                   attrs: { id: "rsthead" }
                 },
                 [
-                  _vm._m(0),
+                  _c("thead", [
+                    _c(
+                      "tr",
+                      [
+                        _c("th", [_vm._v("No")]),
+                        _vm._v(" "),
+                        _c("th", [_vm._v("Nama Barang")]),
+                        _vm._v(" "),
+                        _c("th", [_vm._v("Qty")]),
+                        _vm._v(" "),
+                        _c("th", [_vm._v("Satuan")]),
+                        _vm._v(" "),
+                        _c("th", [_vm._v("Harga")]),
+                        _vm._v(" "),
+                        _c("th", [_vm._v("Sub Total")]),
+                        _vm._v(" "),
+                        _vm._l(_vm.so, function(vso) {
+                          return vso.status == "Draft" || vso.status == "Tolak"
+                            ? _c("th", { key: vso.nomor_so }, [_vm._v("Aksi")])
+                            : _vm._e()
+                        })
+                      ],
+                      2
+                    )
+                  ]),
                   _vm._v(" "),
                   _c(
                     "tbody",
                     _vm._l(_vm.Ltersedia, function(ts, index) {
-                      return _c("tr", { key: ts.id }, [
-                        _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(_vm._s(index + 1))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(ts.nama_barang))]),
-                        _vm._v(" "),
-                        _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(_vm._s(ts.qty_tersedia))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(_vm._s(ts.satuan))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(_vm._s(ts.catatan))
-                        ]),
-                        _vm._v(" "),
-                        _vm._m(1, true)
-                      ])
+                      return _c(
+                        "tr",
+                        { key: ts.id },
+                        [
+                          _c(
+                            "td",
+                            { staticStyle: { "text-align": "center" } },
+                            [_vm._v(_vm._s(index + 1))]
+                          ),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(ts.nama_barang))]),
+                          _vm._v(" "),
+                          _c(
+                            "td",
+                            { staticStyle: { "text-align": "center" } },
+                            [_vm._v(_vm._s(ts.qty_tersedia))]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "td",
+                            { staticStyle: { "text-align": "center" } },
+                            [_vm._v(_vm._s(ts.satuan))]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "td",
+                            { staticStyle: { "text-align": "center" } },
+                            [_vm._v(_vm._s(_vm._f("currency")(ts.harga)))]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "td",
+                            { staticStyle: { "text-align": "center" } },
+                            [
+                              _vm._v(
+                                _vm._s(
+                                  _vm._f("currency")(ts.harga * ts.qty_tersedia)
+                                )
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _vm._l(_vm.so, function(vso) {
+                            return vso.status == "Draft" ||
+                              vso.status == "Tolak"
+                              ? _c(
+                                  "td",
+                                  {
+                                    key: vso.nomor_so,
+                                    staticStyle: { "text-align": "center" }
+                                  },
+                                  [
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-danger",
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.deleteTersedia(ts)
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Hapus")]
+                                    )
+                                  ]
+                                )
+                              : _vm._e()
+                          })
+                        ],
+                        2
+                      )
                     }),
                     0
                   )
@@ -56658,36 +57007,101 @@ var render = function() {
                 attrs: { id: "rsthead" }
               },
               [
-                _vm._m(2),
+                _c("thead", [
+                  _c(
+                    "tr",
+                    [
+                      _c("th", [_vm._v("No")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Nama Barang")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Qty")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Satuan")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Harga")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Sub Total")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Estimasi Kedatangan")]),
+                      _vm._v(" "),
+                      _vm._l(_vm.so, function(vso) {
+                        return vso.status == "Draft" || vso.status == "Tolak"
+                          ? _c("th", { key: vso.nomor_so }, [_vm._v("Aksi")])
+                          : _vm._e()
+                      })
+                    ],
+                    2
+                  )
+                ]),
                 _vm._v(" "),
                 _c(
                   "tbody",
                   _vm._l(_vm.LTTersedia, function(ltt, index) {
-                    return _c("tr", { key: ltt.id }, [
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(index + 1))
-                      ]),
-                      _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(ltt.nama_barang))]),
-                      _vm._v(" "),
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(ltt.qty_tdktersedia))
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(ltt.satuan))
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(ltt.tgl_datang))
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(ltt.catatan))
-                      ]),
-                      _vm._v(" "),
-                      _vm._m(3, true)
-                    ])
+                    return _c(
+                      "tr",
+                      { key: ltt.id },
+                      [
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(_vm._s(index + 1))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(ltt.nama_barang))]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(_vm._s(ltt.qty_tdktersedia))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(_vm._s(ltt.satuan))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(_vm._s(_vm._f("currency")(ltt.harga)))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm._f("currency")(
+                                ltt.harga * ltt.qty_tdktersedia
+                              )
+                            )
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(_vm._s(ltt.tgl_datang))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.so, function(vso) {
+                          return vso.status == "Draft" || vso.status == "Tolak"
+                            ? _c(
+                                "td",
+                                {
+                                  key: vso.nomor_so,
+                                  staticStyle: { "text-align": "center" }
+                                },
+                                [
+                                  _c(
+                                    "button",
+                                    {
+                                      staticClass: "btn btn-danger",
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.deleteTdkTersedia(ltt)
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("Hapus")]
+                                  )
+                                ]
+                              )
+                            : _vm._e()
+                        })
+                      ],
+                      2
+                    )
                   }),
                   0
                 )
@@ -56695,71 +57109,34 @@ var render = function() {
             )
           ])
         ]
-      )
+      ),
+      _vm._v(" "),
+      _vm._l(_vm.so, function(lso, index) {
+        return _c(
+          "div",
+          { key: index, staticClass: "row mt-2" },
+          _vm._l(_vm.so, function(vso) {
+            return vso.status == "Tolak"
+              ? _c(
+                  "div",
+                  { key: vso.nomor_so, attrs: { id: "alastolak" } },
+                  _vm._l(_vm.so, function(lso, index) {
+                    return _c("div", { key: index }, [
+                      _c("b", [_vm._v(_vm._s(lso.alastolak))])
+                    ])
+                  }),
+                  0
+                )
+              : _vm._e()
+          }),
+          0
+        )
+      })
     ],
     2
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("No")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Nama Barang")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Qty")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Satuan")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Catatan")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Aksi")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", { staticStyle: { "text-align": "center" } }, [
-      _c("button", { staticClass: "btn btn-danger" }, [_vm._v("Hapus")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("No")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Nama Barang")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Qty")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Satuan")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Estimasi Kedatangan")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Catatan")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Aksi")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", { staticStyle: { "text-align": "center" } }, [
-      _c("button", { staticClass: "btn btn-danger" }, [_vm._v("Hapus")])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -56839,7 +57216,9 @@ var render = function() {
         [
           _c("option", { attrs: { value: "Draft" } }, [_vm._v("Waiting list")]),
           _vm._v(" "),
-          _c("option", { attrs: { value: "Acc" } }, [_vm._v("Accept")])
+          _c("option", { attrs: { value: "Acc" } }, [_vm._v("Accept")]),
+          _vm._v(" "),
+          _c("option", { attrs: { value: "Tolak" } }, [_vm._v("Rejected")])
         ]
       )
     ]),
@@ -56920,6 +57299,12 @@ var render = function() {
                       rs.status == "Acc"
                         ? _c("button", { staticClass: "btn btn-orange" }, [
                             _vm._v("Request Edit")
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      rs.status == "Tolak"
+                        ? _c("button", { staticClass: "btn btn-orange" }, [
+                            _vm._v("Request Ulang")
                           ])
                         : _vm._e()
                     ],
@@ -57039,7 +57424,9 @@ var render = function() {
         [
           _c("option", { attrs: { value: "Draft" } }, [_vm._v("Request SO")]),
           _vm._v(" "),
-          _c("option", { attrs: { value: "Acc" } }, [_vm._v("Accept")])
+          _c("option", { attrs: { value: "Acc" } }, [_vm._v("Accept")]),
+          _vm._v(" "),
+          _c("option", { attrs: { value: "Tolak" } }, [_vm._v("Rejected")])
         ]
       )
     ]),
@@ -57514,17 +57901,135 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n                Konfirmasi SO\n            ")]
+                [_vm._v("\n                Terima SO\n            ")]
               )
             : _vm._e(),
           _vm._v(" "),
           lso.status == "Draft"
-            ? _c("button", { staticClass: "btn-danger btn ml-1" }, [
-                _vm._v("\n                Tolak SO\n            ")
-              ])
+            ? _c(
+                "button",
+                {
+                  staticClass: "btn-danger btn ml-1",
+                  on: {
+                    click: function($event) {
+                      return _vm.showModal()
+                    }
+                  }
+                },
+                [_vm._v("\n                Tolak SO\n            ")]
+              )
             : _vm._e()
         ])
-      })
+      }),
+      _vm._v(" "),
+      _vm._l(_vm.so, function(vso) {
+        return vso.status == "Tolak"
+          ? _c(
+              "div",
+              { key: vso.nomor_so, attrs: { id: "alastolak" } },
+              _vm._l(_vm.so, function(lso, index) {
+                return _c("div", { key: index }, [
+                  _c("b", [_vm._v(_vm._s(lso.alastolak))])
+                ])
+              }),
+              0
+            )
+          : _vm._e()
+      }),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "modal-form",
+            tabindex: "-1",
+            "data-backdrop": "static",
+            role: "dialog",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true"
+          }
+        },
+        [
+          _c(
+            "div",
+            { staticClass: "modal-dialog", attrs: { role: "document" } },
+            [
+              _c(
+                "div",
+                { staticClass: "modal-content", attrs: { id: "modal-width" } },
+                [
+                  _vm._m(2),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Alasan Penolakan")]),
+                      _vm._v(" "),
+                      _c("textarea", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.up.alastolak,
+                            expression: "up.alastolak"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        domProps: { value: _vm.up.alastolak },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.up, "alastolak", $event.target.value)
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.so, function(lso, index) {
+                    return _c(
+                      "div",
+                      { key: index, staticClass: "modal-footer" },
+                      [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-secondary",
+                            attrs: { type: "button", "data-dismiss": "modal" },
+                            on: {
+                              click: function($event) {
+                                return _vm.resetForm()
+                              }
+                            }
+                          },
+                          [_vm._v("Close")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                return _vm.tolakSo(lso)
+                              }
+                            }
+                          },
+                          [_vm._v("Konfirmasi Tolak")]
+                        )
+                      ]
+                    )
+                  })
+                ],
+                2
+              )
+            ]
+          )
+        ]
+      )
     ],
     2
   )
@@ -57570,6 +58075,31 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Estimasi Kedatangan")])
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
+        [_vm._v("Form Penolakan SO")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
     ])
   }
 ]

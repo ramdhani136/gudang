@@ -7,6 +7,7 @@
             <select name="status" v-model="status" class="form-control">
                 <option value="Draft">Request SO</option>
                 <option value="Acc">Accept</option>
+                <option value="Tolak">Rejected</option>
             </select>
         </div>
             <div id="overflow" class="border-top">
@@ -65,6 +66,8 @@ export default {
                     return this.so.filter(elem=> elem.status==="Draft")
                 }else if(this.status==="Acc"){
                     return this.so.filter(elem=> elem.status==="Acc")
+                }else if(this.status==="Tolak"){
+                    return this.so.filter(elem=> elem.status==="Tolak")
                 }
             }else{
                 return this.so.filter(elem => {

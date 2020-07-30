@@ -198,7 +198,8 @@ export default {
         position: absolute;
         width: 90%;
         text-align: center;
-        color: rgb(175, 173, 173);
+        color: rgb(197, 196, 196);
         top: 350px;
+        letter-spacing: 0.5px;
     }
 </style>
