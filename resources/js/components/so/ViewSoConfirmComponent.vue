@@ -38,6 +38,9 @@
         </div>
         <div id="rsoverflowso" class="row mt-2 mx-auto">
             <div class="row float-left  ml-3 mt-4 label">Item Tersedia</div>
+
+            <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{totalt+totald | currency}}</div>
+
             <div class="row mt-1 mx-auto col-12">
                 <Circle5 id="load3" v-if="load"></Circle5>
                 <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -47,7 +50,8 @@
                             <th>Nama Barang</th>
                             <th>Qty</th>
                             <th>Satuan</th>
-                            <th>Catatan</th>
+                            <th>Harga</th>
+                            <th>Sub Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,7 +60,8 @@
                             <td>{{ts.nama_barang}}</td>
                             <td style="text-align:center">{{ts.qty_tersedia}}</td>
                             <td style="text-align:center">{{ts.satuan}}</td>
-                            <td style="text-align:center">{{ts.catatan}}</td>
+                            <td style="text-align:center">{{ts.harga | currency}}</td>
+                            <td style="text-align:center">{{ts.harga*ts.qty_tersedia | currency}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -70,8 +75,9 @@
                             <th>Nama Barang</th>
                             <th>Qty</th>
                             <th>Satuan</th>
+                            <th>Harga</th>
+                            <th>Sub total</th>
                             <th>Estimasi Kedatangan</th>
-                            <th>Catatan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,8 +86,9 @@
                             <td>{{ltt.nama_barang}}</td>
                             <td style="text-align:center">{{ltt.qty_tdktersedia}}</td>
                             <td style="text-align:center">{{ltt.satuan}}</td>
+                            <td style="text-align:center">{{ltt.harga | currency}}</td>
+                            <td style="text-align:center">{{ltt.harga*ltt.qty_tdktersedia | currency}}</td>
                             <td style="text-align:center">{{ltt.tgl_datang}}</td>
-                            <td style="text-align:center">{{ltt.catatan}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -90,6 +97,9 @@
         <div class="row mt-2" v-for="(lso,index) in so" :key="index">
                 <button v-if="lso.status=='Draft'" @click="confirmSO(lso)" class="btn-orange btn ml-3" >
                     Konfirmasi SO
+                </button>
+                <button v-if="lso.status=='Draft'"  class="btn-danger btn ml-1" >
+                    Tolak SO
                 </button>
         </div>
     </div>
@@ -110,6 +120,10 @@ export default {
             tujuan:'',
             up:{},
             load:true,
+            totalt:0,
+            subTotalt:0,
+            totald:0,
+            subTotald:0
         }
     },
     created(){
@@ -130,16 +144,28 @@ export default {
                 this.so=res.data.data;
                 this.tujuan=this.so[0].nomor_rso;
                 axios.get(`/api/listrso/data/dic/`+this.tujuan)
-                .then(res=>this.Ltersedia=res.data.data)});  
+                .then(res=>{this.Ltersedia=res.data.data
+                    this.totalt=0;
+                    for (let i = 0; i < this.Ltersedia.length; i++) {
+                    this.subTotalt=parseInt(this.Ltersedia[i].qty_tersedia)*parseInt(this.Ltersedia[i].harga);
+                    this.totalt += this.subTotalt;     
+                    }
+                });
+                
+                });  
         },
         ListTdkTersedia(){
-
             axios.get(`/api/so/${this.$route.params.id}`)
             .then(res=>{
                 this.so=res.data.data;
                 this.tujuan=this.so[0].nomor_rso;
                 axios.get(`/api/listrso/data/acc/`+this.tujuan)
-                .then(res=>{this.LTTersedia=res.data.data
+                .then(res=>{this.LTTersedia=res.data.data;
+                    this.totald=0;
+                    for (let i = 0; i < this.LTTersedia.length; i++) {
+                    this.subTotald=parseInt(this.LTTersedia[i].qty_tdktersedia)*parseInt(this.LTTersedia[i].harga);
+                    this.totald += this.subTotald;     
+                    }
                     this.load=false;
                 });
             });

@@ -38,6 +38,7 @@
         </div>
         <div v-if="rlist.status=='Confirmed'" v-for="rlist in form" :key="rlist.id" id="rsoverflowso" class="row mt-2 mx-auto">
             <div class="row float-left  ml-3 mt-4 label">Item Tersedia</div>
+            <div v-if="rlist.status=='Confirmed'" id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{totalt+totald | currency}}</div>
             <div class="row mt-1 mx-auto col-12" v-for="rlist in form" :key="rlist.id">
                 <Circle5 id="load3" v-if="load"></Circle5>
                 <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -47,6 +48,8 @@
                             <th>Nama Barang</th>
                             <th v-if="rlist.status=='Confirmed'">Qty</th>
                             <th>Satuan</th>
+                            <th>Harga</th>
+                            <th>Sub Total</th>
                             <th v-if="rlist.status=='Sent'">Catatan</th>
                             <th v-if="rlist.status=='Confirmed'">Aksi</th>
                         </tr>
@@ -57,6 +60,8 @@
                             <td>{{list.nama_barang}}</td>
                             <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tersedia}}</td>
                             <td style="text-align:center">{{list.satuan}}</td>
+                            <td style="text-align:center">{{list.harga | currency}}</td>
+                            <td style="text-align:center">{{list.qty_tersedia*list.harga | currency}}</td>
                             <td v-if="rlist.status=='Sent'" style="text-align:center">{{list.catatan}}</td>
                             <td  v-if="rlist.status=='Confirmed'" style="text-align:center">
                                 <button @click="deleteTersedia(list)"  class="btn btn-danger">Hapus</button>
@@ -74,6 +79,8 @@
                             <th>Nama Barang</th>
                             <th v-if="rlist.status=='Confirmed'">Qty</th>
                             <th>Satuan</th>
+                            <th>Harga</th>
+                            <th>Sub Total</th>
                             <th v-if="rlist.status=='Sent'">Catatan</th>
                             <th v-if="rlist.status=='Confirmed'">Estimasi Kedatangan</th>
                             <th v-if="rlist.status=='Confirmed'">Aksi</th>
@@ -85,6 +92,8 @@
                             <td>{{list.nama_barang}}</td>
                             <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tdktersedia}}</td>
                             <td style="text-align:center">{{list.satuan}}</td>
+                            <td style="text-align:center">{{list.harga | currency}}</td>
+                            <td style="text-align:center">{{list.qty_tdktersedia*list.harga | currency}}</td>
                             <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.tgl_datang}}</td>
                             <td v-if="rlist.status=='Sent'" style="text-align:center">{{list.catatan}}</td>
                             <td  v-if="rlist.status=='Confirmed'" style="text-align:center">
@@ -147,6 +156,10 @@ export default {
             statusso:{},
             nomorrso:'',
             load:true,
+            totalt:0,
+            subTotalt:0,
+            totald:0,
+            subTotald:0
         }
     },
     created(){
@@ -179,12 +192,23 @@ export default {
         getlistRso(){
             axios.get(`/api/listrso/data/dic/${this.$route.params.id}`)
             .then(res=>{this.listrso=res.data.data
-                this.load=false;
+                this.totalt=0;
+                for (let i = 0; i < this.listrso.length; i++) {
+                    this.subTotalt=parseInt(this.listrso[i].qty_tersedia)*parseInt(this.listrso[i].harga);
+                    this.totalt += this.subTotalt;     
+                }
             });
         },
         getlistTdktersedia(){
             axios.get(`/api/listrso/data/acc/${this.$route.params.id}`)
-            .then(res=>this.tidaktersedia=res.data.data)
+            .then(res=>{this.tidaktersedia=res.data.data
+                this.totald=0;
+                for (let i = 0; i < this.tidaktersedia.length; i++) {
+                    this.subTotald=parseInt(this.tidaktersedia[i].qty_tdktersedia)*parseInt(this.tidaktersedia[i].harga);
+                    this.totald += this.subTotald;     
+                }
+                this.load=false;
+            });
         },
         deleteTersedia(list){
             let keputusan=confirm('Apakah anda yakin ingin menghapus barang ini?');
@@ -298,7 +322,7 @@ export default {
             return output
         },
         CreateSo(rlist){
-            let tanya=confirm('Apakah yakin ingin mengirim RSO ini ke DIC?');
+            let tanya=confirm('Apakah yakin ingin membuat SO ini?');
             if(tanya===true){
             this.so.nomor_rso=rlist.nomor_rso;
             axios.post("/api/so",this.so)

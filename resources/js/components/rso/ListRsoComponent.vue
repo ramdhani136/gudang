@@ -69,6 +69,7 @@
         </div>
         <div class="row m-auto" v-for="rlist in form" :key="rlist.id">
             <button v-if="rlist.status=='Draft'" @click="showmodal()" type="button" class="btn btn-success mt-3">+ Tambah Barang</button>
+            <div v-if="rlist.status=='Draft'" id="total" class="mt-3 ml-auto">Total Invoice :&nbsp; {{total | currency}}</div>
         </div>
         <div id="rsoverflow" class="row mt-2 mx-auto" v-for="rlist in form" :key="rlist.id">
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -76,8 +77,10 @@
                     <tr>
                         <th>No</th>
                         <th>Nama Barang</th>
-                        <th>Diminta</th>
                         <th>Satuan</th>
+                        <th>Qty</th>
+                        <th>Harga</th>
+                        <th>Sub Total</th>
                         <th v-if="rlist.status=='Sent'">Catatan</th>
                         <th v-if="rlist.status=='Confirmed'">Status</th>
                         <th v-if="rlist.status=='Confirmed'">Tersedia</th>
@@ -90,8 +93,10 @@
                     <tr v-for="(list,index) in listrso" :key="list.nomor_rso">
                         <td style="text-align:center">{{index+1}}</td>
                         <td>{{list.nama_barang}}</td>
-                        <td style="text-align:center">{{list.qty}}</td>
                         <td style="text-align:center">{{list.satuan}}</td>
+                        <td style="text-align:center">{{list.qty}}</td>
+                        <td style="text-align:center">{{list.harga | currency}}</td>
+                        <td style="text-align:center">{{list.harga * list.qty | currency}}</td>
                         <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.status}}</td>
                         <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tersedia}}</td>
                         <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tdktersedia}}</td>
@@ -163,6 +168,16 @@
                     <div class="form-group">
                         <label>Satuan</label>
                         <input v-model="ket.satuan"  type="text"  class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <select @change="selectItem()" v-model="jenisHarga" class="form-control">
+                            <option value="N">Default</option>
+                            <option value="Y">Harga Spesial</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Harga</label>
+                        <input v-model="inputlrso.harga" type="number" class="form-control" disabled>
                     </div>
                     <div class="form-group">
                         <label>Catatan</label>
@@ -271,6 +286,11 @@ export default {
             qtyupdate:0,
             statusup:{},
             load:true,
+            hargaSpecial:{},
+            coba:{},
+            jenisHarga:'N',
+            subTotal:0,
+            total:0,
         }
     },
     created(){
@@ -293,8 +313,7 @@ export default {
                 return [];
             }
             return this.customers.filter((item)=> item.nama.toLowerCase().includes(this.query2.toLowerCase()))
-        }
-        
+        },
     },
     methods:{
         getdisabled(rlist){
@@ -350,6 +369,11 @@ export default {
         getlistRso(){
             axios.get(`/api/listrso/${this.$route.params.id}`)
             .then(res=>{this.listrso=res.data.data
+                this.total=0;
+                for (let i = 0; i < this.listrso.length; i++) {
+                    this.subTotal=parseInt(this.listrso[i].qty)*parseInt(this.listrso[i].harga);
+                    this.total += this.subTotal;     
+                }
                 this.load=false;
             });
         },
@@ -391,6 +415,8 @@ export default {
             this.inputlrso.qty=list.qty
             this.inputlrso.catatan=list.catatan
             this.edit=true
+            this.inputlrso.harga=list.harga
+            this.inputlrso.id_custprice=list.id_custprice
             this.showmodal()
         },
         deleteListRso(list){
@@ -423,15 +449,17 @@ export default {
         },
         resetform(){
             this.getlistRso()
-            this.inputlrso.id=""
-            this.ket.satuan=""
-            this.inputlrso.kode_barang=""
-            this.inputlrso.qty=""
-            this.inputlrso.catatan=""
-            this.ket.nama="Pilih Barang"
-            this.custom=null
-            this.edit=false
-            this.visible=false
+            this.inputlrso.id="";
+            this.ket.satuan="";
+            this.inputlrso.kode_barang="";
+            this.inputlrso.qty="";
+            this.inputlrso.catatan="";
+            this.ket.nama="Pilih Barang";
+            this.custom=null;
+            this.edit=false;
+            this.visible=false;
+            this.inputlrso.harga="";
+            this.jenisHarga='N';
         },
         toggleVisible(){
             this.visible = !this.visible;
@@ -445,7 +473,41 @@ export default {
         },
         selectItem(){
             this.custom = this.matches[this.selected];
-            this.inputlrso.kode_barang= this.custom.kode;
+            this.inputlrso.kode_barang= this.custom.kode;     
+            axios.get(`/api/rso/${this.$route.params.id}`)
+            .then(res=>{this.coba=res.data.data
+                this.cust=this.coba[0].kode_customer;
+                this.convertCust=this.coba[0].kode_customer;
+                // this.convertCust.toString()
+                // this.convertCust=this.convertCust.replace('/','');
+                // console.log(this.convertCust);
+                // console.log(this.custom.kode);
+                axios.get("/api/view/price/"+this.cust+"/"+this.custom.kode)
+                .then(res=>{this.hargaSpecial=res.data.data;
+                if(this.hargaSpecial.length<1){
+                    this.visible=true;
+                    this.visible=false;
+                    this.inputlrso.harga=this.custom.harga;
+                    this.inputlrso.id_custprice="";
+                }else{
+                    if(this.jenisHarga=='N'){
+                        this.visible=true;
+                        this.visible=false;
+                        this.inputlrso.harga=this.custom.harga;
+                        this.inputlrso.id_custprice="";
+                    }else{
+                        this.visible=true;
+                        this.visible=false
+                        this.hargas=this.hargaSpecial[0].harga;
+                        this.id=this.hargaSpecial[0].id;
+                        this.inputlrso.harga=this.hargas;
+                        this.inputlrso.id_custprice=this.id;
+                    }
+                }
+                });
+            });
+
+
             this.ket.satuan= this.custom.satuan;
             this.visible=false;
         },
@@ -540,13 +602,27 @@ export default {
                     })
                 })
             }
-        }
+        },
     },
 
 }
 </script>
 
 <style>
+    #total{
+        width:30%;
+        height: 50px;
+        padding: 1%;
+        border:solid 1px rgb(209, 209, 209);
+        text-align: center;
+        align-items: center;
+        font-size: 1.1em;
+        border-radius: 3px;
+        color: #666;
+        background-color:#fff ;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
     #load2{
         position: relative;
         margin: 0 auto; 

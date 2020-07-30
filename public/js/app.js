@@ -3729,6 +3729,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -3769,7 +3784,12 @@ __webpack_require__.r(__webpack_exports__);
       },
       qtyupdate: 0,
       statusup: {},
-      load: true
+      load: true,
+      hargaSpecial: {},
+      coba: {},
+      jenisHarga: 'N',
+      subTotal: 0,
+      total: 0
     };
   },
   created: function created() {
@@ -3870,6 +3890,13 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("/api/listrso/".concat(this.$route.params.id)).then(function (res) {
         _this5.listrso = res.data.data;
+        _this5.total = 0;
+
+        for (var i = 0; i < _this5.listrso.length; i++) {
+          _this5.subTotal = parseInt(_this5.listrso[i].qty) * parseInt(_this5.listrso[i].harga);
+          _this5.total += _this5.subTotal;
+        }
+
         _this5.load = false;
       });
     },
@@ -3921,6 +3948,8 @@ __webpack_require__.r(__webpack_exports__);
       this.inputlrso.qty = list.qty;
       this.inputlrso.catatan = list.catatan;
       this.edit = true;
+      this.inputlrso.harga = list.harga;
+      this.inputlrso.id_custprice = list.id_custprice;
       this.showmodal();
     },
     deleteListRso: function deleteListRso(list) {
@@ -3972,6 +4001,8 @@ __webpack_require__.r(__webpack_exports__);
       this.custom = null;
       this.edit = false;
       this.visible = false;
+      this.inputlrso.harga = "";
+      this.jenisHarga = 'N';
     },
     toggleVisible: function toggleVisible() {
       this.visible = !this.visible;
@@ -3984,8 +4015,43 @@ __webpack_require__.r(__webpack_exports__);
       this.selectItem();
     },
     selectItem: function selectItem() {
+      var _this11 = this;
+
       this.custom = this.matches[this.selected];
       this.inputlrso.kode_barang = this.custom.kode;
+      axios.get("/api/rso/".concat(this.$route.params.id)).then(function (res) {
+        _this11.coba = res.data.data;
+        _this11.cust = _this11.coba[0].kode_customer;
+        _this11.convertCust = _this11.coba[0].kode_customer; // this.convertCust.toString()
+        // this.convertCust=this.convertCust.replace('/','');
+        // console.log(this.convertCust);
+        // console.log(this.custom.kode);
+
+        axios.get("/api/view/price/" + _this11.cust + "/" + _this11.custom.kode).then(function (res) {
+          _this11.hargaSpecial = res.data.data;
+
+          if (_this11.hargaSpecial.length < 1) {
+            _this11.visible = true;
+            _this11.visible = false;
+            _this11.inputlrso.harga = _this11.custom.harga;
+            _this11.inputlrso.id_custprice = "";
+          } else {
+            if (_this11.jenisHarga == 'N') {
+              _this11.visible = true;
+              _this11.visible = false;
+              _this11.inputlrso.harga = _this11.custom.harga;
+              _this11.inputlrso.id_custprice = "";
+            } else {
+              _this11.visible = true;
+              _this11.visible = false;
+              _this11.hargas = _this11.hargaSpecial[0].harga;
+              _this11.id = _this11.hargaSpecial[0].id;
+              _this11.inputlrso.harga = _this11.hargas;
+              _this11.inputlrso.id_custprice = _this11.id;
+            }
+          }
+        });
+      });
       this.ket.satuan = this.custom.satuan;
       this.visible = false;
     },
@@ -4037,10 +4103,10 @@ __webpack_require__.r(__webpack_exports__);
       this.$refs.optionListCust.scrollTop = this.selected * this.itemHeight;
     },
     getCustomer: function getCustomer() {
-      var _this11 = this;
+      var _this12 = this;
 
       axios.get("/api/customer").then(function (res) {
-        return _this11.customers = res.data.data;
+        return _this12.customers = res.data.data;
       });
     },
     aksiDetail: function aksiDetail(list) {
@@ -4068,7 +4134,7 @@ __webpack_require__.r(__webpack_exports__);
       this.showDetail();
     },
     kirimPurch: function kirimPurch(list) {
-      var _this12 = this;
+      var _this13 = this;
 
       var tanya = confirm('Yakin kirim ulang permintaan?');
 
@@ -4081,10 +4147,10 @@ __webpack_require__.r(__webpack_exports__);
 
         this.upDetail.qty = parseInt(this.upDetail.qty_tdktersedia) + parseInt(this.qtyupdate);
         axios.put("/api/listrso/" + this.upDetail.id, this.upDetail).then(function (response) {
-          axios.put("/api/rso/" + _this12.upDetail.nomor_rso, _this12.statusup).then(function (response) {
+          axios.put("/api/rso/" + _this13.upDetail.nomor_rso, _this13.statusup).then(function (response) {
             $("#modal-detail").modal("hide");
 
-            _this12.$router.push({
+            _this13.$router.push({
               name: 'rso'
             });
           });
@@ -5070,6 +5136,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -5094,7 +5169,11 @@ __webpack_require__.r(__webpack_exports__);
       },
       statusso: {},
       nomorrso: '',
-      load: true
+      load: true,
+      totalt: 0,
+      subTotalt: 0,
+      totald: 0,
+      subTotald: 0
     };
   },
   created: function created() {
@@ -5141,14 +5220,27 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("/api/listrso/data/dic/".concat(this.$route.params.id)).then(function (res) {
         _this4.listrso = res.data.data;
-        _this4.load = false;
+        _this4.totalt = 0;
+
+        for (var i = 0; i < _this4.listrso.length; i++) {
+          _this4.subTotalt = parseInt(_this4.listrso[i].qty_tersedia) * parseInt(_this4.listrso[i].harga);
+          _this4.totalt += _this4.subTotalt;
+        }
       });
     },
     getlistTdktersedia: function getlistTdktersedia() {
       var _this5 = this;
 
       axios.get("/api/listrso/data/acc/".concat(this.$route.params.id)).then(function (res) {
-        return _this5.tidaktersedia = res.data.data;
+        _this5.tidaktersedia = res.data.data;
+        _this5.totald = 0;
+
+        for (var i = 0; i < _this5.tidaktersedia.length; i++) {
+          _this5.subTotald = parseInt(_this5.tidaktersedia[i].qty_tdktersedia) * parseInt(_this5.tidaktersedia[i].harga);
+          _this5.totald += _this5.subTotald;
+        }
+
+        _this5.load = false;
       });
     },
     deleteTersedia: function deleteTersedia(list) {
@@ -5278,7 +5370,7 @@ __webpack_require__.r(__webpack_exports__);
     CreateSo: function CreateSo(rlist) {
       var _this11 = this;
 
-      var tanya = confirm('Apakah yakin ingin mengirim RSO ini ke DIC?');
+      var tanya = confirm('Apakah yakin ingin membuat SO ini?');
 
       if (tanya === true) {
         this.so.nomor_rso = rlist.nomor_rso;
@@ -5826,6 +5918,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -5839,7 +5941,11 @@ __webpack_require__.r(__webpack_exports__);
       LTTersedia: {},
       tujuan: '',
       up: {},
-      load: true
+      load: true,
+      totalt: 0,
+      subTotalt: 0,
+      totald: 0,
+      subTotald: 0
     };
   },
   created: function created() {
@@ -5863,7 +5969,13 @@ __webpack_require__.r(__webpack_exports__);
         _this2.so = res.data.data;
         _this2.tujuan = _this2.so[0].nomor_rso;
         axios.get("/api/listrso/data/dic/" + _this2.tujuan).then(function (res) {
-          return _this2.Ltersedia = res.data.data;
+          _this2.Ltersedia = res.data.data;
+          _this2.totalt = 0;
+
+          for (var i = 0; i < _this2.Ltersedia.length; i++) {
+            _this2.subTotalt = parseInt(_this2.Ltersedia[i].qty_tersedia) * parseInt(_this2.Ltersedia[i].harga);
+            _this2.totalt += _this2.subTotalt;
+          }
         });
       });
     },
@@ -5875,6 +5987,13 @@ __webpack_require__.r(__webpack_exports__);
         _this3.tujuan = _this3.so[0].nomor_rso;
         axios.get("/api/listrso/data/acc/" + _this3.tujuan).then(function (res) {
           _this3.LTTersedia = res.data.data;
+          _this3.totald = 0;
+
+          for (var i = 0; i < _this3.LTTersedia.length; i++) {
+            _this3.subTotald = parseInt(_this3.LTTersedia[i].qty_tdktersedia) * parseInt(_this3.LTTersedia[i].harga);
+            _this3.totald += _this3.subTotald;
+          }
+
           _this3.load = false;
         });
       });
@@ -11467,7 +11586,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n#load2{\n    position: relative;\n    margin: 0 auto; \n    margin-top:60px ;\n}\n#rsoverflow{\nwidth: 100%;\nmax-height: 240px;\noverflow-y: scroll;\nborder-top:solid 1px #dee2e6;\n}\n#rsthead thead tr th{\n    text-align: center;\n    border-bottom: none;\n    position: -webkit-sticky;\n    position: sticky; top: 0; \n    background-color: #fff;\n    top: -1px;\n    border-collapse: collapse;\n    box-shadow: inset 0 0 0 #dee2e6,\n    inset 0 -1px 0 #dee2e6;\n}\n.btn-orange{\n    background-color: lightsalmon;\n    border:solid 1px rgb(247, 141, 99);\n    color: white;\n}\n.btn-orange:hover{\n    background-color: rgb(253, 143, 100);\n    border:solid 1px rgb(243, 127, 81);\n    color: white;\n}\n.optionbr{\n    max-height: 350px;\n    overflow-y: scroll;\n    margin-top: 5px;\n}\n.optionbr ul{\n    list-style-type:none;\n    text-align: left;\n    padding-left:0;\n}\n.optionbr ul li{\n    border-bottom: 1px solid lightgrey;\n    padding:10px;\n    cursor: pointer;\n    background-color: #f1f1f1;\n}\n.optionbr ul li.selected{\n    background-color: #58bd4c;\n    color: #fff;\n}\n.popovercs{\n    max-width: 92%;\n    min-height: 50px;\n    border:1px solid lightgray;\n    position: absolute;\n    z-index: 800;\n    top:70px;\n    left: 4%;\n    right: 0;\n    background-color: #fff;\n    border-radius: 3px;\n    text-align: center;\n}\n.popovercs input{\n    width:95%;\n    margin-top: 5px;\n    height: 40px;\n    font-size: 14px;\n    border-radius: 3px;\n    border:solid 1px lightgray;\n    padding-left: 8px;\n}\n\n\n", ""]);
+exports.push([module.i, "\n#total{\n    width:30%;\n    height: 50px;\n    padding: 1%;\n    border:solid 1px rgb(209, 209, 209);\n    text-align: center;\n    align-items: center;\n    font-size: 1.1em;\n    border-radius: 3px;\n    color: #666;\n    background-color:#fff ;\n    font-weight: 600;\n    letter-spacing: 0.5px;\n}\n#load2{\n    position: relative;\n    margin: 0 auto; \n    margin-top:60px ;\n}\n#rsoverflow{\nwidth: 100%;\nmax-height: 240px;\noverflow-y: scroll;\nborder-top:solid 1px #dee2e6;\n}\n#rsthead thead tr th{\n    text-align: center;\n    border-bottom: none;\n    position: -webkit-sticky;\n    position: sticky; top: 0; \n    background-color: #fff;\n    top: -1px;\n    border-collapse: collapse;\n    box-shadow: inset 0 0 0 #dee2e6,\n    inset 0 -1px 0 #dee2e6;\n}\n.btn-orange{\n    background-color: lightsalmon;\n    border:solid 1px rgb(247, 141, 99);\n    color: white;\n}\n.btn-orange:hover{\n    background-color: rgb(253, 143, 100);\n    border:solid 1px rgb(243, 127, 81);\n    color: white;\n}\n.optionbr{\n    max-height: 350px;\n    overflow-y: scroll;\n    margin-top: 5px;\n}\n.optionbr ul{\n    list-style-type:none;\n    text-align: left;\n    padding-left:0;\n}\n.optionbr ul li{\n    border-bottom: 1px solid lightgrey;\n    padding:10px;\n    cursor: pointer;\n    background-color: #f1f1f1;\n}\n.optionbr ul li.selected{\n    background-color: #58bd4c;\n    color: #fff;\n}\n.popovercs{\n    max-width: 92%;\n    min-height: 50px;\n    border:1px solid lightgray;\n    position: absolute;\n    z-index: 800;\n    top:70px;\n    left: 4%;\n    right: 0;\n    background-color: #fff;\n    border-radius: 3px;\n    text-align: center;\n}\n.popovercs input{\n    width:95%;\n    margin-top: 5px;\n    height: 40px;\n    font-size: 14px;\n    border-radius: 3px;\n    border:solid 1px lightgray;\n    padding-left: 8px;\n}\n\n\n", ""]);
 
 // exports
 
@@ -52770,6 +52889,18 @@ var render = function() {
                 },
                 [_vm._v("+ Tambah Barang")]
               )
+            : _vm._e(),
+          _vm._v(" "),
+          rlist.status == "Draft"
+            ? _c(
+                "div",
+                { staticClass: "mt-3 ml-auto", attrs: { id: "total" } },
+                [
+                  _vm._v(
+                    "Total Invoice :  " + _vm._s(_vm._f("currency")(_vm.total))
+                  )
+                ]
+              )
             : _vm._e()
         ])
       }),
@@ -52797,9 +52928,13 @@ var render = function() {
                     _vm._v(" "),
                     _c("th", [_vm._v("Nama Barang")]),
                     _vm._v(" "),
-                    _c("th", [_vm._v("Diminta")]),
-                    _vm._v(" "),
                     _c("th", [_vm._v("Satuan")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Qty")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Harga")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Sub Total")]),
                     _vm._v(" "),
                     rlist.status == "Sent"
                       ? _c("th", [_vm._v("Catatan")])
@@ -52838,11 +52973,21 @@ var render = function() {
                       _c("td", [_vm._v(_vm._s(list.nama_barang))]),
                       _vm._v(" "),
                       _c("td", { staticStyle: { "text-align": "center" } }, [
+                        _vm._v(_vm._s(list.satuan))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { staticStyle: { "text-align": "center" } }, [
                         _vm._v(_vm._s(list.qty))
                       ]),
                       _vm._v(" "),
                       _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(list.satuan))
+                        _vm._v(_vm._s(_vm._f("currency")(list.harga)))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { staticStyle: { "text-align": "center" } }, [
+                        _vm._v(
+                          _vm._s(_vm._f("currency")(list.harga * list.qty))
+                        )
                       ]),
                       _vm._v(" "),
                       rlist.status == "Confirmed"
@@ -53227,6 +53372,82 @@ var render = function() {
                               return
                             }
                             _vm.$set(_vm.ket, "satuan", $event.target.value)
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c(
+                        "select",
+                        {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.jenisHarga,
+                              expression: "jenisHarga"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          on: {
+                            change: [
+                              function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.jenisHarga = $event.target.multiple
+                                  ? $$selectedVal
+                                  : $$selectedVal[0]
+                              },
+                              function($event) {
+                                return _vm.selectItem()
+                              }
+                            ]
+                          }
+                        },
+                        [
+                          _c("option", { attrs: { value: "N" } }, [
+                            _vm._v("Default")
+                          ]),
+                          _vm._v(" "),
+                          _c("option", { attrs: { value: "Y" } }, [
+                            _vm._v("Harga Spesial")
+                          ])
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Harga")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.inputlrso.harga,
+                            expression: "inputlrso.harga"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "number", disabled: "" },
+                        domProps: { value: _vm.inputlrso.harga },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.inputlrso,
+                              "harga",
+                              $event.target.value
+                            )
                           }
                         }
                       })
@@ -55755,6 +55976,22 @@ var render = function() {
                   _vm._v("Item Tersedia")
                 ]),
                 _vm._v(" "),
+                rlist.status == "Confirmed"
+                  ? _c(
+                      "div",
+                      {
+                        staticClass: "mt-3 ml-auto mr-3",
+                        attrs: { id: "total" }
+                      },
+                      [
+                        _vm._v(
+                          "Total Invoice :  " +
+                            _vm._s(_vm._f("currency")(_vm.totalt + _vm.totald))
+                        )
+                      ]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
                 _vm._l(_vm.form, function(rlist) {
                   return _c(
                     "div",
@@ -55784,6 +56021,10 @@ var render = function() {
                                 : _vm._e(),
                               _vm._v(" "),
                               _c("th", [_vm._v("Satuan")]),
+                              _vm._v(" "),
+                              _c("th", [_vm._v("Harga")]),
+                              _vm._v(" "),
+                              _c("th", [_vm._v("Sub Total")]),
                               _vm._v(" "),
                               rlist.status == "Sent"
                                 ? _c("th", [_vm._v("Catatan")])
@@ -55821,6 +56062,30 @@ var render = function() {
                                   "td",
                                   { staticStyle: { "text-align": "center" } },
                                   [_vm._v(_vm._s(list.satuan))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [
+                                    _vm._v(
+                                      _vm._s(_vm._f("currency")(list.harga))
+                                    )
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [
+                                    _vm._v(
+                                      _vm._s(
+                                        _vm._f("currency")(
+                                          list.qty_tersedia * list.harga
+                                        )
+                                      )
+                                    )
+                                  ]
                                 ),
                                 _vm._v(" "),
                                 rlist.status == "Sent"
@@ -55896,6 +56161,10 @@ var render = function() {
                               _vm._v(" "),
                               _c("th", [_vm._v("Satuan")]),
                               _vm._v(" "),
+                              _c("th", [_vm._v("Harga")]),
+                              _vm._v(" "),
+                              _c("th", [_vm._v("Sub Total")]),
+                              _vm._v(" "),
                               rlist.status == "Sent"
                                 ? _c("th", [_vm._v("Catatan")])
                                 : _vm._e(),
@@ -55936,6 +56205,30 @@ var render = function() {
                                   "td",
                                   { staticStyle: { "text-align": "center" } },
                                   [_vm._v(_vm._s(list.satuan))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [
+                                    _vm._v(
+                                      _vm._s(_vm._f("currency")(list.harga))
+                                    )
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [
+                                    _vm._v(
+                                      _vm._s(
+                                        _vm._f("currency")(
+                                          list.qty_tdktersedia * list.harga
+                                        )
+                                      )
+                                    )
+                                  ]
                                 ),
                                 _vm._v(" "),
                                 rlist.status == "Confirmed"
@@ -57086,6 +57379,17 @@ var render = function() {
           _vm._v(" "),
           _c(
             "div",
+            { staticClass: "mt-3 ml-auto mr-3", attrs: { id: "total" } },
+            [
+              _vm._v(
+                "Total Invoice :  " +
+                  _vm._s(_vm._f("currency")(_vm.totalt + _vm.totald))
+              )
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
             { staticClass: "row mt-1 mx-auto col-12" },
             [
               _vm.load ? _c("Circle5", { attrs: { id: "load3" } }) : _vm._e(),
@@ -57119,7 +57423,15 @@ var render = function() {
                         ]),
                         _vm._v(" "),
                         _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(_vm._s(ts.catatan))
+                          _vm._v(_vm._s(_vm._f("currency")(ts.harga)))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm._f("currency")(ts.harga * ts.qty_tersedia)
+                            )
+                          )
                         ])
                       ])
                     }),
@@ -57165,11 +57477,19 @@ var render = function() {
                       ]),
                       _vm._v(" "),
                       _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(ltt.tgl_datang))
+                        _vm._v(_vm._s(_vm._f("currency")(ltt.harga)))
                       ]),
                       _vm._v(" "),
                       _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(ltt.catatan))
+                        _vm._v(
+                          _vm._s(
+                            _vm._f("currency")(ltt.harga * ltt.qty_tdktersedia)
+                          )
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { staticStyle: { "text-align": "center" } }, [
+                        _vm._v(_vm._s(ltt.tgl_datang))
                       ])
                     ])
                   }),
@@ -57196,6 +57516,12 @@ var render = function() {
                 },
                 [_vm._v("\n                Konfirmasi SO\n            ")]
               )
+            : _vm._e(),
+          _vm._v(" "),
+          lso.status == "Draft"
+            ? _c("button", { staticClass: "btn-danger btn ml-1" }, [
+                _vm._v("\n                Tolak SO\n            ")
+              ])
             : _vm._e()
         ])
       })
@@ -57218,7 +57544,9 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Satuan")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Catatan")])
+        _c("th", [_vm._v("Harga")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Sub Total")])
       ])
     ])
   },
@@ -57236,9 +57564,11 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Satuan")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Estimasi Kedatangan")]),
+        _c("th", [_vm._v("Harga")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Catatan")])
+        _c("th", [_vm._v("Sub total")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Estimasi Kedatangan")])
       ])
     ])
   }

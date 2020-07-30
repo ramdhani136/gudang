@@ -44,6 +44,8 @@ class ListRsoResource extends JsonResource
             'kode_customer'=>$this->rso->kode_customer,
             'so_ket'=>$this->rso->keterangan,
             'booking'=>$this->booking,
+            'harga'=>$this->harga,
+            'id_custprice'=>$this->id_custprice,
         ];
     }
 }
