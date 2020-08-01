@@ -8,6 +8,9 @@ use App\Model\Rso\Listrso;
 use App\Http\Resources\ListRsoResource;
 use App\Http\Resources\GrouplistResource;
 use Symfony\Component\HttpFoundation\Response;
+use App\Http\Resources\listpoPriceResource;
+
+
 
 class ListRsoController extends Controller
 {
@@ -108,19 +111,26 @@ class ListRsoController extends Controller
     }
 
     public function  group(){
-        $data= Listrso::where('qty_tdktersedia','>',0)->where('so_open','Y')->groupBy('kode_barang')
+        $data= Listrso::where('qty_tdktersedia','>',0)->where('so_open','Y')->groupBy('kode_barang')->where('open_po','N')
         ->selectRaw('count(*) as total, kode_barang')->get();
         return GrouplistResource::collection($data);
     }
 
     
     public function  grouplist($barang){
-        return ListRsoResource::collection(Listrso::where('qty_tdktersedia','>',0)->where('so_open','Y')->where('kode_barang',$barang)->get());
+        return ListRsoResource::collection(Listrso::where('qty_tdktersedia','>',0)->where('so_open','Y')->where('kode_barang',$barang)->where('open_po','N')->get());
     }
 
     public function sOpen(Request $request, $no){
         Listrso::where('nomor_rso',$no)->update($request->all());
         return response('update',response::HTTP_CREATED);
     }
+
+    public function  listpo($po){
+        $data= Listrso::where('nomor_po',$po)->where('qty_tdktersedia','>',0)->where('so_open','Y')->groupBy('kode_barang')->groupBy('nomor_po')->groupBy('harga_supplier')->where('open_po','Y')
+        ->selectRaw('count(*) as total, kode_barang')->selectRaw('count(*) as total, nomor_po')->selectRaw('count(*) as total, harga_supplier')->get();
+        return GrouplistResource::collection($data);
+    }
+
 
 }

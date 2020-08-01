@@ -47,6 +47,8 @@ class ListRsoResource extends JsonResource
             'booking'=>$this->booking,
             'harga'=>$this->harga,
             'id_custprice'=>$this->id_custprice,
+            'open_po'=>$this->open_po,
+            'harga_supplier'=>$this->harga_supplier,
         ];
     }
 }
