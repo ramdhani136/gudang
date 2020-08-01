@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\Rso\Listrso;
 use App\Http\Resources\ListRsoResource;
+use App\Http\Resources\GrouplistResource;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListRsoController extends Controller
@@ -104,6 +105,22 @@ class ListRsoController extends Controller
 
     public function dicacc($no){
         return  ListRsoResource::collection(Listrso::where('nomor_rso',$no)->where('qty_tersedia','>',0)->get());
+    }
+
+    public function  group(){
+        $data= Listrso::where('qty_tdktersedia','>',0)->where('so_open','Y')->groupBy('kode_barang')
+        ->selectRaw('count(*) as total, kode_barang')->get();
+        return GrouplistResource::collection($data);
+    }
+
+    
+    public function  grouplist($barang){
+        return ListRsoResource::collection(Listrso::where('qty_tdktersedia','>',0)->where('so_open','Y')->where('kode_barang',$barang)->get());
+    }
+
+    public function sOpen(Request $request, $no){
+        Listrso::where('nomor_rso',$no)->update($request->all());
+        return response('update',response::HTTP_CREATED);
     }
 
 }

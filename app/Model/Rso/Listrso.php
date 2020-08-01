@@ -5,6 +5,7 @@ namespace App\Model\Rso;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Rso\Rso;
 use App\Model\Barang\Barang;
+use App\Model\So\So;
 
 class Listrso extends Model
 {
@@ -18,4 +19,5 @@ class Listrso extends Model
     public function barang(){
         return $this->belongsTo(barang::class,'kode_barang','kode');
     }
+
 }

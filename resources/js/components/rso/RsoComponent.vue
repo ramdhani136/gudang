@@ -17,7 +17,7 @@
             <table id="thead" class="table table-striped table-bordered" style="width:100%">
                     <thead>
                         <tr>
-                            <th>no</th>
+                            <th>No</th>
                             <th>Nomor RSO</th>
                             <th>Tanggal</th>
                             <th>Customer</th>

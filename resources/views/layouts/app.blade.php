@@ -83,6 +83,9 @@
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/dic" class="dropdown-item" >Request Sales Order</router-link>
+                                    <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link>
+                                    <router-link to="/dic/incoming" class="dropdown-item" >Incoming Goods</router-link>
+                                    <router-link to="/dic/incoming/confirm" class="dropdown-item" >IG Confirmation</router-link>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -92,6 +95,8 @@
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/purchase" class="dropdown-item" >Estimation Request RSO</router-link>
+                                    <router-link to="/purchase/pr" class="dropdown-item" >Purchasing Request</router-link>
+                                    <router-link to="/purchase/po" class="dropdown-item" >Purchasing Order</router-link>
                                 </div>
                             </li>
                                 

@@ -329,12 +329,12 @@ export default {
             .then((response)=>{
                 this.nomorrso=rlist.nomor_rso;
                 this.statusso.nomor_rso=rlist.nomor_rso;
+                this.statusso.nomor_so=this.so.nomor_so;
                 this.statusso.tanggal_rso=rlist.tanggal_rso;
                 this.statusso.nip_sales=rlist.nip_sales;
                 this.statusso.kode_customer=rlist.kode_customer;
                 this.statusso.keterangan=rlist.keterangan;
                 this.statusso.status="So";
-                
                 axios.put("/api/rso/"+  this.nomorrso,this.statusso)
                 .then((response)=>{
                     this.$router.push({name:'rso'}) 

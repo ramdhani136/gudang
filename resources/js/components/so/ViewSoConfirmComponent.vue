@@ -148,7 +148,8 @@ export default {
             totalt:0,
             subTotalt:0,
             totald:0,
-            subTotald:0
+            subTotald:0,
+            statusSo: {'so_open': 'Y'}
         }
     },
     created(){
@@ -235,7 +236,12 @@ export default {
                 this.up.status="Acc";
                 axios.put("/api/so/"+this.up.nomor_so,this.up)
                 .then((response)=>{
-                    this.$router.push({name:'soconfirm'})
+                    this.statusSo={'so_open': 'Y'};
+                    axios.put("/api/listrso/data/sopen/"+ this.up.nomor_rso,this.statusSo)
+                    .then(res=>{
+                        this.$router.push({name:'soconfirm'})
+                    });
+                    
                 })
             }
         },
@@ -250,8 +256,8 @@ export default {
                 this.up.status="Tolak";
                 axios.put("/api/so/"+this.up.nomor_so,this.up)
                 .then((response)=>{
-                    $("#modal-form").modal("hide");
-                    this.$router.push({name:'soconfirm'})
+                        $("#modal-form").modal("hide");
+                        this.$router.push({name:'soconfirm'})
                 })
             }
         }
