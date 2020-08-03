@@ -1,76 +1,49 @@
 <template>
-    <div class="container" @keyup.esc="resetForm()">
-        <button @click="showmodalPO()" class="btn btn-success my-3">+ Create PO</button>
+    <div class="container">
         <div class="form-group col-3 my-3 float-right">
             <input v-model="search"  type="text" class="form-control" placeholder="Search">
         </div>
-        <div id="overflow" class="border-top">
-        <table id="thead" class="table table-striped table-bordered" style="width:100%">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Kode</th>
-                <th>Nama Barang</th>
-                <th>Diminta</th>
-                <th>Satuan</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(prlist , index) in FilteredPr" :key="index">
-                <td style="text-align:center">{{index+1}}</td>
-                <td style="text-align:center">{{prlist.kode_barang}}</td>
-                <td>{{prlist.nama}}</td>
-                <td style="text-align:center">{{prlist.jumlah}}</td>
-                <td style="text-align:center">{{prlist.satuan}}</td>
-                <td style="text-align:center">
-                    <button @click="showmodal(prlist)" class="btn btn-primary">Lihat Rincian</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <Circle5 id="load" v-if="load"></Circle5>
-    </div>
-    <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div  class="modal-dialog" role="document">
-                <div id="modal-width" class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="scrollList">
-                        <table  id="thead" class="table table-striped table-bordered" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th style="text-align:center">No</th>
-                                    <th style="text-align:center">Nomor SO</th>
-                                    <th>Customer</th>
-                                    <th style="text-align:center">Jumlah</th>
-                                    <th style="text-align:center">Satuan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(prl,index) in prlist" :key="index">
-                                    <td style="text-align:center">{{index+1}}</td>
-                                    <td style="text-align:center">{{prl.nomor_so}}</td>
-                                    <td>{{prl.nama_customer}}</td>
-                                    <td style="text-align:center">{{prl.qty_tdktersedia}}</td>
-                                    <td style="text-align:center">{{prl.satuan}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-                </div>
+        <div class="form-group col-3 my-3 ml-n3 float-left">
+            <select name="status" v-model="status" class="form-control">
+                <option value="Draft">Draft</option>
+                <option value="Request">Request</option>
+                <option value="Acc">Accepted</option>
+                <option value="Tolak">Rejected</option>
+                <option value="Selesai">Selesai</option>
+            </select>
+        </div>    
+            <div id="overflow" class="border-top">
+            <button  @click="showmodalPO()" class="btn btn-success my-3">+ Create PO</button>
+            <table id="thead" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nomor PO</th>
+                            <th>Tanggal</th>
+                            <th>Supplier</th>
+                            <th>Estimasi Kedatangan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(pl , index) in FilterKategori" :key="index">
+                            <td style="text-align:center">{{index+1}}</td>
+                            <td style="text-align:center">{{pl.nomor_po}}</td>
+                            <td style="text-align:center">{{pl.tanggal_po}}</td>
+                            <td>{{pl.supplier}}</td>
+                            <td style="text-align:center">{{pl.tanggal_datang}}</td>
+                            <td  style="text-align:center">
+                                <router-link :to="{name:'poCreateView',params:{nomor:pl.nomor_po}}" class="btn btn-primary" >
+                                    Lihat Detail
+                                </router-link>
+                                <button @click="getHapus(pl)" v-if="pl.status=='Draft'" class="btn btn-danger">Hapus</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <Circle5 id="load" v-if="load"></Circle5>
             </div>
-        </div>
-        <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
                 <div class="modal-header">
@@ -134,7 +107,7 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
 </template>
 
 <script>
@@ -146,35 +119,48 @@ export default {
     data(){
         return{
             search  : '',
-            pr:[],
+            status:'Draft',
+            po:[],
             load:true,
-            listPr:{},
-            tujuan:{},
-            prlist:{},
-            upload:{
-                nomor_po:this.po_nomor(),
-                tanggal_po:this.now(),
-                tanggal_datang:this.now(),
-            },
             visible:false,
             query:'',
             selected:0,
             supply:null,
             itemHeight:39,
             supplier:[],
-            purchasing:{}
+            purchasing:{},
+            upload:{
+                nomor_po:this.po_nomor(),
+                tanggal_po:this.now(),
+                tanggal_datang:this.now(),
+            },
+            file:{}
         }
     },
     created(){
-        this.getPr();
+        this.getPo();
         this.getSupplier();
         this.getPurchasing();
     },
     computed:{
-        FilteredPr(){
-            return this.pr.filter(elem => {
-            return elem.nama.toLowerCase().includes(this.search);
+        FilterKategori(){
+            if(this.search===""){
+                if(this.status==="Draft"){
+                    return this.po.filter(elem=> elem.status==="Draft")
+                }else if(this.status==="Request"){
+                    return this.po.filter(elem=> elem.status==="Request")
+                }else if(this.status==="Acc"){
+                    return this.po.filter(elem=> elem.status==="Acc")
+                }else if(this.status==="Tolak"){
+                    return this.po.filter(elem=> elem.status==="Tolak")
+                }else if(this.status==="Selesai"){
+                    return this.po.filter(elem=> elem.status==="Selesai")
+                }
+            }else{
+                return this.po.filter(elem => {
+                return elem.nomor_po.toLowerCase().includes(this.search);
             });
+            }
         },
         matches(){
             if(this.query==''){
@@ -184,29 +170,21 @@ export default {
         }
     },
     methods:{
+        getPo(){
+            axios.get("/api/po")
+            .then(res=>{this.po=res.data.data
+                this.load=false;
+            });
+        },
         getSupplier(){
             axios.get("/api/supplier")
             .then(res=>{this.supplier=res.data.data;
-            });
-        },
-        getPr(){
-            axios.get("/api/listrso/data/group")
-            .then(res=>{this.pr=res.data.data
-                this.load=false;
             });
         },
         getPurchasing(){
             axios.get("/api/purchasing")
             .then(res=>{this.purchasing=res.data.data;
             });
-        },
-        showmodal(prlist){
-            this.tujuan.kode=prlist.kode_barang;
-            axios.get("/api/listrso/data/group/"+this.tujuan.kode)
-            .then(res=>{this.prlist=res.data.data;
-
-            });
-            $("#modal-pr").modal("show");
         },
         showmodalPO(){
             $("#modal-po").modal("show");
@@ -275,6 +253,23 @@ export default {
             $("#modal-po").modal("hide");
             this.$router.push({name:'poCreateView',params:{nomor:this.upload.nomor_po}})
             });
+        },
+        getHapus(pl){
+            let jawab= confirm("Apakah anda yakin ingin menghapus PO Ini?");
+            if(jawab===true){
+                axios.delete("/api/po/"+pl.nomor_po)
+                .then(res=>{
+                    this.file.open_po="N";
+                    this.file.harga_supplier=0;  
+                    this.file.nomor_po="";
+                        axios.put("/api/listrso/data/deletePo/"+pl.nomor_po,this.file)
+                        .then(res=>{
+                            this.getPo();
+                            this.getSupplier();
+                            this.getPurchasing();
+                        });
+                });
+            }
         }
     }
 }
@@ -282,10 +277,5 @@ export default {
 
 
 <style>
-    #scrollList{
-        width: 100%;
-        max-height:400px ;
-        overflow-y: scroll;
-        font-size: 0.9em;
-    }
+
 </style>

@@ -28,6 +28,7 @@ Route::get('listrso/data/acc/{no}','Rso\ListRsoController@purchacc');
 Route::get('listrso/data/dic/{no}','Rso\ListRsoController@dicacc');
 Route::put('listrso/data/booking/{no}','Rso\ListRsoController@booking');
 Route::put('listrso/data/sopen/{no}','Rso\ListRsoController@sOpen');
+Route::put('listrso/data/deletePo/{po}','Rso\ListRsoController@deletePo');
 Route::get('listrso/data/group','Rso\ListRsoController@group');
 Route::get('listrso/data/listpo/{po}','Rso\ListRsoController@listpo');
 Route::get('listrso/data/group/{barang}','Rso\ListRsoController@grouplist');

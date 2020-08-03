@@ -37,7 +37,7 @@
             </div>
         </div>
         <div id="rsoverflowso" class="row mt-2 mx-auto">
-            <button @click="showmodal()" class="row float-left  ml-3 mt-4 label">Ambil Permintaan</button>
+                <button v-for="(lpo,index) in po" :key="index" v-if="lpo.status=='Draft' | lpo.status=='Tolak'" @click="showmodal()" class="row float-left  ml-3 mt-4 label">Ambil Permintaan</button>
             <div id="totalpo" class="mt-3 ml-auto mr-3">Total Invoice &nbsp; : &nbsp;{{totalPrice | currency}}</div>
             <div class="row mt-1 mx-auto col-12" >
                 <Circle5 id="load3" v-if="load"></Circle5>
@@ -69,9 +69,18 @@
                 </table>
             </div>
         </div>   
-        <div  class="row mt-2">
-                <button   class="btn-orange btn ml-3" >
+        <div v-for="lpo in po" :key="lpo.nomor_po" class="row mt-2">
+                <button v-if="lpo.status=='Draft'"  @click="submitPo(lpo)" class="btn-orange btn ml-4" >
                     Kirim PO
+                </button>
+                <button v-if="lpo.status=='Tolak'"  @click="submitPo(lpo)" class="btn-orange btn ml-4" >
+                    Request Ulang
+                </button>
+                <button @click="terimaPo(lpo)" v-if="lpo.status=='Request'" class="btn-success btn ml-4" >
+                    Terima PO
+                </button>
+                <button @click="formTolak(lpo)" v-if="lpo.status=='Request'" class="btn-danger btn ml-1" >
+                    Tolak PO
                 </button>
         </div>
         <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -143,23 +152,23 @@
                     <div id="scrollList">
                         <table  id="thead" class="table table-striped table-bordered" style="width:100%">
                             <thead>
-                                <tr>
+                                <tr v-for="(lpo,index) in po" :key="index">
                                     <th style="text-align:center">No</th>
                                     <th style="text-align:center">Nomor SO</th>
                                     <th>Customer</th>
                                     <th style="text-align:center">Jumlah</th>
                                     <th style="text-align:center">Satuan</th>
-                                    <th style="text-align:center">Aksi</th>
+                                    <th v-if="lpo.status=='Draft'" style="text-align:center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody v-for="(lpo,index) in po" :key="index">
                                 <tr v-for="(prl,index) in pOpen" :key="index">
                                     <td style="text-align:center">{{index+1}}</td>
                                     <td style="text-align:center">{{prl.nomor_so}}</td>
                                     <td>{{prl.nama_customer}}</td>
                                     <td style="text-align:center">{{prl.qty_tdktersedia}}</td>
                                     <td style="text-align:center">{{prl.satuan}}</td>
-                                    <td>
+                                    <td v-if="lpo.status=='Draft' | lpo.status=='Tolak'">
                                         <button @click="destroy(prl)" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
                                     </td>
                                 </tr>
@@ -171,6 +180,35 @@
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
                 </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal-tolak" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div  class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Penolakan PO</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Alasan Penolakan</label>
+                        <textarea v-model="up.alastolak" class="form-control"></textarea>
+                    </div>               
+                </div>
+                <div v-for="(lpo,index) in po" :key="index" class="modal-footer">
+                    <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="tolakPo(lpo)" class="btn btn-orange">Konfirmasi Tolak</button>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2"v-for="(lpo,index) in po" :key="index">
+            <div v-if="lpo.status=='Tolak'" id="alastolak">
+                <div>
+                    <b>{{lpo.alastolak}}</b> 
+                </div>                
             </div>
         </div>
     </div>
@@ -194,7 +232,11 @@ export default {
             file:{},
             listpo:{},
             totalPrice:0,
-            pOpen:{}
+            pOpen:{},
+            confirm:{
+                status:'Request'
+            },
+            up:{}
         }
     },
     created(){
@@ -274,6 +316,7 @@ export default {
             this.prlist={};
             this.checked=[];
             this.file={};
+            this.up.alastolak="";
         },
         TambahItem(){
             this.file.nomor_po=this.$route.params.nomor;
@@ -310,6 +353,40 @@ export default {
                     $("#modal-form").modal("hide");
                 });
             }
+        },
+        submitPo(lpo){
+            let tanya=confirm("Apakah anda yakin ingin mengirim PO ini?");
+            if(tanya===true){
+            axios.put("/api/po/"+lpo.nomor_po,this.confirm)
+            .then(res=>{
+                this.$router.push({name:'po'})
+            });
+            }
+        },
+        terimaPo(lpo){
+            let tanyakan=confirm("Apakah anda yakin ingin menerima PO ini?");
+            if(tanyakan===true){
+                this.confirm.status="Acc";
+                axios.put("/api/po/"+lpo.nomor_po,this.confirm)
+                .then(res=>{
+                this.$router.push({name:'po'})
+            });
+            }
+        },
+        formTolak(){
+            $("#modal-tolak").modal("show");
+        },
+        tolakPo(lpo){
+            let tanyakan=confirm("Apakah anda yakin ingin menolak PO ini?");
+            if(tanyakan===true){
+                this.up.status="Tolak";
+                axios.put("/api/po/"+lpo.nomor_po,this.up)
+                .then(res=>{
+                $("#modal-tolak").modal("hide");
+                this.$router.push({name:'po'})
+            });
+            }
+
         }
     },
 }

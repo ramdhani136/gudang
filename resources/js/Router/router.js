@@ -28,6 +28,7 @@ import viewPriceComponent from '../components/customer/viewPriceComponent.vue'
 
 import PuchaseRequestComponent from '../components/purchase/PuchaseRequestComponent.vue'
 import poCreateViewComponent from '../components/purchase/poCreateViewComponent.vue'
+import poComponent from '../components/purchase/poComponent.vue'
 
 
 
@@ -62,6 +63,7 @@ const routes=[
 
     {name:'pr', path:'/purchase/pr', component:PuchaseRequestComponent},
     {name:'poCreateView', path:'/purchase/po/create/:nomor', component:poCreateViewComponent},
+    {name:'po', path:'/purchase/po/', component:poComponent},
 ]
 
 

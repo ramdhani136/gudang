@@ -136,5 +136,9 @@ class ListRsoController extends Controller
         return GroupItemResource::collection($data);
     }
 
+    public function deletePo(Request $request, $po){
+        Listrso::where('nomor_po',$po)->update($request->all());
+        return response('update',response::HTTP_CREATED);
+    }
 
 }
