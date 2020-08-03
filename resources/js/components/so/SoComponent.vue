@@ -6,7 +6,7 @@
         <div class="form-group col-3 my-3 ml-n3 float-left">
             <select name="status" v-model="status" class="form-control">
                 <option value="Draft">Waiting list</option>
-                <option value="Acc">Accept</option>
+                <option value="Acc">Open</option>
                 <option value="Tolak">Rejected</option>
             </select>
         </div>
@@ -34,7 +34,6 @@
                                     Lihat Detail
                                 </router-link>
                                 <button @click="deleteSo(rs)" v-if="rs.status=='Draft'" class="btn btn-danger">Hapus</button>
-                                <button v-if="rs.status=='Acc'" class="btn btn-orange">Request Edit</button>
                                 <button v-if="rs.status=='Tolak'" class="btn btn-orange">Request Ulang</button>
                             </td>
                         </tr>

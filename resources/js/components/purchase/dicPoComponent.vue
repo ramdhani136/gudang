@@ -2,19 +2,7 @@
     <div class="container">
         <div class="form-group col-3 my-3 float-right">
             <input v-model="search"  type="text" class="form-control" placeholder="Search">
-        </div>
-        <div class="form-group col-3 my-3 ml-n3 float-left">
-            <select name="status" v-model="status" class="form-control">
-                <option value="Draft">Draft</option>
-                <option value="Request">Request</option>
-                <option value="Acc">Open</option>
-                <option value="Tolak">Rejected</option>
-                <option value="Selesai">Selesai</option>
-            </select>
-        </div> 
-        <div class="row">
-            <button  @click="showmodalPO()" class="btn btn-success my-3">+ Create PO</button>
-        </div>   
+        </div>  
             <div id="overflow" class="border-top">
             <table id="thead" class="table table-striped table-bordered" style="width:100%">
                     <thead>
@@ -38,77 +26,13 @@
                                 <router-link :to="{name:'poCreateView',params:{nomor:pl.nomor_po}}" class="btn btn-primary" >
                                     Lihat Detail
                                 </router-link>
-                                <button @click="getHapus(pl)" v-if="pl.status=='Draft'" class="btn btn-danger">Hapus</button>
+                                <button  class="btn btn-success">Print Form Checker</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
                 <Circle5 id="load" v-if="load"></Circle5>
             </div>
-            <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div  class="modal-dialog" role="document">
-                <div id="modal-width" class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Form Purchase</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Nomor PO</label>
-                        <input v-model="upload.nomor_po" type="text" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Tanggal</label>
-                        <input @change="validate()" :min="now()" v-model="upload.tanggal_po" type="date" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Suplier</label>
-                        <div class="autocomplete"></div>
-                        <div class="input" @click="toggleVisible" v-text="supply ? supply.nama:''"></div>
-                        <div class="placeholder" v-if="supply==null">Pilih Supplier</div>
-                        <div class="popover" v-show="visible">
-                            <input type="text"
-                            @keydown.up="up"
-                            @keydown.down="down"
-                            @keydown.enter="selectItem"
-                            v-model="query"
-                            placeholder="Masukan nama Supplier .."
-                            >
-                            <div class="option" ref="optionList">
-                                <ul>
-                                    <li v-for="(match,index) in matches" 
-                                    :key="match.kode"
-                                    v-text="match.nama"
-                                    :class="{'selected':(selected==index)}"
-                                    @click="itemClicked(index)"></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Purchasing</label>
-                        <select v-model="upload.nip_purchasing" class="form-control">
-                            <option v-for="(purch,index) in purchasing"  :value="purch.nip" :key="index">{{purch.nama}}</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Tanggal Datang</label>
-                        <input @change="validate()" :min="now()" v-model="upload.tanggal_datang" type="date" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Keterangan</label>
-                        <textarea v-model="upload.keterangan" class="form-control"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button @click="resetForm()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button @click="CreatePo()" type="button" class="btn btn-orange">Create PO</button>
-                </div>
-                </div>
-            </div>
-        </div>
         </div>
 </template>
 
@@ -121,7 +45,7 @@ export default {
     data(){
         return{
             search  : '',
-            status:'Draft',
+            status:'Acc',
             po:[],
             load:true,
             visible:false,

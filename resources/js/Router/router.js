@@ -29,6 +29,9 @@ import viewPriceComponent from '../components/customer/viewPriceComponent.vue'
 import PuchaseRequestComponent from '../components/purchase/PuchaseRequestComponent.vue'
 import poCreateViewComponent from '../components/purchase/poCreateViewComponent.vue'
 import poComponent from '../components/purchase/poComponent.vue'
+import dicPoComponent from '../components/purchase/dicPoComponent.vue'
+
+import ingoodsComponent from '../components/barang/ingoodsComponent.vue'
 
 
 
@@ -62,8 +65,11 @@ const routes=[
     {name:'viewItem', path:'/price/:customer/:barang', component:viewPriceComponent},
 
     {name:'pr', path:'/purchase/pr', component:PuchaseRequestComponent},
-    {name:'poCreateView', path:'/purchase/po/create/:nomor', component:poCreateViewComponent},
+    {name:'poCreateView', path:'/purchase/po/view/:nomor', component:poCreateViewComponent},
     {name:'po', path:'/purchase/po/', component:poComponent},
+    {name:'dpo', path:'/purchase/dpo', component:dicPoComponent},
+
+    {name:'ingoods', path:'/dic/incoming', component:ingoodsComponent},
 ]
 
 
