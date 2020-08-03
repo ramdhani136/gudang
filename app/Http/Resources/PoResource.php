@@ -25,6 +25,7 @@ class PoResource extends JsonResource
             'purchasing'=>$this->purchasing->nama,
             'status'=>$this->status,
             'keterangan'=>$this->keterangan,
+            'alastolak'=>$this->alastolak,
         ];
     }
 }

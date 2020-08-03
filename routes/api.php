@@ -31,6 +31,7 @@ Route::put('listrso/data/sopen/{no}','Rso\ListRsoController@sOpen');
 Route::get('listrso/data/group','Rso\ListRsoController@group');
 Route::get('listrso/data/listpo/{po}','Rso\ListRsoController@listpo');
 Route::get('listrso/data/group/{barang}','Rso\ListRsoController@grouplist');
+Route::get('listrso/data/groupopen/{po}/{barang}','Rso\ListRsoController@groupopen');
 Route::resource('supplier','Supplier\SupplierController');
 Route::resource('listrso','Rso\ListRsoController');
 Route::resource('sales','Sales\SalesController');

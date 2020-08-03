@@ -3819,6 +3819,49 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -3835,7 +3878,8 @@ __webpack_require__.r(__webpack_exports__);
       po: {},
       file: {},
       listpo: {},
-      totalPrice: 0
+      totalPrice: 0,
+      pOpen: {}
     };
   },
   created: function created() {
@@ -3924,6 +3968,7 @@ __webpack_require__.r(__webpack_exports__);
       this.chooseItem = '';
       this.prlist = {};
       this.checked = [];
+      this.file = {};
     },
     TambahItem: function TambahItem() {
       var _this6 = this;
@@ -3933,9 +3978,41 @@ __webpack_require__.r(__webpack_exports__);
 
       for (var i = 0; i < this.checked.length; i++) {
         axios.put("/api/listrso/" + this.checked[i], this.file).then(function (res) {
+          _this6.getPr();
+
           _this6.getListPo();
 
           _this6.resetForm();
+
+          $("#modal-form").modal("hide");
+        });
+      }
+    },
+    showDetail: function showDetail(list) {
+      var _this7 = this;
+
+      this.tujuan = list.kode_barang;
+      this.npo = this.$route.params.nomor;
+      axios.get("/api/listrso/data/groupopen/" + this.npo + "/" + this.tujuan).then(function (res) {
+        _this7.pOpen = res.data.data;
+      });
+      $("#modal-pr").modal("show");
+    },
+    destroy: function destroy(prl) {
+      var _this8 = this;
+
+      var keputusan = confirm("Yakin igin hapus ini?");
+
+      if (keputusan === true) {
+        this.file.nomor_po = "";
+        this.file.open_po = "N";
+        this.file.harga_supplier = 0;
+        axios.put("/api/listrso/" + prl.id, this.file).then(function (res) {
+          _this8.getPr();
+
+          _this8.getListPo();
+
+          _this8.resetForm();
 
           $("#modal-form").modal("hide");
         });
@@ -53976,31 +54053,46 @@ var render = function() {
                   _vm._v(" "),
                   _c(
                     "tbody",
-                    _vm._l(_vm.listpo, function(lpo, index) {
+                    _vm._l(_vm.listpo, function(list, index) {
                       return _c("tr", { key: index }, [
                         _c("td", { staticStyle: { "text-align": "center" } }, [
                           _vm._v(_vm._s(index + 1))
                         ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(lpo.nama))]),
+                        _c("td", [_vm._v(_vm._s(list.nama))]),
                         _vm._v(" "),
                         _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(_vm._s(lpo.jumlah))
+                          _vm._v(_vm._s(list.jumlah))
                         ]),
                         _vm._v(" "),
                         _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(_vm._s(lpo.satuan))
+                          _vm._v(_vm._s(list.satuan))
                         ]),
                         _vm._v(" "),
                         _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(_vm._s(_vm._f("currency")(lpo.harga_supplier)))
+                          _vm._v(
+                            _vm._s(_vm._f("currency")(list.harga_supplier))
+                          )
                         ]),
                         _vm._v(" "),
                         _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(_vm._s(_vm._f("currency")(lpo.subtotal)))
+                          _vm._v(_vm._s(_vm._f("currency")(list.subtotal)))
                         ]),
                         _vm._v(" "),
-                        _vm._m(1, true)
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-primary",
+                              on: {
+                                click: function($event) {
+                                  return _vm.showDetail(list)
+                                }
+                              }
+                            },
+                            [_vm._v("Lihat Rincian")]
+                          )
+                        ])
                       ])
                     }),
                     0
@@ -54013,7 +54105,7 @@ var render = function() {
         ]
       ),
       _vm._v(" "),
-      _vm._m(2),
+      _vm._m(1),
       _vm._v(" "),
       _c(
         "div",
@@ -54169,7 +54261,7 @@ var render = function() {
                           staticStyle: { width: "100%" }
                         },
                         [
-                          _vm._m(3),
+                          _vm._m(2),
                           _vm._v(" "),
                           _c(
                             "tbody",
@@ -54318,6 +54410,106 @@ var render = function() {
             ]
           )
         ]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "modal-pr",
+            tabindex: "-1",
+            "data-backdrop": "static",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true"
+          }
+        },
+        [
+          _c(
+            "div",
+            { staticClass: "modal-dialog", attrs: { role: "document" } },
+            [
+              _c(
+                "div",
+                { staticClass: "modal-content", attrs: { id: "modal-width" } },
+                [
+                  _vm._m(3),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("div", { attrs: { id: "scrollList" } }, [
+                      _c(
+                        "table",
+                        {
+                          staticClass: "table table-striped table-bordered",
+                          staticStyle: { width: "100%" },
+                          attrs: { id: "thead" }
+                        },
+                        [
+                          _vm._m(4),
+                          _vm._v(" "),
+                          _c(
+                            "tbody",
+                            _vm._l(_vm.pOpen, function(prl, index) {
+                              return _c("tr", { key: index }, [
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [_vm._v(_vm._s(index + 1))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [_vm._v(_vm._s(prl.nomor_so))]
+                                ),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(prl.nama_customer))]),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [_vm._v(_vm._s(prl.qty_tdktersedia))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [_vm._v(_vm._s(prl.satuan))]
+                                ),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _c(
+                                    "button",
+                                    {
+                                      staticClass: "btn btn-danger",
+                                      attrs: {
+                                        type: "button",
+                                        "data-dismiss": "modal"
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.destroy(prl)
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("Delete")]
+                                  )
+                                ])
+                              ])
+                            }),
+                            0
+                          )
+                        ]
+                      )
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _vm._m(5)
+                ]
+              )
+            ]
+          )
+        ]
       )
     ],
     2
@@ -54343,16 +54535,6 @@ var staticRenderFns = [
         _c("th", [_vm._v("Sub Total")]),
         _vm._v(" "),
         _c("th", [_vm._v("Aksi")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", { staticStyle: { "text-align": "center" } }, [
-      _c("button", { staticClass: "btn btn-primary" }, [
-        _vm._v("Lihat Rincian")
       ])
     ])
   },
@@ -54390,6 +54572,72 @@ var staticRenderFns = [
           _vm._v("Tandai")
         ])
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
+        [_vm._v("Rincian Permintaan")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { staticStyle: { "text-align": "center" } }, [_vm._v("No")]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { "text-align": "center" } }, [
+          _vm._v("Nomor SO")
+        ]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Customer")]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { "text-align": "center" } }, [
+          _vm._v("Jumlah")
+        ]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { "text-align": "center" } }, [
+          _vm._v("Satuan")
+        ]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { "text-align": "center" } }, [_vm._v("Aksi")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-footer" }, [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-secondary",
+          attrs: { type: "button", "data-dismiss": "modal" }
+        },
+        [_vm._v("Close")]
+      )
     ])
   }
 ]

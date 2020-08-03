@@ -54,15 +54,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(lpo,index) in listpo" :key="index">
+                        <tr v-for="(list,index) in listpo" :key="index">
                             <td style="text-align:center">{{index+1}}</td>
-                            <td>{{lpo.nama}}</td>
-                            <td style="text-align:center">{{lpo.jumlah}}</td>
-                            <td style="text-align:center">{{lpo.satuan}}</td>
-                            <td style="text-align:center">{{lpo.harga_supplier | currency}}</td>
-                            <td style="text-align:center">{{lpo.subtotal | currency}}</td>
+                            <td>{{list.nama}}</td>
+                            <td style="text-align:center">{{list.jumlah}}</td>
+                            <td style="text-align:center">{{list.satuan}}</td>
+                            <td style="text-align:center">{{list.harga_supplier | currency}}</td>
+                            <td style="text-align:center">{{list.subtotal | currency}}</td>
                             <td  style="text-align:center">
-                                <button class="btn btn-primary">Lihat Rincian</button>
+                                <button @click="showDetail(list)" class="btn btn-primary">Lihat Rincian</button>
                             </td>
                         </tr>
                     </tbody>
@@ -130,6 +130,49 @@
                 </div>
             </div>
         </div>
+            <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div  class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="scrollList">
+                        <table  id="thead" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center">No</th>
+                                    <th style="text-align:center">Nomor SO</th>
+                                    <th>Customer</th>
+                                    <th style="text-align:center">Jumlah</th>
+                                    <th style="text-align:center">Satuan</th>
+                                    <th style="text-align:center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(prl,index) in pOpen" :key="index">
+                                    <td style="text-align:center">{{index+1}}</td>
+                                    <td style="text-align:center">{{prl.nomor_so}}</td>
+                                    <td>{{prl.nama_customer}}</td>
+                                    <td style="text-align:center">{{prl.qty_tdktersedia}}</td>
+                                    <td style="text-align:center">{{prl.satuan}}</td>
+                                    <td>
+                                        <button @click="destroy(prl)" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -151,6 +194,7 @@ export default {
             file:{},
             listpo:{},
             totalPrice:0,
+            pOpen:{}
         }
     },
     created(){
@@ -229,6 +273,7 @@ export default {
             this.chooseItem='';
             this.prlist={};
             this.checked=[];
+            this.file={};
         },
         TambahItem(){
             this.file.nomor_po=this.$route.params.nomor;
@@ -236,12 +281,36 @@ export default {
             for(let i=0;i<this.checked.length;i++){
                 axios.put("/api/listrso/"+ this.checked[i],this.file)
                 .then(res=>{
+                    this.getPr();
                     this.getListPo();
                     this.resetForm();
                     $("#modal-form").modal("hide");
                 });
             }
         },
+        showDetail(list){
+            this.tujuan=list.kode_barang;
+            this.npo=this.$route.params.nomor;
+            axios.get("/api/listrso/data/groupopen/"+this.npo+"/"+this.tujuan)
+            .then(res=>{this.pOpen=res.data.data;
+            });
+            $("#modal-pr").modal("show");
+        },
+        destroy(prl){
+            let keputusan = confirm("Yakin igin hapus ini?");
+            if(keputusan===true){
+                this.file.nomor_po="";
+                this.file.open_po="N";
+                this.file.harga_supplier=0;
+                axios.put("/api/listrso/"+ prl.id,this.file)
+                .then(res=>{
+                    this.getPr();
+                    this.getListPo();
+                    this.resetForm();
+                    $("#modal-form").modal("hide");
+                });
+            }
+        }
     },
 }
 </script>
