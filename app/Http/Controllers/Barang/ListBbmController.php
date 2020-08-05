@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Po;
+namespace App\Http\Controllers\Barang;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Model\Po\Po;
-use App\Http\Resources\PoResource;
+use App\Model\Barang\Listbbm;
+use App\Http\Resources\ListBbmResource;
 use Symfony\Component\HttpFoundation\Response;
 
-class PoController extends Controller
+class ListBbmController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class PoController extends Controller
      */
     public function index()
     {
-        return PoResource::collection(Po::orderBy('updated_at','ASC')->get());
+        return ListBbmResource::collection(Listbbm::latest()->get());
     }
 
     /**
@@ -38,8 +38,8 @@ class PoController extends Controller
      */
     public function store(Request $request)
     {
-        $data=Po::create($request->all());
-        return response(new PoResource($data),response::HTTP_CREATED);
+        $data=Listbbm::create($request->all());
+        return response(new ListBbmResource($data),response::HTTP_CREATED);
     }
 
     /**
@@ -48,9 +48,9 @@ class PoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($po)
+    public function show($listbbm)
     {
-        return PoResource::collection(Po::where('nomor_po',$po)->get());
+        return ListBbmResource::collection(Listbbm::where('nomor_bbm',$listbbm)->get());
     }
 
     /**
@@ -71,10 +71,10 @@ class PoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $po)
+    public function update(Request $request, $listbbm)
     {
-        Po::where('nomor_po',$po)->update($request->all());
-        return response('updated',response::HTTP_CREATED);
+        Barang::where('id',$listbbm)->update($request->all());
+        return response('update',response::HTTP_CREATED);
     }
 
     /**
@@ -83,13 +83,9 @@ class PoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($po)
+    public function destroy($listbbm)
     {
-        Po::where('nomor_po',$po)->delete();
-    }
-
-    public function aktif()
-    {
-        return PoResource::collection(Po::orderBy('updated_at','ASC')->where('status','Acc')->get());
+        Barang::where('id',$listbbm)->delete();
+        return response('deleted',response::HTTP_OK);
     }
 }

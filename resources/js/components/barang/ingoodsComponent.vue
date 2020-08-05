@@ -6,12 +6,11 @@
         <div class="form-group col-3 my-3 ml-n3 float-left">
             <select name="status" v-model="status" class="form-control">
                 <option value="draft">Draft</option>
-                <option value="open">Open</option>
                 <option value="close">Close</option>
             </select>
         </div> 
         <div class="row">
-            <button class="btn btn-success my-3">+ Create BBM</button>
+            <router-link to="/dic/incoming/view" class="btn btn-success my-3" >+ Create BBM</router-link>
         </div>
         <div id="overflow" class="border-top">
                 <table id="thead" class="table table-striped table-bordered" style="width:100%">
@@ -31,9 +30,12 @@
                         <td style="text-align:center">{{bm.bbm}}</td>
                         <td style="text-align:center">{{bm.tanggal}}</td>
                         <td style="text-align:center">{{bm.nomor_po}}</td>
-                        <td style="text-align:center">{{bm.supplier}}</td>
+                        <td>{{bm.supplier}}</td>
                         <td style="text-align:center">
-                            <button class="btn btn-primary">Lihat Detail</button>
+                            <router-link :to="{name:'viewbbm',params:{nomor:bm.bbm}}" class="btn btn-primary">
+                                    Edit
+                            </router-link>
+                            <button class="btn btn-danger">Hapus</button>
                         </td>
                     </tr>
                 </tbody>
@@ -62,9 +64,17 @@ export default {
     },
     computed:{
         FilteredBBM(){
-            return this.bbm.filter(elem => {
-            return elem.nomor_po.toLowerCase().includes(this.search);
-        });
+            if(this.search===""){
+                if(this.status==="draft"){
+                    return this.bbm.filter(elem=> elem.status==="draft")
+                }else if(this.status==="open"){
+                    return this.bbm.filter(elem=> elem.status==="open")
+                }
+            }else{
+                return this.bbm.filter(elem => {
+                return elem.nomor_po.toLowerCase().includes(this.search);
+            });
+            }
         },
     },
     methods:{
@@ -73,7 +83,7 @@ export default {
             .then(res=>{
                 this.bbm=res.data.data;
             })
-        }
+        },
     }
 }
 </script>

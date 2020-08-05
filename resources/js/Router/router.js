@@ -32,6 +32,8 @@ import poComponent from '../components/purchase/poComponent.vue'
 import dicPoComponent from '../components/purchase/dicPoComponent.vue'
 
 import ingoodsComponent from '../components/barang/ingoodsComponent.vue'
+import ViewingoodsComponent from '../components/barang/ViewingoodsComponent.vue'
+import ViewBbmComponent from '../components/barang/ViewBbmComponent.vue'
 
 
 
@@ -70,6 +72,8 @@ const routes=[
     {name:'dpo', path:'/purchase/dpo', component:dicPoComponent},
 
     {name:'ingoods', path:'/dic/incoming', component:ingoodsComponent},
+    {name:'creategoods', path:'/dic/incoming/view', component:ViewingoodsComponent},
+    {name:'viewbbm', path:'/dic/incoming/view/:nomor', component:ViewBbmComponent},
 ]
 
 

@@ -43,5 +43,7 @@ Route::get('data/price/{customer}/{barang}','Sales\CustpriceController@viewprice
 Route::get('view/price/{customer}/{barang}','Sales\CustpriceController@ambilPrice');
 Route::resource('purchasing','Purchase\PurchasingController');
 Route::resource('po','Po\PoController');
+Route::get('poaktif/','Po\PoController@aktif');
+Route::resource('listbbm','Barang\ListBbmController');
 
 
