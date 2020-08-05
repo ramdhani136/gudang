@@ -92,5 +92,9 @@ class RsoController extends Controller
         return RsoResource::collection(Rso::where('status','Purch')->orderBy('updated_at','ASC')->get());
     }
 
+    public function confirm(){
+        return RsoResource::collection(Rso::where('status','Confirmed')->orderBy('updated_at','ASC')->get());
+    }
+
 
 }

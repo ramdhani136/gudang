@@ -23,6 +23,7 @@ Route::resource('customer','Customer\CustomerController');
 Route::resource('divisi','Divisi\DivisiController');
 Route::resource('rso','Rso\RsoController');
 Route::get('rso/data/purch/','Rso\RsoController@purch');
+Route::get('rso/data/confirm/','Rso\RsoController@confirm');
 Route::get('listrso/data/purch/{id}','Rso\ListRsoController@purch');
 Route::get('listrso/data/acc/{no}','Rso\ListRsoController@purchacc');
 Route::get('listrso/data/dic/{no}','Rso\ListRsoController@dicacc');

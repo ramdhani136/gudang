@@ -98,6 +98,10 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
+                        <label>Kode Barang</label>
+                        <input v-model="dic.kode" type="text"   autocomplete="off" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
                         <label>Nama Barang</label>
                         <input v-model="dic.nama_barang" type="text"   autocomplete="off" class="form-control" disabled>
                     </div>
@@ -189,6 +193,7 @@ export default {
         },
         showModal(list){
             this.getlistRso()
+            this.dic.kode=list.lkode_barang
             this.dic.catatan=list.catatan
             this.dic.id=list.id
             this.dic.nama_barang=list.nama_barang
@@ -243,16 +248,17 @@ export default {
             }
         },
         resetForm(){
-            this.getlistRso()
-            this.dic.catatan=""
-            this.dic.id=""
-            this.dic.nama_barang=""
-            this.update.status=""
-            this.update.qty_tersedia=""
-            this.update.qty_tdktersedia=""
+            this.getlistRso();
+            this.dic.catatan="";
+            this.dic.id="";
+            this.dic.nama_barang="";
+            this.update.status="";
+            this.update.qty_tersedia="";
+            this.update.qty_tdktersedia="";
             this.dic.jumlahrso=""
-            this.dic.satuan=""
-            this.coba=0
+            this.dic.satuan="";
+            this.coba=0;
+            this.dic.kode="";
         },
         ConfirmRso(up){
             let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');

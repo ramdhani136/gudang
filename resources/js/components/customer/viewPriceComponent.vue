@@ -28,7 +28,6 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>No.Reg</th>
                 <th>Tanggal</th>
                 <th>Harga</th>
                 <th>Sales</th>
@@ -39,7 +38,6 @@
         <tbody>
                 <tr v-for="(it,index) in item" :key="index">
                 <td style="text-align:center">{{index+1}}</td>
-                <td style="text-align:center">{{it.no_reg}}</td>
                 <td style="text-align:center">{{it.created_at}}</td>
                 <td style="text-align:center">{{it.harga | currency}}</td>
                 <td style="text-align:center">{{it.sales}}</td>
@@ -75,10 +73,6 @@
                         <div class="form-group">
                             <label>Satuan</label>
                             <input v-for="br in barang" :key="br.kode" type="text" class="form-control" :value="br.satuan"  disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>No.Reg</label>
-                            <input v-model="up.no_reg"  type="text" name="harga"  autocomplete="off" class="form-control">
                         </div>
                         <div class="form-group">
                             <label>Sales</label>

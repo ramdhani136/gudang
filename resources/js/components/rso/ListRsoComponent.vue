@@ -115,7 +115,10 @@
             <Circle5 id="load2" v-if="load"></Circle5>
         </div>
         <div  class="row mt-2"  v-for="rlist in form" :key="rlist.id">
-                <router-link :to="{name:'createso',params:{id:rlist.nomor_rso}}" v-if="rlist.status=='Confirmed'" class="btn-success btn ml-3" >
+                <!-- <router-link :to="{name:'createso',params:{id:rlist.nomor_rso}}" v-if="rlist.status=='Confirmed'" class="btn-success btn ml-3" >
+                    Proses SO
+                </router-link> -->
+                <router-link :to="{name:'formcreateso'}" v-if="rlist.status=='Confirmed'" class="btn-success btn ml-3" >
                     Proses SO
                 </router-link>
         </div>
@@ -137,6 +140,10 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="form-group">
+                        <label>kode Barang</label>
+                        <input v-model="ket.kode_barang"  type="text" name="qty"  autocomplete="off" class="form-control" disabled>
+                    </div>
                     <div class="form-group">
                         <label>Nama Barang</label>
                         <div class="autocomplete"></div>
@@ -351,13 +358,17 @@ export default {
             this.getRso()
             axios.put(`/api/rso/${this.$route.params.id}`,this.inprso)
             .then((response)=>{
-                    this.getRso()
-                    this.getlistRso()
-                    this.getBarang()
+                    this.load=true;
+                    this.getRso();
+                    this.getCustomer();
+                    this.getSales();
+                    this.getlistRso();
+                    this.getBarang();
+                    this.getSales();
+                    this.load=false;
                     this.tbsukses=false
                     this.disabled=1
                     this.tombol="Edit RSO"
-                    this.$router.push({name:'rso'})
                 })
         },
         showmodal(){
@@ -451,6 +462,7 @@ export default {
             this.getlistRso()
             this.inputlrso.id="";
             this.ket.satuan="";
+            this.ket.kode_barang="";
             this.inputlrso.kode_barang="";
             this.inputlrso.qty="";
             this.inputlrso.catatan="";
@@ -507,7 +519,7 @@ export default {
                 });
             });
 
-
+            this.ket.kode_barang= this.custom.kode;
             this.ket.satuan= this.custom.satuan;
             this.visible=false;
         },
