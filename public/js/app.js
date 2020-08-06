@@ -3942,6 +3942,7 @@ __webpack_require__.r(__webpack_exports__);
 
         if (list.acc_purch == "N") {
           _this6.update.alastolak = "";
+          _this6.update.so_tdktersedia = "N";
           axios.put("/api/listrso/" + _this6.dic.id, _this6.update).then(function (response) {
             _this6.list.acc_purch = "Y";
 
@@ -3949,6 +3950,7 @@ __webpack_require__.r(__webpack_exports__);
           });
         } else if (list.acc_purch == "Y") {
           _this6.update.tanggal_datang = "";
+          _this6.update.so_tdktersedia = "Y";
           axios.put("/api/listrso/" + _this6.dic.id, _this6.update).then(function (response) {
             _this6.list.acc_purch = "N";
 
@@ -6451,7 +6453,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       _this4.getlistRso();
 
       if (_this4.update.status === "Tidak Tersedia") {
-        _this4.update.qty_tersedia = '';
+        _this4.update.qty_tersedia = "";
+        _this4.update.so_tersedia = "Y";
+        _this4.update.so_tdktersedia = "N";
         _this4.update.qty_tdktersedia = _this4.dic.jumlahrso;
         axios.put("/api/listrso/" + _this4.dic.id, _this4.update);
 
@@ -6459,13 +6463,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       } else if (_this4.update.status === "Tersedia") {
         _this4.getlistRso();
 
+        _this4.update.so_tdktersedia = "Y";
+        _this4.update.so_tersedia = "N";
         _this4.update.qty_tersedia = _this4.dic.jumlahrso;
         _this4.update.qty_tdktersedia = '';
         axios.put("/api/listrso/" + _this4.dic.id, _this4.update).then(function (response) {
           _this4.tujuanConfirm();
         });
       } else if (_this4.update.status === "Tersedia Sebagian") {
-        _this4.tujuanConfirm();
+        _this4.getlistRso();
+
+        _this4.update.so_tdktersedia = "N";
+        _this4.update.so_tersedia = "N";
+        axios.put("/api/listrso/" + _this4.dic.id, _this4.update).then(function (response) {
+          _this4.tujuanConfirm();
+        });
       }
     });
   }), _defineProperty(_methods, "updateStatusklik", function updateStatusklik(list) {
@@ -7699,6 +7711,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -7708,8 +7727,8 @@ __webpack_require__.r(__webpack_exports__);
     return {
       load: false,
       up: {
-        bbm: this.so_nomor(),
-        tanggal: this.now(),
+        nomor_so: this.so_nomor(),
+        tanggal_so: this.now(),
         tanggal_kirim: this.tglKirim()
       },
       poaktif: {},
@@ -7726,13 +7745,29 @@ __webpack_require__.r(__webpack_exports__);
       uploood: {},
       rso: {},
       status: 'Tersedia',
-      listso: {}
+      listso: {},
+      upload: {},
+      ubah: {},
+      tdkada: {},
+      banding2: {
+        jumlah: '',
+        status: '',
+        penyama: ''
+      },
+      updaterso: {},
+      updatersot: {},
+      listrso: {},
+      listdel: {
+        qty: 0
+      },
+      gagal: false
     };
   },
   created: function created() {
     this.getPoAktif();
     this.getRso();
     this.resetForm();
+    this.timer();
   },
   computed: {},
   methods: {
@@ -7808,6 +7843,7 @@ __webpack_require__.r(__webpack_exports__);
             _this4.total += _this4.subTotal;
             _this4.lstatus = "Tersedia";
             _this4.tampil = false;
+            _this4.statuspo = true;
           }
         });
       } else if (this.status === "TidakTersedia") {
@@ -7821,58 +7857,247 @@ __webpack_require__.r(__webpack_exports__);
             _this4.total += _this4.subTotal;
             _this4.lstatus = "Tidak Tersedia";
             _this4.tampil = true;
+            _this4.statuspo = false;
           }
         });
       }
 
       $("#modal-po").modal("hide");
-    }
-    /* draftBbm(){
-        let keputusan=confirm("Simpan Draft?");
-        if(keputusan===true){
-        axios.post("/api/bbm",this.up)
-        .then(res=>{
-            for(let i=0;i<this.checker.length;i++){
-                this.uploadlist.kode_barang=this.checker[i].kode_barang;
-                this.uploadlist.qty=this.hitung.qty[i];
-                this.uploadlist.keterangan=this.hitung.keterangan[i];
-                this.uploadlist.nomor_bbm=this.up.bbm;
-                this.uploood={kode_barang:this.uploadlist.kode_barang,nomor_bbm:this.uploadlist.nomor_bbm,
-                qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan
-                };
-                axios.post("/api/listbbm",this.uploood)
-                .then(res=>{
-                    this.$router.push({name:'ingoods'});
-                });
-        }
     },
-    )
+    draftSo: function draftSo() {
+      var _this5 = this;
+
+      var keputusan = confirm("Simpan Draft?");
+      this.banding2.jumlah = "";
+      this.banding2.penyama = "";
+
+      if (keputusan === true) {
+        if (this.listso.length > 0) {
+          if (this.statuspo === true) {
+            this.up.statusso = "tersedia";
+            axios.post("/api/so", this.up).then(function (res) {
+              _this5.ubah.so_tersedia = "Y";
+
+              for (var i = 0; i < _this5.listso.length; i++) {
+                _this5.upload.id = _this5.listso[i].id;
+                axios.put("/api/listrso/" + _this5.upload.id, _this5.ubah).then(function (res) {
+                  axios.get("/api/listrso/" + _this5.up.nomor_rso).then(function (res) {
+                    _this5.listrso = res.data.data;
+
+                    for (var _i = 0; _i < _this5.listrso.length; _i++) {
+                      _this5.banding2.so_tdktersedia = _this5.listrso[_i].so_tdktersedia;
+                      _this5.banding2.jumlah += _this5.banding2.so_tdktersedia;
+                      _this5.banding2.penyama += "Y";
+                      _this5.banding2.nomor_rso = _this5.listrso[0].lno_rso;
+                    }
+
+                    if (_this5.banding2.jumlah === _this5.banding2.penyama) {
+                      _this5.updaterso.status = "So";
+                      axios.put("/api/rso/" + _this5.banding2.nomor_rso, _this5.updaterso).then(function (res) {
+                        _this5.$router.push({
+                          name: 'so'
+                        });
+                      });
+                    }
+
+                    _this5.$router.push({
+                      name: 'so'
+                    });
+                  });
+                });
+              }
+
+              ;
+            });
+          } else {
+            this.up.statusso = "tidaktersedia";
+            axios.post("/api/so", this.up).then(function (res) {
+              _this5.ubah.so_tdktersedia = "Y";
+
+              for (var i = 0; i < _this5.listso.length; i++) {
+                _this5.upload.id = _this5.listso[i].id;
+                axios.put("/api/listrso/" + _this5.upload.id, _this5.ubah).then(function (res) {
+                  axios.get("/api/listrso/" + _this5.up.nomor_rso).then(function (res) {
+                    _this5.listrso = res.data.data;
+
+                    for (var _i2 = 0; _i2 < _this5.listrso.length; _i2++) {
+                      _this5.banding2.so_tersedia = _this5.listrso[_i2].so_tersedia;
+                      _this5.banding2.jumlah += _this5.banding2.so_tersedia;
+                      _this5.banding2.penyama += "Y";
+                      _this5.banding2.nomor_rso = _this5.listrso[0].lno_rso;
+                    }
+
+                    if (_this5.banding2.jumlah === _this5.banding2.penyama) {
+                      _this5.updaterso.status = "So";
+                      axios.put("/api/rso/" + _this5.banding2.nomor_rso, _this5.updaterso).then(function (res) {
+                        _this5.$router.push({
+                          name: 'so'
+                        });
+                      });
+                    }
+
+                    _this5.$router.push({
+                      name: 'so'
+                    });
+                  });
+                });
+              }
+
+              ;
+            });
+          }
+        } else {
+          this.gagal = true;
         }
-    }, */
+      }
+    },
+    submitSo: function submitSo() {
+      var _this6 = this;
 
-    /*  submitBBM(){   
-     let jawab=confirm("Yakin ingin mengirim Bukti Barang Masuk ini?");
-     if(jawab===true){
-         this.up.status="open";
-         axios.post("/api/bbm",this.up)
-         .then(res=>{
-             for(let i=0;i<this.checker.length;i++){
-                 this.uploadlist.kode_barang=this.checker[i].kode_barang;
-                 this.uploadlist.qty=this.hitung.qty[i];
-                 this.uploadlist.keterangan=this.hitung.keterangan[i];
-                 this.uploadlist.nomor_bbm=this.up.bbm;
-                 this.uploadlist.status="open";
-                 this.uploood={kode_barang:this.uploadlist.kode_barang,nomor_bbm:this.uploadlist.nomor_bbm,
-                 qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan
-                 };
-                 axios.post("/api/listbbm",this.uploood)
-                 .then(res=>{
-                     this.$router.push({name:'ingoods'});
-                 });
-         }
-     },
-     )}} */
+      var keputusan = confirm("Simpan Draft?");
+      this.banding2.jumlah = "";
+      this.banding2.penyama = "";
 
+      if (keputusan === true) {
+        if (this.listso.length > 0) {
+          if (this.statuspo === true) {
+            this.up.statusso = "tersedia";
+            this.up.status = "Acc";
+            axios.post("/api/so", this.up).then(function (res) {
+              _this6.ubah.so_tersedia = "Y";
+
+              for (var i = 0; i < _this6.listso.length; i++) {
+                _this6.upload.id = _this6.listso[i].id;
+                axios.put("/api/listrso/" + _this6.upload.id, _this6.ubah).then(function (res) {
+                  axios.get("/api/listrso/" + _this6.up.nomor_rso).then(function (res) {
+                    _this6.listrso = res.data.data;
+
+                    for (var _i3 = 0; _i3 < _this6.listrso.length; _i3++) {
+                      _this6.banding2.so_tdktersedia = _this6.listrso[_i3].so_tdktersedia;
+                      _this6.banding2.jumlah += _this6.banding2.so_tdktersedia;
+                      _this6.banding2.penyama += "Y";
+                      _this6.banding2.nomor_rso = _this6.listrso[0].lno_rso;
+                    }
+
+                    if (_this6.banding2.jumlah === _this6.banding2.penyama) {
+                      _this6.updaterso.status = "So";
+                      axios.put("/api/rso/" + _this6.banding2.nomor_rso, _this6.updaterso).then(function (res) {
+                        _this6.$router.push({
+                          name: 'so'
+                        });
+                      });
+                    }
+
+                    _this6.$router.push({
+                      name: 'so'
+                    });
+                  });
+                });
+              }
+
+              ;
+            });
+          } else {
+            this.up.statusso = "tidaktersedia";
+            this.up.status = "Acc";
+            axios.post("/api/so", this.up).then(function (res) {
+              _this6.ubah.so_tdktersedia = "Y";
+
+              for (var i = 0; i < _this6.listso.length; i++) {
+                _this6.upload.id = _this6.listso[i].id;
+                axios.put("/api/listrso/" + _this6.upload.id, _this6.ubah).then(function (res) {
+                  axios.get("/api/listrso/" + _this6.up.nomor_rso).then(function (res) {
+                    _this6.listrso = res.data.data;
+
+                    for (var _i4 = 0; _i4 < _this6.listrso.length; _i4++) {
+                      _this6.banding2.so_tersedia = _this6.listrso[_i4].so_tersedia;
+                      _this6.banding2.jumlah += _this6.banding2.so_tersedia;
+                      _this6.banding2.penyama += "Y";
+                      _this6.banding2.nomor_rso = _this6.listrso[0].lno_rso;
+                    }
+
+                    if (_this6.banding2.jumlah === _this6.banding2.penyama) {
+                      _this6.updaterso.status = "So";
+                      axios.put("/api/rso/" + _this6.banding2.nomor_rso, _this6.updaterso).then(function (res) {
+                        _this6.$router.push({
+                          name: 'so'
+                        });
+                      });
+                    }
+
+                    _this6.$router.push({
+                      name: 'so'
+                    });
+                  });
+                });
+              }
+
+              ;
+            });
+          }
+        } else {
+          this.gagal = true;
+        }
+      }
+    },
+    hapuslistSo: function hapuslistSo(ls) {
+      var _this7 = this;
+
+      var keputusan = confirm("Yakin ingin menghapus item ini?");
+
+      if (keputusan === true) {
+        if (this.status === "Tersedia") {
+          if (ls.status === "Tersedia") {
+            axios["delete"]("/api/listrso/" + ls.id).then(function (res) {
+              _this7.pilihStatus();
+            });
+          } else if (ls.status === "Tidak Tersedia") {
+            axios["delete"]("/api/listrso/" + ls.id).then(function (res) {
+              _this7.pilihStatus();
+            });
+          } else if (ls.status === "Tersedia Sebagian") {
+            this.listdel.qty = parseInt(ls.qty) - parseInt(ls.qty_tersedia);
+            this.listdel.qty_tersedia = "";
+            this.listdel.status = "Tidak Tersedia";
+            this.listdel.so_tersedia = "Y";
+            axios.put("/api/listrso/" + ls.id, this.listdel).then(function (res) {
+              _this7.pilihStatus();
+
+              _this7.listdel = {};
+            });
+          }
+        } else if (this.status === "TidakTersedia") {
+          if (ls.status === "Tersedia") {
+            axios["delete"]("/api/listrso/" + ls.id).then(function (res) {
+              _this7.pilihStatus();
+            });
+          } else if (ls.status === "Tidak Tersedia") {
+            axios["delete"]("/api/listrso/" + ls.id).then(function (res) {
+              _this7.pilihStatus();
+            });
+          } else if (ls.status === "Tersedia Sebagian") {
+            this.listdel.qty = parseInt(ls.qty) - parseInt(ls.qty_tdktersedia);
+            this.listdel.qty_tdktersedia = "";
+            this.listdel.status = "Tersedia";
+            this.listdel.so_tdktersedia = "Y";
+            this.listdel.tanggal_datang = "";
+            this.listdel.acc_purch = "N";
+            axios.put("/api/listrso/" + ls.id, this.listdel).then(function (res) {
+              _this7.pilihStatus();
+
+              _this7.listdel = {};
+            });
+          }
+        }
+      }
+    },
+    timer: function timer() {
+      var _this8 = this;
+
+      setInterval(function () {
+        _this8.gagal = false;
+      }, 5000);
+    }
   }
 });
 
@@ -8175,6 +8400,9 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_loading_spinner__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-loading-spinner */ "./node_modules/vue-loading-spinner/src/index.js");
+//
+//
+//
 //
 //
 //
@@ -63308,19 +63536,19 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.up.bbm,
-                expression: "up.bbm"
+                value: _vm.up.nomor_so,
+                expression: "up.nomor_so"
               }
             ],
             staticClass: "form-control col-12",
             attrs: { type: "text" },
-            domProps: { value: _vm.up.bbm },
+            domProps: { value: _vm.up.nomor_so },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.$set(_vm.up, "bbm", $event.target.value)
+                _vm.$set(_vm.up, "nomor_so", $event.target.value)
               }
             }
           })
@@ -63334,13 +63562,13 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.up.tanggal,
-                expression: "up.tanggal"
+                value: _vm.up.tanggal_so,
+                expression: "up.tanggal_so"
               }
             ],
             staticClass: "form-control col-12",
             attrs: { type: "date", min: _vm.now() },
-            domProps: { value: _vm.up.tanggal },
+            domProps: { value: _vm.up.tanggal_so },
             on: {
               change: function($event) {
                 return _vm.validate()
@@ -63349,7 +63577,7 @@ var render = function() {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.$set(_vm.up, "tanggal", $event.target.value)
+                _vm.$set(_vm.up, "tanggal_so", $event.target.value)
               }
             }
           })
@@ -63571,7 +63799,20 @@ var render = function() {
                           )
                         : _vm._e(),
                       _vm._v(" "),
-                      _vm._m(0, true)
+                      _c("td", { staticStyle: { "text-align": "center" } }, [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger",
+                            on: {
+                              click: function($event) {
+                                return _vm.hapuslistSo(ls)
+                              }
+                            }
+                          },
+                          [_vm._v("Hapus")]
+                        )
+                      ])
                     ])
                   }),
                   0
@@ -63591,7 +63832,7 @@ var render = function() {
           staticClass: "btn-orange btn ml-4",
           on: {
             click: function($event) {
-              return _vm.draftBbm()
+              return _vm.draftSo()
             }
           }
         },
@@ -63604,7 +63845,7 @@ var render = function() {
           staticClass: "btn-success btn ml-2",
           on: {
             click: function($event) {
-              return _vm.submitBBM()
+              return _vm.submitSo()
             }
           }
         },
@@ -63822,18 +64063,12 @@ var render = function() {
       ]
     ),
     _vm._v(" "),
-    _vm._m(1)
+    _vm._m(0),
+    _vm._v(" "),
+    _vm.gagal ? _c("div", { staticClass: "row mt-2" }, [_vm._m(1)]) : _vm._e()
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", { staticStyle: { "text-align": "center" } }, [
-      _c("button", { staticClass: "btn btn-danger" }, [_vm._v("Hapus")])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -63989,6 +64224,16 @@ var staticRenderFns = [
         )
       ]
     )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { attrs: { id: "alastolak" } }, [
+      _c("div", [
+        _c("b", [_vm._v("Belum ada list Request Sales Order Yang di pilih! ")])
+      ])
+    ])
   }
 ]
 render._withStripped = true
@@ -64594,6 +64839,19 @@ var render = function() {
         ]
       )
     ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "row" },
+      [
+        _c(
+          "router-link",
+          { staticClass: "btn btn-success my-3", attrs: { to: "/so/create/" } },
+          [_vm._v("+ Create SO")]
+        )
+      ],
+      1
+    ),
     _vm._v(" "),
     _c(
       "div",

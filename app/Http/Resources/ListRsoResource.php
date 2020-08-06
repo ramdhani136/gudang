@@ -48,6 +48,8 @@ class ListRsoResource extends JsonResource
             'harga'=>$this->harga,
             'id_custprice'=>$this->id_custprice,
             'open_po'=>$this->open_po,
+            'so_tersedia'=>$this->so_tersedia,
+            'so_tdktersedia'=>$this->so_tdktersedia,
             'harga_supplier'=>$this->harga_supplier,
         ];
     }

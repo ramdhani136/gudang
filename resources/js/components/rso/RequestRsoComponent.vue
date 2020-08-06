@@ -208,12 +208,16 @@ export default {
             .then((response)=>{
                 this.getlistRso()
                 if(this.update.status==="Tidak Tersedia"){
-                    this.update.qty_tersedia=''
+                    this.update.qty_tersedia="";
+                    this.update.so_tersedia="Y";
+                    this.update.so_tdktersedia="N";
                     this.update.qty_tdktersedia=this.dic.jumlahrso
                     axios.put(`/api/listrso/`+this.dic.id,this.update)
                     this.tujuanConfirm()
                 }else  if(this.update.status==="Tersedia"){
                     this.getlistRso()
+                    this.update.so_tdktersedia="Y";
+                    this.update.so_tersedia="N";
                     this.update.qty_tersedia=this.dic.jumlahrso
                     this.update.qty_tdktersedia=''
                     axios.put(`/api/listrso/`+this.dic.id,this.update)
@@ -221,7 +225,13 @@ export default {
                     this.tujuanConfirm()
                     })
                 }else if(this.update.status==="Tersedia Sebagian"){
+                    this.getlistRso()
+                    this.update.so_tdktersedia="N";
+                    this.update.so_tersedia="N";
+                    axios.put(`/api/listrso/`+this.dic.id,this.update)
+                    .then((response)=>{
                     this.tujuanConfirm()
+                    })
                 }
             })     
         },

@@ -233,6 +233,7 @@ export default {
                 this.getlistRso()
                 if(list.acc_purch=="N"){
                     this.update.alastolak="";
+                    this.update.so_tdktersedia="N";
                     axios.put(`/api/listrso/`+this.dic.id,this.update)
                     .then((response)=>{
                         this.list.acc_purch="Y";
@@ -240,6 +241,7 @@ export default {
                 })
                 }else if(list.acc_purch=="Y"){
                     this.update.tanggal_datang="";
+                    this.update.so_tdktersedia="Y";
                     axios.put(`/api/listrso/`+this.dic.id,this.update)
                     .then((response)=>{
                         this.list.acc_purch="N";

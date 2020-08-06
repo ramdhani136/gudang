@@ -10,6 +10,9 @@
                 <option value="Tolak">Rejected</option>
             </select>
         </div>
+        <div class="row">
+            <router-link to="/so/create/" class="btn btn-success my-3" >+ Create SO</router-link>
+        </div> 
             <div id="overflow" class="border-top">
             <table id="thead" class="table table-striped table-bordered" style="width:100%">
                     <thead>
