@@ -5,7 +5,7 @@
         </div>
         <div class="form-group col-3 my-3 ml-n3 float-left">
             <select name="status" v-model="status" class="form-control">
-                <option value="Draft">Request SO</option>
+                <option value="Sent">Request SO</option>
                 <option value="Acc">Accept</option>
                 <option value="Tolak">Rejected</option>
             </select>
@@ -51,7 +51,7 @@ export default {
     data(){
         return{
             search  : '',
-            status:'Draft',
+            status:'Sent',
             so:[],
             load:true,
         }
@@ -62,8 +62,8 @@ export default {
     computed:{
         FilterKategori(){
             if(this.search===""){
-                if(this.status==="Draft"){
-                    return this.so.filter(elem=> elem.status==="Draft")
+                if(this.status==="Sent"){
+                    return this.so.filter(elem=> elem.status==="Sent")
                 }else if(this.status==="Acc"){
                     return this.so.filter(elem=> elem.status==="Acc")
                 }else if(this.status==="Tolak"){

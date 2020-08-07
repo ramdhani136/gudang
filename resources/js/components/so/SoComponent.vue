@@ -5,7 +5,8 @@
         </div>
         <div class="form-group col-3 my-3 ml-n3 float-left">
             <select name="status" v-model="status" class="form-control">
-                <option value="Draft">Waiting list</option>
+                <option value="Draft">Draft SO</option>
+                <option value="Sent">Waiting list</option>
                 <option value="Acc">Open</option>
                 <option value="Tolak">Rejected</option>
             </select>
@@ -59,6 +60,10 @@ export default {
             status:'Draft',
             so:[],
             load:true,
+            update:{},
+            listrso:{},
+            uplsoneg:{},
+            uplsopos:{},
         }
     },
     created(){
@@ -71,7 +76,10 @@ export default {
                     return this.so.filter(elem=> elem.status==="Draft")
                 }else if(this.status==="Acc"){
                     return this.so.filter(elem=> elem.status==="Acc")
-                }else if(this.status==="Tolak"){
+                }else if(this.status==="Sent"){
+                    return this.so.filter(elem=> elem.status==="Sent")
+                }
+                else if(this.status==="Tolak"){
                     return this.so.filter(elem=> elem.status==="Tolak")
                 }
             }else{
@@ -91,13 +99,56 @@ export default {
         deleteSo(rs){
             let keputusan=confirm('yakin ingin menghapus SO ini?');
             if(keputusan==true){
-                axios.delete("/api/rso/"+rs.nomor_rso)
-                .then(response=>{
-                    axios.delete("/api/so/"+rs.nomor_so)
-                    .then(response=>{
-                        this.$router.push({name:'so'})
-                    })
-                });
+                if(rs.statusso==="tersedia"){
+                    this.update.status="Confirmed";
+                    axios.put("/api/rso/"+rs.nomor_rso,this.update)
+                    .then(res=>{
+                        axios.get("/api/listrso/"+rs.nomor_rso)
+                        .then(res=>{
+                            this.listrso=res.data.data;
+                            for(let i=0;i<this.listrso.length;i++){
+                                if(this.listrso[i].qty_tersedia>0){
+                                    this.uplsoneg.so_tersedia="N";
+                                    axios.put("/api/listrso/"+this.listrso[i].id,this.uplsoneg)
+                                        .then(res=>{
+                                        });
+                                    }else{
+                                        this.uplsopos.so_tersedia="Y";
+                                        axios.put("/api/listrso/"+this.listrso[i].id,this.uplsopos)
+                                            .then(res=>{
+                                        });
+                                    }
+                            }
+                            axios.delete("/api/so/"+rs.nomor_so)
+                            .then(res=>{
+                                this.getSo();
+                            })
+                        });
+                    });
+                }else{
+                    this.update.status="Confirmed";
+                    axios.put("/api/rso/"+rs.nomor_rso,this.update)
+                    .then(res=>{
+                        axios.get("/api/listrso/"+rs.nomor_rso)
+                        .then(res=>{
+                            this.listrso=res.data.data;
+                            for(let i=0;i<this.listrso.length;i++){
+                                if(this.listrso[i].qty_tdktersedia>0 && this.listrso[i].acc_purch==="Y"){
+                                    this.uplsopos.so_tdktersedia="N";
+                                    axios.put("/api/listrso/"+this.listrso[i].id,this.uplsopos)
+                                }else if(this.listrso[i].qty_tdktersedia>0 && this.listrso[i].acc_purch==="N"){
+                                    this.uplsoneg.so_tdktersedia="Y";
+                                    axios.put("/api/listrso/"+this.listrso[i].id,this.uplsoneg)
+                                }
+                            }
+                            axios.delete("/api/so/"+rs.nomor_so)
+                            .then(res=>{
+                                this.getSo();
+                            })
+                        });
+                    });
+                    
+                }
             }
         }
     }

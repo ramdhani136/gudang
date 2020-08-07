@@ -110,6 +110,14 @@ class ListRsoController extends Controller
         return  ListRsoResource::collection(Listrso::where('so_tersedia','N')->where('nomor_rso',$no)->where('qty_tersedia','>',0)->get());
     }
 
+    public function sotersedia($no){
+        return  ListRsoResource::collection(Listrso::where('nomor_rso',$no)->where('acc_purch','Y')->where('qty_tersedia','>',0)->get());
+    }
+
+    public function sott($no){
+        return  ListRsoResource::collection(Listrso::where('nomor_rso',$no)->where('qty_tdktersedia','>',0)->get());
+    }
+
     public function  group(){
         $data= Listrso::where('qty_tdktersedia','>',0)->where('so_open','Y')->groupBy('kode_barang')->where('open_po','N')
         ->selectRaw('count(*) as total, kode_barang')->get();

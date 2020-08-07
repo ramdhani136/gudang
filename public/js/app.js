@@ -7736,19 +7736,11 @@ __webpack_require__.r(__webpack_exports__);
       aktif: {},
       listsisa: {},
       checker: [],
-      listbbm: {},
-      uploadlist: [],
-      hitung: {
-        qty: [],
-        keterangan: []
-      },
-      uploood: {},
       rso: {},
       status: 'Tersedia',
       listso: {},
       upload: {},
       ubah: {},
-      tdkada: {},
       banding2: {
         jumlah: '',
         status: '',
@@ -7962,7 +7954,7 @@ __webpack_require__.r(__webpack_exports__);
         if (this.listso.length > 0) {
           if (this.statuspo === true) {
             this.up.statusso = "tersedia";
-            this.up.status = "Acc";
+            this.up.status = "Sent";
             axios.post("/api/so", this.up).then(function (res) {
               _this6.ubah.so_tersedia = "Y";
 
@@ -7999,7 +7991,7 @@ __webpack_require__.r(__webpack_exports__);
             });
           } else {
             this.up.statusso = "tidaktersedia";
-            this.up.status = "Acc";
+            this.up.status = "Sent";
             axios.post("/api/so", this.up).then(function (res) {
               _this6.ubah.so_tdktersedia = "Y";
 
@@ -8449,6 +8441,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -8459,7 +8452,11 @@ __webpack_require__.r(__webpack_exports__);
       search: '',
       status: 'Draft',
       so: [],
-      load: true
+      load: true,
+      update: {},
+      listrso: {},
+      uplsoneg: {},
+      uplsopos: {}
     };
   },
   created: function created() {
@@ -8477,6 +8474,10 @@ __webpack_require__.r(__webpack_exports__);
         } else if (this.status === "Acc") {
           return this.so.filter(function (elem) {
             return elem.status === "Acc";
+          });
+        } else if (this.status === "Sent") {
+          return this.so.filter(function (elem) {
+            return elem.status === "Sent";
           });
         } else if (this.status === "Tolak") {
           return this.so.filter(function (elem) {
@@ -8505,13 +8506,49 @@ __webpack_require__.r(__webpack_exports__);
       var keputusan = confirm('yakin ingin menghapus SO ini?');
 
       if (keputusan == true) {
-        axios["delete"]("/api/rso/" + rs.nomor_rso).then(function (response) {
-          axios["delete"]("/api/so/" + rs.nomor_so).then(function (response) {
-            _this3.$router.push({
-              name: 'so'
+        if (rs.statusso === "tersedia") {
+          this.update.status = "Confirmed";
+          axios.put("/api/rso/" + rs.nomor_rso, this.update).then(function (res) {
+            axios.get("/api/listrso/" + rs.nomor_rso).then(function (res) {
+              _this3.listrso = res.data.data;
+
+              for (var i = 0; i < _this3.listrso.length; i++) {
+                if (_this3.listrso[i].qty_tersedia > 0) {
+                  _this3.uplsoneg.so_tersedia = "N";
+                  axios.put("/api/listrso/" + _this3.listrso[i].id, _this3.uplsoneg).then(function (res) {});
+                } else {
+                  _this3.uplsopos.so_tersedia = "Y";
+                  axios.put("/api/listrso/" + _this3.listrso[i].id, _this3.uplsopos).then(function (res) {});
+                }
+              }
+
+              axios["delete"]("/api/so/" + rs.nomor_so).then(function (res) {
+                _this3.getSo();
+              });
             });
           });
-        });
+        } else {
+          this.update.status = "Confirmed";
+          axios.put("/api/rso/" + rs.nomor_rso, this.update).then(function (res) {
+            axios.get("/api/listrso/" + rs.nomor_rso).then(function (res) {
+              _this3.listrso = res.data.data;
+
+              for (var i = 0; i < _this3.listrso.length; i++) {
+                if (_this3.listrso[i].qty_tdktersedia > 0 && _this3.listrso[i].acc_purch === "Y") {
+                  _this3.uplsopos.so_tdktersedia = "N";
+                  axios.put("/api/listrso/" + _this3.listrso[i].id, _this3.uplsopos);
+                } else if (_this3.listrso[i].qty_tdktersedia > 0 && _this3.listrso[i].acc_purch === "N") {
+                  _this3.uplsoneg.so_tdktersedia = "Y";
+                  axios.put("/api/listrso/" + _this3.listrso[i].id, _this3.uplsoneg);
+                }
+              }
+
+              axios["delete"]("/api/so/" + rs.nomor_so).then(function (res) {
+                _this3.getSo();
+              });
+            });
+          });
+        }
       }
     }
   }
@@ -8581,7 +8618,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       search: '',
-      status: 'Draft',
+      status: 'Sent',
       so: [],
       load: true
     };
@@ -8594,9 +8631,9 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       if (this.search === "") {
-        if (this.status === "Draft") {
+        if (this.status === "Sent") {
           return this.so.filter(function (elem) {
-            return elem.status === "Draft";
+            return elem.status === "Sent";
           });
         } else if (this.status === "Acc") {
           return this.so.filter(function (elem) {
@@ -8748,28 +8785,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -8779,8 +8794,7 @@ __webpack_require__.r(__webpack_exports__);
     return {
       so: {},
       vso: {},
-      Ltersedia: {},
-      LTTersedia: {},
+      listso: {},
       tujuan: '',
       up: {},
       load: true,
@@ -8790,13 +8804,16 @@ __webpack_require__.r(__webpack_exports__);
       subTotald: 0,
       statusSo: {
         'so_open': 'Y'
+      },
+      ket: {
+        qtypesan: 0,
+        subtotal: 0
       }
     };
   },
   created: function created() {
     this.getSo();
-    this.ListTersedia();
-    this.ListTdkTersedia();
+    this.getlistso();
   },
   computed: {},
   methods: {
@@ -8810,40 +8827,36 @@ __webpack_require__.r(__webpack_exports__);
         return _this.so = res.data.data;
       });
     },
-    ListTersedia: function ListTersedia() {
+    getlistso: function getlistso() {
       var _this2 = this;
 
-      axios.get("/api/so/".concat(this.$route.params.id)).then(function (res) {
+      axios.get("/api/so/" + this.$route.params.id).then(function (res) {
         _this2.so = res.data.data;
-        _this2.tujuan = _this2.so[0].nomor_rso;
-        axios.get("/api/listrso/data/dic/" + _this2.tujuan).then(function (res) {
-          _this2.Ltersedia = res.data.data;
-          _this2.totalt = 0;
 
-          for (var i = 0; i < _this2.Ltersedia.length; i++) {
-            _this2.subTotalt = parseInt(_this2.Ltersedia[i].qty_tersedia) * parseInt(_this2.Ltersedia[i].harga);
-            _this2.totalt += _this2.subTotalt;
-          }
-        });
-      });
-    },
-    ListTdkTersedia: function ListTdkTersedia() {
-      var _this3 = this;
+        if (_this2.so[0].statusso === "tersedia") {
+          axios.get("/api/listrso/data/sotersedia/" + _this2.so[0].nomor_rso).then(function (res) {
+            _this2.listso = res.data.data;
+            _this2.load = false;
 
-      axios.get("/api/so/".concat(this.$route.params.id)).then(function (res) {
-        _this3.so = res.data.data;
-        _this3.tujuan = _this3.so[0].nomor_rso;
-        axios.get("/api/listrso/data/acc/" + _this3.tujuan).then(function (res) {
-          _this3.LTTersedia = res.data.data;
-          _this3.totald = 0;
+            for (var i = 0; i < _this2.listso.length; i++) {
+              _this2.ket.qtypesan = _this2.listso[i].qty_tersedia;
+              _this2.ket.subtotal += parseInt(_this2.listso[i].qty_tersedia) * parseInt(_this2.listso[i].harga);
+              _this2.ket.status = "Tersedia";
+            }
+          });
+        } else {
+          axios.get("/api/listrso/data/sott/" + _this2.so[0].nomor_rso).then(function (res) {
+            _this2.listso = res.data.data;
+            _this2.load = false;
 
-          for (var i = 0; i < _this3.LTTersedia.length; i++) {
-            _this3.subTotald = parseInt(_this3.LTTersedia[i].qty_tdktersedia) * parseInt(_this3.LTTersedia[i].harga);
-            _this3.totald += _this3.subTotald;
-          }
-
-          _this3.load = false;
-        });
+            for (var i = 0; i < _this2.listso.length; i++) {
+              _this2.ket.qtypesan = _this2.listso[i].qty_tdktersedia;
+              _this2.ket.subtotal += parseInt(_this2.ket.qtypesan) * parseInt(_this2.listso[i].harga);
+              _this2.ket.status = "Tidak Tersedia";
+              _this2.ket.tanggal = _this2.listso[i].tgl_datang;
+            }
+          });
+        }
       });
     },
     now: function now() {
@@ -8871,7 +8884,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     confirmSO: function confirmSO(lso) {
-      var _this4 = this;
+      var _this3 = this;
 
       var keputusan = confirm('Apakah anda yakin ingin menerima SO ini?');
 
@@ -8883,11 +8896,11 @@ __webpack_require__.r(__webpack_exports__);
         this.up.keterangan = lso.keterangan;
         this.up.status = "Acc";
         axios.put("/api/so/" + this.up.nomor_so, this.up).then(function (response) {
-          _this4.statusSo = {
+          _this3.statusSo = {
             'so_open': 'Y'
           };
-          axios.put("/api/listrso/data/sopen/" + _this4.up.nomor_rso, _this4.statusSo).then(function (res) {
-            _this4.$router.push({
+          axios.put("/api/listrso/data/sopen/" + _this3.up.nomor_rso, _this3.statusSo).then(function (res) {
+            _this3.$router.push({
               name: 'soconfirm'
             });
           });
@@ -8895,7 +8908,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     tolakSo: function tolakSo(lso) {
-      var _this5 = this;
+      var _this4 = this;
 
       var keputusan = confirm('Apakah anda yakin ingin menolak SO ini?');
 
@@ -8909,7 +8922,7 @@ __webpack_require__.r(__webpack_exports__);
         axios.put("/api/so/" + this.up.nomor_so, this.up).then(function (response) {
           $("#modal-form").modal("hide");
 
-          _this5.$router.push({
+          _this4.$router.push({
             name: 'soconfirm'
           });
         });
@@ -64831,7 +64844,9 @@ var render = function() {
           }
         },
         [
-          _c("option", { attrs: { value: "Draft" } }, [_vm._v("Waiting list")]),
+          _c("option", { attrs: { value: "Draft" } }, [_vm._v("Draft SO")]),
+          _vm._v(" "),
+          _c("option", { attrs: { value: "Sent" } }, [_vm._v("Waiting list")]),
           _vm._v(" "),
           _c("option", { attrs: { value: "Acc" } }, [_vm._v("Open")]),
           _vm._v(" "),
@@ -65046,7 +65061,7 @@ var render = function() {
           }
         },
         [
-          _c("option", { attrs: { value: "Draft" } }, [_vm._v("Request SO")]),
+          _c("option", { attrs: { value: "Sent" } }, [_vm._v("Request SO")]),
           _vm._v(" "),
           _c("option", { attrs: { value: "Acc" } }, [_vm._v("Accept")]),
           _vm._v(" "),
@@ -65384,17 +65399,13 @@ var render = function() {
         "div",
         { staticClass: "row mt-2 mx-auto", attrs: { id: "rsoverflowso" } },
         [
-          _c("div", { staticClass: "row float-left  ml-3 mt-4 label" }, [
-            _vm._v("Item Tersedia")
-          ]),
-          _vm._v(" "),
           _c(
             "div",
             { staticClass: "mt-3 ml-auto mr-3", attrs: { id: "total" } },
             [
               _vm._v(
                 "Total Invoice :  " +
-                  _vm._s(_vm._f("currency")(_vm.totalt + _vm.totald))
+                  _vm._s(_vm._f("currency")(_vm.ket.subtotal))
               )
             ]
           ),
@@ -65413,21 +65424,53 @@ var render = function() {
                   attrs: { id: "rsthead" }
                 },
                 [
-                  _vm._m(0),
+                  _c("thead", [
+                    _c("tr", [
+                      _c("th", [_vm._v("No")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Nama Barang")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Qty")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Satuan")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Harga")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Sub Total")]),
+                      _vm._v(" "),
+                      _c("th", [_vm._v("Status")]),
+                      _vm._v(" "),
+                      _vm.ket.status == "Tidak Tersedia"
+                        ? _c("th", [_vm._v("Estimasi Tersedia")])
+                        : _vm._e()
+                    ])
+                  ]),
                   _vm._v(" "),
                   _c(
                     "tbody",
-                    _vm._l(_vm.Ltersedia, function(ts, index) {
-                      return _c("tr", { key: ts.id }, [
+                    _vm._l(_vm.listso, function(ts, index) {
+                      return _c("tr", { key: index }, [
                         _c("td", { staticStyle: { "text-align": "center" } }, [
                           _vm._v(_vm._s(index + 1))
                         ]),
                         _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(ts.nama_barang))]),
                         _vm._v(" "),
-                        _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(_vm._s(ts.qty_tersedia))
-                        ]),
+                        _vm.ket.status == "Tersedia"
+                          ? _c(
+                              "td",
+                              { staticStyle: { "text-align": "center" } },
+                              [_vm._v(_vm._s(ts.qty_tersedia))]
+                            )
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.ket.status == "Tidak Tersedia"
+                          ? _c(
+                              "td",
+                              { staticStyle: { "text-align": "center" } },
+                              [_vm._v(_vm._s(ts.qty_tdktersedia))]
+                            )
+                          : _vm._e(),
                         _vm._v(" "),
                         _c("td", { staticStyle: { "text-align": "center" } }, [
                           _vm._v(_vm._s(ts.satuan))
@@ -65437,13 +65480,49 @@ var render = function() {
                           _vm._v(_vm._s(_vm._f("currency")(ts.harga)))
                         ]),
                         _vm._v(" "),
-                        _c("td", { staticStyle: { "text-align": "center" } }, [
-                          _vm._v(
-                            _vm._s(
-                              _vm._f("currency")(ts.harga * ts.qty_tersedia)
+                        _vm.ket.status == "Tersedia"
+                          ? _c(
+                              "td",
+                              { staticStyle: { "text-align": "center" } },
+                              [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm._f("currency")(
+                                      ts.harga * ts.qty_tersedia
+                                    )
+                                  )
+                                )
+                              ]
                             )
-                          )
-                        ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.ket.status == "Tidak Tersedia"
+                          ? _c(
+                              "td",
+                              { staticStyle: { "text-align": "center" } },
+                              [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm._f("currency")(
+                                      ts.harga * ts.qty_tdktersedia
+                                    )
+                                  )
+                                )
+                              ]
+                            )
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(_vm._s(_vm.ket.status))
+                        ]),
+                        _vm._v(" "),
+                        _vm.ket.status == "Tidak Tersedia"
+                          ? _c(
+                              "td",
+                              { staticStyle: { "text-align": "center" } },
+                              [_vm._v(_vm._s(ts.tgl_datang))]
+                            )
+                          : _vm._e()
                       ])
                     }),
                     0
@@ -65452,69 +65531,13 @@ var render = function() {
               )
             ],
             1
-          ),
-          _vm._v(" "),
-          _c("div", { staticClass: "row float-left ml-3 mt-2 labelt" }, [
-            _vm._v("Item Tidak Tersedia")
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "row mt-1 mx-auto  col-12" }, [
-            _c(
-              "table",
-              {
-                staticClass: "table mt-2 table-striped table-bordered",
-                staticStyle: { width: "100%" },
-                attrs: { id: "rsthead" }
-              },
-              [
-                _vm._m(1),
-                _vm._v(" "),
-                _c(
-                  "tbody",
-                  _vm._l(_vm.LTTersedia, function(ltt, index) {
-                    return _c("tr", { key: ltt.id }, [
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(index + 1))
-                      ]),
-                      _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(ltt.nama_barang))]),
-                      _vm._v(" "),
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(ltt.qty_tdktersedia))
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(ltt.satuan))
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(_vm._f("currency")(ltt.harga)))
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(
-                          _vm._s(
-                            _vm._f("currency")(ltt.harga * ltt.qty_tdktersedia)
-                          )
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { staticStyle: { "text-align": "center" } }, [
-                        _vm._v(_vm._s(ltt.tgl_datang))
-                      ])
-                    ])
-                  }),
-                  0
-                )
-              ]
-            )
-          ])
+          )
         ]
       ),
       _vm._v(" "),
       _vm._l(_vm.so, function(lso, index) {
         return _c("div", { key: index, staticClass: "row mt-2" }, [
-          lso.status == "Draft"
+          lso.status == "Sent"
             ? _c(
                 "button",
                 {
@@ -65529,7 +65552,7 @@ var render = function() {
               )
             : _vm._e(),
           _vm._v(" "),
-          lso.status == "Draft"
+          lso.status == "Sent"
             ? _c(
                 "button",
                 {
@@ -65583,7 +65606,7 @@ var render = function() {
                 "div",
                 { staticClass: "modal-content", attrs: { id: "modal-width" } },
                 [
-                  _vm._m(2),
+                  _vm._m(0),
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-body" }, [
                     _c("div", { staticClass: "form-group" }, [
@@ -65659,48 +65682,6 @@ var render = function() {
   )
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("No")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Nama Barang")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Qty")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Satuan")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Harga")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Sub Total")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("No")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Nama Barang")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Qty")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Satuan")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Harga")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Sub total")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Estimasi Kedatangan")])
-      ])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement

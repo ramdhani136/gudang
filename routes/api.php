@@ -27,6 +27,8 @@ Route::get('rso/data/confirm/','Rso\RsoController@confirm');
 Route::get('listrso/data/purch/{id}','Rso\ListRsoController@purch');
 Route::get('listrso/data/acc/{no}','Rso\ListRsoController@purchacc');
 Route::get('listrso/data/dic/{no}','Rso\ListRsoController@dicacc');
+Route::get('listrso/data/sotersedia/{no}','Rso\ListRsoController@sotersedia');
+Route::get('listrso/data/sott/{no}','Rso\ListRsoController@sott');
 Route::put('listrso/data/booking/{no}','Rso\ListRsoController@booking');
 Route::put('listrso/data/sopen/{no}','Rso\ListRsoController@sOpen');
 Route::put('listrso/data/deletePo/{po}','Rso\ListRsoController@deletePo');

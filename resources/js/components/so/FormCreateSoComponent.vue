@@ -187,19 +187,11 @@ export default {
             aktif:{},
             listsisa:{},
             checker:[],
-            listbbm:{},
-            uploadlist:[],
-            hitung:{
-                qty:[],
-                keterangan:[],
-            },
-            uploood:{},
             rso:{},
             status:'Tersedia',
             listso:{},
             upload:{},
             ubah:{},
-            tdkada:{},
             banding2:{
                 jumlah:'',
                 status:'',
@@ -393,7 +385,7 @@ export default {
                 if(this.listso.length>0){
                     if(this.statuspo===true){
                         this.up.statusso="tersedia";
-                        this.up.status="Acc";
+                        this.up.status="Sent";
                         axios.post("/api/so",this.up)
                             .then(res=>{
                                 this.ubah.so_tersedia="Y";
@@ -424,7 +416,7 @@ export default {
                             });    
                     }else{
                         this.up.statusso="tidaktersedia";
-                        this.up.status="Acc";
+                        this.up.status="Sent";
                         axios.post("/api/so",this.up)
                             .then(res=>{
                                 this.ubah.so_tdktersedia="Y";

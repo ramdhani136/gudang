@@ -21,7 +21,6 @@ Auth::routes();
 
 
 Route::view('/','home')->middleware('auth');
-
 Route::view('/{any}','home')->middleware('auth');
 Route::view('/{any}/{any1}/{any2}','home')->middleware('auth');
 Route::view('/{any}/{any1}/{any2}/{any3}','home')->middleware('auth');
