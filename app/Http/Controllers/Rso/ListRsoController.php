@@ -111,11 +111,11 @@ class ListRsoController extends Controller
     }
 
     public function sotersedia($no){
-        return  ListRsoResource::collection(Listrso::where('nomor_rso',$no)->where('acc_purch','Y')->where('qty_tersedia','>',0)->get());
+        return  ListRsoResource::collection(Listrso::where('nomor_rso',$no)->where('qty_tersedia','>',0)->get());
     }
 
     public function sott($no){
-        return  ListRsoResource::collection(Listrso::where('nomor_rso',$no)->where('qty_tdktersedia','>',0)->get());
+        return  ListRsoResource::collection(Listrso::where('nomor_rso',$no)->where('acc_purch','Y')->where('qty_tdktersedia','>',0)->get());
     }
 
     public function  group(){

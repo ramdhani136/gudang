@@ -37,63 +37,37 @@
             </div>
         </div>
         <div id="rsoverflowso" class="row mt-2 mx-auto">
-            <div class="row float-left  ml-3 mt-4 label">Item Tersedia</div>
-            <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{totalt+totald | currency}}</div>
+            <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ket.subtotal | currency}}</div>
             <div class="row mt-1 mx-auto col-12">
                 <Circle5 id="load3" v-if="load"></Circle5>
                 <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
                     <thead>
-                        <tr>
+                        <tr v-for="(lso,index) in so" :key="index">
                             <th>No</th>
                             <th>Nama Barang</th>
                             <th>Qty</th>
                             <th>Satuan</th>
                             <th>Harga</th>
                             <th>Sub Total</th>
-                            <th v-for="vso in so" :key="vso.nomor_so"  v-if="vso.status=='Draft' || vso.status=='Tolak'" >Aksi</th>
+                            <th>Status</th>
+                            <th v-if="ket.status=='Tidak Tersedia'">Estimasi Tersedia</th>
+                            <th v-if="lso.status=='Draft'">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(ts,index) in Ltersedia" :key="ts.id">
+                        <tr v-for="(ts,index) in listso" :key="index">
                             <td style="text-align:center">{{index+1}}</td>
                             <td>{{ts.nama_barang}}</td>
-                            <td style="text-align:center">{{ts.qty_tersedia}}</td>
+                            <td style="text-align:center" v-if="ket.status=='Tersedia'">{{ts.qty_tersedia}}</td>
+                            <td style="text-align:center" v-if="ket.status=='Tidak Tersedia'">{{ts.qty_tdktersedia}}</td>
                             <td style="text-align:center">{{ts.satuan}}</td>
                             <td style="text-align:center">{{ts.harga | currency}}</td>
-                            <td style="text-align:center">{{ts.harga*ts.qty_tersedia | currency}}</td>
-                            <td v-if="vso.status=='Draft' || vso.status=='Tolak'"  v-for="vso in so" :key="vso.nomor_so" style="text-align:center">
-                                <button @click="deleteTersedia(ts)" class="btn btn-danger">Hapus</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-                <div class="row float-left ml-3 mt-2 labelt">Item Tidak Tersedia</div>
-                <div class="row mt-1 mx-auto  col-12">
-                <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Barang</th>
-                            <th>Qty</th>
-                            <th>Satuan</th>
-                            <th>Harga</th>
-                            <th>Sub Total</th>
-                            <th>Estimasi Kedatangan</th>
-                            <th v-for="vso in so" :key="vso.nomor_so"  v-if="vso.status=='Draft' || vso.status=='Tolak'">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(ltt,index) in LTTersedia " :key="ltt.id">
-                            <td style="text-align:center">{{index+1}}</td>
-                            <td>{{ltt.nama_barang}}</td>
-                            <td style="text-align:center">{{ltt.qty_tdktersedia}}</td>
-                            <td style="text-align:center">{{ltt.satuan}}</td>
-                            <td style="text-align:center">{{ltt.harga | currency}}</td>
-                            <td style="text-align:center">{{ltt.harga*ltt.qty_tdktersedia | currency}}</td>
-                            <td style="text-align:center">{{ltt.tgl_datang}}</td>
-                            <td v-for="vso in so" :key="vso.nomor_so"  v-if="vso.status=='Draft' || vso.status=='Tolak'" style="text-align:center">
-                                <button @click="deleteTdkTersedia(ltt)"  class="btn btn-danger">Hapus</button>
+                            <td style="text-align:center" v-if="ket.status=='Tersedia'">{{ts.harga*ts.qty_tersedia | currency}}</td>
+                            <td style="text-align:center" v-if="ket.status=='Tidak Tersedia'">{{ts.harga*ts.qty_tdktersedia | currency}}</td>
+                            <td style="text-align:center">{{ket.status}}</td>
+                            <td style="text-align:center" v-if="ket.status=='Tidak Tersedia'">{{ts.tgl_datang}}</td>
+                            <td style="text-align:center" v-for="(lso,index) in so" :key="index" v-if="lso.status=='Draft'" >
+                                <button @click="hapusListSo(ts)" class="btn btn-danger">Hapus</button>
                             </td>
                         </tr>
                     </tbody>
@@ -101,10 +75,38 @@
             </div>
         </div>   
         <div class="row mt-2" v-for="(lso,index) in so" :key="index">
-            <div v-if="vso.status=='Tolak'" v-for="vso in so" :key="vso.nomor_so" id="alastolak">
-                <div v-for="(lso,index) in so" :key="index">
-                    <b>{{lso.alastolak}}</b> 
-                </div>                
+                <button v-if="lso.status=='Draft'" class="btn-orange btn ml-3" >
+                    Simpan Draft
+                </button>
+                <button v-if="lso.status=='Draft'"  class="btn-success btn ml-1" >
+                    Kirim SO
+                </button>
+        </div>
+        <div v-if="vso.status=='Tolak'" v-for="vso in so" :key="vso.nomor_so" id="alastolak">
+            <div v-for="(lso,index) in so" :key="index">
+                <b>{{lso.alastolak}}</b> 
+            </div>    
+        </div>
+        <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div  class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Penolakan SO</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Alasan Penolakan</label>
+                        <textarea v-model="up.alastolak" class="form-control"></textarea>
+                    </div>               
+                </div>
+                <div v-for="(lso,index) in so" :key="index" class="modal-footer">
+                    <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="tolakSo(lso)" class="btn btn-primary">Konfirmasi Tolak</button>
+                </div>
+                </div>
             </div>
         </div>
     </div>
@@ -120,58 +122,64 @@ export default {
         return {
             so:{},
             vso:{},
-            Ltersedia:{},
-            LTTersedia:{},
+            listso:{},
             tujuan:'',
+            up:{},
             load:true,
             totalt:0,
             subTotalt:0,
             totald:0,
             subTotald:0,
-            urso:{}
+            statusSo: {'so_open': 'Y'},
+            ket:{
+                qtypesan:0,
+                subtotal:0,
+            },
+            listrso:{}
         }
     },
     created(){
         this.getSo();
-        this.ListTersedia();
-        this.ListTdkTersedia();
+        this.getlistso()
     },  
     computed:{       
     },
     methods:{
+        showModal(){
+            $("#modal-form").modal("show");
+        },
         getSo(){
             axios.get(`/api/so/${this.$route.params.id}`)
             .then(res=>this.so=res.data.data);
         },
-        ListTersedia(){
-            axios.get(`/api/so/${this.$route.params.id}`)
+        getlistso(){
+            axios.get("/api/so/"+this.$route.params.id)
             .then(res=>{
                 this.so=res.data.data;
-                this.tujuan=this.so[0].nomor_rso;
-                axios.get(`/api/listrso/data/dic/`+this.tujuan)
-                .then(res=>{this.Ltersedia=res.data.data
-                    this.totalt=0;
-                    for (let i = 0; i < this.Ltersedia.length; i++) {
-                    this.subTotalt=parseInt(this.Ltersedia[i].qty_tersedia)*parseInt(this.Ltersedia[i].harga);
-                    this.totalt += this.subTotalt;     
-                    }
-                })
-            });  
-        },
-        ListTdkTersedia(){
-            axios.get(`/api/so/${this.$route.params.id}`)
-            .then(res=>{
-                this.so=res.data.data;
-                this.tujuan=this.so[0].nomor_rso;
-                axios.get(`/api/listrso/data/acc/`+this.tujuan)
-                .then(res=>{this.LTTersedia=res.data.data
-                    this.totald=0;
-                    for (let i = 0; i < this.LTTersedia.length; i++) {
-                    this.subTotald=parseInt(this.LTTersedia[i].qty_tdktersedia)*parseInt(this.LTTersedia[i].harga);
-                    this.totald += this.subTotald;     
-                    }
-                    this.load=false;
-                });
+                if(this.so[0].statusso==="tersedia"){
+                    axios.get(`/api/listrso/data/sotersedia/`+this.so[0].nomor_rso)
+                    .then(res=>{
+                        this.listso=res.data.data;
+                        this.load=false;
+                        for(let i=0;i<this.listso.length;i++){
+                            this.ket.qtypesan=this.listso[i].qty_tersedia;
+                            this.ket.subtotal+=parseInt(this.listso[i].qty_tersedia)*parseInt(this.listso[i].harga);
+                            this.ket.status="Tersedia";
+                        }     
+                    });
+                }else{
+                    axios.get(`/api/listrso/data/sott/`+this.so[0].nomor_rso)
+                    .then(res=>{
+                        this.listso=res.data.data;
+                        this.load=false;
+                        for(let i=0;i<this.listso.length;i++){
+                            this.ket.qtypesan=this.listso[i].qty_tdktersedia;
+                            this.ket.subtotal+=parseInt(this.ket.qtypesan)*parseInt(this.listso[i].harga);
+                            this.ket.status="Tidak Tersedia";
+                            this.ket.tanggal=this.listso[i].tgl_datang;
+                        }  
+                    });
+                }
             });
         },
         now(){
@@ -200,104 +208,22 @@ export default {
                 this.so.tanggal_kirim=this.tglKirim();
             }
         },
-        deleteTersedia(ts){
-            let keputusan=confirm('Apakah anda yakin ingin menghapus barang ini?');
+        hapusListSo(lso){
+            let keputusan=confirm("Yakin ingin menghapus item ini dari SO?");
             if(keputusan===true){
-                if(ts.qty_tdktersedia>0){
-                    this.urso.id=ts.id;
-                    this.urso.nomor_rso=ts.nomor_rso;
-                    this.urso.tanggal_rso=ts.tanggal_rso;
-                    this.urso.kode_barang=ts.kode_barang;
-                    this.urso.qty=ts.qty-ts.qty_tersedia;
-                    this.urso.qty_tersedia="";
-                    this.urso.qty_tdktersedia=ts.qty_tdktersedia;
-                    this.urso.tangga_datang=ts.tangga_datang;
-                    this.urso.acc_purch=ts.acc_purch;
-                    this.urso.status="Tidak Tersedia";
-                    this.urso.catatan=ts.catatan;
-                    this.urso.booking=ts.booking;
-                    axios.put("/api/listrso/"+  this.urso.id,this.urso)
-                    .then((response)=>{
-                        this.ListTersedia();
-                        this.ListTdkTersedia();
-                    })
+                axios.get(`/api/so/${this.$route.params.id}`)
+                .then(res=>this.so=res.data.data);
+                if(this.so[0].statusso==="tersedia"){
+                    alert(lso.id);
                 }else{
-                    axios.delete("/api/listrso/" + ts.id)
-                    .then(response=>{
-                    this.ListTersedia();
-                    this.ListTdkTersedia();
-                })
-                } 
+                    alert(lso.id);
+                }
             }
-        },
-        deleteTdkTersedia(ltt){
-            let keputusan=confirm('Apakah anda yakin ingin menghapus barang ini?');
-            if(keputusan===true){
-                if(ltt.qty_tersedia>0){
-                    this.urso.id=ltt.id;
-                    this.urso.nomor_rso=ltt.nomor_rso;
-                    this.urso.tanggal_rso=ltt.tanggal_rso;
-                    this.urso.kode_barang=ltt.kode_barang;
-                    this.urso.qty=ltt.qty-ltt.qty_tdktersedia;
-                    this.urso.qty_tersedia=ltt.qty_tersedia;
-                    this.urso.qty_tdktersedia="";
-                    this.urso.tanggal_datang="";
-                    this.urso.acc_purch="";
-                    this.urso.status="Tersedia";
-                    this.urso.catatan=ltt.catatan;
-                    this.urso.booking=ltt.booking;
-                    axios.put("/api/listrso/"+  this.urso.id,this.urso)
-                    .then((response)=>{
-                        this.ListTersedia();
-                        this.ListTdkTersedia();
-                    })
-                }else{
-                    axios.delete("/api/listrso/" + ltt.id)
-                    .then(response=>{
-                    this.ListTersedia();
-                    this.ListTdkTersedia();
-                })
-                }       
-            }
-        },
+        }
     },
 }
 </script>
 
 <style>
-    #rsoverflowso{
-    width: 100%;
-    max-height: 275px;
-    overflow-y: scroll;
-    border-top:solid 1px #dee2e6;
-    }
-
-    .label{
-        border:solid 1px rgb(42, 199, 42);
-        background-color: rgb(104, 226, 104);
-        font-size: 16px;
-        border-radius: 3px;
-        padding: 5px;
-        padding-left:1%;
-        padding-right: 1%;
-        color:#fff;
-    }
-
-    .labelt{
-        border:solid 1px rgb(40, 131, 206);
-        background-color: rgb(75, 161, 231);
-        font-size: 16px;
-        border-radius: 3px;
-        padding: 5px;
-        padding-left:1%;
-        padding-right: 1%;
-        color:#fff;
-    }
-
-    .error-template {padding: 40px 15px;text-align: center;}
-    .error-actions {margin-top:15px;margin-bottom:15px;}
-    .error-actions .btn { margin-right:10px; }
-
-
 
 </style>
