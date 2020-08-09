@@ -36,17 +36,18 @@ Route::get('listrso/data/group','Rso\ListRsoController@group');
 Route::get('listrso/data/listpo/{po}','Rso\ListRsoController@listpo');
 Route::get('listrso/data/group/{barang}','Rso\ListRsoController@grouplist');
 Route::get('listrso/data/groupopen/{po}/{barang}','Rso\ListRsoController@groupopen');
+Route::put('listrso/data/{po}/{barang}','Rso\ListRsoController@statuspo');
 Route::resource('supplier','Supplier\SupplierController');
 Route::resource('listrso','Rso\ListRsoController');
 Route::resource('sales','Sales\SalesController');
 Route::resource('so','So\SoController');
-Route::resource('bbm','Barang\BbmController');
+Route::resource('bcm','Barang\BcmController');
 Route::resource('custprice','sales\CustpriceController');
 Route::get('data/price/{customer}/{barang}','Sales\CustpriceController@viewprice');
 Route::get('view/price/{customer}/{barang}','Sales\CustpriceController@ambilPrice');
 Route::resource('purchasing','Purchase\PurchasingController');
 Route::resource('po','Po\PoController');
 Route::get('poaktif/','Po\PoController@aktif');
-Route::resource('listbbm','Barang\ListBbmController');
+Route::resource('listbcm','Barang\ListBcmController');
 
 

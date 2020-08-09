@@ -84,6 +84,7 @@
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/dic" class="dropdown-item" >Request Sales Order</router-link>
                                     <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link>
+                                    <router-link to="/dic/bcm" class="dropdown-item" >Bukti Checker</router-link>
                                     <router-link to="/dic/incoming" class="dropdown-item" >Incoming Goods</router-link>
                                     <router-link to="/dic/incoming/confirm" class="dropdown-item" >IG Confirmation</router-link>
                                 </div>

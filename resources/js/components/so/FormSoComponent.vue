@@ -75,10 +75,10 @@
             </div>
         </div>   
         <div class="row mt-2" v-for="(lso,index) in so" :key="index">
-                <button v-if="lso.status=='Draft'" class="btn-orange btn ml-3" >
+                <button @click="submitDraft()" v-if="lso.status=='Draft'" class="btn-orange btn ml-3" >
                     Simpan Draft
                 </button>
-                <button v-if="lso.status=='Draft'"  class="btn-success btn ml-1" >
+                <button @click="submitSend()" v-if="lso.status=='Draft'"  class="btn-success btn ml-1" >
                     Kirim SO
                 </button>
         </div>
@@ -135,7 +135,10 @@ export default {
                 qtypesan:0,
                 subtotal:0,
             },
-            listrso:{}
+            listrso:{},
+            updel:{qty:0,},
+            ada:0,
+            ubah:{}
         }
     },
     created(){
@@ -208,18 +211,132 @@ export default {
                 this.so.tanggal_kirim=this.tglKirim();
             }
         },
-        hapusListSo(lso){
-            let keputusan=confirm("Yakin ingin menghapus item ini dari SO?");
+        hapusListSo(ts){
+            let keputusan=confirm("Yakin ingin menghapus item ini dari SO? #Akan otomatis menghapus item in pada RSO");
             if(keputusan===true){
                 axios.get(`/api/so/${this.$route.params.id}`)
                 .then(res=>this.so=res.data.data);
                 if(this.so[0].statusso==="tersedia"){
-                    alert(lso.id);
+                    axios.get("/api/listrso/"+ts.id+"/edit")
+                    .then(res=>{
+                        this.listrso=res.data.data;
+                        this.updel.qty_tersedia="";
+                        this.updel.so_tersedia="Y";
+                        this.updel.qty=parseInt(this.listrso[0].qty)-parseInt(this.listrso[0].qty_tersedia);
+                        if(this.updel.qty<1){
+                            axios.delete("/api/listrso/"+this.listrso[0].id)
+                            .then(res=>{
+                                this.getSo();
+                                this.getlistso()
+                            }); 
+                        }else{
+                            axios.put("/api/listrso/"+this.listrso[0].id,this.updel)
+                            .then(res=>{
+                                this.getSo();
+                                this.getlistso()
+                            });
+                        };
+                        axios.get(`/api/listrso/data/sotersedia/`+this.so[0].nomor_rso)
+                        .then(res=>{
+                            this.ada=0;
+                            this.listso=res.data.data;
+                            for(let i=0;i<this.listso.length;i++){
+                                this.ada += parseInt(this.listso[i].qty_tersedia);
+                            }
+                            if(this.ada<1){
+                                    axios.get("/api/listrso/"+this.so[0].nomor_rso)
+                                    .then(res=>{
+                                        this.listrso=res.data.data;
+                                        if(this.listrso.length>0){
+                                                axios.delete("/api/so/"+this.$route.params.id)
+                                                .then(res=>{
+                                                    this.$router.push({name:'so'})
+                                                });  
+                                        }else{
+                                            axios.delete("/api/rso/"+this.so[0].nomor_rso)
+                                            .then(res=>{
+                                                axios.delete("/api/so/"+this.$route.params.id)
+                                                .then(res=>{
+                                                    this.$router.push({name:'so'})
+                                                }); 
+                                            });                  
+                                        }
+                                });
+                            }else{
+                                this.getSo();
+                                this.getlistso();
+                            }
+                        });
+                    });
                 }else{
-                    alert(lso.id);
+                    axios.get("/api/listrso/"+ts.id+"/edit")
+                    .then(res=>{
+                        this.listrso=res.data.data;
+                        this.updel.qty_tdktersedia="";
+                        this.updel.so_tdktersedia="Y";
+                        this.updel.qty=parseInt(this.listrso[0].qty)-parseInt(this.listrso[0].qty_tdktersedia);
+                        if(this.updel.qty<1){
+                            axios.delete("/api/listrso/"+this.listrso[0].id)
+                            .then(res=>{
+                                this.getSo();
+                                this.getlistso()
+                            }); 
+                        }else{
+                            axios.put("/api/listrso/"+this.listrso[0].id,this.updel)
+                            .then(res=>{
+                                this.getSo();
+                                this.getlistso()
+                            });
+                        };
+                        axios.get(`/api/listrso/data/sott/`+this.so[0].nomor_rso)
+                        .then(res=>{
+                            this.ada=0;
+                            this.listso=res.data.data;
+                            for(let i=0;i<this.listso.length;i++){
+                                this.ada += parseInt(this.listso[i].qty_tdktersedia);
+                            }
+                            if(this.ada<1){
+                                    axios.get("/api/listrso/"+this.so[0].nomor_rso)
+                                    .then(res=>{
+                                        this.listrso=res.data.data;
+                                        if(this.listrso.length>0){
+                                                axios.delete("/api/so/"+this.$route.params.id)
+                                                .then(res=>{
+                                                    this.$router.push({name:'so'})
+                                                });
+                                        }else{
+                                            axios.delete("/api/rso/"+this.so[0].nomor_rso)
+                                            .then(res=>{
+                                                axios.delete("/api/so/"+this.$route.params.id)
+                                                .then(res=>{
+                                                    this.$router.push({name:'so'})
+                                                });
+                                            });
+                                        }
+                                    });
+                            }else{
+                                this.getSo();
+                                this.getlistso();
+                            }
+                        });
+                    });
                 }
             }
+        },
+        submitDraft(){
+            this.$router.push({name:'so'})
+        },
+        submitSend(){
+            let keputusan=confirm("yakin ingin mengirim SO ini?");
+            if(keputusan===true){
+                this.ubah.status="Sent";
+                axios.put("/api/so/"+this.$route.params.id,this.ubah)
+                .then(res=>{
+                    this.$router.push({name:'so'})
+                });
+            }
         }
+
     },
 }
 </script>

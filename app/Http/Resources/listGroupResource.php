@@ -4,8 +4,9 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Model\Rso\Listrso;
+use App\Model\So\So;
 
-class ListRsoResource extends JsonResource
+class listGroupResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -13,19 +14,17 @@ class ListRsoResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    
     public function toArray($request)
     {
 
         $data=Listrso::all();
             $oncom= Listrso::where('kode_barang',$this->kode_barang)->sum('qty');
-        
-
-
+            $so=So::where('nomor_rso',$this->nomor_rso)->where('status',"Acc")->where("statusso","tidaktersedia")->get()->first();
         return 
         [
             'id'=>$this->id,
             'lno_rso'=>$this->nomor_rso,
+            'nomor_so'=>$so->nomor_so,
             'lkode_barang'=>$this->kode_barang,
             'nama_barang'=>$this->barang->nama,
             'nama_customer'=>$this->rso->customer->nama,

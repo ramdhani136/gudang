@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ListBbmResource extends JsonResource
+class BcmResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +14,14 @@ class ListBbmResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            'id'=>$this->id,
-            'nomor_bbm'=>$this->nomor_bbm,
-            'qty'=>$this->qty,
+        return 
+        [
+            'bcm'=>$this->bcm,
+            'tanggal'=>$this->tanggal,
+            'nomor_po'=>$this->nomor_po,
             'keterangan'=>$this->keterangan,
+            'status'=>$this->status,
+            'supplier'=>$this->po->supplier->nama
         ];
     }
 }

@@ -4,19 +4,19 @@ namespace App\Model\Barang;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Po\Po;
-use App\Model\Barang\listbbm;
+use App\Model\Barang\listbcm;
 
-class Bbm extends Model
+class Bcm extends Model
 {
-    protected $table="bbm";
+    protected $table="bcm";
     protected $guarded=[];
 
     public function po(){
         return $this->belongsTo(Po::class,'nomor_po','nomor_po');
     }
 
-    public function listbbm(){
-        return $this->hasMany(listbbm::class,'nomor_bbm','bbm');
+    public function listbcm(){
+        return $this->hasMany(listbbm::class,'nomor_bcm','bcm');
     }
 }
 

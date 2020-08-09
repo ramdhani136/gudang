@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Barang;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Model\Barang\Bbm;
-use App\Http\Resources\BbmResource;
+use App\Model\Barang\Listbcm;
+use App\Http\Resources\ListBcmResource;
 use Symfony\Component\HttpFoundation\Response;
 
-class BbmController extends Controller
+class ListBcmController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class BbmController extends Controller
      */
     public function index()
     {
-        return BbmResource::collection(Bbm::latest()->get());
+        return ListBcmResource::collection(Listbcm::latest()->get());
     }
 
     /**
@@ -38,8 +38,8 @@ class BbmController extends Controller
      */
     public function store(Request $request)
     {
-        $data=Bbm::create($request->all());
-        return response(new BbmResource($data),response::HTTP_CREATED);
+        $data=Listbcm::create($request->all());
+        return response(new ListBcmResource($data),response::HTTP_CREATED);
     }
 
     /**
@@ -48,9 +48,9 @@ class BbmController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($listbcm)
     {
-        return BbmResource::collection(Bbm::where('bbm',$id)->get());
+        return ListBcmResource::collection(Listbcm::where('nomor_bbm',$listbcm)->get());
     }
 
     /**
@@ -71,9 +71,9 @@ class BbmController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $listbcm)
     {
-        Bbm::where('bbm',$id)->update($request->all());
+        Barang::where('id',$listbcm)->update($request->all());
         return response('update',response::HTTP_CREATED);
     }
 
@@ -83,9 +83,9 @@ class BbmController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($listbcm)
     {
-        Bbm::where('bbm',$id)->delete();
+        Barang::where('id',$listbcm)->delete();
         return response('deleted',response::HTTP_OK);
     }
 }

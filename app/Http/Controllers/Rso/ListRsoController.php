@@ -10,6 +10,7 @@ use App\Http\Resources\GrouplistResource;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Resources\listpoPriceResource;
 use App\Http\Resources\GroupItemResource;
+use App\Http\Resources\listGroupResource;
 
 
 class ListRsoController extends Controller
@@ -126,11 +127,11 @@ class ListRsoController extends Controller
 
     
     public function  grouplist($barang){
-        return ListRsoResource::collection(Listrso::where('qty_tdktersedia','>',0)->where('so_open','Y')->where('kode_barang',$barang)->where('open_po','N')->get());
+        return listGroupResource::collection(Listrso::where('qty_tdktersedia','>',0)->where('so_tdktersedia','Y')->where('kode_barang',$barang)->where('open_po','N')->get());
     }
 
     public function  groupopen($po,$barang){
-        return ListRsoResource::collection(Listrso::where('nomor_po',$po)->where('qty_tdktersedia','>',0)->where('so_open','Y')->where('kode_barang',$barang)->where('open_po','Y')->get());
+        return listGroupResource::collection(Listrso::where('nomor_po',$po)->where('qty_tdktersedia','>',0)->where('so_open','Y')->where('kode_barang',$barang)->where('open_po','Y')->get());
     }
 
     public function sOpen(Request $request, $no){
@@ -139,13 +140,18 @@ class ListRsoController extends Controller
     }
 
     public function  listpo($po){
-        $data= Listrso::where('nomor_po',$po)->where('qty_tdktersedia','>',0)->where('so_open','Y')->groupBy('kode_barang')->groupBy('nomor_po')->groupBy('harga_supplier')->where('open_po','Y')
+        $data= Listrso::where('nomor_po',$po)->where('qty_tdktersedia','>',0)->where('so_open','Y')->where('po_close','N')->groupBy('kode_barang')->groupBy('nomor_po')->groupBy('harga_supplier')->where('open_po','Y')
         ->selectRaw('count(*) as total, kode_barang')->selectRaw('count(*) as total, nomor_po')->selectRaw('count(*) as total, harga_supplier')->get();
         return GroupItemResource::collection($data);
     }
 
     public function deletePo(Request $request, $po){
         Listrso::where('nomor_po',$po)->update($request->all());
+        return response('update',response::HTTP_CREATED);
+    }
+
+    public function statuspo(Request $request, $po,$barang){
+        Listrso::where('nomor_po',$po)->where('kode_barang',$barang)->update($request->all());
         return response('update',response::HTTP_CREATED);
     }
 

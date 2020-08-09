@@ -36,6 +36,9 @@ import ingoodsComponent from '../components/barang/ingoodsComponent.vue'
 import ViewingoodsComponent from '../components/barang/ViewingoodsComponent.vue'
 import ViewBbmComponent from '../components/barang/ViewBbmComponent.vue'
 
+import BuktiCheckerInComponent from '../components/bc/BuktiCheckerInComponent.vue'
+import CreateBcmComponent from '../components/bc/CreateBcmComponent.vue'
+
 
 
 
@@ -76,6 +79,9 @@ const routes=[
     {name:'ingoods', path:'/dic/incoming', component:ingoodsComponent},
     {name:'creategoods', path:'/dic/incoming/view', component:ViewingoodsComponent},
     {name:'viewbbm', path:'/dic/incoming/view/:nomor', component:ViewBbmComponent},
+
+    {name:'bcmcomponent', path:'/dic/bcm', component:BuktiCheckerInComponent},
+    {name:'createbcm', path:'/dic/bcm/view', component:CreateBcmComponent},
 ]
 
 
