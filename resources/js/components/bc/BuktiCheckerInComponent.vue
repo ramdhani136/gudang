@@ -34,7 +34,7 @@
                         <td style="text-align:center">{{bm.nomor_po}}</td>
                         <td>{{bm.supplier}}</td>
                         <td style="text-align:center">
-                            <router-link :to="{name:'viewbbm',params:{nomor:bm.bbm}}" class="btn btn-primary">
+                            <router-link :to="{name:'viewbcm',params:{nomor:bm.bcm}}" class="btn btn-primary">
                                     Edit
                             </router-link>
                             <button class="btn btn-danger">Hapus</button>

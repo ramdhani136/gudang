@@ -38,6 +38,7 @@ import ViewBbmComponent from '../components/barang/ViewBbmComponent.vue'
 
 import BuktiCheckerInComponent from '../components/bc/BuktiCheckerInComponent.vue'
 import CreateBcmComponent from '../components/bc/CreateBcmComponent.vue'
+import ViewBcmComponent from '../components/bc/ViewBcmComponent.vue'
 
 
 
@@ -82,6 +83,7 @@ const routes=[
 
     {name:'bcmcomponent', path:'/dic/bcm', component:BuktiCheckerInComponent},
     {name:'createbcm', path:'/dic/bcm/view', component:CreateBcmComponent},
+    {name:'viewbcm', path:'/dic/bcm/view/:nomor', component: ViewBcmComponent},
 ]
 
 

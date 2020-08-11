@@ -50,7 +50,7 @@ class ListBcmController extends Controller
      */
     public function show($listbcm)
     {
-        return ListBcmResource::collection(Listbcm::where('nomor_bbm',$listbcm)->get());
+        return ListBcmResource::collection(Listbcm::where('nomor_bcm',$listbcm)->get());
     }
 
     /**

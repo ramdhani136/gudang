@@ -3260,7 +3260,11 @@ __webpack_require__.r(__webpack_exports__);
       },
       uplist: {},
       sipo: 0,
-      uppo: {}
+      uppo: {},
+      listpo: {},
+      persen: 0,
+      listrso: {},
+      coba: []
     };
   },
   created: function created() {
@@ -3350,66 +3354,89 @@ __webpack_require__.r(__webpack_exports__);
     submitBCM: function submitBCM() {
       var _this4 = this;
 
-      var jawab = confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
+      var _loop = function _loop(i) {
+        axios.get("/api/view/detailpo/" + _this4.checker[i].nomor_po + "/" + _this4.checker[i].kode_barang).then(function (res) {
+          _this4.listpo = res.data.data;
+          _this4.persen = 0;
 
-      if (jawab === true) {
-        this.up.status = "open";
-        axios.post("/api/bcm", this.up).then(function (res) {
-          for (var i = 0; i < _this4.checker.length; i++) {
-            _this4.uploadlist.kode_barang = _this4.checker[i].kode_barang;
-            _this4.uploadlist.qty = _this4.hitung.qty[i];
-            _this4.uploadlist.keterangan = _this4.hitung.keterangan[i];
-            _this4.uploadlist.nomor_bcm = _this4.up.bcm;
-            _this4.uploadlist.status = "open";
-            _this4.uploood = {
-              kode_barang: _this4.uploadlist.kode_barang,
-              nomor_bcm: _this4.uploadlist.nomor_bcm,
-              qty: _this4.uploadlist.qty,
-              keterangan: _this4.uploadlist.keterangan
+          for (var j = 0; j < _this4.listpo.length; j++) {
+            _this4.persen += parseInt(_this4.listpo[j].qty_tdktersedia);
+            _this4.coba = [];
+            _this4.coba = [{
+              qty: _this4.persen / 100
+            }];
+          }
+
+          for (var z = 0; z < _this4.listpo.length; z++) {
+            _this4.uplistsisa = {
+              qty_masuk: _this4.listpo[z].qty_tdktersedia / _this4.coba[0].qty / 100 * _this4.hitung.qty[i] + _this4.listpo[z].qty_masuk
             };
-            axios.post("/api/listbcm", _this4.uploood).then(function (res) {
-              for (var _i = 0; _i < _this4.checker.length; _i++) {
-                _this4.uplistsisa = {
-                  qty_masuk: parseInt(_this4.hitung.qty[_i]) + parseInt(_this4.checker[_i].masuk)
-                };
-                axios.put("/api/listrso/data/" + _this4.checker[_i].nomor_po + "/" + _this4.checker[_i].kode_barang, _this4.uplistsisa).then(function (res) {
-                  axios.get("/api/listrso/data/listpo/" + _this4.aktif.nomor_po).then(function (res) {
-                    _this4.listsisa = res.data.data;
-
-                    for (var _i2 = 0; _i2 < _this4.listsisa.length; _i2++) {
-                      if (_this4.listsisa[_i2].sisapo < 1) {
-                        _this4.uplist.po_close = "Y";
-                        axios.put("/api/listrso/data/" + _this4.listsisa[_i2].nomor_po + "/" + _this4.listsisa[_i2].kode_barang, _this4.uplist).then(function (res) {});
-                      }
-                    }
-                  });
-                  _this4.sipo = 0;
-                  axios.get("/api/listrso/data/listpo/" + _this4.aktif.nomor_po).then(function (res) {
-                    _this4.listsisa = res.data.data;
-
-                    for (var _i3 = 0; _i3 < _this4.listsisa.length; _i3++) {
-                      _this4.sipo += parseInt(_this4.listsisa[_i3].sisapo);
-                    }
-
-                    if (_this4.sipo < 1) {
-                      _this4.uppo.status = "Selesai";
-                      axios.put("/api/po/" + _this4.aktif.nomor_po, _this4.uppo).then(function (res) {
-                        _this4.$router.push({
-                          name: 'bcmcomponent'
-                        });
-                      });
-                    } else {
-                      _this4.$router.push({
-                        name: 'bcmcomponent'
-                      });
-                    }
-                  });
-                });
-              }
+            axios.put("/api/listrso/" + _this4.listpo[z].id, _this4.uplistsisa).then(function (res) {
+              console.log("berhasil");
             });
           }
         });
+      };
+
+      for (var i = 0; i < this.checker.length; i++) {
+        _loop(i);
       }
+      /* let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
+      if(jawab===true){
+          this.up.status="open";
+          axios.post("/api/bcm",this.up)
+          .then(res=>{
+              for(let i=0;i<this.checker.length;i++){
+                  this.uploadlist.kode_barang=this.checker[i].kode_barang;
+                  this.uploadlist.qty=this.hitung.qty[i];
+                  this.uploadlist.keterangan=this.hitung.keterangan[i];
+                  this.uploadlist.nomor_bcm=this.up.bcm;
+                  this.uploadlist.status="open";
+                  this.uploood={kode_barang:this.uploadlist.kode_barang,nomor_bcm:this.uploadlist.nomor_bcm,
+                  qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan
+                  };
+                  axios.post("/api/listbcm",this.uploood)
+                  .then(res=>{
+                      for(let i=0;i<this.checker.length;i++){
+                      this.uplistsisa={qty_masuk:parseInt(this.hitung.qty[i])+parseInt(this.checker[i].masuk)}
+                      axios.put("/api/listrso/data/"+this.checker[i].nomor_po+"/"+this.checker[i].kode_barang,this.uplistsisa)
+                          .then(res=>{
+                              axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
+                              .then(res=>{
+                                  this.listsisa=res.data.data;
+                                  for(let i=0;i<this.listsisa.length;i++){
+                                      if(this.listsisa[i].sisapo<1){
+                                          this.uplist.po_close="Y";
+                                          axios.put("/api/listrso/data/"+this.listsisa[i].nomor_po+"/"+this.listsisa[i].kode_barang,this.uplist)
+                                          .then(res=>{
+                                          });
+                                          }
+                                  }
+                              })
+                              this.sipo=0;
+                              axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
+                              .then(res=>{
+                                  this.listsisa=res.data.data;
+                                  for(let i=0;i<this.listsisa.length;i++){
+                                      this.sipo+=parseInt(this.listsisa[i].sisapo);
+                                  }
+                                  if(this.sipo<1){
+                                      this.uppo.status="Selesai";
+                                      axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
+                                      .then(res=>{
+                                          this.$router.push({name:'bcmcomponent'});
+                                      });
+                                  }else{
+                                      this.$router.push({name:'bcmcomponent'});
+                                  }
+                              });
+                          });
+              }
+                  });
+          }
+      },
+      )} */
+
     },
     requestBcm: function requestBcm() {
       var _this5 = this;
@@ -3432,18 +3459,18 @@ __webpack_require__.r(__webpack_exports__);
               keterangan: _this5.uploadlist.keterangan
             };
             axios.post("/api/listbcm", _this5.uploood).then(function (res) {
-              for (var _i4 = 0; _i4 < _this5.checker.length; _i4++) {
+              for (var _i = 0; _i < _this5.checker.length; _i++) {
                 _this5.uplistsisa = {
-                  qty_masuk: parseInt(_this5.hitung.qty[_i4]) + parseInt(_this5.checker[_i4].masuk)
+                  qty_masuk: parseInt(_this5.hitung.qty[_i]) + parseInt(_this5.checker[_i].masuk)
                 };
-                axios.put("/api/listrso/data/" + _this5.checker[_i4].nomor_po + "/" + _this5.checker[_i4].kode_barang, _this5.uplistsisa).then(function (res) {
+                axios.put("/api/listrso/data/" + _this5.checker[_i].nomor_po + "/" + _this5.checker[_i].kode_barang, _this5.uplistsisa).then(function (res) {
                   axios.get("/api/listrso/data/listpo/" + _this5.aktif.nomor_po).then(function (res) {
                     _this5.listsisa = res.data.data;
 
-                    for (var _i5 = 0; _i5 < _this5.listsisa.length; _i5++) {
-                      if (_this5.listsisa[_i5].sisapo < 1) {
+                    for (var _i2 = 0; _i2 < _this5.listsisa.length; _i2++) {
+                      if (_this5.listsisa[_i2].sisapo < 1) {
                         _this5.uplist.po_close = "Y";
-                        axios.put("/api/listrso/data/" + _this5.listsisa[_i5].nomor_po + "/" + _this5.listsisa[_i5].kode_barang, _this5.uplist).then(function (res) {});
+                        axios.put("/api/listrso/data/" + _this5.listsisa[_i2].nomor_po + "/" + _this5.listsisa[_i2].kode_barang, _this5.uplist).then(function (res) {});
                       }
                     }
                   });
@@ -3451,8 +3478,8 @@ __webpack_require__.r(__webpack_exports__);
                   axios.get("/api/listrso/data/listpo/" + _this5.aktif.nomor_po).then(function (res) {
                     _this5.listsisa = res.data.data;
 
-                    for (var _i6 = 0; _i6 < _this5.listsisa.length; _i6++) {
-                      _this5.sipo += parseInt(_this5.listsisa[_i6].sisapo);
+                    for (var _i3 = 0; _i3 < _this5.listsisa.length; _i3++) {
+                      _this5.sipo += parseInt(_this5.listsisa[_i3].sisapo);
                     }
 
                     if (_this5.sipo < 1) {
@@ -3496,6 +3523,297 @@ __webpack_require__.r(__webpack_exports__);
         this.jenbutton = false;
       }
     }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/bc/ViewBcmComponent.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/bc/ViewBcmComponent.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vue_loading_spinner__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-loading-spinner */ "./node_modules/vue-loading-spinner/src/index.js");
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  components: {
+    Circle5: vue_loading_spinner__WEBPACK_IMPORTED_MODULE_0__["Circle5"]
+  },
+  data: function data() {
+    return _defineProperty({
+      load: false,
+      up: {
+        bcm: this.$route.params.nomor,
+        tanggal: this.now()
+      },
+      poaktif: {},
+      ket: {},
+      aktif: {},
+      listsisa: {},
+      checker: [],
+      listbcm: {},
+      uploadlist: [],
+      hitung: {
+        qty: [],
+        keterangan: []
+      },
+      uploood: {},
+      aksicek: 'benar',
+      jenbutton: true,
+      cek: {},
+      uplistsisa: {
+        qty_masuk: 0
+      },
+      uplist: {},
+      sipo: 0,
+      uppo: {},
+      bcm: {}
+    }, "listbcm", {});
+  },
+  created: function created() {
+    this.getBcm();
+    this.getListBcm();
+  },
+  computed: {},
+  methods: {
+    getBcm: function getBcm() {
+      var _this = this;
+
+      axios.get("/api/bcm/" + this.$route.params.nomor).then(function (res) {
+        _this.bcm = res.data.data;
+      });
+    },
+    getListBcm: function getListBcm() {
+      var _this2 = this;
+
+      axios.get("/api/listbcm/" + this.$route.params.nomor).then(function (res) {
+        _this2.listbcm = res.data.data;
+      });
+    },
+    now: function now() {
+      var d = new Date();
+      var month = d.getMonth() + 1;
+      var day = d.getDate();
+      var output = d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-" + (day < 10 ? '0' : '') + day;
+      return output;
+    },
+    validate: function validate() {
+      if (this.so.tanggal_so < this.now()) {
+        this.so.tanggal_so = this.now();
+      }
+    },
+    tglKirim: function tglKirim() {
+      var d = new Date();
+      var month = d.getMonth() + 1;
+      var day = d.getDate() + 2;
+      var output = d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-" + (day < 10 ? '0' : '') + day;
+      return output;
+    },
+    bcm_nomor: function bcm_nomor() {
+      var d = new Date();
+      var month = d.getMonth() + 1;
+      var output = "CM-" + d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-";
+      return output;
+    }
+    /* validqty(index){
+            this.pembanding="";
+            this.aksicek="";
+            if(parseInt(this.hitung.qty[index])>parseInt(this.checker[index].sisapo)){
+                this.cek[index]="error"
+            }else{
+                this.cek[index]="tidak"
+            }
+            for(let i=0;i<this.checker.length;i++){
+                this.aksicek+=this.cek[i];
+                this.pembanding+="tidak";
+            }
+            if(this.aksicek===this.pembanding){
+                this.jenbutton=true;
+            }else{
+                this.jenbutton=false;
+            }
+      } */
+
   }
 });
 
@@ -55047,7 +55365,7 @@ var render = function() {
                         {
                           staticClass: "btn btn-primary",
                           attrs: {
-                            to: { name: "viewbbm", params: { nomor: bm.bbm } }
+                            to: { name: "viewbcm", params: { nomor: bm.bcm } }
                           }
                         },
                         [
@@ -55692,6 +56010,808 @@ var render = function() {
     _vm._v(" "),
     _vm._m(2)
   ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("No")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Kode Barang")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Nama Barang")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Satuan")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Sisa PO")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Qty SJ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Keterangan")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", { attrs: { id: "rsthead" } }, [
+      _c("tr", [
+        _c("th", { staticStyle: { "text-align": "center" } }, [_vm._v("No")]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { "text-align": "center" } }, [_vm._v("Item")]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { "text-align": "center" } }, [
+          _vm._v("Satuan")
+        ]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { "text-align": "center" } }, [
+          _vm._v("Sisa PO")
+        ]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { "text-align": "center" } }, [_vm._v("Pilih")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "modal-pr",
+          tabindex: "-1",
+          "data-backdrop": "static",
+          "aria-labelledby": "exampleModalLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          { staticClass: "modal-dialog", attrs: { role: "document" } },
+          [
+            _c(
+              "div",
+              { staticClass: "modal-content", attrs: { id: "modal-width" } },
+              [
+                _c("div", { staticClass: "modal-header" }, [
+                  _c(
+                    "h5",
+                    {
+                      staticClass: "modal-title",
+                      attrs: { id: "exampleModalLabel" }
+                    },
+                    [_vm._v("Rincian Permintaan")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "close",
+                      attrs: {
+                        type: "button",
+                        "data-dismiss": "modal",
+                        "aria-label": "Close"
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("×")
+                      ])
+                    ]
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _c("div", { attrs: { id: "scrollList" } }, [
+                    _c(
+                      "table",
+                      {
+                        staticClass: "table table-striped table-bordered",
+                        staticStyle: { width: "100%" },
+                        attrs: { id: "thead" }
+                      },
+                      [
+                        _c("thead", [
+                          _c("tr", [
+                            _c(
+                              "th",
+                              { staticStyle: { "text-align": "center" } },
+                              [_vm._v("No")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "th",
+                              { staticStyle: { "text-align": "center" } },
+                              [_vm._v("Nomor SO")]
+                            ),
+                            _vm._v(" "),
+                            _c("th", [_vm._v("Customer")]),
+                            _vm._v(" "),
+                            _c(
+                              "th",
+                              { staticStyle: { "text-align": "center" } },
+                              [_vm._v("Jumlah")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "th",
+                              { staticStyle: { "text-align": "center" } },
+                              [_vm._v("Satuan")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "th",
+                              { staticStyle: { "text-align": "center" } },
+                              [_vm._v("Aksi")]
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("tbody", [
+                          _c("tr", [
+                            _c("td", {
+                              staticStyle: { "text-align": "center" }
+                            }),
+                            _vm._v(" "),
+                            _c("td", {
+                              staticStyle: { "text-align": "center" }
+                            }),
+                            _vm._v(" "),
+                            _c("td"),
+                            _vm._v(" "),
+                            _c("td", {
+                              staticStyle: { "text-align": "center" }
+                            }),
+                            _vm._v(" "),
+                            _c("td", {
+                              staticStyle: { "text-align": "center" }
+                            }),
+                            _vm._v(" "),
+                            _c("td", [
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-danger",
+                                  attrs: {
+                                    type: "button",
+                                    "data-dismiss": "modal"
+                                  }
+                                },
+                                [_vm._v("Delete")]
+                              )
+                            ])
+                          ])
+                        ])
+                      ]
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-secondary",
+                      attrs: { type: "button", "data-dismiss": "modal" }
+                    },
+                    [_vm._v("Close")]
+                  )
+                ])
+              ]
+            )
+          ]
+        )
+      ]
+    )
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/bc/ViewBcmComponent.vue?vue&type=template&id=39629d89&":
+/*!**********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/bc/ViewBcmComponent.vue?vue&type=template&id=39629d89& ***!
+  \**********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "container" },
+    [
+      _vm._l(_vm.bcm, function(up, index) {
+        return _c("div", { key: index, staticClass: "row row-cols-2" }, [
+          _c("div", { staticClass: "col-4" }, [
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", [_vm._v("Nomor Checker :")]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: up.bcm,
+                    expression: "up.bcm"
+                  }
+                ],
+                staticClass: "form-control col-12",
+                attrs: { type: "text", disabled: "" },
+                domProps: { value: up.bcm },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(up, "bcm", $event.target.value)
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", [_vm._v("Tanggal :")]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: up.tanggal,
+                    expression: "up.tanggal"
+                  }
+                ],
+                staticClass: "form-control col-12",
+                attrs: { type: "date", min: _vm.now(), disabled: "" },
+                domProps: { value: up.tanggal },
+                on: {
+                  change: function($event) {
+                    return _vm.validate()
+                  },
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(up, "tanggal", $event.target.value)
+                  }
+                }
+              })
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-4" }, [
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", [_vm._v("Supplier")]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: up.supplier,
+                      expression: "up.supplier"
+                    }
+                  ],
+                  staticClass: "col-12 form-control",
+                  attrs: { name: "customer", disabled: "" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        up,
+                        "supplier",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                [
+                  _c("option", { domProps: { value: up.supplier } }, [
+                    _vm._v(_vm._s(up.supplier))
+                  ])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", [_vm._v("Nomor PO")]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: up.nomor_po,
+                    expression: "up.nomor_po"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", disabled: "" },
+                domProps: { value: up.nomor_po },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(up, "nomor_po", $event.target.value)
+                  }
+                }
+              })
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-4" }, [
+            _c("div", { staticClass: "form-group" }, [
+              _c("label", [_vm._v("keterangan")]),
+              _vm._v(" "),
+              _c("textarea", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: up.keterangan,
+                    expression: "up.keterangan"
+                  }
+                ],
+                staticClass: "form-control col-12",
+                attrs: { name: "keterangan" },
+                domProps: { value: up.keterangan },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(up, "keterangan", $event.target.value)
+                  }
+                }
+              })
+            ])
+          ])
+        ])
+      }),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "row mt-2 mx-auto", attrs: { id: "rsoverflowso" } },
+        [
+          _c(
+            "div",
+            { staticClass: "row mt-1 mx-auto col-12" },
+            [
+              _vm.load ? _c("Circle5", { attrs: { id: "load3" } }) : _vm._e(),
+              _vm._v(" "),
+              _c(
+                "table",
+                {
+                  staticClass: "table mt-2 table-striped table-bordered",
+                  staticStyle: { width: "100%" },
+                  attrs: { id: "rsthead" }
+                },
+                [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c(
+                    "tbody",
+                    _vm._l(_vm.listbcm, function(list, index) {
+                      return _c("tr", { key: index }, [
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(_vm._s(index + 1))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(_vm._s(list.kode_barang))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(list.nama_barang))]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(_vm._s(list.satuan))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _vm._v(_vm._s(list.sisapo))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: list.qty,
+                                expression: "list.qty"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "number" },
+                            domProps: { value: list.qty },
+                            on: {
+                              input: [
+                                function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(list, "qty", $event.target.value)
+                                },
+                                function($event) {
+                                  return _vm.validqty(index)
+                                }
+                              ]
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { "text-align": "center" } }, [
+                          _c("textarea", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: list.keterangan,
+                                expression: "list.keterangan"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            domProps: { value: list.keterangan },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  list,
+                                  "keterangan",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          })
+                        ])
+                      ])
+                    }),
+                    0
+                  )
+                ]
+              )
+            ],
+            1
+          )
+        ]
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "row mt-2" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn-orange btn ml-4",
+            on: {
+              click: function($event) {
+                return _vm.draftBcm()
+              }
+            }
+          },
+          [_vm._v("\n                Simpan Draft\n            ")]
+        ),
+        _vm._v(" "),
+        _vm.jenbutton
+          ? _c(
+              "button",
+              {
+                staticClass: "btn-success btn ml-2",
+                on: {
+                  click: function($event) {
+                    return _vm.submitBCM()
+                  }
+                }
+              },
+              [_vm._v("\n                Kirim Warehouse\n            ")]
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        !_vm.jenbutton
+          ? _c(
+              "button",
+              {
+                staticClass: "btn-primary btn ml-2",
+                on: {
+                  click: function($event) {
+                    return _vm.requestBcm()
+                  }
+                }
+              },
+              [_vm._v("\n                Request Acc\n            ")]
+            )
+          : _vm._e()
+      ]),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "modal-po",
+            tabindex: "-1",
+            "data-backdrop": "static",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true"
+          }
+        },
+        [
+          _c(
+            "div",
+            { staticClass: "modal-dialog", attrs: { role: "document" } },
+            [
+              _c(
+                "div",
+                { staticClass: "modal-content", attrs: { id: "modal-width" } },
+                [
+                  _c("div", { staticClass: "modal-header" }, [
+                    _c(
+                      "h5",
+                      {
+                        staticClass: "modal-title",
+                        attrs: { id: "exampleModalLabel" }
+                      },
+                      [_vm._v("Form PO")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "close",
+                        attrs: {
+                          type: "button",
+                          "data-dismiss": "modal",
+                          "aria-label": "Close"
+                        },
+                        on: {
+                          click: function($event) {
+                            return _vm.resetForm()
+                          }
+                        }
+                      },
+                      [
+                        _c("span", { attrs: { "aria-hidden": "true" } }, [
+                          _vm._v("×")
+                        ])
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Pilih PO")]),
+                      _vm._v(" "),
+                      _c(
+                        "select",
+                        {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.aktif,
+                              expression: "aktif"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          on: {
+                            change: [
+                              function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.aktif = $event.target.multiple
+                                  ? $$selectedVal
+                                  : $$selectedVal[0]
+                              },
+                              function($event) {
+                                return _vm.pilihPo(_vm.aktif)
+                              }
+                            ]
+                          }
+                        },
+                        _vm._l(_vm.poaktif, function(aktif, index) {
+                          return _c(
+                            "option",
+                            { key: index, domProps: { value: aktif } },
+                            [_vm._v(_vm._s(aktif.nomor_po))]
+                          )
+                        }),
+                        0
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Supplier")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.ket.supplier,
+                            expression: "ket.supplier"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", disabled: "" },
+                        domProps: { value: _vm.ket.supplier },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.ket, "supplier", $event.target.value)
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { attrs: { id: "overflowBody" } }, [
+                      _c(
+                        "table",
+                        {
+                          staticClass:
+                            "table mt-2 table-striped table-bordered",
+                          staticStyle: { width: "100%" }
+                        },
+                        [
+                          _vm._m(1),
+                          _vm._v(" "),
+                          _c(
+                            "tbody",
+                            _vm._l(_vm.listsisa, function(ls, index) {
+                              return _c("tr", { key: index }, [
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [_vm._v(_vm._s(index + 1))]
+                                ),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(ls.nama))]),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [_vm._v(_vm._s(ls.satuan))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [_vm._v(_vm._s(ls.sisapo))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  { staticStyle: { "text-align": "center" } },
+                                  [
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.checker,
+                                          expression: "checker"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        value: ls,
+                                        checked: Array.isArray(_vm.checker)
+                                          ? _vm._i(_vm.checker, ls) > -1
+                                          : _vm.checker
+                                      },
+                                      on: {
+                                        change: function($event) {
+                                          var $$a = _vm.checker,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = ls,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (_vm.checker = $$a.concat([
+                                                  $$v
+                                                ]))
+                                            } else {
+                                              $$i > -1 &&
+                                                (_vm.checker = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.checker = $$c
+                                          }
+                                        }
+                                      }
+                                    })
+                                  ]
+                                )
+                              ])
+                            }),
+                            0
+                          )
+                        ]
+                      )
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-secondary",
+                        attrs: { type: "button", "data-dismiss": "modal" },
+                        on: {
+                          click: function($event) {
+                            return _vm.resetForm()
+                          }
+                        }
+                      },
+                      [_vm._v("Close")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.checklist()
+                          }
+                        }
+                      },
+                      [_vm._v("Save changes")]
+                    )
+                  ])
+                ]
+              )
+            ]
+          )
+        ]
+      ),
+      _vm._v(" "),
+      _vm._m(2)
+    ],
+    2
+  )
 }
 var staticRenderFns = [
   function() {
@@ -86771,6 +87891,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_barang_ViewBbmComponent_vue__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ../components/barang/ViewBbmComponent.vue */ "./resources/js/components/barang/ViewBbmComponent.vue");
 /* harmony import */ var _components_bc_BuktiCheckerInComponent_vue__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ../components/bc/BuktiCheckerInComponent.vue */ "./resources/js/components/bc/BuktiCheckerInComponent.vue");
 /* harmony import */ var _components_bc_CreateBcmComponent_vue__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ../components/bc/CreateBcmComponent.vue */ "./resources/js/components/bc/CreateBcmComponent.vue");
+/* harmony import */ var _components_bc_ViewBcmComponent_vue__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ../components/bc/ViewBcmComponent.vue */ "./resources/js/components/bc/ViewBcmComponent.vue");
+
 
 
 
@@ -86918,6 +88040,10 @@ var routes = [{
   name: 'createbcm',
   path: '/dic/bcm/view',
   component: _components_bc_CreateBcmComponent_vue__WEBPACK_IMPORTED_MODULE_30__["default"]
+}, {
+  name: 'viewbcm',
+  path: '/dic/bcm/view/:nomor',
+  component: _components_bc_ViewBcmComponent_vue__WEBPACK_IMPORTED_MODULE_31__["default"]
 }];
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]);
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
@@ -87526,6 +88652,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CreateBcmComponent_vue_vue_type_template_id_fc7489c0___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CreateBcmComponent_vue_vue_type_template_id_fc7489c0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/bc/ViewBcmComponent.vue":
+/*!*********************************************************!*\
+  !*** ./resources/js/components/bc/ViewBcmComponent.vue ***!
+  \*********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ViewBcmComponent_vue_vue_type_template_id_39629d89___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewBcmComponent.vue?vue&type=template&id=39629d89& */ "./resources/js/components/bc/ViewBcmComponent.vue?vue&type=template&id=39629d89&");
+/* harmony import */ var _ViewBcmComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ViewBcmComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/bc/ViewBcmComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _ViewBcmComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ViewBcmComponent_vue_vue_type_template_id_39629d89___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _ViewBcmComponent_vue_vue_type_template_id_39629d89___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/bc/ViewBcmComponent.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/bc/ViewBcmComponent.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************!*\
+  !*** ./resources/js/components/bc/ViewBcmComponent.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ViewBcmComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./ViewBcmComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/bc/ViewBcmComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ViewBcmComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/bc/ViewBcmComponent.vue?vue&type=template&id=39629d89&":
+/*!****************************************************************************************!*\
+  !*** ./resources/js/components/bc/ViewBcmComponent.vue?vue&type=template&id=39629d89& ***!
+  \****************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ViewBcmComponent_vue_vue_type_template_id_39629d89___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./ViewBcmComponent.vue?vue&type=template&id=39629d89& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/bc/ViewBcmComponent.vue?vue&type=template&id=39629d89&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ViewBcmComponent_vue_vue_type_template_id_39629d89___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ViewBcmComponent_vue_vue_type_template_id_39629d89___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

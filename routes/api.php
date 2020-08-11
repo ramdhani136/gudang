@@ -34,6 +34,7 @@ Route::put('listrso/data/sopen/{no}','Rso\ListRsoController@sOpen');
 Route::put('listrso/data/deletePo/{po}','Rso\ListRsoController@deletePo');
 Route::get('listrso/data/group','Rso\ListRsoController@group');
 Route::get('listrso/data/listpo/{po}','Rso\ListRsoController@listpo');
+Route::get('listrso/data/listclose/{po}','Rso\ListRsoController@listclose');
 Route::get('listrso/data/group/{barang}','Rso\ListRsoController@grouplist');
 Route::get('listrso/data/groupopen/{po}/{barang}','Rso\ListRsoController@groupopen');
 Route::put('listrso/data/{po}/{barang}','Rso\ListRsoController@statuspo');
@@ -49,5 +50,6 @@ Route::resource('purchasing','Purchase\PurchasingController');
 Route::resource('po','Po\PoController');
 Route::get('poaktif/','Po\PoController@aktif');
 Route::resource('listbcm','Barang\ListBcmController');
+Route::get('view/detailpo/{po}/{barang}','Rso\ListRsoController@detailpo');
 
 

@@ -145,6 +145,12 @@ class ListRsoController extends Controller
         return GroupItemResource::collection($data);
     }
 
+    public function  listclose($po){
+        $data= Listrso::where('nomor_po',$po)->where('qty_tdktersedia','>',0)->where('so_open','Y')->where('po_close','Y')->groupBy('kode_barang')->groupBy('nomor_po')->groupBy('harga_supplier')->where('open_po','Y')
+        ->selectRaw('count(*) as total, kode_barang')->selectRaw('count(*) as total, nomor_po')->selectRaw('count(*) as total, harga_supplier')->get();
+        return GroupItemResource::collection($data);
+    }
+
     public function deletePo(Request $request, $po){
         Listrso::where('nomor_po',$po)->update($request->all());
         return response('update',response::HTTP_CREATED);
@@ -153,6 +159,11 @@ class ListRsoController extends Controller
     public function statuspo(Request $request, $po,$barang){
         Listrso::where('nomor_po',$po)->where('kode_barang',$barang)->update($request->all());
         return response('update',response::HTTP_CREATED);
+    }
+
+    public function detailpo($po,$barang){
+        $data=Listrso::where('nomor_po',$po)->where('kode_barang',$barang)->get();
+        return  ListRsoResource::collection($data);
     }
 
 }

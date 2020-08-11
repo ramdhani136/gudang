@@ -17,8 +17,11 @@ class ListBcmResource extends JsonResource
         return [
             'id'=>$this->id,
             'nomor_bcm'=>$this->nomor_bcm,
+            'kode_barang'=>$this->kode_barang,
             'qty'=>$this->qty,
             'keterangan'=>$this->keterangan,
+            'nama_barang'=>$this->barang->nama,
+            'satuan'=>$this->barang->satuan,
         ];
     }
 }

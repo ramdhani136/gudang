@@ -205,7 +205,11 @@ export default {
             },
             uplist:{},
             sipo:0,
-            uppo:{}
+            uppo:{},
+            listpo:{},
+            persen:0,
+            listrso:{},
+            coba:[]
         }
     },
     created(){
@@ -290,8 +294,29 @@ export default {
         )
             }
         },
-        submitBCM(){   
-        let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
+        submitBCM(){
+        for(let i=0;i<this.checker.length;i++){
+            axios.get("/api/view/detailpo/"+this.checker[i].nomor_po+"/"+this.checker[i].kode_barang)
+            .then(res=>{
+                this.listpo=res.data.data;
+                this.persen=0
+                for(let j=0;j<this.listpo.length;j++){  
+                    this.persen+=parseInt(this.listpo[j].qty_tdktersedia);
+                    this.coba=[];
+                    this.coba=[{qty:this.persen/100,}];
+                }
+                for(let z=0;z<this.listpo.length;z++){
+                    this.uplistsisa={qty_masuk:((((this.listpo[z].qty_tdktersedia/this.coba[0].qty)/100)*(this.hitung.qty[i]))+this.listpo[z].qty_masuk)};
+                    axios.put("/api/listrso/"+this.listpo[z].id,this.uplistsisa)
+                    .then(res=>{
+                        console.log("berhasil");
+                    });
+                    
+                }
+                
+            });
+        }
+        /* let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
         if(jawab===true){
             this.up.status="open";
             axios.post("/api/bcm",this.up)
@@ -345,7 +370,7 @@ export default {
                     });
             }
         },
-        )}
+        )} */
         },
         requestBcm(){   
             let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");

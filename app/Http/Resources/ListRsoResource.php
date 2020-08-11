@@ -50,6 +50,7 @@ class ListRsoResource extends JsonResource
             'so_tersedia'=>$this->so_tersedia,
             'so_tdktersedia'=>$this->so_tdktersedia,
             'harga_supplier'=>$this->harga_supplier,
+            'qty_masuk'=>$this->qty_masuk,
         ];
     }
 }
