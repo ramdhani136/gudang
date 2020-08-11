@@ -35,6 +35,7 @@ Route::put('listrso/data/deletePo/{po}','Rso\ListRsoController@deletePo');
 Route::get('listrso/data/group','Rso\ListRsoController@group');
 Route::get('listrso/data/listpo/{po}','Rso\ListRsoController@listpo');
 Route::get('listrso/data/listclose/{po}','Rso\ListRsoController@listclose');
+Route::get('listrso/data/listall/{po}','Rso\ListRsoController@listall');
 Route::get('listrso/data/group/{barang}','Rso\ListRsoController@grouplist');
 Route::get('listrso/data/groupopen/{po}/{barang}','Rso\ListRsoController@groupopen');
 Route::put('listrso/data/{po}/{barang}','Rso\ListRsoController@statuspo');

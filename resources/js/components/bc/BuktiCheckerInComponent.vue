@@ -12,7 +12,7 @@
             </select>
         </div> 
         <div class="row">
-            <router-link to="/dic/bcm/view" class="btn btn-success my-3" >+ Create Bukti Checker</router-link>
+            <router-link to="/dic/bcm/view" class="btn btn-success my-3" >+ Create Bukti Checker</router-link>  
         </div>
         <div id="overflow" class="border-top">
                 <table id="thead" class="table table-striped table-bordered" style="width:100%">
@@ -35,9 +35,9 @@
                         <td>{{bm.supplier}}</td>
                         <td style="text-align:center">
                             <router-link :to="{name:'viewbcm',params:{nomor:bm.bcm}}" class="btn btn-primary">
-                                    Edit
+                                    Lihat Data
                             </router-link>
-                            <button class="btn btn-danger">Hapus</button>
+                            <button v-if="bm.status==='tolak'||bm.status==='draft'" class="btn btn-danger">Hapus</button>
                         </td>
                     </tr>
                 </tbody>
@@ -57,7 +57,7 @@ export default {
         return{
             search:'',
             load:false,
-            status:'draft',
+            status:'open',
             bcm:[],
         }
     },

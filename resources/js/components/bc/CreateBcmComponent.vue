@@ -201,7 +201,7 @@ export default {
             jenbutton:true,
             cek:{},
             uplistsisa:{
-                qty_masuk:0
+                qty_masuk:0,
             },
             uplist:{},
             sipo:0,
@@ -209,7 +209,7 @@ export default {
             listpo:{},
             persen:0,
             listrso:{},
-            coba:[]
+            coba:[],
         }
     },
     created(){
@@ -273,8 +273,9 @@ export default {
             $("#modal-po").modal("hide");
         },
         draftBcm(){
-            let keputusan=confirm("Simpan Draft?");
-            if(keputusan===true){
+            let jawab=confirm("Simpan Draft?");
+        if(jawab===true){
+            this.up.status="Draft";
             axios.post("/api/bcm",this.up)
             .then(res=>{
                 for(let i=0;i<this.checker.length;i++){
@@ -282,41 +283,68 @@ export default {
                     this.uploadlist.qty=this.hitung.qty[i];
                     this.uploadlist.keterangan=this.hitung.keterangan[i];
                     this.uploadlist.nomor_bcm=this.up.bcm;
+                    this.uploadlist.status="open";
                     this.uploood={kode_barang:this.uploadlist.kode_barang,nomor_bcm:this.uploadlist.nomor_bcm,
                     qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan
                     };
                     axios.post("/api/listbcm",this.uploood)
-                    .then(res=>{
-                        this.$router.push({name:'bcmcomponent'});
+                    .then(res=>{ 
                     });
-            }
+                }
+                for(let h=0;h<this.checker.length;h++){
+                        axios.get("/api/view/detailpo/"+this.checker[h].nomor_po+"/"+this.checker[h].kode_barang)
+                        .then(res=>{
+                            this.listpo=res.data.data;
+                            this.persen=0
+                            for(let j=0;j<this.listpo.length;j++){  
+                                this.persen+=parseInt(this.listpo[j].qty_tdktersedia);
+                                this.coba=[];
+                                this.coba=[{qty: Math.round(this.persen/100),}];
+                            }
+                            for(let z=0;z<this.listpo.length;z++){
+                                this.uplistsisa={qty_masuk:((((this.listpo[z].qty_tdktersedia/this.coba[0].qty)/100)*(this.hitung.qty[h]))+this.listpo[z].qty_masuk)};
+                                axios.put("/api/listrso/"+this.listpo[z].id,this.uplistsisa)
+                                .then(res=>{
+                                    axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
+                                    .then(res=>{
+                                        this.listsisa=res.data.data;
+                                        for(let i=0;i<this.listsisa.length;i++){
+                                            if(this.listsisa[i].sisapo<1){
+                                                this.uplist.po_close="Y";
+                                                axios.put("/api/listrso/data/"+this.listsisa[i].nomor_po+"/"+this.listsisa[i].kode_barang,this.uplist)
+                                                .then(res=>{
+                                                });
+                                                }
+                                        }
+                                    })
+                                    this.sipo=0;
+                                    axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
+                                    .then(res=>{
+                                        this.sisasemua=0;
+                                        this.listsisa=res.data.data;
+                                        for(let i=0;i<this.listsisa.length;i++){
+                                            this.sipo+=parseInt(this.listsisa[i].sisapo);  
+                                        }
+                                        if(this.sipo<1){
+                                            this.uppo.status="Selesai";
+                                            axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
+                                            .then(res=>{
+                                                this.$router.push({name:'bcmcomponent'});
+                                            });
+                                        }else{
+                                            this.$router.push({name:'bcmcomponent'});
+                                        }
+                                    });
+                                });
+                                
+                            }
+                        });
+                }
         },
-        )
-            }
+        )}
         },
         submitBCM(){
-        for(let i=0;i<this.checker.length;i++){
-            axios.get("/api/view/detailpo/"+this.checker[i].nomor_po+"/"+this.checker[i].kode_barang)
-            .then(res=>{
-                this.listpo=res.data.data;
-                this.persen=0
-                for(let j=0;j<this.listpo.length;j++){  
-                    this.persen+=parseInt(this.listpo[j].qty_tdktersedia);
-                    this.coba=[];
-                    this.coba=[{qty:this.persen/100,}];
-                }
-                for(let z=0;z<this.listpo.length;z++){
-                    this.uplistsisa={qty_masuk:((((this.listpo[z].qty_tdktersedia/this.coba[0].qty)/100)*(this.hitung.qty[i]))+this.listpo[z].qty_masuk)};
-                    axios.put("/api/listrso/"+this.listpo[z].id,this.uplistsisa)
-                    .then(res=>{
-                        console.log("berhasil");
-                    });
-                    
-                }
-                
-            });
-        }
-        /* let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
+        let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
         if(jawab===true){
             this.up.status="open";
             axios.post("/api/bcm",this.up)
@@ -331,46 +359,60 @@ export default {
                     qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan
                     };
                     axios.post("/api/listbcm",this.uploood)
-                    .then(res=>{
-                        for(let i=0;i<this.checker.length;i++){
-                        this.uplistsisa={qty_masuk:parseInt(this.hitung.qty[i])+parseInt(this.checker[i].masuk)}
-                        axios.put("/api/listrso/data/"+this.checker[i].nomor_po+"/"+this.checker[i].kode_barang,this.uplistsisa)
-                            .then(res=>{
-                                axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
-                                .then(res=>{
-                                    this.listsisa=res.data.data;
-                                    for(let i=0;i<this.listsisa.length;i++){
-                                        if(this.listsisa[i].sisapo<1){
-                                            this.uplist.po_close="Y";
-                                            axios.put("/api/listrso/data/"+this.listsisa[i].nomor_po+"/"+this.listsisa[i].kode_barang,this.uplist)
-                                            .then(res=>{
-                                            });
-                                            }
-                                    }
-                                })
-                                this.sipo=0;
-                                axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
-                                .then(res=>{
-                                    this.listsisa=res.data.data;
-                                    for(let i=0;i<this.listsisa.length;i++){
-                                        this.sipo+=parseInt(this.listsisa[i].sisapo);
-                                    }
-                                    if(this.sipo<1){
-                                        this.uppo.status="Selesai";
-                                        axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
-                                        .then(res=>{
-                                            this.$router.push({name:'bcmcomponent'});
-                                        });
-                                    }else{
-                                        this.$router.push({name:'bcmcomponent'});
-                                    }
-                                });
-                            });
-                }
+                    .then(res=>{ 
                     });
-            }
+                }
+                for(let h=0;h<this.checker.length;h++){
+                        axios.get("/api/view/detailpo/"+this.checker[h].nomor_po+"/"+this.checker[h].kode_barang)
+                        .then(res=>{
+                            this.listpo=res.data.data;
+                            this.persen=0
+                            for(let j=0;j<this.listpo.length;j++){  
+                                this.persen+=parseInt(this.listpo[j].qty_tdktersedia);
+                                this.coba=[];
+                                this.coba=[{qty: Math.round(this.persen/100),}];
+                            }
+                            for(let z=0;z<this.listpo.length;z++){
+                            this.uplistsisa={qty_masuk:((((this.listpo[z].qty_tdktersedia/this.coba[0].qty)/100)*(this.hitung.qty[h]))+this.listpo[z].qty_masuk)};
+                                axios.put("/api/listrso/"+this.listpo[z].id,this.uplistsisa)
+                                .then(res=>{
+                                    axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
+                                    .then(res=>{
+                                        this.listsisa=res.data.data;
+                                        for(let i=0;i<this.listsisa.length;i++){
+                                            if(this.listsisa[i].sisapo<1){
+                                                this.uplist.po_close="Y";
+                                                axios.put("/api/listrso/data/"+this.listsisa[i].nomor_po+"/"+this.listsisa[i].kode_barang,this.uplist)
+                                                .then(res=>{
+                                                });
+                                                }
+                                        }
+                                    })
+                                    this.sipo=0;
+                                    axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
+                                    .then(res=>{
+                                        this.sisasemua=0;
+                                        this.listsisa=res.data.data;
+                                        for(let i=0;i<this.listsisa.length;i++){
+                                            this.sipo+=parseInt(this.listsisa[i].sisapo);  
+                                        }
+                                        if(this.sipo<1){
+                                            this.uppo.status="Selesai";
+                                            axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
+                                            .then(res=>{
+                                                this.$router.push({name:'bcmcomponent'});
+                                            });
+                                        }else{
+                                            this.$router.push({name:'bcmcomponent'});
+                                        }
+                                    });
+                                });
+                                
+                            }
+                        });
+                }
         },
-        )} */
+        )}
         },
         requestBcm(){   
             let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
@@ -388,44 +430,58 @@ export default {
                     qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan
                     };
                     axios.post("/api/listbcm",this.uploood)
-                    .then(res=>{
-                        for(let i=0;i<this.checker.length;i++){
-                        this.uplistsisa={qty_masuk:parseInt(this.hitung.qty[i])+parseInt(this.checker[i].masuk)}
-                        axios.put("/api/listrso/data/"+this.checker[i].nomor_po+"/"+this.checker[i].kode_barang,this.uplistsisa)
-                            .then(res=>{
-                                axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
-                                .then(res=>{
-                                    this.listsisa=res.data.data;
-                                    for(let i=0;i<this.listsisa.length;i++){
-                                        if(this.listsisa[i].sisapo<1){
-                                            this.uplist.po_close="Y";
-                                            axios.put("/api/listrso/data/"+this.listsisa[i].nomor_po+"/"+this.listsisa[i].kode_barang,this.uplist)
-                                            .then(res=>{
-                                            });
-                                            }
-                                    }
-                                })
-                                this.sipo=0;
-                                axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
-                                .then(res=>{
-                                    this.listsisa=res.data.data;
-                                    for(let i=0;i<this.listsisa.length;i++){
-                                        this.sipo+=parseInt(this.listsisa[i].sisapo);
-                                    }
-                                    if(this.sipo<1){
-                                        this.uppo.status="Selesai";
-                                        axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
-                                        .then(res=>{
-                                            this.$router.push({name:'bcmcomponent'});
-                                        });
-                                    }else{
-                                        this.$router.push({name:'bcmcomponent'});
-                                    }
-                                });
-                            });
-                }
+                    .then(res=>{ 
                     });
-            }
+                }
+                for(let h=0;h<this.checker.length;h++){
+                        axios.get("/api/view/detailpo/"+this.checker[h].nomor_po+"/"+this.checker[h].kode_barang)
+                        .then(res=>{
+                            this.listpo=res.data.data;
+                            this.persen=0
+                            for(let j=0;j<this.listpo.length;j++){  
+                                this.persen+=parseInt(this.listpo[j].qty_tdktersedia);
+                                this.coba=[];
+                                this.coba=[{qty: Math.round(this.persen/100),}];
+                            }
+                            for(let z=0;z<this.listpo.length;z++){
+                                this.uplistsisa={qty_masuk:((((this.listpo[z].qty_tdktersedia/this.coba[0].qty)/100)*(this.hitung.qty[h]))+this.listpo[z].qty_masuk)};
+                                axios.put("/api/listrso/"+this.listpo[z].id,this.uplistsisa)
+                                .then(res=>{
+                                    axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
+                                    .then(res=>{
+                                        this.listsisa=res.data.data;
+                                        for(let i=0;i<this.listsisa.length;i++){
+                                            if(this.listsisa[i].sisapo<1){
+                                                this.uplist.po_close="Y";
+                                                axios.put("/api/listrso/data/"+this.listsisa[i].nomor_po+"/"+this.listsisa[i].kode_barang,this.uplist)
+                                                .then(res=>{
+                                                });
+                                                }
+                                        }
+                                    })
+                                    this.sipo=0;
+                                    axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
+                                    .then(res=>{
+                                        this.sisasemua=0;
+                                        this.listsisa=res.data.data;
+                                        for(let i=0;i<this.listsisa.length;i++){
+                                            this.sipo+=parseInt(this.listsisa[i].sisapo);  
+                                        }
+                                        if(this.sipo<1){
+                                            this.uppo.status="Selesai";
+                                            axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
+                                            .then(res=>{
+                                                this.$router.push({name:'bcmcomponent'});
+                                            });
+                                        }else{
+                                            this.$router.push({name:'bcmcomponent'});
+                                        }
+                                    });
+                                });
+                                
+                            }
+                        });
+                }
         },
         )}
         },

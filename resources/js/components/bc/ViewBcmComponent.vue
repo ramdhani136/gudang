@@ -26,7 +26,8 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>keterangan</label>
-                    <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
+                    <textarea v-if="up.status==='open' || up.status==='tolak' || up.status==='close' || up.status==='sent'" v-model="up.keterangan" name="keterangan" class="form-control col-12" disabled></textarea>
+                    <textarea v-if="up.status==='draft' || up.status==='tolak'" v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
                 </div>
             </div>
         </div>
@@ -46,31 +47,33 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(list,index) in listbcm" :key="index">
+                        <tr v-for="(list,indexlist) in listbcm" :key="indexlist">
                             <td style="text-align:center">{{index+1}}</td>
                             <td style="text-align:center">{{list.kode_barang}}</td>
                             <td>{{list.nama_barang}}</td>
                             <td style="text-align:center">{{list.satuan}}</td>
-                            <td style="text-align:center">{{list.sisapo}}</td>
-                            <td  style="text-align:center">
-                                <input @input="validqty(index)"  v-model="list.qty" type="number" class="form-control">
+                            <td style="text-align:center">{{list.masuk+list.sisapo}}</td>
+                            <td  style="text-align:center" v-for="(bc,index) in bcm" :key="index">
+                                <input v-if="bc.status==='sent' || bc.status==='open' || bc.status==='close'"    v-model="list.qty" type="number" class="form-control" disabled>
+                                <input v-if="bc.status==='draft' || bc.status==='tolak'"  @input="validqty(indexlist)"  v-model="hitung.qty[indexlist]" type="number" class="form-control">
                             </td>
-                            <td style="text-align:center">
-                                <textarea v-model="list.keterangan" class="form-control"></textarea>
+                            <td style="text-align:center" v-for="(bc,index) in bcm" :key="index">
+                                <textarea v-if="bc.status==='sent' || bc.status==='open' || bc.status==='close'" v-model="list.keterangan" class="form-control" disabled></textarea>
+                                <textarea  v-if="bc.status==='draft' || bc.status==='tolak'" v-model="list.keterangan" class="form-control"></textarea>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>   
-        <div class="row mt-2">
-                <button @click="draftBcm()" class="btn-orange btn ml-4" >
+        <div class="row mt-2" v-for="(bc,index) in bcm" :key="index">
+                <button v-if="bc.status==='draft'" @click="draftBcm()" class="btn-orange btn ml-4" >
                     Simpan Draft
                 </button>
-                <button v-if="jenbutton" @click="submitBCM()" class="btn-success btn ml-2" >
+                <button v-if="jenbutton && bc.status==='draft' || bc.status==='tolak'" @click="submitBCM()" class="btn-success btn ml-2" >
                     Kirim Warehouse
                 </button>
-                <button v-if="!jenbutton" @click="requestBcm()" class="btn-primary btn ml-2" >
+                <button v-if="!jenbutton && bc.status==='draft' || bc.status==='tolak'" @click="requestBcm()" class="btn-primary btn ml-2" >
                     Request Acc
                 </button>
         </div>
@@ -82,89 +85,6 @@
                     <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Pilih PO</label>
-                        <select @change="pilihPo(aktif)" v-model="aktif" class="form-control">
-                            <option :value="aktif" v-for="(aktif,index) in poaktif" :key="index">{{aktif.nomor_po}}</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Supplier</label>
-                        <input v-model="ket.supplier" type="text" class="form-control" disabled>
-                    </div>
-                    <div id="overflowBody">
-                    <table class="table mt-2 table-striped table-bordered" style="width:100%">
-                        <thead  id="rsthead">
-                            <tr>
-                                <th style="text-align:center">No</th>
-                                <th style="text-align:center">Item</th>
-                                <th style="text-align:center">Satuan</th>
-                                <th style="text-align:center">Sisa PO</th>
-                                <th style="text-align:center">Pilih</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(ls,index) in listsisa" :key="index">
-                                <td style="text-align:center">{{index+1}}</td>
-                                <td>{{ls.nama}}</td>
-                                <td style="text-align:center">{{ls.satuan}}</td>
-                                <td style="text-align:center">{{ls.sisapo}}</td>
-                                <td style="text-align:center">
-                                    <input v-model="checker" type="checkbox" :value="ls">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button @click="resetForm()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="checklist()" class="btn btn-primary">Save changes</button>
-                </div>
-                </div>
-            </div>
-        </div>
-            <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div  class="modal-dialog" role="document">
-                <div id="modal-width" class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="scrollList">
-                        <table  id="thead" class="table table-striped table-bordered" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th style="text-align:center">No</th>
-                                    <th style="text-align:center">Nomor SO</th>
-                                    <th>Customer</th>
-                                    <th style="text-align:center">Jumlah</th>
-                                    <th style="text-align:center">Satuan</th>
-                                    <th style="text-align:center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="text-align:center"></td>
-                                    <td style="text-align:center"></td>
-                                    <td></td>
-                                    <td style="text-align:center"></td>
-                                    <td style="text-align:center"></td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
                 </div>
             </div>
@@ -207,7 +127,10 @@ export default {
             sipo:0,
             uppo:{},
             bcm:{},
-            listbcm:{}
+            listbcm:{},
+            list:{
+                qty:[],
+            }
         }
     },
     created(){
@@ -227,6 +150,9 @@ export default {
                 axios.get("/api/listbcm/"+this.$route.params.nomor)
                 .then(res=>{
                     this.listbcm=res.data.data;
+                    for(let i=0;i<this.listbcm.length;i++){
+                        this.hitung.qty[i]=this.listbcm[i].masuk 
+                    }
                 });  
         },
         now(){
@@ -257,25 +183,30 @@ export default {
             var output = "CM-" + d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" ;
             return output
         },
-        /* validqty(index){
+        validqty(indexlist){
                 this.pembanding="";
                 this.aksicek="";
-                if(parseInt(this.hitung.qty[index])>parseInt(this.checker[index].sisapo)){
-                    this.cek[index]="error"
-                }else{
-                    this.cek[index]="tidak"
-                }
-                for(let i=0;i<this.checker.length;i++){
-                    this.aksicek+=this.cek[i];
-                    this.pembanding+="tidak";
-                }
-                if(this.aksicek===this.pembanding){
-                    this.jenbutton=true;
-                }else{
-                    this.jenbutton=false;
-                }
-
-        } */
+                axios.get("/api/listbcm/"+this.$route.params.nomor)
+                .then(res=>{
+                    this.listbcm=res.data.data;
+                    for(let i=0;i<this.listbcm.length;i++){
+                        if(this.hitung.qty[i]>this.listbcm[i].masuk-this.listbcm[i].sisapo){
+                            this.cek[i]="error"
+                        }else{
+                            this.cek[i]="tidak"
+                        }
+                        for(let i=0;i<this.listbcm.length;i++){
+                            this.aksicek+=this.cek[i];
+                            this.pembanding+="tidak";
+                        }
+                        if(this.aksicek===this.pembanding){
+                            this.jenbutton=true;
+                        }else{
+                            this.jenbutton=false;
+                        } 
+                    }
+                }); 
+        }
     },
 } 
 </script>

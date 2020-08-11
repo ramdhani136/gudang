@@ -428,6 +428,7 @@ export default {
             this.edit=true
             this.inputlrso.harga=list.harga
             this.inputlrso.id_custprice=list.id_custprice
+            this.ket.kode_barang=list.lkode_barang;
             this.showmodal()
         },
         deleteListRso(list){
@@ -472,6 +473,7 @@ export default {
             this.visible=false;
             this.inputlrso.harga="";
             this.jenisHarga='N';
+            this.ket.kode_barang="";
         },
         toggleVisible(){
             this.visible = !this.visible;
