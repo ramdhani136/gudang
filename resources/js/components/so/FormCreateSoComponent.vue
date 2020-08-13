@@ -10,6 +10,10 @@
                     <label>Tanggal :</label>
                     <input v-model="up.tanggal_so" type="date" @change="validate()" :min="now()" class="form-control col-12" >
                 </div>
+                <div class="form-group">
+                    <label>Tanggal Kirim :</label>
+                    <input v-model="up.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" >
+                </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
@@ -22,15 +26,27 @@
                     <label>Nomor RSO</label>
                     <input v-model="up.nomor_rso" @click="showPo()" type="text" class="form-control" placeholder="Pilih RSO">
                 </div>
-            </div>
-            <div class="col-4">
-                <div class="form-group">
-                    <label>Tanggal Kirim :</label>
-                    <input v-model="up.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" >
-                </div>
                 <div class="form-group">
                     <label>keterangan</label>
                     <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label>Distribusi :</label>
+                    <select class="form-control" v-model="up.distribusi" @click="ifkirim()" @change="aksidistribusi()" :disabled="disabled == 1">
+                        <option value="default">- Masukan pilihan anda -</option>
+                        <option value="kirim">Di Kirim</option>
+                        <option value="ambil">Ambil Sendiri</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lokasi</label>
+                    <input @click="clikdistribusi()" v-model="up.lokasi" name="alamat" class="form-control col-12" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Alamat</label>
+                    <textarea v-model="up.alamat" name="alamat" class="form-control col-12" disabled></textarea>
                 </div>
             </div>
         </div>
@@ -165,6 +181,74 @@
                 </div>                
             </div>
         </div>
+        <div class="modal fade" id="modal-lokasi" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div  class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Tujuan Pengiriman</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                        <div class="form-group">
+                            <label>Lokasi</label>
+                            <select class="form-control" @change="pilihLokasi()" v-model="lokasi">
+                                <option value="default">Default</option>
+                                <option value="ekspedisi">Ekspedisi</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="form-group" v-if="lokasi==='ekspedisi'">
+                        <label>Lokasi</label>
+                        <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisible" v-text="eks ? eks.nama:''"></div>
+                        <div class="placeholder" v-if="eks==null">Pilih Ekspedisi</div>
+                        <div class="popover" v-show="visible">
+                            <input type="text"
+                            @keydown.up="up"
+                            @keydown.down="down"
+                            @keydown.enter="selectItem"
+                            v-model="query"
+                            placeholder="Masukan nama ekspedisi.."
+                            >
+                            <div class="optionbr" ref="optionList">
+                                <ul>
+                                    <li v-for="(match,index) in matches" 
+                                    :key="match.id"
+                                    v-text="match.nama"
+                                    :class="{'selected':(selected==index)}"
+                                    @click="itemClicked(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div v-if="lokasi==='ekspedisi'" class="form-group mt-3" >
+                            <label>Alamat</label>
+                            <textarea v-model="eksal" class="form-control" disabled></textarea>
+                        </div>
+                        <div v-if="lokasi==='default'" class="form-group">
+                            <label>Alamat</label>
+                            <textarea v-model="defaultal" class="form-control" disabled></textarea>
+                        </div>
+                        <div v-if="lokasi==='lainnya'"  class="form-group">
+                            <label>Tempat/Gedung</label>
+                            <input  type="text" class="form-control" v-model="lainlok">
+                        </div>
+                        <div v-if="lokasi==='lainnya'" class="form-group">
+                            <label>Alamat</label>
+                            <textarea v-model="lainal" class="form-control"></textarea>
+                        </div>
+                        
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="selectLokasi()" class="btn btn-primary" data-dismiss="modal">Save Change</button>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -204,6 +288,16 @@ export default {
                 qty:0,
             },
             gagal:false,
+            distribusi:'default',
+            lokasi:'default',
+            dataekspedisi:{},
+            visible:false,
+            visiblecust:false,
+            query:'',
+            selected:0,
+            eks:null,
+            itemHeight:39,
+            disabled:1,
         }
     },
     created(){
@@ -211,9 +305,15 @@ export default {
         this.getRso();
         this.resetForm();
         this.timer();
+        this.getekspedisi();
     },  
     computed:{  
-        
+        matches(){
+            if(this.query==''){
+                return [];
+            }
+            return this.dataekspedisi.filter((item)=> item.nama.toLowerCase().includes(this.query.toLowerCase()))
+        },
     },
     methods:{
         getRso(){
@@ -226,6 +326,12 @@ export default {
             axios.get("/api/poaktif/")
             .then(res=>{
                 this.poaktif=res.data.data;
+            });
+        },
+        getekspedisi(){
+            axios.get("/api/ekspedisi")
+            .then(res=>{
+                this.dataekspedisi=res.data.data;
             });
         },
         now(){
@@ -266,6 +372,7 @@ export default {
             this.checker=[];
             this.ket.customer=aktif.customer;
             this.up.nomor_rso=aktif.nomor_rso;
+            this.defaultlok=aktif.customer;
             axios.get("/api/listrso/data/listpo/"+aktif.nomor_po)
             .then(res=>{
                 this.listsisa=res.data.data;
@@ -286,6 +393,7 @@ export default {
                         this.lstatus="Tersedia";
                         this.tampil=false;
                         this.statuspo=true;
+                        this.disabled=0;
                 }
                     });
             }else if(this.status==="TidakTersedia"){
@@ -510,7 +618,75 @@ export default {
                     this.gagal=false;
                 }, 5000);
             },
+        aksidistribusi(){
+            if(this.up.distribusi==="kirim"){
+                this.lokasi="default";
+                if(this.lokasi==='default'){
+                this.lok=this.defaultlok;
+                this.al="Belum ada alamat";
+                }
+                $("#modal-lokasi").modal("show");  
+            }else if(this.up.distribusi==='ambil'){
+                this.up.lokasi="PT. Ekatunggal Tunas Mandiri";
+                this.up.alamat="Jl. Pahlawan No.29A, RT.003/005 Citeureup, Kab. Bogor, Jawa Barat";
+            }else if(this.up.distribusi==="default"){
+                this.up.alamat="";
+                this.up.lokasi="";
+            }
+        },
+        pilihLokasi(){
+            if(this.lokasi==='default'){
+                
+            }else if(this.lokasi==='ekspedisi'){
+                
+            }else if(this.lokasi==='lainnya'){
 
+            }
+        },
+        selectLokasi(){
+            this.up.distribusi="default";
+            this.up.distribusi="kirim";
+            if(this.lokasi==='ekspedisi'){
+                this.lok=this.ekslok;
+                this.al=this.eksal;
+            }else if(this.lokasi==='lainnya'){
+                this.lok=this.lainlok;
+                this.al=this.lainal;
+            }
+            this.up.lokasi=this.lok;
+            this.up.alamat=this.al;
+        },
+        toggleVisible(){
+            this.visible = !this.visible;
+        },
+        itemClicked(index){
+            this.selected=index;
+            this.selectItem();
+        },
+        selectItem(){
+            this.eks = this.matches[this.selected];  
+            this.eksal= this.eks.alamat;
+            this.ekslok= this.eks.nama;
+            this.up.id_ekspedisi= this.eks.id;
+            this.visible=false;
+        },
+        up(){
+            if(this.selected==0){
+                return;
+            }
+            this.selected -= 1;
+            this.scrollToItem();
+        },
+        down(){
+            if(this.selected >= this.matches.length -1 ){
+                return;
+            }
+            this.selected += 1;
+            this.scrollToItem();
+        },
+        scrollToItem(){
+            this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
+        },
     }   
 } 
 </script>

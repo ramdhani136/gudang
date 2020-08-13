@@ -17,6 +17,12 @@ class BarangController extends Controller
      */
     public function index()
     {
+        return BarangResource::collection(Barang::where('aktif','Y')->latest()->get());
+    }
+
+
+    public function all()
+    {
         return BarangResource::collection(Barang::latest()->get());
     }
 

@@ -1,12 +1,12 @@
 <template>
     <div class="container"  @keyup.esc="resetForm()">
-        <button @click="showmodal()" class="btn btn-success my-3">+ Tambah Barang</button>
+        <button @click="showmodal()" class="btn btn-success my-3">+ Request Barang</button>
         <div class="form-group col-3 my-3 float-right">
             <input v-model="search"  type="text" class="form-control" placeholder="Search">
         </div>
         <div class="form-group col-3 my-3 float-right">
             <select name="status" v-model="status" class="form-control">
-                <option value="N">Request Konfirmasi</option>
+                <option value="N">Menunggu Konfirmasi</option>
                 <option value="Y">Barang Aktif</option>
             </select>
         </div>
@@ -15,11 +15,8 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>Kode Barang</th>
                 <th>Nama Barang</th>
-                <th>Stok</th>
-                <th>Booking</th>
-                <th>Order</th>
-                <th>Tersedia</th>
                 <th>Satuan</th>
                 <th>Aksi</th>
             </tr>
@@ -27,16 +24,11 @@
         <tbody>
             <tr v-for="(br , index) in filteredMembers" :key="br.kode">
                 <td style="text-align:center">{{index+1}}</td>
+                <td style="text-align:center">{{br.kode}}</td>
                 <td>{{br.nama}}</td>
-                <td>{{br.qty}}</td>
-                <td>{{br.dibooking}}</td>
-                <td>800</td>
-                <td>800</td>
-                <td>{{br.satuan}}</td>
+                <td style="text-align:center">{{br.satuan}}</td>
                 <td style="text-align:center">
-                    <button v-if="br.aktif==='Y'" @click="updateBarang(br)" class="btn btn-primary">Edit</button>
-                    <button v-if="br.aktif==='N'" @click="aksiconfirm(br)" class="btn btn-primary">Tindakan</button>
-                    <button @click="deleteBarang(br)" class="btn btn-danger">Hapus</button>
+                    <button @click="updateBarang(br)" class="btn btn-primary">Lihat</button>
                 </td>
             </tr>
         </tbody>
@@ -105,8 +97,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button v-if="!acc" type="button" @click="createBarang()" class="btn btn-primary">Save changes</button>
-                    <button  v-if="acc" type="button" @click="AccBarang()" class="btn btn-success">Terima Permintaan</button>
+                    <button v-if="!edit" type="button" @click="createBarang()" class="btn btn-primary">Kirim Permintaan</button>
                 </div>
                 </div>
             </div>
@@ -133,9 +124,8 @@ export default {
             errors:[],
             edit:false,
             load:true,
-            status:'Y',
             disabled:0,
-            acc:false,
+            status:'Y',
         }
     },
     created(){
@@ -164,18 +154,16 @@ export default {
             });
         },
         showmodal(){
-            this.acc=false;
             this.disabled=0;
             this.errors=[];
             $("#modal-form").modal("show");
         },
         createBarang(){
             if(this.edit===false){
-                this.form.aktif="Y";
                 axios.post("/api/barang",this.form)
                 .then((response)=>{
                     this.getBarang();
-                    this.$router.push({name:'barang'})
+                    this.$router.push({name:'purchasebarang'})
                     $("#modal-form").modal("hide");
                     this.resetForm();
                 })
@@ -195,10 +183,9 @@ export default {
                     }
             })
             }else{
-                this.form.aktif="Y";
                 axios.put("/api/barang/"+  this.form.kode,this.form)
                 .then((response)=>{
-                    this.$router.push({name:'barang'})
+                    this.$router.push({name:'purchasebarang'})
                     this.getBarang();
                     $("#modal-form").modal("hide");
                     this.edit=false
@@ -222,18 +209,18 @@ export default {
             }
         },
         updateBarang(barang){
-            this.disabled=0;
-            this.form.nama=barang.nama;
-            this.form.qty=barang.qty;
-            this.form.satuan=barang.satuan;
-            this.form.kode=barang.kode;
-            this.form.harga=barang.harga;
-            this.form.min_stok=barang.min_stok;
-            this.form.max_stok=barang.max_stok;
-            this.form.kubikasi=barang.kubikasi;
-            this.form.kg=barang.kg;
-            this.edit=true;
-            this.showmodal();
+            this.disabled=1;
+            this.form.nama=barang.nama
+            this.form.qty=barang.qty
+            this.form.satuan=barang.satuan
+            this.form.kode=barang.kode
+            this.form.harga=barang.harga
+            this.form.min_stok=barang.min_stok
+            this.form.max_stok=barang.max_stok
+            this.form.kubikasi=barang.kubikasi
+            this.form.kg=barang.kg
+            this.edit=true
+            $("#modal-form").modal("show");
         },
         deleteBarang(barang){
             let keputusan=confirm('Apakah anda yakin?');
@@ -259,62 +246,11 @@ export default {
             this.form.kubikasi="";
             this.form.kg="";
         },
-        aksiconfirm(barang){
-            this.acc=true;
-            this.disabled=1;
-            this.form.nama=barang.nama;
-            this.form.qty=barang.qty;
-            this.kodebarang=barang.kode;
-            this.form.satuan=barang.satuan;
-            this.form.kode=barang.kode;
-            this.form.harga=barang.harga;
-            this.form.min_stok=barang.min_stok;
-            this.form.max_stok=barang.max_stok;
-            this.form.kubikasi=barang.kubikasi;
-            this.form.kg=barang.kg;
-            this.edit=true;
-            $("#modal-form").modal("show");
-        },
-        AccBarang(){
-            this.acc={aktif:'Y'};
-            let tanya=confirm("Yakin ingin menerima master barang ini?");
-            if(tanya===true){
-                axios.put("/api/barang/"+this.kodebarang,this.acc)
-                .then(res=>{
-                    this.getBarang();
-                    $("#modal-form").modal("hide");
-                });
-                this.getBarang();
-                $("#modal-form").modal("hide");
-            }
-        }
     }
 }
 </script>
 
 
 <style>
-    #overflow{
-        width: 100%;
-    height: 440px;
-    overflow-y: scroll;
-    }
-
-    #thead thead tr th{
-        text-align: center;
-        border-bottom: none;
-        position: sticky; top: 0; 
-        background-color: #fff;
-        top: -1px;
-        border-collapse: collapse;
-        box-shadow: inset 0 0 0 #dee2e6,
-        inset 0 -1px 0 #dee2e6;
-    }
-
-    #modal-width{
-    width: 120%;
-    height: auto;
-    right: 13%;
-    }
     
 </style>

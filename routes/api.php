@@ -19,6 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::resource('barang','Barang\BarangController');
+Route::get('barang/data/all/','Barang\BarangController@all');
 Route::resource('customer','Customer\CustomerController');
 Route::resource('divisi','Divisi\DivisiController');
 Route::resource('rso','Rso\RsoController');
@@ -52,5 +53,7 @@ Route::resource('po','Po\PoController');
 Route::get('poaktif/','Po\PoController@aktif');
 Route::resource('listbcm','Barang\ListBcmController');
 Route::get('view/detailpo/{po}/{barang}','Rso\ListRsoController@detailpo');
+
+Route::resource('ekspedisi','Ekspedisi\EkspedisiController');
 
 

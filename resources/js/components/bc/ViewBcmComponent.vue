@@ -27,7 +27,7 @@
                 <div class="form-group">
                     <label>keterangan</label>
                     <textarea v-if="up.status==='open' || up.status==='tolak' || up.status==='close' || up.status==='sent'" v-model="up.keterangan" name="keterangan" class="form-control col-12" disabled></textarea>
-                    <textarea v-if="up.status==='draft' || up.status==='tolak'" v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
+                    <textarea v-if="up.status==='draft' || up.status==='tolak'" v-model="uploood.keterangan" name="keterangan" class="form-control col-12"></textarea>
                 </div>
             </div>
         </div>
@@ -48,7 +48,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="(list,indexlist) in listbcm" :key="indexlist">
-                            <td style="text-align:center">{{index+1}}</td>
+                            <td style="text-align:center">{{indexlist+1}}</td>
                             <td style="text-align:center">{{list.kode_barang}}</td>
                             <td>{{list.nama_barang}}</td>
                             <td style="text-align:center">{{list.satuan}}</td>
@@ -58,8 +58,8 @@
                                 <input v-if="bc.status==='draft' || bc.status==='tolak'"  @input="validqty(indexlist)"  v-model="hitung.qty[indexlist]" type="number" class="form-control">
                             </td>
                             <td style="text-align:center" v-for="(bc,index) in bcm" :key="index">
-                                <textarea v-if="bc.status==='sent' || bc.status==='open' || bc.status==='close'" v-model="list.keterangan" class="form-control" disabled></textarea>
-                                <textarea  v-if="bc.status==='draft' || bc.status==='tolak'" v-model="list.keterangan" class="form-control"></textarea>
+                                <textarea v-if="bc.status==='sent' || bc.status==='open' || bc.status==='close'" v-model="hitung.keterangan[indexlist]" class="form-control" disabled></textarea>
+                                <textarea  v-if="bc.status==='draft' || bc.status==='tolak'" v-model="hitung.keterangan[indexlist]" class="form-control"></textarea>
                             </td>
                         </tr>
                     </tbody>
@@ -111,7 +111,9 @@ export default {
             listsisa:{},
             checker:[],
             listbcm:{},
-            uploadlist:[],
+            uploadlist:{
+                qty_masuk:0,
+            },
             hitung:{
                 qty:[],
                 keterangan:[],
@@ -120,8 +122,9 @@ export default {
             aksicek:'benar',
             jenbutton:true,
             cek:{},
-            uplistsisa:{
-                qty_masuk:0
+            uplistbcm:{
+                qty:0,
+                keterangan:[]
             },
             uplist:{},
             sipo:0,
@@ -130,7 +133,8 @@ export default {
             listbcm:{},
             list:{
                 qty:[],
-            }
+            },
+            listrso:{}
         }
     },
     created(){
@@ -144,6 +148,7 @@ export default {
         getBcm(){
             axios.get("/api/bcm/"+this.$route.params.nomor)
             .then(res=>{this.bcm=res.data.data
+                this.uploood.keterangan=this.bcm[0].keterangan;
             });     
         },
         getListBcm(){
@@ -151,7 +156,8 @@ export default {
                 .then(res=>{
                     this.listbcm=res.data.data;
                     for(let i=0;i<this.listbcm.length;i++){
-                        this.hitung.qty[i]=this.listbcm[i].masuk 
+                        this.hitung.qty[i]=this.listbcm[i].masuk; 
+                        this.hitung.keterangan[i]=this.listbcm[i].keterangan; 
                     }
                 });  
         },
@@ -206,6 +212,74 @@ export default {
                         } 
                     }
                 }); 
+        },
+        draftBcm(){
+            /* let jawab=confirm("Simpan Draft?");
+            if(jawab===true){
+                this.up.status="Draft";
+                axios.put("/api/bcm/"+this.$route.params.nomor,this.uploood)
+                .then(res=>{
+                    axios.get("/api/listbcm/"+this.$route.params.nomor)
+                    .then(res=>{
+                        this.listbcm=res.data.data;
+                        for(let i=0;i<this.listbcm.length;i++){
+                            this.uplistbcm={
+                                qty:this.hitung.qty[i],
+                                keterangan:this.hitung.keterangan[i]
+                            };
+                            console.log(this.uplistbcm);
+                            axios.put("/api/listbcm/"+this.listbcm[i].id,this.uplistbcm)
+                            .then(res=>{
+                                this.uploadlist={
+                                qty_masuk:parseInt((this.listbcm[i].masuk-this.listbcm[i].qty)+this.hitung.qty[i])
+                                };
+                                axios.get("/api/view/detailpo/"+this.listbcm[i].nomor_po+"/"+this.listbcm[i].kode_barang)
+                                .then(res=>{
+                                this.listrso=res.data.data;
+                                    axios.put("/api/listrso/"+this.listrso[0].id,this.uploadlist)
+                                    .then(res=>{
+                                        axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
+                                        .then(res=>{
+                                            this.listsisa=res.data.data;
+                                            for(let i=0;i<this.listsisa.length;i++){
+                                                if(this.listsisa[i].sisapo<1){
+                                                    this.uplist.po_close="Y";
+                                                    axios.put("/api/listrso/data/"+this.listsisa[i].nomor_po+"/"+this.listsisa[i].kode_barang,this.uplist)
+                                                    .then(res=>{
+                                                    });
+                                                }
+                                            }
+                                        })
+                                        this.sipo=0;
+                                        axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
+                                        .then(res=>{
+                                            this.sisasemua=0;
+                                            this.listsisa=res.data.data;
+                                            for(let i=0;i<this.listsisa.length;i++){
+                                                this.sipo+=parseInt(this.listsisa[i].sisapo);  
+                                            }
+                                            if(this.sipo>1){
+                                                this.uppo.status="Selesai";
+                                                axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
+                                                .then(res=>{
+                                                    this.$router.push({name:'bcmcomponent'});
+                                                });
+                                            }else{
+                                                this.uppo.status="Acc";
+                                                axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
+                                                .then(res=>{
+                                                    this.$router.push({name:'bcmcomponent'});
+                                                });
+                                            }
+                                        });
+                                    })
+                                });
+                            });
+                        }
+                    });
+                })
+                
+            } */
         }
     },
 } 

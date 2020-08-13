@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import BarangComponent from '../components/barang/BarangComponent.vue'
+import PurchaseBarangComponent from '../components/barang/PurchaseBarangComponent.vue'
 import CustomerComponent from '../components/customer/CustomerComponent.vue'
 import DivisiComponent from '../components/divisi/DivisiComponent.vue'
 import SupplierComponent from '../components/supplier/SupplierComponent.vue'
@@ -39,7 +40,12 @@ import ViewBbmComponent from '../components/barang/ViewBbmComponent.vue'
 import BuktiCheckerInComponent from '../components/bc/BuktiCheckerInComponent.vue'
 import CreateBcmComponent from '../components/bc/CreateBcmComponent.vue'
 import ViewBcmComponent from '../components/bc/ViewBcmComponent.vue'
+import RequestBcmComponent from '../components/bc/RequestBcmComponent.vue'
+import ViewRequestComponent from '../components/bc/ViewRequestComponent.vue'
 
+import SoComponentDic from '../components/distribusi/SoComponentDic.vue'
+import BckComponent from '../components/distribusi/BckComponent.vue'
+import BbkComponent from '../components/distribusi/BbkComponent.vue'
 
 
 
@@ -47,6 +53,7 @@ import ViewBcmComponent from '../components/bc/ViewBcmComponent.vue'
 
 const routes=[
     {name:'barang', path:'/barang', component:BarangComponent},
+    {name:'purchasebarang', path:'/purchase/barang/', component:PurchaseBarangComponent},
     {name:'customer', path:'/customer', component:CustomerComponent},
     {name:'divisi', path:'/divisi', component:DivisiComponent},
     {name:'supplier', path:'/supplier', component:SupplierComponent},
@@ -84,6 +91,13 @@ const routes=[
     {name:'bcmcomponent', path:'/dic/bcm', component:BuktiCheckerInComponent},
     {name:'createbcm', path:'/dic/bcm/view', component:CreateBcmComponent},
     {name:'viewbcm', path:'/dic/bcm/view/:nomor', component: ViewBcmComponent},
+    {name:'rbcm', path:'/dic/rbcm', component: RequestBcmComponent},
+    {name:'viewrbcm', path:'/dic/rbcm/view/:nomor', component: ViewRequestComponent},
+
+
+    {name:'distribusiso', path:'/distribusi/so', component:SoComponentDic},
+    {name:'distribusibck', path:'/distribusi/bck', component:BckComponent},
+    {name:'distribusibbk', path:'/distribusi/bbk', component: BbkComponent},
 ]
 
 

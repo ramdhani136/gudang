@@ -121,7 +121,7 @@ export default {
     data(){
         return{
             search  : '',
-            status:'Draft',
+            status:'Acc',
             po:[],
             load:true,
             visible:false,

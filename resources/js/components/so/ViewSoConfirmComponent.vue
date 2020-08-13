@@ -10,6 +10,10 @@
                     <label>Tanggal :</label>
                     <input v-model="vso.tanggal_so" type="date" @change="validate()" :min="now()" class="form-control col-12" disabled>
                 </div>
+                <div class="form-group">
+                    <label>Tanggal Kirim :</label>
+                    <input v-model="vso.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" disabled>
+                </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
@@ -24,15 +28,27 @@
                         <option :value="vso.nip_sales">{{vso.sales}}</option>
                     </select>
                 </div>
-            </div>
-            <div class="col-4">
-                <div class="form-group">
-                    <label>Tanggal Kirim :</label>
-                    <input v-model="vso.tanggal_kirim" type="date" @change="validateKirim()" :min="tglKirim()" class="form-control col-12" disabled>
-                </div>
                 <div class="form-group">
                     <label>keterangan</label>
                     <textarea v-model="vso.keterangan"  name="keterangan" class="form-control col-12" disabled></textarea>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label>Distribusi :</label>
+                    <select class="form-control" v-model="vso.distribusi" @click="ifkirim()" @change="aksidistribusi()" disabled>
+                        <option value="default">- Masukan pilihan anda -</option>
+                        <option value="kirim">Di Kirim</option>
+                        <option value="ambil">Ambil Sendiri</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lokasi</label>
+                    <input @click="clikdistribusi()" v-model="vso.lokasi" name="alamat" class="form-control col-12" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Alamat</label>
+                    <textarea v-model="vso.alamat" name="alamat" class="form-control col-12" disabled></textarea>
                 </div>
             </div>
         </div>
@@ -130,12 +146,14 @@ export default {
             ket:{
                 qtypesan:0,
                 subtotal:0,
-            }
+            },
+            uplist:[],
+            aksiup:{},
         }
     },
     created(){
         this.getSo();
-        this.getlistso()
+        this.getlistso();
     },  
     computed:{       
     },
@@ -160,6 +178,10 @@ export default {
                             this.ket.qtypesan=this.listso[i].qty_tersedia;
                             this.ket.subtotal+=parseInt(this.listso[i].qty_tersedia)*parseInt(this.listso[i].harga);
                             this.ket.status="Tersedia";
+                            this.uplist[i]={
+                                id:this.listso[i].id,
+                                statusso:this.listso[i].statusso,
+                            };     
                         }     
                     });
                 }else{
@@ -172,6 +194,10 @@ export default {
                             this.ket.subtotal+=parseInt(this.ket.qtypesan)*parseInt(this.listso[i].harga);
                             this.ket.status="Tidak Tersedia";
                             this.ket.tanggal=this.listso[i].tgl_datang;
+                            this.uplist[i]={
+                                id:this.listso[i].id,
+                                statusso:"Y",
+                            };
                         }  
                     });
                 }
@@ -219,7 +245,13 @@ export default {
                     .then(res=>{
                         this.$router.push({name:'soconfirm'})
                     });
-                    
+                    for(let d=0;d<this.uplist.length;d++){
+                        this.aksiup={statusso:this.uplist[d].statusso,};
+                        axios.put("/api/listrso/"+this.uplist[d].id,this.aksiup)
+                        .then(res=>{
+                            console.log("tes");
+                        });
+                    }
                 })
             }
         },

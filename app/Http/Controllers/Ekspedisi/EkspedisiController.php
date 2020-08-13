@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Barang;
+namespace App\Http\Controllers\Ekspedisi;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Model\Barang\Listbcm;
-use App\Http\Resources\ListBcmResource;
+use App\Model\Ekspedisi\Ekspedisi;
+use App\Http\Resources\EkspedisiResource;
 use Symfony\Component\HttpFoundation\Response;
 
-class ListBcmController extends Controller
+class EkspedisiController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class ListBcmController extends Controller
      */
     public function index()
     {
-        return ListBcmResource::collection(Listbcm::latest()->get());
+        return EkspedisiResource::collection(Ekspedisi::all());
     }
 
     /**
@@ -38,8 +38,8 @@ class ListBcmController extends Controller
      */
     public function store(Request $request)
     {
-        $data=Listbcm::create($request->all());
-        return response(new ListBcmResource($data),response::HTTP_CREATED);
+        $data=Ekspedisi::create($request->all());
+        return response(new EkspedisiResource($data),response::HTTP_CREATED);
     }
 
     /**
@@ -48,9 +48,9 @@ class ListBcmController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($listbcm)
+    public function show($id)
     {
-        return ListBcmResource::collection(Listbcm::where('nomor_bcm',$listbcm)->get());
+        return EkspedisiResource::collection(Ekspedisi::where('id',$id)->get());
     }
 
     /**
@@ -71,9 +71,9 @@ class ListBcmController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $listbcm)
+    public function update(Request $request, $id)
     {
-        Listbcm::where('id',$listbcm)->update($request->all());
+        Ekspedisi::where('id',$id)->update($request->all());
         return response('update',response::HTTP_CREATED);
     }
 
@@ -83,9 +83,9 @@ class ListBcmController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($listbcm)
+    public function destroy($id)
     {
-        Barang::where('id',$listbcm)->delete();
+        Ekspedisi::where('id',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
 }

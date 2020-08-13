@@ -10,6 +10,12 @@
                     <label>Tanggal :</label>
                     <input v-model="vso.tanggal_so" type="date" @change="validate()" :min="now()" class="form-control col-12" disabled>
                 </div>
+                <div class="form-group">
+                    <label>Tanggal Kirim :</label>
+                    <input v-model="vso.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="disabled == 1">
+                </div>
+                <button @click="getdisabled()" v-if="vso.status==='Draft'" class="btn btn-primary">{{tombol}}</button>
+                <button @click="updateSO(vso)" v-if="tbsukses && vso.status==='Draft'" class="btn btn-success col-4 ml-1">Update</button>
             </div>
             <div class="col-4">
                 <div class="form-group">
@@ -24,15 +30,27 @@
                         <option :value="vso.nip_sales">{{vso.sales}}</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>keterangan</label>
+                    <textarea v-model="vso.keterangan"  name="keterangan" class="form-control col-12" :disabled="disabled == 1"></textarea>
+                </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
-                    <label>Tanggal Kirim :</label>
-                    <input v-model="vso.tanggal_kirim" type="date" @change="validateKirim()" :min="tglKirim()" class="form-control col-12" disabled>
+                    <label>Distribusi :</label>
+                    <select class="form-control" v-model="vso.distribusi" @click="ifkirim()" @change="aksidistribusi()" :disabled="disabled == 1">
+                        <option value="default">- Masukan pilihan anda -</option>
+                        <option value="kirim">Di Kirim</option>
+                        <option value="ambil">Ambil Sendiri</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>keterangan</label>
-                    <textarea v-model="vso.keterangan"  name="keterangan" class="form-control col-12" disabled></textarea>
+                    <label>Lokasi</label>
+                    <input @click="clikdistribusi()" v-model="vso.lokasi" name="alamat" class="form-control col-12" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Alamat</label>
+                    <textarea  v-model="vso.alamat" name="alamat" class="form-control col-12" disabled></textarea>
                 </div>
             </div>
         </div>
@@ -138,7 +156,10 @@ export default {
             listrso:{},
             updel:{qty:0,},
             ada:0,
-            ubah:{}
+            ubah:{},
+            disabled:1,
+            tombol:'Edit SO',
+            tbsukses:false,
         }
     },
     created(){
@@ -335,6 +356,20 @@ export default {
                     this.$router.push({name:'so'})
                 });
             }
+        },
+        getdisabled(){
+            this.disabled = (this.disabled + 1) % 2;
+            if(this.disabled==1){
+                this.tombol="Edit Rso";
+                this.tbsukses=false;
+    
+            }else{
+                this.tombol="Close";
+                this.tbsukses=true;
+            }
+        },
+        updateSO(vso){
+            alert(vso.nomor_so);
         }
 
     },

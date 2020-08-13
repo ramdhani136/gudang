@@ -26,7 +26,6 @@
                                 <router-link :to="{name:'poCreateView',params:{nomor:pl.nomor_po}}" class="btn btn-primary" >
                                     Lihat Detail
                                 </router-link>
-                                <button  class="btn btn-success">Print Form Checker</button>
                             </td>
                         </tr>
                     </tbody>

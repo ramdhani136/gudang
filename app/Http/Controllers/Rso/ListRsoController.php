@@ -127,7 +127,7 @@ class ListRsoController extends Controller
 
     
     public function  grouplist($barang){
-        return listGroupResource::collection(Listrso::where('qty_tdktersedia','>',0)->where('so_tdktersedia','Y')->where('kode_barang',$barang)->where('open_po','N')->get());
+        return listGroupResource::collection(Listrso::where('statusso','Y')->where('qty_tdktersedia','>',0)->where('so_tdktersedia','Y')->where('kode_barang',$barang)->where('open_po','N')->get());
     }
 
     public function  groupopen($po,$barang){

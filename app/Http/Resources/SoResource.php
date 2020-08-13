@@ -29,6 +29,10 @@ class SoResource extends JsonResource
             'sales'=>$this->rso->sales->nama,
             'alastolak'=>$this->alastolak,
             'statusso'=>$this->statusso,
+            'id_ekspedisi'=>$this->id_ekspedisi,
+            'lokasi'=>$this->lokasi,
+            'alamat'=>$this->alamat,
+            'distribusi'=>$this->distribusi,
         ];
     }
 }

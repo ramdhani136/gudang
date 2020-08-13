@@ -32,6 +32,7 @@ class BarangResource extends JsonResource
             'max_stok'=>$this->max_stok, 
             'kubikasi'=>$this->kubikasi, 
             'kg'=>$this->kg, 
+            'aktif'=>$this->aktif,
         ];
     }
 }
