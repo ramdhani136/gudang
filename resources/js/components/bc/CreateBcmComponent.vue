@@ -64,9 +64,9 @@
             </div>
         </div>   
         <div class="row mt-2">
-                <button @click="draftBcm()" class="btn-orange btn ml-4" >
+                <!-- <button @click="draftBcm()" class="btn-orange btn ml-4" >
                     Simpan Draft
-                </button>
+                </button> -->
                 <button v-if="jenbutton" @click="submitBCM()" class="btn-success btn ml-2" >
                     Kirim Warehouse
                 </button>
@@ -299,7 +299,7 @@ export default {
                             for(let j=0;j<this.listpo.length;j++){  
                                 this.persen+=parseInt(this.listpo[j].qty_tdktersedia);
                                 this.coba=[];
-                                this.coba=[{qty: Math.round(this.persen/100),}];
+                                this.coba=[{qty: this.persen/100,}];
                             }
                             for(let z=0;z<this.listpo.length;z++){
                                 this.uplistsisa={qty_masuk:((((this.listpo[z].qty_tdktersedia/this.coba[0].qty)/100)*(this.hitung.qty[h]))+this.listpo[z].qty_masuk)};
@@ -370,7 +370,7 @@ export default {
                             for(let j=0;j<this.listpo.length;j++){  
                                 this.persen+=parseInt(this.listpo[j].qty_tdktersedia);
                                 this.coba=[];
-                                this.coba=[{qty: Math.round(this.persen/100),}];
+                                this.coba=[{qty: this.persen/100,}];
                             }
                             for(let z=0;z<this.listpo.length;z++){
                             this.uplistsisa={qty_masuk:((((this.listpo[z].qty_tdktersedia/this.coba[0].qty)/100)*(this.hitung.qty[h]))+this.listpo[z].qty_masuk)};
@@ -441,7 +441,7 @@ export default {
                             for(let j=0;j<this.listpo.length;j++){  
                                 this.persen+=parseInt(this.listpo[j].qty_tdktersedia);
                                 this.coba=[];
-                                this.coba=[{qty: Math.round(this.persen/100),}];
+                                this.coba=[{qty: this.persen/100,}];
                             }
                             for(let z=0;z<this.listpo.length;z++){
                                 this.uplistsisa={qty_masuk:((((this.listpo[z].qty_tdktersedia/this.coba[0].qty)/100)*(this.hitung.qty[h]))+this.listpo[z].qty_masuk)};

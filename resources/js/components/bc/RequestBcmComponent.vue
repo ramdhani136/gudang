@@ -7,6 +7,7 @@
             <select name="status" v-model="status" class="form-control">
                 <option value="sent">Request Acc</option>
                 <option value="open">Open</option>
+                <option value="tolak">Tolak</option>
                 <option value="close">Close</option>
             </select>
         </div> 
@@ -68,6 +69,8 @@ export default {
                     return this.bcm.filter(elem=> elem.status==="close")
                 }else if(this.status==="sent"){
                     return this.bcm.filter(elem=> elem.status==="sent")
+                }else if(this.status==="tolak"){
+                    return this.bcm.filter(elem=> elem.status==="tolak")
                 }
             }else{
                 return this.bcm.filter(elem => {

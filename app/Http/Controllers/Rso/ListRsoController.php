@@ -140,7 +140,7 @@ class ListRsoController extends Controller
     }
 
     public function  listpo($po){
-        $data= Listrso::where('nomor_po',$po)->where('qty_tdktersedia','>',0)->where('so_open','Y')->where('po_close','N')->groupBy('kode_barang')->groupBy('nomor_po')->groupBy('harga_supplier')->where('open_po','Y')
+        $data= Listrso::where('nomor_po',$po)->where('qty_tdktersedia','>',0)->where('so_open','Y')->groupBy('kode_barang')->groupBy('nomor_po')->groupBy('harga_supplier')->where('open_po','Y')
         ->selectRaw('count(*) as total, kode_barang')->selectRaw('count(*) as total, nomor_po')->selectRaw('count(*) as total, harga_supplier')->get();
         return GroupItemResource::collection($data);
     }

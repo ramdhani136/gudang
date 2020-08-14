@@ -3372,6 +3372,10 @@ __webpack_require__.r(__webpack_exports__);
           return this.bcm.filter(function (elem) {
             return elem.status === "sent";
           });
+        } else if (this.status === "tolak") {
+          return this.bcm.filter(function (elem) {
+            return elem.status === "tolak";
+          });
         }
       } else {
         return this.bcm.filter(function (elem) {
@@ -3705,7 +3709,7 @@ __webpack_require__.r(__webpack_exports__);
                 _this3.persen += parseInt(_this3.listpo[j].qty_tdktersedia);
                 _this3.coba = [];
                 _this3.coba = [{
-                  qty: Math.round(_this3.persen / 100)
+                  qty: _this3.persen / 100
                 }];
               }
 
@@ -3789,7 +3793,7 @@ __webpack_require__.r(__webpack_exports__);
                 _this4.persen += parseInt(_this4.listpo[j].qty_tdktersedia);
                 _this4.coba = [];
                 _this4.coba = [{
-                  qty: Math.round(_this4.persen / 100)
+                  qty: _this4.persen / 100
                 }];
               }
 
@@ -3873,7 +3877,7 @@ __webpack_require__.r(__webpack_exports__);
                 _this5.persen += parseInt(_this5.listpo[j].qty_tdktersedia);
                 _this5.coba = [];
                 _this5.coba = [{
-                  qty: Math.round(_this5.persen / 100)
+                  qty: _this5.persen / 100
                 }];
               }
 
@@ -4005,6 +4009,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -4037,6 +4042,10 @@ __webpack_require__.r(__webpack_exports__);
         } else if (this.status === "sent") {
           return this.bcm.filter(function (elem) {
             return elem.status === "sent";
+          });
+        } else if (this.status === "tolak") {
+          return this.bcm.filter(function (elem) {
+            return elem.status === "tolak";
           });
         }
       } else {
@@ -4481,7 +4490,10 @@ __webpack_require__.r(__webpack_exports__);
         qty: [],
         keterangan: []
       },
-      bcm: {}
+      bcm: {},
+      update: {
+        alastolak: ''
+      }
     };
   },
   created: function created() {
@@ -4519,7 +4531,64 @@ __webpack_require__.r(__webpack_exports__);
     },
     tolak: function tolak(bs) {
       $("#modal-form").modal("show");
-    }
+    },
+    tolakSo: function tolakSo(bc) {
+      var _this3 = this;
+
+      var tanya = confirm("Apakah anda yakin?");
+
+      if (tanya === true) {
+        if (this.update.alastolak === "") {
+          console.log("jangan kosong");
+        } else {
+          this.update.status = "open";
+          axios.put("/api/bcm/" + this.$route.params.nomor, this.update).then(function (res) {
+            axios.get("/api/listbcm/" + _this3.$route.params.nomor).then(function (res) {
+              _this3.listbcm = res.data.data;
+
+              for (var i = 0; i < _this3.listbcm.length; i++) {
+                _this3.defaultqty = {
+                  qty: _this3.listbcm[i].qty + _this3.listbcm[i].sisapo
+                };
+                axios.put("/api/listbcm/" + _this3.listbcm[i].id, _this3.defaultqty).then(function (res) {
+                  $("#modal-form").modal("hide");
+
+                  _this3.$router.push({
+                    name: 'rbcm'
+                  });
+                });
+              }
+            });
+          });
+        }
+      }
+    },
+    confirm: function (_confirm) {
+      function confirm(_x) {
+        return _confirm.apply(this, arguments);
+      }
+
+      confirm.toString = function () {
+        return _confirm.toString();
+      };
+
+      return confirm;
+    }(function (bc) {
+      var _this4 = this;
+
+      var tanya = confirm("Yakin ingin menerima barang masuk ini?");
+
+      if (tanya === true) {
+        this.update = {
+          status: "open"
+        };
+        axios.put("/api/bcm/" + bc.bcm, this.update).then(function (res) {
+          _this4.$router.push({
+            name: 'rbcm'
+          });
+        });
+      }
+    })
   }
 });
 
@@ -10686,7 +10755,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       search: '',
-      status: 'Draft',
+      status: 'Acc',
       so: [],
       load: true,
       update: {},
@@ -57309,11 +57378,11 @@ var render = function() {
           }
         },
         [
-          _c("option", { attrs: { value: "draft" } }, [_vm._v("Draft")]),
-          _vm._v(" "),
           _c("option", { attrs: { value: "sent" } }, [_vm._v("Menunggu Acc")]),
           _vm._v(" "),
           _c("option", { attrs: { value: "open" } }, [_vm._v("Open")]),
+          _vm._v(" "),
+          _c("option", { attrs: { value: "tolak" } }, [_vm._v("Tolak")]),
           _vm._v(" "),
           _c("option", { attrs: { value: "close" } }, [_vm._v("Close")])
         ]
@@ -57730,19 +57799,6 @@ var render = function() {
     ),
     _vm._v(" "),
     _c("div", { staticClass: "row mt-2" }, [
-      _c(
-        "button",
-        {
-          staticClass: "btn-orange btn ml-4",
-          on: {
-            click: function($event) {
-              return _vm.draftBcm()
-            }
-          }
-        },
-        [_vm._v("\n                Simpan Draft\n            ")]
-      ),
-      _vm._v(" "),
       _vm.jenbutton
         ? _c(
             "button",
@@ -58311,6 +58367,8 @@ var render = function() {
           _c("option", { attrs: { value: "sent" } }, [_vm._v("Request Acc")]),
           _vm._v(" "),
           _c("option", { attrs: { value: "open" } }, [_vm._v("Open")]),
+          _vm._v(" "),
+          _c("option", { attrs: { value: "tolak" } }, [_vm._v("Tolak")]),
           _vm._v(" "),
           _c("option", { attrs: { value: "close" } }, [_vm._v("Close")])
         ]
@@ -59280,7 +59338,7 @@ var render = function() {
                   staticClass: "btn-success btn ml-4",
                   on: {
                     click: function($event) {
-                      return _vm.confirm(_vm.bs)
+                      return _vm.confirm(bc)
                     }
                   }
                 },
@@ -59295,7 +59353,7 @@ var render = function() {
                   staticClass: "btn-orange btn ml-1",
                   on: {
                     click: function($event) {
-                      return _vm.tolak(_vm.bs)
+                      return _vm.tolak(bc)
                     }
                   }
                 },
@@ -59329,38 +59387,74 @@ var render = function() {
                 [
                   _vm._m(1),
                   _vm._v(" "),
-                  _vm._m(2),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Alasan Penolakan")]),
+                      _vm._v(" "),
+                      _c("textarea", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.update.alastolak,
+                            expression: "update.alastolak"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        domProps: { value: _vm.update.alastolak },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.update,
+                              "alastolak",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "modal-footer" }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-secondary",
-                        attrs: { type: "button", "data-dismiss": "modal" },
-                        on: {
-                          click: function($event) {
-                            return _vm.resetForm()
-                          }
-                        }
-                      },
-                      [_vm._v("Close")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function($event) {
-                            return _vm.tolakSo(_vm.lso)
-                          }
-                        }
-                      },
-                      [_vm._v("Konfirmasi Tolak")]
+                  _vm._l(_vm.bcm, function(bc, index) {
+                    return _c(
+                      "div",
+                      { key: index, staticClass: "modal-footer" },
+                      [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-secondary",
+                            attrs: { type: "button", "data-dismiss": "modal" },
+                            on: {
+                              click: function($event) {
+                                return _vm.resetForm()
+                              }
+                            }
+                          },
+                          [_vm._v("Close")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                return _vm.tolakSo(bc)
+                              }
+                            }
+                          },
+                          [_vm._v("Konfirmasi Tolak")]
+                        )
+                      ]
                     )
-                  ])
-                ]
+                  })
+                ],
+                2
               )
             ]
           )
@@ -59416,18 +59510,6 @@ var staticRenderFns = [
         },
         [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
       )
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-body" }, [
-      _c("div", { staticClass: "form-group" }, [
-        _c("label", [_vm._v("Alasan Penolakan")]),
-        _vm._v(" "),
-        _c("textarea", { staticClass: "form-control" })
-      ])
     ])
   }
 ]

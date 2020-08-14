@@ -64,10 +64,10 @@
             </div>
         </div>   
         <div class="row mt-2" v-for="(bc,index) in bcm" :key="index">
-                <button v-if="bc.status==='sent'" @click="confirm(bs)" class="btn-success btn ml-4" >
+                <button v-if="bc.status==='sent'" @click="confirm(bc)" class="btn-success btn ml-4" >
                     Terima Permintaan
                 </button>
-                <button v-if="bc.status==='sent'" @click="tolak(bs)" class="btn-orange btn ml-1" >
+                <button v-if="bc.status==='sent'" @click="tolak(bc)" class="btn-orange btn ml-1" >
                     Tolak Permintaan
                 </button>
         </div>
@@ -83,12 +83,12 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Alasan Penolakan</label>
-                        <textarea class="form-control"></textarea>
+                        <textarea v-model="update.alastolak" class="form-control"></textarea>
                     </div>               
                 </div>
-                <div  class="modal-footer">
+                <div  class="modal-footer" v-for="(bc,index) in bcm" :key="index">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="tolakSo(lso)" class="btn btn-primary">Konfirmasi Tolak</button>
+                    <button type="button" @click="tolakSo(bc)" class="btn btn-primary">Konfirmasi Tolak</button>
                 </div>
                 </div>
             </div>
@@ -111,6 +111,9 @@ export default {
                 keterangan:[],
             },
             bcm:{},
+            update:{
+                alastolak:'',
+            }
         }
     },
     created(){
@@ -147,6 +150,41 @@ export default {
             },
         tolak(bs){
             $("#modal-form").modal("show");
+        },
+        tolakSo(bc){
+            let tanya=confirm("Apakah anda yakin?");
+            if(tanya===true){
+                if(this.update.alastolak===""){
+                console.log("jangan kosong");
+                }else{
+                    this.update.status="open";
+                    axios.put("/api/bcm/"+this.$route.params.nomor,this.update)
+                    .then(res=>{
+                        axios.get("/api/listbcm/"+this.$route.params.nomor)
+                        .then(res=>{
+                            this.listbcm=res.data.data;
+                            for(let i=0;i<this.listbcm.length;i++){
+                                this.defaultqty={qty:this.listbcm[i].qty+this.listbcm[i].sisapo}
+                                axios.put("/api/listbcm/"+this.listbcm[i].id,this.defaultqty)
+                                .then(res=>{
+                                    $("#modal-form").modal("hide");
+                                    this.$router.push({name:'rbcm'})
+                                });     
+                            }
+                        });
+                    });
+                }  
+            }
+        },
+        confirm(bc){
+        let tanya=confirm("Yakin ingin menerima barang masuk ini?");
+        if(tanya===true){
+            this.update={status:"open"};
+            axios.put("/api/bcm/"+bc.bcm,this.update)
+            .then(res=>{
+                this.$router.push({name:'rbcm'})
+            })
+        }
         }
     },
 } 
