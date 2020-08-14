@@ -54,6 +54,14 @@
                         <input v-model="form.nama" type="text" name="nama"  autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
+                        <label>Alamat</label>
+                        <textarea v-model="form.alamat" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>No. Kontak</label>
+                        <input v-model="form.kontak" type="text" name="number"  autocomplete="off" class="form-control">
+                    </div>
+                    <div class="form-group">
                         <label>Keterangan</label>
                         <textarea v-model="form.keterangan" class="form-control"></textarea>
                     </div>
@@ -155,6 +163,8 @@ export default {
         updateCustomer(customer){
             this.form.nama=customer.nama
             this.form.kode=customer.kode
+            this.form.alamat=customer.alamat
+            this.form.kontak=customer.kontak
             this.target=customer.kode
             this.form.status=customer.status
             this.form.keterangan=customer.keterangan 
@@ -174,11 +184,13 @@ export default {
             }
         },
         resetForm(){
-            this.form.nama=""
-            this.form.kode=""
-            this.form.status="Aktif"
-            this.target=""
-            this.form.keterangan="" 
+            this.form.nama="";
+            this.form.kode="";
+            this.form.alamat="";
+            this.form.kontak="";
+            this.form.status="Aktif";
+            this.target="";
+            this.form.keterangan=""; 
             this.edit=false;
         },
     }

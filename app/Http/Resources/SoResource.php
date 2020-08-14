@@ -24,6 +24,7 @@ class SoResource extends JsonResource
             'keterangan'=>$this->keterangan,
             'status'=>$this->status,
             'customer'=>$this->rso->customer->nama,
+            'alamatcustomer'=>$this->rso->customer->alamat,
             'kode_customer'=>$this->rso->customer->kode,
             'nip_sales'=>$this->rso->sales->nip,
             'sales'=>$this->rso->sales->nama,

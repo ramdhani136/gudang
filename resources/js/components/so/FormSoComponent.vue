@@ -1,10 +1,10 @@
 <template>
     <div class="container">
-        <div  class="row row-cols-2" v-for="vso in so" :key="vso.nomor_so">
+        <div  class="row row-cols-2" v-for="(vso,index) in so" :key="index">
             <div class="col-4">
                 <div class="form-group">
                     <label>Nomor SO :</label>
-                    <input v-model="vso.nomor_so" type="text" class="form-control col-12" disabled>
+                    <input v-model="vso.nomor_so" type="text" class="form-control col-12" :disabled="disabled == 1">
                 </div>
                 <div class="form-group">
                     <label>Tanggal :</label>
@@ -14,8 +14,8 @@
                     <label>Tanggal Kirim :</label>
                     <input v-model="vso.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="disabled == 1">
                 </div>
-                <button @click="getdisabled()" v-if="vso.status==='Draft'" class="btn btn-primary">{{tombol}}</button>
-                <button @click="updateSO(vso)" v-if="tbsukses && vso.status==='Draft'" class="btn btn-success col-4 ml-1">Update</button>
+                <button @click="getdisabled()" v-if="vso.status==='Draft' || vso.status==='Tolak'" class="btn btn-primary">{{tombol}}</button>
+                <button @click="updateSO(vso)" v-if="tbsukses && vso.status==='Draft' || tbsukses && vso.status==='Tolak'" class="btn btn-success col-4 ml-1">Update</button>
             </div>
             <div class="col-4">
                 <div class="form-group">
@@ -38,7 +38,7 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>Distribusi :</label>
-                    <select class="form-control" v-model="vso.distribusi" @click="ifkirim()" @change="aksidistribusi()" :disabled="disabled == 1">
+                    <select class="form-control" v-model="vso.distribusi" @change="aksidistribusi(vso)" :disabled="disabled == 1">
                         <option value="default">- Masukan pilihan anda -</option>
                         <option value="kirim">Di Kirim</option>
                         <option value="ambil">Ambil Sendiri</option>
@@ -99,34 +99,90 @@
                 <button @click="submitSend()" v-if="lso.status=='Draft'"  class="btn-success btn ml-1" >
                     Kirim SO
                 </button>
+                <button @click="submitSend()" v-if="lso.status=='Tolak'"  class="btn-orange btn ml-3" >
+                    Request Ulang
+                </button>
         </div>
-        <div v-if="vso.status=='Tolak'" v-for="vso in so" :key="vso.nomor_so" id="alastolak">
+        <div v-if="vso.status=='Tolak'" v-for="vso in so" :key="vso.nomor_so" id="alastolak" class="mt-3">
             <div v-for="(lso,index) in so" :key="index">
                 <b>{{lso.alastolak}}</b> 
             </div>    
         </div>
-        <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="modal-lokasi" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Form Penolakan SO</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Form Tujuan Pengiriman</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label>Alasan Penolakan</label>
-                        <textarea v-model="up.alastolak" class="form-control"></textarea>
-                    </div>               
+                        <div class="form-group">
+                            <label>Tujuan</label>
+                            <select class="form-control" v-model="lokasi">
+                                <option value="default">Default</option>
+                                <option value="ekspedisi">Ekspedisi</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="form-group" v-if="lokasi==='ekspedisi'">
+                        <label>Lokasi</label>
+                        <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisible" v-text="eks ? eks.nama:''"></div>
+                        <div class="placeholder" v-if="eks==null">Pilih Ekspedisi</div>
+                        <div class="popover" v-show="visible">
+                            <input type="text"
+                            @keydown.up="up"
+                            @keydown.down="down"
+                            @keydown.enter="selectItem"
+                            v-model="query"
+                            placeholder="Masukan nama ekspedisi.."
+                            >
+                            <div class="optionbr" ref="optionList">
+                                <ul>
+                                    <li v-for="(match,index) in matches" 
+                                    :key="match.id"
+                                    v-text="match.nama"
+                                    :class="{'selected':(selected==index)}"
+                                    @click="itemClicked(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div v-if="lokasi==='ekspedisi'" class="form-group mt-3" >
+                            <label>Alamat</label>
+                            <textarea v-model="eksal" class="form-control" disabled></textarea>
+                        </div>
+                        <div v-if="lokasi==='default'" class="form-group">
+                            <label>Alamat</label>
+                            <textarea  v-for="vso in so" :key="vso.nomor_so" v-model="vso.alamatcustomer" class="form-control" disabled></textarea>
+                        </div>
+                        <div v-if="lokasi==='lainnya'"  class="form-group">
+                            <label>Tempat/Gedung</label>
+                            <input  type="text" class="form-control" v-model="lainlok">
+                        </div>
+                        <div v-if="lokasi==='lainnya'" class="form-group">
+                            <label>Alamat</label>
+                            <textarea v-model="lainal" class="form-control"></textarea>
+                        </div>
+                        
                 </div>
-                <div v-for="(lso,index) in so" :key="index" class="modal-footer">
-                    <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="tolakSo(lso)" class="btn btn-primary">Konfirmasi Tolak</button>
+                <div class="modal-footer"  v-for="vso in so" :key="vso.nomor_so">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="selectLokasi(vso)" class="btn btn-primary" data-dismiss="modal">Save Change</button>
                 </div>
                 </div>
             </div>
         </div>
+
+
+
+
+
+
+
     </div>
 </template>
 
@@ -142,7 +198,6 @@ export default {
             vso:{},
             listso:{},
             tujuan:'',
-            up:{},
             load:true,
             totalt:0,
             subTotalt:0,
@@ -160,15 +215,41 @@ export default {
             disabled:1,
             tombol:'Edit SO',
             tbsukses:false,
+            gagal:false,
+            distribusi:'default',
+            lokasi:'default',
+            dataekspedisi:{},
+            visible:false,
+            visiblecust:false,
+            query:'',
+            selected:0,
+            eks:null,
+            itemHeight:39,
+            disabled:1,
+            dataekspedisi:{},
+            eksal:'',
         }
     },
     created(){
         this.getSo();
-        this.getlistso()
+        this.getlistso();
+        this.getekspedisi();
     },  
-    computed:{       
+    computed:{  
+        matches(){
+            if(this.query==''){
+                return [];
+            }
+            return this.dataekspedisi.filter((item)=> item.nama.toLowerCase().includes(this.query.toLowerCase()))
+        },     
     },
     methods:{
+            getekspedisi(){
+            axios.get("/api/ekspedisi")
+            .then(res=>{
+                this.dataekspedisi=res.data.data;
+            });
+        },
         showModal(){
             $("#modal-form").modal("show");
         },
@@ -369,8 +450,87 @@ export default {
             }
         },
         updateSO(vso){
-            alert(vso.nomor_so);
-        }
+            this.dataso={
+                tanggal_kirim:vso.tanggal_kirim,
+                keterangan:vso.keterangan,
+                lokasi:vso.lokasi,
+                alamat:vso.alamat,
+                id_ekspedisi:vso.id_ekspedisi,
+                distribusi:vso.distribusi,
+                nomor_so:vso.nomor_so,
+            };
+
+            axios.put("/api/so/"+this.$route.params.id,this.dataso)
+            .then(res=>{
+                this.tbsukses=false;
+                this.disabled=1;
+                this.tombol="Edit Rso";
+                this.$router.push({path:'/so/form/'+vso.nomor_so});
+            });
+        },
+        aksidistribusi(vso){
+            if(vso.distribusi==="kirim"){
+                this.lokasi="default";
+                if(this.lokasi==='default'){
+                }
+                $("#modal-lokasi").modal("show");  
+            }else if(vso.distribusi==='ambil'){
+                vso.lokasi="PT. Ekatunggal Tunas Mandiri";
+                vso.alamat="Jl. Pahlawan No.29A, RT.003/005 Citeureup, Kab. Bogor, Jawa Barat";
+            }else if(vso.distribusi==="default"){
+                vso.alamat="";
+                vso.lokasi="";
+            }
+        },
+        selectLokasi(vso){
+            vso.distribusi="default";
+            vso.distribusi="kirim";
+            if(this.lokasi==='ekspedisi'){
+                this.lok=this.ekslok;
+                this.al=this.eksal;
+                this.ide=this.eksid;
+            }else if(this.lokasi==='lainnya'){
+                this.lok=this.lainlok;
+                this.al=this.lainal;
+            }else if(this.lokasi==='default'){
+                this.lok=vso.customer;
+                this.al=vso.alamatcustomer;
+            } 
+            vso.lokasi=this.lok;
+            vso.alamat=this.al;
+            vso.id_ekspedisi=this.ide;
+        },
+        toggleVisible(){
+            this.visible = !this.visible;
+        },
+        itemClicked(index){
+            this.selected=index;
+            this.selectItem();
+        },
+        selectItem(){
+            this.eks = this.matches[this.selected];  
+            this.eksal= this.eks.alamat;
+            this.ekslok= this.eks.nama;
+            this.eksid= this.eks.id;
+            this.visible=false;
+        },
+        up(){
+            if(this.selected==0){
+                return;
+            }
+            this.selected -= 1;
+            this.scrollToItem();
+        },
+        down(){
+            if(this.selected >= this.matches.length -1 ){
+                return;
+            }
+            this.selected += 1;
+            this.scrollToItem();
+        },
+        scrollToItem(){
+            this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
+        },
 
     },
 }

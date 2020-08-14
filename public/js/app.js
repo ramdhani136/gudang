@@ -4693,6 +4693,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -4782,6 +4790,8 @@ __webpack_require__.r(__webpack_exports__);
     updateCustomer: function updateCustomer(customer) {
       this.form.nama = customer.nama;
       this.form.kode = customer.kode;
+      this.form.alamat = customer.alamat;
+      this.form.kontak = customer.kontak;
       this.target = customer.kode;
       this.form.status = customer.status;
       this.form.keterangan = customer.keterangan;
@@ -4804,6 +4814,8 @@ __webpack_require__.r(__webpack_exports__);
     resetForm: function resetForm() {
       this.form.nama = "";
       this.form.kode = "";
+      this.form.alamat = "";
+      this.form.kontak = "";
       this.form.status = "Aktif";
       this.target = "";
       this.form.keterangan = "";
@@ -9667,6 +9679,7 @@ __webpack_require__.r(__webpack_exports__);
       this.ket.customer = aktif.customer;
       this.up.nomor_rso = aktif.nomor_rso;
       this.defaultlok = aktif.customer;
+      this.defaultal = aktif.alamat;
       axios.get("/api/listrso/data/listpo/" + aktif.nomor_po).then(function (res) {
         _this5.listsisa = res.data.data;
       });
@@ -9704,6 +9717,7 @@ __webpack_require__.r(__webpack_exports__);
             _this6.lstatus = "Tidak Tersedia";
             _this6.tampil = true;
             _this6.statuspo = false;
+            _this6.disabled = 0;
           }
         });
       }
@@ -9948,10 +9962,7 @@ __webpack_require__.r(__webpack_exports__);
       if (this.up.distribusi === "kirim") {
         this.lokasi = "default";
 
-        if (this.lokasi === 'default') {
-          this.lok = this.defaultlok;
-          this.al = "Belum ada alamat";
-        }
+        if (this.lokasi === 'default') {}
 
         $("#modal-lokasi").modal("show");
       } else if (this.up.distribusi === 'ambil') {
@@ -9961,9 +9972,6 @@ __webpack_require__.r(__webpack_exports__);
         this.up.alamat = "";
         this.up.lokasi = "";
       }
-    },
-    pilihLokasi: function pilihLokasi() {
-      if (this.lokasi === 'default') {} else if (this.lokasi === 'ekspedisi') {} else if (this.lokasi === 'lainnya') {}
     },
     selectLokasi: function selectLokasi() {
       this.up.distribusi = "default";
@@ -9975,6 +9983,9 @@ __webpack_require__.r(__webpack_exports__);
       } else if (this.lokasi === 'lainnya') {
         this.lok = this.lainlok;
         this.al = this.lainal;
+      } else if (this.lokasi === 'default') {
+        this.lok = this.defaultlok;
+        this.al = this.defaultal;
       }
 
       this.up.lokasi = this.lok;
@@ -10028,6 +10039,64 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_loading_spinner__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-loading-spinner */ "./node_modules/vue-loading-spinner/src/index.js");
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -10166,12 +10235,13 @@ __webpack_require__.r(__webpack_exports__);
     Circle5: vue_loading_spinner__WEBPACK_IMPORTED_MODULE_0__["Circle5"]
   },
   data: function data() {
-    return {
+    var _ref;
+
+    return _ref = {
       so: {},
       vso: {},
       listso: {},
       tujuan: '',
-      up: {},
       load: true,
       totalt: 0,
       subTotalt: 0,
@@ -10192,52 +10262,82 @@ __webpack_require__.r(__webpack_exports__);
       ubah: {},
       disabled: 1,
       tombol: 'Edit SO',
-      tbsukses: false
-    };
+      tbsukses: false,
+      gagal: false,
+      distribusi: 'default',
+      lokasi: 'default',
+      dataekspedisi: {},
+      visible: false,
+      visiblecust: false,
+      query: '',
+      selected: 0,
+      eks: null,
+      itemHeight: 39
+    }, _defineProperty(_ref, "disabled", 1), _defineProperty(_ref, "dataekspedisi", {}), _defineProperty(_ref, "eksal", ''), _ref;
   },
   created: function created() {
     this.getSo();
     this.getlistso();
+    this.getekspedisi();
   },
-  computed: {},
+  computed: {
+    matches: function matches() {
+      var _this = this;
+
+      if (this.query == '') {
+        return [];
+      }
+
+      return this.dataekspedisi.filter(function (item) {
+        return item.nama.toLowerCase().includes(_this.query.toLowerCase());
+      });
+    }
+  },
   methods: {
+    getekspedisi: function getekspedisi() {
+      var _this2 = this;
+
+      axios.get("/api/ekspedisi").then(function (res) {
+        _this2.dataekspedisi = res.data.data;
+      });
+    },
     showModal: function showModal() {
       $("#modal-form").modal("show");
     },
     getSo: function getSo() {
-      var _this = this;
+      var _this3 = this;
 
       axios.get("/api/so/".concat(this.$route.params.id)).then(function (res) {
-        return _this.so = res.data.data;
+        return _this3.so = res.data.data;
       });
     },
     getlistso: function getlistso() {
-      var _this2 = this;
+      var _this4 = this;
 
       axios.get("/api/so/" + this.$route.params.id).then(function (res) {
-        _this2.so = res.data.data;
+        _this4.so = res.data.data;
 
-        if (_this2.so[0].statusso === "tersedia") {
-          axios.get("/api/listrso/data/sotersedia/" + _this2.so[0].nomor_rso).then(function (res) {
-            _this2.listso = res.data.data;
-            _this2.load = false;
+        if (_this4.so[0].statusso === "tersedia") {
+          axios.get("/api/listrso/data/sotersedia/" + _this4.so[0].nomor_rso).then(function (res) {
+            _this4.listso = res.data.data;
+            _this4.load = false;
 
-            for (var i = 0; i < _this2.listso.length; i++) {
-              _this2.ket.qtypesan = _this2.listso[i].qty_tersedia;
-              _this2.ket.subtotal += parseInt(_this2.listso[i].qty_tersedia) * parseInt(_this2.listso[i].harga);
-              _this2.ket.status = "Tersedia";
+            for (var i = 0; i < _this4.listso.length; i++) {
+              _this4.ket.qtypesan = _this4.listso[i].qty_tersedia;
+              _this4.ket.subtotal += parseInt(_this4.listso[i].qty_tersedia) * parseInt(_this4.listso[i].harga);
+              _this4.ket.status = "Tersedia";
             }
           });
         } else {
-          axios.get("/api/listrso/data/sott/" + _this2.so[0].nomor_rso).then(function (res) {
-            _this2.listso = res.data.data;
-            _this2.load = false;
+          axios.get("/api/listrso/data/sott/" + _this4.so[0].nomor_rso).then(function (res) {
+            _this4.listso = res.data.data;
+            _this4.load = false;
 
-            for (var i = 0; i < _this2.listso.length; i++) {
-              _this2.ket.qtypesan = _this2.listso[i].qty_tdktersedia;
-              _this2.ket.subtotal += parseInt(_this2.ket.qtypesan) * parseInt(_this2.listso[i].harga);
-              _this2.ket.status = "Tidak Tersedia";
-              _this2.ket.tanggal = _this2.listso[i].tgl_datang;
+            for (var i = 0; i < _this4.listso.length; i++) {
+              _this4.ket.qtypesan = _this4.listso[i].qty_tdktersedia;
+              _this4.ket.subtotal += parseInt(_this4.ket.qtypesan) * parseInt(_this4.listso[i].harga);
+              _this4.ket.status = "Tidak Tersedia";
+              _this4.ket.tanggal = _this4.listso[i].tgl_datang;
             }
           });
         }
@@ -10268,59 +10368,59 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     hapusListSo: function hapusListSo(ts) {
-      var _this3 = this;
+      var _this5 = this;
 
       var keputusan = confirm("Yakin ingin menghapus item ini dari SO? #Akan otomatis menghapus item in pada RSO");
 
       if (keputusan === true) {
         axios.get("/api/so/".concat(this.$route.params.id)).then(function (res) {
-          return _this3.so = res.data.data;
+          return _this5.so = res.data.data;
         });
 
         if (this.so[0].statusso === "tersedia") {
           axios.get("/api/listrso/" + ts.id + "/edit").then(function (res) {
-            _this3.listrso = res.data.data;
-            _this3.updel.qty_tersedia = "";
-            _this3.updel.so_tersedia = "Y";
-            _this3.updel.qty = parseInt(_this3.listrso[0].qty) - parseInt(_this3.listrso[0].qty_tersedia);
+            _this5.listrso = res.data.data;
+            _this5.updel.qty_tersedia = "";
+            _this5.updel.so_tersedia = "Y";
+            _this5.updel.qty = parseInt(_this5.listrso[0].qty) - parseInt(_this5.listrso[0].qty_tersedia);
 
-            if (_this3.updel.qty < 1) {
-              axios["delete"]("/api/listrso/" + _this3.listrso[0].id).then(function (res) {
-                _this3.getSo();
+            if (_this5.updel.qty < 1) {
+              axios["delete"]("/api/listrso/" + _this5.listrso[0].id).then(function (res) {
+                _this5.getSo();
 
-                _this3.getlistso();
+                _this5.getlistso();
               });
             } else {
-              axios.put("/api/listrso/" + _this3.listrso[0].id, _this3.updel).then(function (res) {
-                _this3.getSo();
+              axios.put("/api/listrso/" + _this5.listrso[0].id, _this5.updel).then(function (res) {
+                _this5.getSo();
 
-                _this3.getlistso();
+                _this5.getlistso();
               });
             }
 
             ;
-            axios.get("/api/listrso/data/sotersedia/" + _this3.so[0].nomor_rso).then(function (res) {
-              _this3.ada = 0;
-              _this3.listso = res.data.data;
+            axios.get("/api/listrso/data/sotersedia/" + _this5.so[0].nomor_rso).then(function (res) {
+              _this5.ada = 0;
+              _this5.listso = res.data.data;
 
-              for (var i = 0; i < _this3.listso.length; i++) {
-                _this3.ada += parseInt(_this3.listso[i].qty_tersedia);
+              for (var i = 0; i < _this5.listso.length; i++) {
+                _this5.ada += parseInt(_this5.listso[i].qty_tersedia);
               }
 
-              if (_this3.ada < 1) {
-                axios.get("/api/listrso/" + _this3.so[0].nomor_rso).then(function (res) {
-                  _this3.listrso = res.data.data;
+              if (_this5.ada < 1) {
+                axios.get("/api/listrso/" + _this5.so[0].nomor_rso).then(function (res) {
+                  _this5.listrso = res.data.data;
 
-                  if (_this3.listrso.length > 0) {
-                    axios["delete"]("/api/so/" + _this3.$route.params.id).then(function (res) {
-                      _this3.$router.push({
+                  if (_this5.listrso.length > 0) {
+                    axios["delete"]("/api/so/" + _this5.$route.params.id).then(function (res) {
+                      _this5.$router.push({
                         name: 'so'
                       });
                     });
                   } else {
-                    axios["delete"]("/api/rso/" + _this3.so[0].nomor_rso).then(function (res) {
-                      axios["delete"]("/api/so/" + _this3.$route.params.id).then(function (res) {
-                        _this3.$router.push({
+                    axios["delete"]("/api/rso/" + _this5.so[0].nomor_rso).then(function (res) {
+                      axios["delete"]("/api/so/" + _this5.$route.params.id).then(function (res) {
+                        _this5.$router.push({
                           name: 'so'
                         });
                       });
@@ -10328,56 +10428,56 @@ __webpack_require__.r(__webpack_exports__);
                   }
                 });
               } else {
-                _this3.getSo();
+                _this5.getSo();
 
-                _this3.getlistso();
+                _this5.getlistso();
               }
             });
           });
         } else {
           axios.get("/api/listrso/" + ts.id + "/edit").then(function (res) {
-            _this3.listrso = res.data.data;
-            _this3.updel.qty_tdktersedia = "";
-            _this3.updel.so_tdktersedia = "Y";
-            _this3.updel.qty = parseInt(_this3.listrso[0].qty) - parseInt(_this3.listrso[0].qty_tdktersedia);
+            _this5.listrso = res.data.data;
+            _this5.updel.qty_tdktersedia = "";
+            _this5.updel.so_tdktersedia = "Y";
+            _this5.updel.qty = parseInt(_this5.listrso[0].qty) - parseInt(_this5.listrso[0].qty_tdktersedia);
 
-            if (_this3.updel.qty < 1) {
-              axios["delete"]("/api/listrso/" + _this3.listrso[0].id).then(function (res) {
-                _this3.getSo();
+            if (_this5.updel.qty < 1) {
+              axios["delete"]("/api/listrso/" + _this5.listrso[0].id).then(function (res) {
+                _this5.getSo();
 
-                _this3.getlistso();
+                _this5.getlistso();
               });
             } else {
-              axios.put("/api/listrso/" + _this3.listrso[0].id, _this3.updel).then(function (res) {
-                _this3.getSo();
+              axios.put("/api/listrso/" + _this5.listrso[0].id, _this5.updel).then(function (res) {
+                _this5.getSo();
 
-                _this3.getlistso();
+                _this5.getlistso();
               });
             }
 
             ;
-            axios.get("/api/listrso/data/sott/" + _this3.so[0].nomor_rso).then(function (res) {
-              _this3.ada = 0;
-              _this3.listso = res.data.data;
+            axios.get("/api/listrso/data/sott/" + _this5.so[0].nomor_rso).then(function (res) {
+              _this5.ada = 0;
+              _this5.listso = res.data.data;
 
-              for (var i = 0; i < _this3.listso.length; i++) {
-                _this3.ada += parseInt(_this3.listso[i].qty_tdktersedia);
+              for (var i = 0; i < _this5.listso.length; i++) {
+                _this5.ada += parseInt(_this5.listso[i].qty_tdktersedia);
               }
 
-              if (_this3.ada < 1) {
-                axios.get("/api/listrso/" + _this3.so[0].nomor_rso).then(function (res) {
-                  _this3.listrso = res.data.data;
+              if (_this5.ada < 1) {
+                axios.get("/api/listrso/" + _this5.so[0].nomor_rso).then(function (res) {
+                  _this5.listrso = res.data.data;
 
-                  if (_this3.listrso.length > 0) {
-                    axios["delete"]("/api/so/" + _this3.$route.params.id).then(function (res) {
-                      _this3.$router.push({
+                  if (_this5.listrso.length > 0) {
+                    axios["delete"]("/api/so/" + _this5.$route.params.id).then(function (res) {
+                      _this5.$router.push({
                         name: 'so'
                       });
                     });
                   } else {
-                    axios["delete"]("/api/rso/" + _this3.so[0].nomor_rso).then(function (res) {
-                      axios["delete"]("/api/so/" + _this3.$route.params.id).then(function (res) {
-                        _this3.$router.push({
+                    axios["delete"]("/api/rso/" + _this5.so[0].nomor_rso).then(function (res) {
+                      axios["delete"]("/api/so/" + _this5.$route.params.id).then(function (res) {
+                        _this5.$router.push({
                           name: 'so'
                         });
                       });
@@ -10385,9 +10485,9 @@ __webpack_require__.r(__webpack_exports__);
                   }
                 });
               } else {
-                _this3.getSo();
+                _this5.getSo();
 
-                _this3.getlistso();
+                _this5.getlistso();
               }
             });
           });
@@ -10400,14 +10500,14 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     submitSend: function submitSend() {
-      var _this4 = this;
+      var _this6 = this;
 
       var keputusan = confirm("yakin ingin mengirim SO ini?");
 
       if (keputusan === true) {
         this.ubah.status = "Sent";
         axios.put("/api/so/" + this.$route.params.id, this.ubah).then(function (res) {
-          _this4.$router.push({
+          _this6.$router.push({
             name: 'so'
           });
         });
@@ -10425,7 +10525,94 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     updateSO: function updateSO(vso) {
-      alert(vso.nomor_so);
+      var _this7 = this;
+
+      this.dataso = {
+        tanggal_kirim: vso.tanggal_kirim,
+        keterangan: vso.keterangan,
+        lokasi: vso.lokasi,
+        alamat: vso.alamat,
+        id_ekspedisi: vso.id_ekspedisi,
+        distribusi: vso.distribusi,
+        nomor_so: vso.nomor_so
+      };
+      axios.put("/api/so/" + this.$route.params.id, this.dataso).then(function (res) {
+        _this7.tbsukses = false;
+        _this7.disabled = 1;
+        _this7.tombol = "Edit Rso";
+
+        _this7.$router.push({
+          path: '/so/form/' + vso.nomor_so
+        });
+      });
+    },
+    aksidistribusi: function aksidistribusi(vso) {
+      if (vso.distribusi === "kirim") {
+        this.lokasi = "default";
+
+        if (this.lokasi === 'default') {}
+
+        $("#modal-lokasi").modal("show");
+      } else if (vso.distribusi === 'ambil') {
+        vso.lokasi = "PT. Ekatunggal Tunas Mandiri";
+        vso.alamat = "Jl. Pahlawan No.29A, RT.003/005 Citeureup, Kab. Bogor, Jawa Barat";
+      } else if (vso.distribusi === "default") {
+        vso.alamat = "";
+        vso.lokasi = "";
+      }
+    },
+    selectLokasi: function selectLokasi(vso) {
+      vso.distribusi = "default";
+      vso.distribusi = "kirim";
+
+      if (this.lokasi === 'ekspedisi') {
+        this.lok = this.ekslok;
+        this.al = this.eksal;
+        this.ide = this.eksid;
+      } else if (this.lokasi === 'lainnya') {
+        this.lok = this.lainlok;
+        this.al = this.lainal;
+      } else if (this.lokasi === 'default') {
+        this.lok = vso.customer;
+        this.al = vso.alamatcustomer;
+      }
+
+      vso.lokasi = this.lok;
+      vso.alamat = this.al;
+      vso.id_ekspedisi = this.ide;
+    },
+    toggleVisible: function toggleVisible() {
+      this.visible = !this.visible;
+    },
+    itemClicked: function itemClicked(index) {
+      this.selected = index;
+      this.selectItem();
+    },
+    selectItem: function selectItem() {
+      this.eks = this.matches[this.selected];
+      this.eksal = this.eks.alamat;
+      this.ekslok = this.eks.nama;
+      this.eksid = this.eks.id;
+      this.visible = false;
+    },
+    up: function up() {
+      if (this.selected == 0) {
+        return;
+      }
+
+      this.selected -= 1;
+      this.scrollToItem();
+    },
+    down: function down() {
+      if (this.selected >= this.matches.length - 1) {
+        return;
+      }
+
+      this.selected += 1;
+      this.scrollToItem();
+    },
+    scrollToItem: function scrollToItem() {
+      this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
     }
   }
 });
@@ -10442,7 +10629,6 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_loading_spinner__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-loading-spinner */ "./node_modules/vue-loading-spinner/src/index.js");
-//
 //
 //
 //
@@ -59643,6 +59829,61 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Alamat")]),
+                      _vm._v(" "),
+                      _c("textarea", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.form.alamat,
+                            expression: "form.alamat"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        domProps: { value: _vm.form.alamat },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.form, "alamat", $event.target.value)
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("No. Kontak")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.form.kontak,
+                            expression: "form.kontak"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          name: "number",
+                          autocomplete: "off"
+                        },
+                        domProps: { value: _vm.form.kontak },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.form, "kontak", $event.target.value)
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
                       _c("label", [_vm._v("Keterangan")]),
                       _vm._v(" "),
                       _c("textarea", {
@@ -68930,9 +69171,6 @@ var render = function() {
               staticClass: "form-control",
               attrs: { disabled: _vm.disabled == 1 },
               on: {
-                click: function($event) {
-                  return _vm.ifkirim()
-                },
                 change: [
                   function($event) {
                     var $$selectedVal = Array.prototype.filter
@@ -69403,7 +69641,7 @@ var render = function() {
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-body" }, [
                   _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Lokasi")]),
+                    _c("label", [_vm._v("Tujuan")]),
                     _vm._v(" "),
                     _c(
                       "select",
@@ -69418,24 +69656,19 @@ var render = function() {
                         ],
                         staticClass: "form-control",
                         on: {
-                          change: [
-                            function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.lokasi = $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
-                            },
-                            function($event) {
-                              return _vm.pilihLokasi()
-                            }
-                          ]
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.lokasi = $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          }
                         }
                       },
                       [
@@ -69952,8 +70185,8 @@ var render = function() {
     "div",
     { staticClass: "container" },
     [
-      _vm._l(_vm.so, function(vso) {
-        return _c("div", { key: vso.nomor_so, staticClass: "row row-cols-2" }, [
+      _vm._l(_vm.so, function(vso, index) {
+        return _c("div", { key: index, staticClass: "row row-cols-2" }, [
           _c("div", { staticClass: "col-4" }, [
             _c("div", { staticClass: "form-group" }, [
               _c("label", [_vm._v("Nomor SO :")]),
@@ -69968,7 +70201,7 @@ var render = function() {
                   }
                 ],
                 staticClass: "form-control col-12",
-                attrs: { type: "text", disabled: "" },
+                attrs: { type: "text", disabled: _vm.disabled == 1 },
                 domProps: { value: vso.nomor_so },
                 on: {
                   input: function($event) {
@@ -70043,7 +70276,7 @@ var render = function() {
               })
             ]),
             _vm._v(" "),
-            vso.status === "Draft"
+            vso.status === "Draft" || vso.status === "Tolak"
               ? _c(
                   "button",
                   {
@@ -70058,7 +70291,8 @@ var render = function() {
                 )
               : _vm._e(),
             _vm._v(" "),
-            _vm.tbsukses && vso.status === "Draft"
+            (_vm.tbsukses && vso.status === "Draft") ||
+            (_vm.tbsukses && vso.status === "Tolak")
               ? _c(
                   "button",
                   {
@@ -70208,9 +70442,6 @@ var render = function() {
                   staticClass: "form-control",
                   attrs: { disabled: _vm.disabled == 1 },
                   on: {
-                    click: function($event) {
-                      return _vm.ifkirim()
-                    },
                     change: [
                       function($event) {
                         var $$selectedVal = Array.prototype.filter
@@ -70230,7 +70461,7 @@ var render = function() {
                         )
                       },
                       function($event) {
-                        return _vm.aksidistribusi()
+                        return _vm.aksidistribusi(vso)
                       }
                     ]
                   }
@@ -70526,6 +70757,21 @@ var render = function() {
                 },
                 [_vm._v("\n                Kirim SO\n            ")]
               )
+            : _vm._e(),
+          _vm._v(" "),
+          lso.status == "Tolak"
+            ? _c(
+                "button",
+                {
+                  staticClass: "btn-orange btn ml-3",
+                  on: {
+                    click: function($event) {
+                      return _vm.submitSend()
+                    }
+                  }
+                },
+                [_vm._v("\n                Request Ulang\n            ")]
+              )
             : _vm._e()
         ])
       }),
@@ -70534,7 +70780,11 @@ var render = function() {
         return vso.status == "Tolak"
           ? _c(
               "div",
-              { key: vso.nomor_so, attrs: { id: "alastolak" } },
+              {
+                key: vso.nomor_so,
+                staticClass: "mt-3",
+                attrs: { id: "alastolak" }
+              },
               _vm._l(_vm.so, function(lso, index) {
                 return _c("div", { key: index }, [
                   _c("b", [_vm._v(_vm._s(lso.alastolak))])
@@ -70550,10 +70800,9 @@ var render = function() {
         {
           staticClass: "modal fade",
           attrs: {
-            id: "modal-form",
+            id: "modal-lokasi",
             tabindex: "-1",
             "data-backdrop": "static",
-            role: "dialog",
             "aria-labelledby": "exampleModalLabel",
             "aria-hidden": "true"
           }
@@ -70571,46 +70820,322 @@ var render = function() {
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-body" }, [
                     _c("div", { staticClass: "form-group" }, [
-                      _c("label", [_vm._v("Alasan Penolakan")]),
+                      _c("label", [_vm._v("Tujuan")]),
                       _vm._v(" "),
-                      _c("textarea", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.up.alastolak,
-                            expression: "up.alastolak"
-                          }
-                        ],
-                        staticClass: "form-control",
-                        domProps: { value: _vm.up.alastolak },
-                        on: {
-                          input: function($event) {
-                            if ($event.target.composing) {
-                              return
+                      _c(
+                        "select",
+                        {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.lokasi,
+                              expression: "lokasi"
                             }
-                            _vm.$set(_vm.up, "alastolak", $event.target.value)
+                          ],
+                          staticClass: "form-control",
+                          on: {
+                            change: function($event) {
+                              var $$selectedVal = Array.prototype.filter
+                                .call($event.target.options, function(o) {
+                                  return o.selected
+                                })
+                                .map(function(o) {
+                                  var val = "_value" in o ? o._value : o.value
+                                  return val
+                                })
+                              _vm.lokasi = $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            }
                           }
-                        }
-                      })
-                    ])
+                        },
+                        [
+                          _c("option", { attrs: { value: "default" } }, [
+                            _vm._v("Default")
+                          ]),
+                          _vm._v(" "),
+                          _c("option", { attrs: { value: "ekspedisi" } }, [
+                            _vm._v("Ekspedisi")
+                          ]),
+                          _vm._v(" "),
+                          _c("option", { attrs: { value: "lainnya" } }, [
+                            _vm._v("Lainnya")
+                          ])
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _vm.lokasi === "ekspedisi"
+                      ? _c("div", { staticClass: "form-group" }, [
+                          _c("label", [_vm._v("Lokasi")]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "autocomplete" }),
+                          _vm._v(" "),
+                          _c("div", {
+                            staticClass: "input",
+                            domProps: {
+                              textContent: _vm._s(_vm.eks ? _vm.eks.nama : "")
+                            },
+                            on: { click: _vm.toggleVisible }
+                          }),
+                          _vm._v(" "),
+                          _vm.eks == null
+                            ? _c("div", { staticClass: "placeholder" }, [
+                                _vm._v("Pilih Ekspedisi")
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            {
+                              directives: [
+                                {
+                                  name: "show",
+                                  rawName: "v-show",
+                                  value: _vm.visible,
+                                  expression: "visible"
+                                }
+                              ],
+                              staticClass: "popover"
+                            },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.query,
+                                    expression: "query"
+                                  }
+                                ],
+                                attrs: {
+                                  type: "text",
+                                  placeholder: "Masukan nama ekspedisi.."
+                                },
+                                domProps: { value: _vm.query },
+                                on: {
+                                  keydown: [
+                                    function($event) {
+                                      if (
+                                        !$event.type.indexOf("key") &&
+                                        _vm._k(
+                                          $event.keyCode,
+                                          "up",
+                                          38,
+                                          $event.key,
+                                          ["Up", "ArrowUp"]
+                                        )
+                                      ) {
+                                        return null
+                                      }
+                                      return _vm.up($event)
+                                    },
+                                    function($event) {
+                                      if (
+                                        !$event.type.indexOf("key") &&
+                                        _vm._k(
+                                          $event.keyCode,
+                                          "down",
+                                          40,
+                                          $event.key,
+                                          ["Down", "ArrowDown"]
+                                        )
+                                      ) {
+                                        return null
+                                      }
+                                      return _vm.down($event)
+                                    },
+                                    function($event) {
+                                      if (
+                                        !$event.type.indexOf("key") &&
+                                        _vm._k(
+                                          $event.keyCode,
+                                          "enter",
+                                          13,
+                                          $event.key,
+                                          "Enter"
+                                        )
+                                      ) {
+                                        return null
+                                      }
+                                      return _vm.selectItem($event)
+                                    }
+                                  ],
+                                  input: function($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.query = $event.target.value
+                                  }
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c(
+                                "div",
+                                { ref: "optionList", staticClass: "optionbr" },
+                                [
+                                  _c(
+                                    "ul",
+                                    _vm._l(_vm.matches, function(match, index) {
+                                      return _c("li", {
+                                        key: match.id,
+                                        class: {
+                                          selected: _vm.selected == index
+                                        },
+                                        domProps: {
+                                          textContent: _vm._s(match.nama)
+                                        },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.itemClicked(index)
+                                          }
+                                        }
+                                      })
+                                    }),
+                                    0
+                                  )
+                                ]
+                              )
+                            ]
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.lokasi === "ekspedisi"
+                      ? _c("div", { staticClass: "form-group mt-3" }, [
+                          _c("label", [_vm._v("Alamat")]),
+                          _vm._v(" "),
+                          _c("textarea", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.eksal,
+                                expression: "eksal"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { disabled: "" },
+                            domProps: { value: _vm.eksal },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.eksal = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.lokasi === "default"
+                      ? _c(
+                          "div",
+                          { staticClass: "form-group" },
+                          [
+                            _c("label", [_vm._v("Alamat")]),
+                            _vm._v(" "),
+                            _vm._l(_vm.so, function(vso) {
+                              return _c("textarea", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: vso.alamatcustomer,
+                                    expression: "vso.alamatcustomer"
+                                  }
+                                ],
+                                key: vso.nomor_so,
+                                staticClass: "form-control",
+                                attrs: { disabled: "" },
+                                domProps: { value: vso.alamatcustomer },
+                                on: {
+                                  input: function($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.$set(
+                                      vso,
+                                      "alamatcustomer",
+                                      $event.target.value
+                                    )
+                                  }
+                                }
+                              })
+                            })
+                          ],
+                          2
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.lokasi === "lainnya"
+                      ? _c("div", { staticClass: "form-group" }, [
+                          _c("label", [_vm._v("Tempat/Gedung")]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.lainlok,
+                                expression: "lainlok"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text" },
+                            domProps: { value: _vm.lainlok },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.lainlok = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.lokasi === "lainnya"
+                      ? _c("div", { staticClass: "form-group" }, [
+                          _c("label", [_vm._v("Alamat")]),
+                          _vm._v(" "),
+                          _c("textarea", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.lainal,
+                                expression: "lainal"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            domProps: { value: _vm.lainal },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.lainal = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      : _vm._e()
                   ]),
                   _vm._v(" "),
-                  _vm._l(_vm.so, function(lso, index) {
+                  _vm._l(_vm.so, function(vso) {
                     return _c(
                       "div",
-                      { key: index, staticClass: "modal-footer" },
+                      { key: vso.nomor_so, staticClass: "modal-footer" },
                       [
                         _c(
                           "button",
                           {
                             staticClass: "btn btn-secondary",
-                            attrs: { type: "button", "data-dismiss": "modal" },
-                            on: {
-                              click: function($event) {
-                                return _vm.resetForm()
-                              }
-                            }
+                            attrs: { type: "button", "data-dismiss": "modal" }
                           },
                           [_vm._v("Close")]
                         ),
@@ -70619,14 +71144,14 @@ var render = function() {
                           "button",
                           {
                             staticClass: "btn btn-primary",
-                            attrs: { type: "button" },
+                            attrs: { type: "button", "data-dismiss": "modal" },
                             on: {
                               click: function($event) {
-                                return _vm.tolakSo(lso)
+                                return _vm.selectLokasi(vso)
                               }
                             }
                           },
-                          [_vm._v("Konfirmasi Tolak")]
+                          [_vm._v("Save Change")]
                         )
                       ]
                     )
@@ -70651,7 +71176,7 @@ var staticRenderFns = [
       _c(
         "h5",
         { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
-        [_vm._v("Form Penolakan SO")]
+        [_vm._v("Form Tujuan Pengiriman")]
       ),
       _vm._v(" "),
       _c(
@@ -70828,7 +71353,7 @@ var render = function() {
                         ]
                       ),
                       _vm._v(" "),
-                      rs.status == "Draft"
+                      rs.status == "Draft" || rs.status == "Tolak"
                         ? _c(
                             "button",
                             {
@@ -70841,12 +71366,6 @@ var render = function() {
                             },
                             [_vm._v("Hapus")]
                           )
-                        : _vm._e(),
-                      _vm._v(" "),
-                      rs.status == "Tolak"
-                        ? _c("button", { staticClass: "btn btn-orange" }, [
-                            _vm._v("Request Ulang")
-                          ])
                         : _vm._e()
                     ],
                     1

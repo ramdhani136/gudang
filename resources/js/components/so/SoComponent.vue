@@ -37,8 +37,7 @@
                                 <router-link :to="{name:'formso',params:{id:rs.nomor_so,rso:rs.nomor_rso}}" class="btn btn-primary" >
                                     Lihat Detail
                                 </router-link>
-                                <button @click="deleteSo(rs)" v-if="rs.status=='Draft'" class="btn btn-danger">Hapus</button>
-                                <button v-if="rs.status=='Tolak'" class="btn btn-orange">Request Ulang</button>
+                                <button @click="deleteSo(rs)" v-if="rs.status=='Draft' || rs.status=='Tolak'" class="btn btn-danger">Hapus</button>
                             </td>
                         </tr>
                     </tbody>

@@ -34,7 +34,7 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>Distribusi :</label>
-                    <select class="form-control" v-model="up.distribusi" @click="ifkirim()" @change="aksidistribusi()" :disabled="disabled == 1">
+                    <select class="form-control" v-model="up.distribusi"  @change="aksidistribusi()" :disabled="disabled == 1">
                         <option value="default">- Masukan pilihan anda -</option>
                         <option value="kirim">Di Kirim</option>
                         <option value="ambil">Ambil Sendiri</option>
@@ -192,8 +192,8 @@
                 </div>
                 <div class="modal-body">
                         <div class="form-group">
-                            <label>Lokasi</label>
-                            <select class="form-control" @change="pilihLokasi()" v-model="lokasi">
+                            <label>Tujuan</label>
+                            <select class="form-control"  v-model="lokasi">
                                 <option value="default">Default</option>
                                 <option value="ekspedisi">Ekspedisi</option>
                                 <option value="lainnya">Lainnya</option>
@@ -373,6 +373,7 @@ export default {
             this.ket.customer=aktif.customer;
             this.up.nomor_rso=aktif.nomor_rso;
             this.defaultlok=aktif.customer;
+            this.defaultal=aktif.alamat;
             axios.get("/api/listrso/data/listpo/"+aktif.nomor_po)
             .then(res=>{
                 this.listsisa=res.data.data;
@@ -407,6 +408,7 @@ export default {
                     this.lstatus="Tidak Tersedia";  
                     this.tampil=true;  
                     this.statuspo=false;
+                    this.disabled=0;
                 }
                 });
             }
@@ -622,8 +624,6 @@ export default {
             if(this.up.distribusi==="kirim"){
                 this.lokasi="default";
                 if(this.lokasi==='default'){
-                this.lok=this.defaultlok;
-                this.al="Belum ada alamat";
                 }
                 $("#modal-lokasi").modal("show");  
             }else if(this.up.distribusi==='ambil'){
@@ -632,15 +632,6 @@ export default {
             }else if(this.up.distribusi==="default"){
                 this.up.alamat="";
                 this.up.lokasi="";
-            }
-        },
-        pilihLokasi(){
-            if(this.lokasi==='default'){
-                
-            }else if(this.lokasi==='ekspedisi'){
-                
-            }else if(this.lokasi==='lainnya'){
-
             }
         },
         selectLokasi(){
@@ -652,7 +643,10 @@ export default {
             }else if(this.lokasi==='lainnya'){
                 this.lok=this.lainlok;
                 this.al=this.lainal;
-            }
+            }else if(this.lokasi==='default'){
+                this.lok=this.defaultlok;
+                this.al=this.defaultal;
+            } 
             this.up.lokasi=this.lok;
             this.up.alamat=this.al;
         },

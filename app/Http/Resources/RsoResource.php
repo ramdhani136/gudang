@@ -21,6 +21,8 @@ class RsoResource extends JsonResource
             'sales'=>$this->sales->nama,
             'nip_sales'=>$this->nip_sales,
             'customer'=>$this->customer->nama,
+            'alamat'=>$this->customer->alamat,
+            'kontak'=>$this->customer->kontak,
             'keterangan'=>$this->keterangan,
             'status'=>$this->status,
             'kode_customer'=>$this->kode_customer,
