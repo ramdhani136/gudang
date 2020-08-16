@@ -197,7 +197,18 @@ export default {
             },
             uploood:{},
             dtime:this.DateTime(),
-            totalmasuk:{}
+            totalmasuk:{},
+            listpo:{},
+            uplist:{},
+            uppo:{},
+            uplistsisa:{
+                qty_masuk:0,
+            },
+            uplistsisa2:{
+                qty_masuk:0,
+            },
+            listpost:{},
+            listsisas:{},
         }
     },
     created(){
@@ -284,50 +295,107 @@ export default {
             }
         }, */
         submitBBM(){  
-            console.log(this.checker);
-      /*   for(let i=0;i<this.checker.length;i++){
-            axios.get("/api/listbcm/data/"+this.checker[i].nomor_bcm+"/"+this.checker[i].kode_barang)
-            .then(res=>{
-                this.totalmasuk=res.data.data;
-                this.pembanding=0;
-                this.pembanding=parseInt(this.checker[i].qty)-parseInt(this.hitung.qty[i]);
-                if(this.pembanding>0){
-                    console.log(this.checker[i].id);
-                    for(let j=0;j<this.totalmasuk.length;j++){
-                        console.log(this.totalmasuk[j].qty);
-                    }
-
-                }else{
-                    console.log(this.checker[i].id);
-
-                }
-
-            });  
-        } */
-
-
-
-        /* let jawab=confirm("Yakin ingin mengirim Bukti Barang Masuk ini?");
-        if(jawab===true){
-            this.up.status="open";
-            axios.post("/api/bbm",this.up)
-            .then(res=>{
-                for(let i=0;i<this.checker.length;i++){
-                    this.uploadlist.kode_barang=this.checker[i].kode_barang;
-                    this.uploadlist.qty=this.hitung.qty[i];
-                    this.uploadlist.keterangan=this.hitung.keterangan[i];
-                    this.uploadlist.nomor_bbm=this.up.bbm;
-                    this.uploadlist.status="open";
-                    this.uploood={kode_barang:this.uploadlist.kode_barang,nomor_bbm:this.uploadlist.nomor_bbm,
-                    qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan
-                    };
-                    axios.post("/api/listbbm",this.uploood)
+            let keputusan=confirm("yakin ingin mengirim Bukti Barang Masuk ini?");
+            if(keputusan===true){
+                axios.post("/api/bbm/",this.up)
+                .then(res=>{
+                    for(let i=0;i<this.checker.length;i++){
+                this.uplistrso={qty:this.hitung.qty[i]};
+                axios.put("/api/listbcm/"+this.checker[i].id,this.uplistrso)
+                .then(res=>{
+                    if(this.hitung.qty[i]<this.checker[i].qty){
+                    axios.get("/api/view/accpo/"+this.checker[i].nomor_po+"/"+this.checker[i].kode_barang)
                     .then(res=>{
+                        this.listpo=res.data.data;
+                        for(let j=0;j<this.listpo.length;j++){ 
+    
+                            if(this.listpo[j].qty_masuk<this.checker[i].qty){
+                                this.hasil=0;
+                                this.checker[i].qty=parseInt(this.checker[i].qty)-parseInt(this.listpo[j].qty_masuk);
+                            }else{
+                                this.hasil=parseInt(this.listpo[j].qty_masuk)-parseInt(this.checker[i].qty);
+                                this.checker[i].qty=parseInt(this.checker[i].qty)-parseInt(this.listpo[j].qty_masuk);
+                            }
+                            if(this.checker[i].qty<0){
+                                this.checker[i].qty=0;
+                            }
+                            this.uplistsisa={qty_masuk:this.hasil};
+                            axios.put("/api/listrso/"+this.listpo[j].id, this.uplistsisa)
+                            .then(res=>{
+                            axios.get("/api/listrso/data/listpo/"+this.checker[i].nomor_po)
+                                .then(res=>{
+                                    this.listsisa=res.data.data;
+                                    for(let k=0;k<this.listsisa.length;k++){
+                                        if(this.listsisa[k].sisapo>0){
+                                            this.uplist.po_close="N";
+                                            axios.put("/api/listrso/data/"+this.listsisa[k].nomor_po+"/"+this.listsisa[k].kode_barang,this.uplist)
+                                            .then(res=>{
+                                            });
+                                            }
+                                            }
+                                })
+                            this.sipo=0;
+                            axios.get("/api/listrso/data/listall/"+this.checker[i].nomor_po)
+                            .then(res=>{
+                                this.sisasemua=0;
+                                this.listsisa=res.data.data;
+                                for(let l=0;l<this.listsisa.length;l++){
+                                    this.sipo+=parseInt(this.listsisa[l].sisapo);  
+                                }
+                                if(this.sipo>0){
+                                this.uppo.status="Acc";
+                                axios.put("/api/po/"+this.checker[i].nomor_po,this.uppo)
+                                    .then(res=>{
+                                    
+                                    });
+                                }
+                                });
+                        });
+                        } 
+                        axios.get("/api/view/detailpo/"+this.checker[i].nomor_po+"/"+this.checker[i].kode_barang)
+                        .then(res=>{
+                            this.listpost=res.data.data;
+                            for(let m=0;m<this.listpost.length;m++){  
+                                if(this.hitung.qty[i]<=(parseInt(this.listpost[m].qty_tdktersedia)-parseInt(this.listpost[m].qty_masuk))){
+                                    this.hasil=this.hitung.qty[i];
+                                    this.hitung.qty[i]=parseInt(this.hitung.qty[i])-(parseInt(this.listpost[m].qty_tdktersedia)-parseInt(this.listpost[m].qty_masuk));
+                                }else if(this.hitung.qty[i]>(parseInt(this.listpost[m].qty_tdktersedia)-parseInt(this.listpost[m].qty_masuk))){
+                                    this.hasil=parseInt(this.listpost[m].qty_tdktersedia)-parseInt(this.listpost[m].qty_masuk);
+                                    this.hitung.qty[i]=parseInt(this.hitung.qty[m])-(parseInt(this.listpost[m].qty_tdktersedia)-parseInt(this.listpost[m].qty_masuk));
+                                }
+                                if(this.hitung.qty[i]<0){
+                                    this.hitung.qty[i]=0;
+                                }
+                                    this.uplistsisa2={qty_masuk:parseInt(this.hasil)+parseInt(this.listpost[m].qty_masuk)};
+                                    console.log(this.uplistsisa2);
+                                    axios.put("/api/listrso/"+this.listpost[m].id,this.uplistsisa2)
+                                    .then(res=>{
+                                    axios.get("/api/listrso/data/listpo/"+this.checker[i].nomor_po)
+                                        .then(res=>{
+                                            this.listsisas=res.data.data;
+                                            for(let k=0;k<this.listsisas.length;k++){
+                                                if(this.listsisas[k].sisapo<1){
+                                                    this.uplist.po_close="Y";
+                                                    axios.put("/api/listrso/data/"+this.checker[i].nomor_po+"/"+this.listsisas[k].kode_barang,this.uplist)
+                                                    .then(res=>{
+                                                    });
+                                                    }
+                                            }
+                                        })
+                                    }); 
+                            }
+                        });
                         this.$router.push({name:'ingoods'});
                     });
+                }else{
+                    console.log('cukup');
+                    this.$router.push({name:'ingoods'});
+                }
+                })
+
             }
-        },
-        )} */
+                });
+            }
         },
         validasiqty(){
             for(let i=0;i<this.checker.length;i++){

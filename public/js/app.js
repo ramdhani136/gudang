@@ -2619,7 +2619,7 @@ __webpack_require__.r(__webpack_exports__);
     return {
       search: '',
       load: false,
-      status: 'draft',
+      status: 'open',
       bbm: []
     };
   },
@@ -2631,13 +2631,13 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       if (this.search === "") {
-        if (this.status === "draft") {
-          return this.bbm.filter(function (elem) {
-            return elem.status === "draft";
-          });
-        } else if (this.status === "open") {
+        if (this.status === "open") {
           return this.bbm.filter(function (elem) {
             return elem.status === "open";
+          });
+        } else if (this.status === "close") {
+          return this.bbm.filter(function (elem) {
+            return elem.status === "close";
           });
         }
       } else {
@@ -2868,7 +2868,18 @@ __webpack_require__.r(__webpack_exports__);
       },
       uploood: {},
       dtime: this.DateTime(),
-      totalmasuk: {}
+      totalmasuk: {},
+      listpo: {},
+      uplist: {},
+      uppo: {},
+      uplistsisa: {
+        qty_masuk: 0
+      },
+      uplistsisa2: {
+        qty_masuk: 0
+      },
+      listpost: {},
+      listsisas: {}
     };
   },
   created: function created() {
@@ -2953,45 +2964,119 @@ __webpack_require__.r(__webpack_exports__);
         }
     }, */
     submitBBM: function submitBBM() {
-      console.log(this.checker);
-      /*   for(let i=0;i<this.checker.length;i++){
-            axios.get("/api/listbcm/data/"+this.checker[i].nomor_bcm+"/"+this.checker[i].kode_barang)
-            .then(res=>{
-                this.totalmasuk=res.data.data;
-                this.pembanding=0;
-                this.pembanding=parseInt(this.checker[i].qty)-parseInt(this.hitung.qty[i]);
-                if(this.pembanding>0){
-                    console.log(this.checker[i].id);
-                    for(let j=0;j<this.totalmasuk.length;j++){
-                        console.log(this.totalmasuk[j].qty);
-                    }
-                  }else{
-                    console.log(this.checker[i].id);
-                  }
-              });  
-        } */
+      var _this3 = this;
 
-      /* let jawab=confirm("Yakin ingin mengirim Bukti Barang Masuk ini?");
-      if(jawab===true){
-          this.up.status="open";
-          axios.post("/api/bbm",this.up)
-          .then(res=>{
-              for(let i=0;i<this.checker.length;i++){
-                  this.uploadlist.kode_barang=this.checker[i].kode_barang;
-                  this.uploadlist.qty=this.hitung.qty[i];
-                  this.uploadlist.keterangan=this.hitung.keterangan[i];
-                  this.uploadlist.nomor_bbm=this.up.bbm;
-                  this.uploadlist.status="open";
-                  this.uploood={kode_barang:this.uploadlist.kode_barang,nomor_bbm:this.uploadlist.nomor_bbm,
-                  qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan
-                  };
-                  axios.post("/api/listbbm",this.uploood)
-                  .then(res=>{
-                      this.$router.push({name:'ingoods'});
+      var keputusan = confirm("yakin ingin mengirim Bukti Barang Masuk ini?");
+
+      if (keputusan === true) {
+        axios.post("/api/bbm/", this.up).then(function (res) {
+          var _loop = function _loop(i) {
+            _this3.uplistrso = {
+              qty: _this3.hitung.qty[i]
+            };
+            axios.put("/api/listbcm/" + _this3.checker[i].id, _this3.uplistrso).then(function (res) {
+              if (_this3.hitung.qty[i] < _this3.checker[i].qty) {
+                axios.get("/api/view/accpo/" + _this3.checker[i].nomor_po + "/" + _this3.checker[i].kode_barang).then(function (res) {
+                  _this3.listpo = res.data.data;
+
+                  for (var j = 0; j < _this3.listpo.length; j++) {
+                    if (_this3.listpo[j].qty_masuk < _this3.checker[i].qty) {
+                      _this3.hasil = 0;
+                      _this3.checker[i].qty = parseInt(_this3.checker[i].qty) - parseInt(_this3.listpo[j].qty_masuk);
+                    } else {
+                      _this3.hasil = parseInt(_this3.listpo[j].qty_masuk) - parseInt(_this3.checker[i].qty);
+                      _this3.checker[i].qty = parseInt(_this3.checker[i].qty) - parseInt(_this3.listpo[j].qty_masuk);
+                    }
+
+                    if (_this3.checker[i].qty < 0) {
+                      _this3.checker[i].qty = 0;
+                    }
+
+                    _this3.uplistsisa = {
+                      qty_masuk: _this3.hasil
+                    };
+                    axios.put("/api/listrso/" + _this3.listpo[j].id, _this3.uplistsisa).then(function (res) {
+                      axios.get("/api/listrso/data/listpo/" + _this3.checker[i].nomor_po).then(function (res) {
+                        _this3.listsisa = res.data.data;
+
+                        for (var k = 0; k < _this3.listsisa.length; k++) {
+                          if (_this3.listsisa[k].sisapo > 0) {
+                            _this3.uplist.po_close = "N";
+                            axios.put("/api/listrso/data/" + _this3.listsisa[k].nomor_po + "/" + _this3.listsisa[k].kode_barang, _this3.uplist).then(function (res) {});
+                          }
+                        }
+                      });
+                      _this3.sipo = 0;
+                      axios.get("/api/listrso/data/listall/" + _this3.checker[i].nomor_po).then(function (res) {
+                        _this3.sisasemua = 0;
+                        _this3.listsisa = res.data.data;
+
+                        for (var l = 0; l < _this3.listsisa.length; l++) {
+                          _this3.sipo += parseInt(_this3.listsisa[l].sisapo);
+                        }
+
+                        if (_this3.sipo > 0) {
+                          _this3.uppo.status = "Acc";
+                          axios.put("/api/po/" + _this3.checker[i].nomor_po, _this3.uppo).then(function (res) {});
+                        }
+                      });
+                    });
+                  }
+
+                  axios.get("/api/view/detailpo/" + _this3.checker[i].nomor_po + "/" + _this3.checker[i].kode_barang).then(function (res) {
+                    _this3.listpost = res.data.data;
+
+                    for (var m = 0; m < _this3.listpost.length; m++) {
+                      if (_this3.hitung.qty[i] <= parseInt(_this3.listpost[m].qty_tdktersedia) - parseInt(_this3.listpost[m].qty_masuk)) {
+                        _this3.hasil = _this3.hitung.qty[i];
+                        _this3.hitung.qty[i] = parseInt(_this3.hitung.qty[i]) - (parseInt(_this3.listpost[m].qty_tdktersedia) - parseInt(_this3.listpost[m].qty_masuk));
+                      } else if (_this3.hitung.qty[i] > parseInt(_this3.listpost[m].qty_tdktersedia) - parseInt(_this3.listpost[m].qty_masuk)) {
+                        _this3.hasil = parseInt(_this3.listpost[m].qty_tdktersedia) - parseInt(_this3.listpost[m].qty_masuk);
+                        _this3.hitung.qty[i] = parseInt(_this3.hitung.qty[m]) - (parseInt(_this3.listpost[m].qty_tdktersedia) - parseInt(_this3.listpost[m].qty_masuk));
+                      }
+
+                      if (_this3.hitung.qty[i] < 0) {
+                        _this3.hitung.qty[i] = 0;
+                      }
+
+                      _this3.uplistsisa2 = {
+                        qty_masuk: parseInt(_this3.hasil) + parseInt(_this3.listpost[m].qty_masuk)
+                      };
+                      console.log(_this3.uplistsisa2);
+                      axios.put("/api/listrso/" + _this3.listpost[m].id, _this3.uplistsisa2).then(function (res) {
+                        axios.get("/api/listrso/data/listpo/" + _this3.checker[i].nomor_po).then(function (res) {
+                          _this3.listsisas = res.data.data;
+
+                          for (var k = 0; k < _this3.listsisas.length; k++) {
+                            if (_this3.listsisas[k].sisapo < 1) {
+                              _this3.uplist.po_close = "Y";
+                              axios.put("/api/listrso/data/" + _this3.checker[i].nomor_po + "/" + _this3.listsisas[k].kode_barang, _this3.uplist).then(function (res) {});
+                            }
+                          }
+                        });
+                      });
+                    }
                   });
+
+                  _this3.$router.push({
+                    name: 'ingoods'
+                  });
+                });
+              } else {
+                console.log('cukup');
+
+                _this3.$router.push({
+                  name: 'ingoods'
+                });
+              }
+            });
+          };
+
+          for (var i = 0; i < _this3.checker.length; i++) {
+            _loop(i);
           }
-      },
-      )} */
+        });
+      }
     },
     validasiqty: function validasiqty() {
       for (var i = 0; i < this.checker.length; i++) {
@@ -55898,7 +55983,7 @@ var render = function() {
           }
         },
         [
-          _c("option", { attrs: { value: "draft" } }, [_vm._v("Draft")]),
+          _c("option", { attrs: { value: "open" } }, [_vm._v("Open")]),
           _vm._v(" "),
           _c("option", { attrs: { value: "close" } }, [_vm._v("Close")])
         ]

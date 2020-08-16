@@ -5,7 +5,7 @@
         </div>
         <div class="form-group col-3 my-3 ml-n3 float-left">
             <select name="status" v-model="status" class="form-control">
-                <option value="draft">Draft</option>
+                <option value="open">Open</option>
                 <option value="close">Close</option>
             </select>
         </div> 
@@ -55,7 +55,7 @@ export default {
         return{
             search:'',
             load:false,
-            status:'draft',
+            status:'open',
             bbm:[],
         }
     },
@@ -65,10 +65,10 @@ export default {
     computed:{
         FilteredBBM(){
             if(this.search===""){
-                if(this.status==="draft"){
-                    return this.bbm.filter(elem=> elem.status==="draft")
-                }else if(this.status==="open"){
+                if(this.status==="open"){
                     return this.bbm.filter(elem=> elem.status==="open")
+                }else if(this.status==="close"){
+                    return this.bbm.filter(elem=> elem.status==="close")
                 }
             }else{
                 return this.bbm.filter(elem => {

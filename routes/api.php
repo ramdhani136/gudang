@@ -56,6 +56,7 @@ Route::get('poaktif/','Po\PoController@aktif');
 Route::resource('listbcm','Barang\ListBcmController');
 Route::get('listbcm/data/{bcm}/{barang}','Barang\ListBcmController@count');
 Route::get('view/detailpo/{po}/{barang}','Rso\ListRsoController@detailpo');
+Route::get('view/accpo/{po}/{barang}','Rso\ListRsoController@accpo');
 
 Route::resource('ekspedisi','Ekspedisi\EkspedisiController');
 
