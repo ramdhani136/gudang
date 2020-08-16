@@ -19,11 +19,15 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Nomor PO</label>
-                    <input v-model="up.nomor_po" @click="showPo()" type="text" class="form-control" placeholder="Pilih Purchase Order">
+                    <label>Nomor Bukti Checker</label>
+                    <input v-model="up.nomor_bcm" @click="showBcm()" type="text" class="form-control" placeholder="Pilih Purchase Order">
                 </div>
             </div>
             <div class="col-4">
+                <div class="form-group">
+                    <label>Nomor Polisi</label>
+                    <input type="text" v-model="ket.nopol" class="form-control" disabled>
+                </div>
                 <div class="form-group">
                     <label>keterangan</label>
                     <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
@@ -39,19 +43,19 @@
                             <th>No</th>
                             <th>Nama Barang</th>
                             <th>Satuan</th>
-                            <th>Sisa PO</th>
-                            <th>Qty Masuk</th>
+                            <th>Qty</th>
+                            <th>Jumlah Real</th>
                             <th>Keterangan</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="(listbbm,index) in checker" :key="index">
                             <td style="text-align:center">{{index+1}}</td>
-                            <td>{{listbbm.nama}}</td>
+                            <td>{{listbbm.nama_barang}}</td>
                             <td style="text-align:center">{{listbbm.satuan}}</td>
-                            <td style="text-align:center">{{listbbm.jumlah}}</td>
+                            <td style="text-align:center">{{listbbm.qty}}</td>
                             <td  style="text-align:center">
-                                <input  v-model="hitung.qty[index]" type="number" class="form-control">
+                                <input @input="validasiqty()" v-model="hitung.qty[index]" type="number" class="form-control">
                             </td>
                             <td style="text-align:center">
                                 <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
@@ -62,9 +66,9 @@
             </div>
         </div>   
         <div class="row mt-2">
-                <button @click="draftBbm()" class="btn-orange btn ml-4" >
+                <!-- <button @click="draftBbm()" class="btn-orange btn ml-4" >
                     Simpan Draft
-                </button>
+                </button> -->
                 <button @click="submitBBM()" class="btn-success btn ml-2" >
                     Kirim BBM
                 </button>
@@ -80,9 +84,9 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Pilih PO</label>
-                        <select @change="pilihPo(aktif)" v-model="aktif" class="form-control">
-                            <option :value="aktif" v-for="(aktif,index) in poaktif" :key="index">{{aktif.nomor_po}}</option>
+                        <label>Pilih Bukti Checker</label>
+                        <select @change="pilihBcm(aktif)" v-model="aktif" class="form-control">
+                            <option :value="aktif" v-for="(aktif,index) in bcmaktif" :key="index">{{aktif.bcm}}</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -103,9 +107,9 @@
                         <tbody>
                             <tr v-for="(ls,index) in listsisa" :key="index">
                                 <td style="text-align:center">{{index+1}}</td>
-                                <td>{{ls.nama}}</td>
+                                <td>{{ls.nama_barang}}</td>
                                 <td style="text-align:center">{{ls.satuan}}</td>
-                                <td style="text-align:center">{{ls.jumlah}}</td>
+                                <td style="text-align:center">{{ls.qty}}</td>
                                 <td style="text-align:center">
                                     <input v-model="checker" type="checkbox" :value="ls">
                                 </td>
@@ -180,7 +184,7 @@ export default {
                 bbm:this.bbm_nomor(),
                 tanggal:this.now(),
             },
-            poaktif:{},
+            bcmaktif:{},
             ket:{},
             aktif:{},
             listsisa:{},
@@ -191,21 +195,23 @@ export default {
                 qty:[],
                 keterangan:[],
             },
-            uploood:{}
+            uploood:{},
+            dtime:this.DateTime(),
+            totalmasuk:{}
         }
     },
     created(){
-        this.getPoAktif();
+        this.getBcmAktif();
         this.resetForm();
     },  
     computed:{  
 
     },
     methods:{
-        getPoAktif(){
-            axios.get("/api/poaktif/")
+        getBcmAktif(){
+            axios.get("/api/bcm/data/open")
             .then(res=>{
-                this.poaktif=res.data.data;
+                this.bcmaktif=res.data.data;
             });
         },
         now(){
@@ -236,17 +242,18 @@ export default {
             var output = "BBM-" + d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" ;
             return output
         },
-        showPo(){
+        showBcm(){
             $("#modal-po").modal("show");
         },
         resetForm(){
             this.checker=[];
-        },
-        pilihPo(aktif){
+        },  
+        pilihBcm(aktif){
             this.checker=[];
             this.ket.supplier=aktif.supplier;
-            this.up.nomor_po=aktif.nomor_po;
-            axios.get("/api/listrso/data/listpo/"+aktif.nomor_po)
+            this.up.nomor_bcm=aktif.bcm;
+            this.ket.nopol=aktif.nopol;
+            axios.get("/api/listbcm/"+aktif.bcm)
             .then(res=>{
                 this.listsisa=res.data.data;
             });
@@ -254,7 +261,7 @@ export default {
         checklist(){
             $("#modal-po").modal("hide");
         },
-        draftBbm(){
+        /* draftBbm(){
             let keputusan=confirm("Simpan Draft?");
             if(keputusan===true){
             axios.post("/api/bbm",this.up)
@@ -275,9 +282,32 @@ export default {
         },
         )
             }
-        },
-        submitBBM(){   
-        let jawab=confirm("Yakin ingin mengirim Bukti Barang Masuk ini?");
+        }, */
+        submitBBM(){  
+            console.log(this.checker);
+      /*   for(let i=0;i<this.checker.length;i++){
+            axios.get("/api/listbcm/data/"+this.checker[i].nomor_bcm+"/"+this.checker[i].kode_barang)
+            .then(res=>{
+                this.totalmasuk=res.data.data;
+                this.pembanding=0;
+                this.pembanding=parseInt(this.checker[i].qty)-parseInt(this.hitung.qty[i]);
+                if(this.pembanding>0){
+                    console.log(this.checker[i].id);
+                    for(let j=0;j<this.totalmasuk.length;j++){
+                        console.log(this.totalmasuk[j].qty);
+                    }
+
+                }else{
+                    console.log(this.checker[i].id);
+
+                }
+
+            });  
+        } */
+
+
+
+        /* let jawab=confirm("Yakin ingin mengirim Bukti Barang Masuk ini?");
         if(jawab===true){
             this.up.status="open";
             axios.post("/api/bbm",this.up)
@@ -297,7 +327,31 @@ export default {
                     });
             }
         },
-        )}}
+        )} */
+        },
+        validasiqty(){
+            for(let i=0;i<this.checker.length;i++){
+                if(this.hitung.qty[i]>this.checker[i].qty){
+                    this.hitung.qty[i]=this.checker[i].qty
+                }   
+            }
+        },
+        DateTime(){
+            this.date = new Date(); 
+            this.month = this.date.getMonth()+1;
+            this.year=this.date.getFullYear();
+            this.hours=this.date.getHours();
+            this.minute=this.date.getMinutes();
+            this.seconds=this.date.getSeconds();
+            if(this.month>12){
+                this.month=12;
+            }
+            this.day = this.date.getDate();
+            this.dates=this.year+"-"+(this.month<10 ? '0' : '')+this.month+"-"+this.day;
+            this.times=this.hours+":"+this.minute+":"+(this.seconds<10 ? '0' : '')+this.seconds;
+            this.datetimes=this.dates+" "+this.times;
+            return this.datetimes;
+        }
     },
 } 
 </script>

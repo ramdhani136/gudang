@@ -33,9 +33,9 @@ import poCreateViewComponent from '../components/purchase/poCreateViewComponent.
 import poComponent from '../components/purchase/poComponent.vue'
 import dicPoComponent from '../components/purchase/dicPoComponent.vue'
 
-import ingoodsComponent from '../components/barang/ingoodsComponent.vue'
-import ViewingoodsComponent from '../components/barang/ViewingoodsComponent.vue'
-import ViewBbmComponent from '../components/barang/ViewBbmComponent.vue'
+import BbmComponent from '../components/bbm/BbmComponent.vue'
+import CreateBbmComponent from '../components/bbm/CreateBbmComponent.vue'
+import ViewBbmComponent from '../components/bbm/ViewBbmComponent.vue'
 
 import BuktiCheckerInComponent from '../components/bc/BuktiCheckerInComponent.vue'
 import CreateBcmComponent from '../components/bc/CreateBcmComponent.vue'
@@ -84,8 +84,8 @@ const routes=[
     {name:'po', path:'/purchase/po/', component:poComponent},
     {name:'dpo', path:'/purchase/dpo', component:dicPoComponent},
 
-    {name:'ingoods', path:'/dic/incoming', component:ingoodsComponent},
-    {name:'creategoods', path:'/dic/incoming/view', component:ViewingoodsComponent},
+    {name:'ingoods', path:'/dic/incoming', component:BbmComponent},
+    {name:'creategoods', path:'/dic/incoming/view', component:CreateBbmComponent},
     {name:'viewbbm', path:'/dic/incoming/view/:nomor', component:ViewBbmComponent},
 
     {name:'bcmcomponent', path:'/dic/bcm', component:BuktiCheckerInComponent},

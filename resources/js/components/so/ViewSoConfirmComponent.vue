@@ -246,7 +246,7 @@ export default {
                         this.$router.push({name:'soconfirm'})
                     });
                     for(let d=0;d<this.uplist.length;d++){
-                        this.aksiup={statusso:this.uplist[d].statusso,};
+                        this.aksiup={statusso:this.uplist[d].statusso,dateaccso:this.DateTime(),};
                         axios.put("/api/listrso/"+this.uplist[d].id,this.aksiup)
                         .then(res=>{
                             console.log("tes");
@@ -270,6 +270,23 @@ export default {
                         this.$router.push({name:'soconfirm'})
                 })
             }
+        },
+        DateTime(){
+            this.date = new Date(); 
+            this.month = this.date.getMonth()+1;
+            this.year=this.date.getFullYear();
+            this.hours=this.date.getHours();
+            this.minute=this.date.getMinutes();
+            this.seconds=this.date.getSeconds();
+            if(this.month>12){
+                this.month=12;
+            }
+            this.day = this.date.getDate();
+            this.dates=this.year+"-"+(this.month<10 ? '0' : '')+this.month+"-"+this.day;
+            this.times=this.hours+":"+this.minute+":"+(this.seconds<10 ? '0' : '')+this.seconds;
+            this.datetimes=this.dates+" "+this.times;
+            console.log(this.datetimes);
+            return this.datetimes;
         }
     },
 }

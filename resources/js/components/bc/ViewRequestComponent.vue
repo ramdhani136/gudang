@@ -25,6 +25,10 @@
             </div>
             <div class="col-4">
                 <div class="form-group">
+                    <label>Nomor Kendaraan</label>
+                    <input v-model="up.nopol"  type="text" class="form-control" disabled>
+                </div>
+                <div class="form-group">
                     <label>keterangan</label>
                     <textarea  v-model="up.keterangan" name="keterangan" class="form-control col-12" disabled></textarea>
                 </div>
@@ -51,7 +55,7 @@
                             <td style="text-align:center">{{list.kode_barang}}</td>
                             <td>{{list.nama_barang}}</td>
                             <td style="text-align:center">{{list.satuan}}</td>
-                            <td style="text-align:center">{{list.masuk+list.sisapo}}</td>
+                            <td style="text-align:center">{{arr[indexlist].qty}}</td>
                             <td  style="text-align:center">
                                 <input v-model="list.qty" type="number" class="form-control" disabled>
                             </td>
@@ -113,7 +117,10 @@ export default {
             bcm:{},
             update:{
                 alastolak:'',
-            }
+            },
+            totalmasuk:{},
+            masuk:{},
+            arr:[]
         }
     },
     created(){
@@ -137,6 +144,13 @@ export default {
                     for(let i=0;i<this.listbcm.length;i++){
                         this.hitung.qty[i]=this.listbcm[i].masuk; 
                         this.hitung.keterangan[i]=this.listbcm[i].keterangan; 
+                        axios.get("/api/listbcm/data/"+this.$route.params.nomor+"/"+this.listbcm[i].kode_barang)
+                        .then(res=>{
+                            this.totalmasuk=res.data.data;
+                            for(let o=0;o<this.totalmasuk.length;o++){
+                                this.masuk={qty:this.totalmasuk[o].sisaporeal}; 
+                            }this.arr.push(this.masuk);
+                        });  
                     }
                 });  
         },

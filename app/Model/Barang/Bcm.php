@@ -5,6 +5,7 @@ namespace App\Model\Barang;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Po\Po;
 use App\Model\Barang\listbcm;
+use App\Model\Bbm\Bbm;
 
 class Bcm extends Model
 {
@@ -18,5 +19,10 @@ class Bcm extends Model
     public function listbcm(){
         return $this->hasMany(listbbm::class,'nomor_bcm','bcm');
     }
+
+    public function bbm(){
+        return $this->hasMany(Bbm::class,'nomor_bcm','bcm');
+    }
+
 }
 

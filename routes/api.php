@@ -35,6 +35,7 @@ Route::put('listrso/data/sopen/{no}','Rso\ListRsoController@sOpen');
 Route::put('listrso/data/deletePo/{po}','Rso\ListRsoController@deletePo');
 Route::get('listrso/data/group','Rso\ListRsoController@group');
 Route::get('listrso/data/listpo/{po}','Rso\ListRsoController@listpo');
+Route::get('listrso/data/pilihpo/{po}','Rso\ListRsoController@pilihpo');
 Route::get('listrso/data/listclose/{po}','Rso\ListRsoController@listclose');
 Route::get('listrso/data/listall/{po}','Rso\ListRsoController@listall');
 Route::get('listrso/data/group/{barang}','Rso\ListRsoController@grouplist');
@@ -45,6 +46,7 @@ Route::resource('listrso','Rso\ListRsoController');
 Route::resource('sales','Sales\SalesController');
 Route::resource('so','So\SoController');
 Route::resource('bcm','Barang\BcmController');
+Route::get('bcm/data/open','Barang\BcmController@open');
 Route::resource('custprice','sales\CustpriceController');
 Route::get('data/price/{customer}/{barang}','Sales\CustpriceController@viewprice');
 Route::get('view/price/{customer}/{barang}','Sales\CustpriceController@ambilPrice');
@@ -52,8 +54,11 @@ Route::resource('purchasing','Purchase\PurchasingController');
 Route::resource('po','Po\PoController');
 Route::get('poaktif/','Po\PoController@aktif');
 Route::resource('listbcm','Barang\ListBcmController');
+Route::get('listbcm/data/{bcm}/{barang}','Barang\ListBcmController@count');
 Route::get('view/detailpo/{po}/{barang}','Rso\ListRsoController@detailpo');
 
 Route::resource('ekspedisi','Ekspedisi\EkspedisiController');
+
+Route::resource('bbm','Bbm\BbmController');
 
 

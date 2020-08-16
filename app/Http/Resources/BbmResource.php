@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BcmResource extends JsonResource
+class BbmResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,13 +16,14 @@ class BcmResource extends JsonResource
     {
         return 
         [
-            'bcm'=>$this->bcm,
+            'bbm'=>$this->bbm,
+            'nomor_bcm'=>$this->nomor_bcm,
             'tanggal'=>$this->tanggal,
-            'nomor_po'=>$this->nomor_po,
             'keterangan'=>$this->keterangan,
             'status'=>$this->status,
-            'supplier'=>$this->po->supplier->nama,
-            'nopol'=>$this->nopol
+            'nomor_po'=>$this->bcm->nomor_po,
+            'nopol'=>$this->bcm->nopol,
+            'supplier'=>$this->bcm->po->supplier->nama
         ];
     }
 }

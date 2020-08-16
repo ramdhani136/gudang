@@ -25,6 +25,10 @@
             </div>
             <div class="col-4">
                 <div class="form-group">
+                    <label>Nomor Kendaraan </label>
+                    <input type="text" v-model="up.nopol" class="form-control">
+                </div>
+                <div class="form-group">
                     <label>keterangan</label>
                     <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
                 </div>
@@ -264,7 +268,7 @@ export default {
             this.checker=[];
             this.ket.supplier=aktif.supplier;
             this.up.nomor_po=aktif.nomor_po;
-            axios.get("/api/listrso/data/listpo/"+aktif.nomor_po)
+            axios.get("/api/listrso/data/pilihpo/"+aktif.nomor_po)
             .then(res=>{
                 this.listsisa=res.data.data;
             });
@@ -356,68 +360,71 @@ export default {
                     this.uploadlist.nomor_bcm=this.up.bcm;
                     this.uploadlist.status="open";
                     this.uploood={kode_barang:this.uploadlist.kode_barang,nomor_bcm:this.uploadlist.nomor_bcm,
-                    qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan
+                    qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan,nomor_po:this.up.nomor_po,sisapo:this.checker[i].sisapo,
                     };
                     axios.post("/api/listbcm",this.uploood)
                     .then(res=>{ 
                     });
                 }
                 for(let h=0;h<this.checker.length;h++){
-                        axios.get("/api/view/detailpo/"+this.checker[h].nomor_po+"/"+this.checker[h].kode_barang)
+                axios.get("/api/view/detailpo/"+this.checker[h].nomor_po+"/"+this.checker[h].kode_barang)
                         .then(res=>{
                             this.listpo=res.data.data;
-                            this.persen=0
                             for(let j=0;j<this.listpo.length;j++){  
-                                this.persen+=parseInt(this.listpo[j].qty_tdktersedia);
-                                this.coba=[];
-                                this.coba=[{qty: this.persen/100,}];
-                            }
-                            for(let z=0;z<this.listpo.length;z++){
-                            this.uplistsisa={qty_masuk:((((this.listpo[z].qty_tdktersedia/this.coba[0].qty)/100)*(this.hitung.qty[h]))+this.listpo[z].qty_masuk)};
-                                axios.put("/api/listrso/"+this.listpo[z].id,this.uplistsisa)
-                                .then(res=>{
+                                if(this.hitung.qty[h]<=(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk))){
+                                    this.hasil=this.hitung.qty[h];
+                                    this.hitung.qty[h]=parseInt(this.hitung.qty[h])-(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk));
+                                }else if(this.hitung.qty[h]>(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk))){
+                                    this.hasil=parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk);
+                                    this.hitung.qty[h]=parseInt(this.hitung.qty[h])-(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk));
+                                }
+                                if(this.hitung.qty[h]<0){
+                                    this.hitung.qty[h]=0;
+                                }
+                                    this.uplistsisa={qty_masuk:parseInt(this.hasil)+parseInt(this.listpo[j].qty_masuk)};
+                                    axios.put("/api/listrso/"+this.listpo[j].id,this.uplistsisa)
+                                    .then(res=>{
                                     axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
-                                    .then(res=>{
-                                        this.listsisa=res.data.data;
-                                        for(let i=0;i<this.listsisa.length;i++){
-                                            if(this.listsisa[i].sisapo<1){
-                                                this.uplist.po_close="Y";
-                                                axios.put("/api/listrso/data/"+this.listsisa[i].nomor_po+"/"+this.listsisa[i].kode_barang,this.uplist)
+                                        .then(res=>{
+                                            this.listsisa=res.data.data;
+                                            for(let k=0;k<this.listsisa.length;k++){
+                                                if(this.listsisa[k].sisapo<1){
+                                                    this.uplist.po_close="Y";
+                                                    axios.put("/api/listrso/data/"+this.listsisa[k].nomor_po+"/"+this.listsisa[k].kode_barang,this.uplist)
+                                                    .then(res=>{
+                                                    });
+                                                    }
+                                            }
+                                        })
+                                        this.sipo=0;
+                                        axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
+                                        .then(res=>{
+                                            this.sisasemua=0;
+                                            this.listsisa=res.data.data;
+                                            for(let l=0;l<this.listsisa.length;l++){
+                                                this.sipo+=parseInt(this.listsisa[l].sisapo);  
+                                            }
+                                            if(this.sipo<1){
+                                                this.uppo.status="Selesai";
+                                                axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
                                                 .then(res=>{
+                                                    this.$router.push({name:'bcmcomponent'});
                                                 });
-                                                }
-                                        }
-                                    })
-                                    this.sipo=0;
-                                    axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
-                                    .then(res=>{
-                                        this.sisasemua=0;
-                                        this.listsisa=res.data.data;
-                                        for(let i=0;i<this.listsisa.length;i++){
-                                            this.sipo+=parseInt(this.listsisa[i].sisapo);  
-                                        }
-                                        if(this.sipo<1){
-                                            this.uppo.status="Selesai";
-                                            axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
-                                            .then(res=>{
+                                            }else{
                                                 this.$router.push({name:'bcmcomponent'});
-                                            });
-                                        }else{
-                                            this.$router.push({name:'bcmcomponent'});
-                                        }
-                                    });
-                                });
-                                
+                                            }
+                                        });
+                                    }); 
                             }
                         });
-                }
+            }
         },
         )}
         },
         requestBcm(){   
-            let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
+        let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
         if(jawab===true){
-            this.up.status="Sent";
+            this.up.status="sent";
             axios.post("/api/bcm",this.up)
             .then(res=>{
                 for(let i=0;i<this.checker.length;i++){
@@ -427,61 +434,64 @@ export default {
                     this.uploadlist.nomor_bcm=this.up.bcm;
                     this.uploadlist.status="open";
                     this.uploood={kode_barang:this.uploadlist.kode_barang,nomor_bcm:this.uploadlist.nomor_bcm,
-                    qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan
+                    qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan,nomor_po:this.up.nomor_po,sisapo:this.checker[i].sisapo,
                     };
                     axios.post("/api/listbcm",this.uploood)
                     .then(res=>{ 
                     });
                 }
                 for(let h=0;h<this.checker.length;h++){
-                        axios.get("/api/view/detailpo/"+this.checker[h].nomor_po+"/"+this.checker[h].kode_barang)
+                axios.get("/api/view/detailpo/"+this.checker[h].nomor_po+"/"+this.checker[h].kode_barang)
                         .then(res=>{
                             this.listpo=res.data.data;
-                            this.persen=0
                             for(let j=0;j<this.listpo.length;j++){  
-                                this.persen+=parseInt(this.listpo[j].qty_tdktersedia);
-                                this.coba=[];
-                                this.coba=[{qty: this.persen/100,}];
-                            }
-                            for(let z=0;z<this.listpo.length;z++){
-                                this.uplistsisa={qty_masuk:((((this.listpo[z].qty_tdktersedia/this.coba[0].qty)/100)*(this.hitung.qty[h]))+this.listpo[z].qty_masuk)};
-                                axios.put("/api/listrso/"+this.listpo[z].id,this.uplistsisa)
-                                .then(res=>{
+                                if(this.hitung.qty[h]<=(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk))){
+                                    this.hasil=this.hitung.qty[h];
+                                    this.hitung.qty[h]=parseInt(this.hitung.qty[h])-(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk));
+                                }else if(this.hitung.qty[h]>(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk))){
+                                    this.hasil=parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk);
+                                    this.hitung.qty[h]=parseInt(this.hitung.qty[h])-(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk));
+                                }
+                                if(this.hitung.qty[h]<0){
+                                    this.hitung.qty[h]=0;
+                                }
+                                    this.uplistsisa={qty_masuk:parseInt(this.hasil)+parseInt(this.listpo[j].qty_masuk)};
+                                    axios.put("/api/listrso/"+this.listpo[j].id,this.uplistsisa)
+                                    .then(res=>{
                                     axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
-                                    .then(res=>{
-                                        this.listsisa=res.data.data;
-                                        for(let i=0;i<this.listsisa.length;i++){
-                                            if(this.listsisa[i].sisapo<1){
-                                                this.uplist.po_close="Y";
-                                                axios.put("/api/listrso/data/"+this.listsisa[i].nomor_po+"/"+this.listsisa[i].kode_barang,this.uplist)
+                                        .then(res=>{
+                                            this.listsisa=res.data.data;
+                                            for(let k=0;k<this.listsisa.length;k++){
+                                                if(this.listsisa[k].sisapo<1){
+                                                    this.uplist.po_close="Y";
+                                                    axios.put("/api/listrso/data/"+this.listsisa[k].nomor_po+"/"+this.listsisa[k].kode_barang,this.uplist)
+                                                    .then(res=>{
+                                                    });
+                                                    }
+                                            }
+                                        })
+                                        this.sipo=0;
+                                        axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
+                                        .then(res=>{
+                                            this.sisasemua=0;
+                                            this.listsisa=res.data.data;
+                                            for(let l=0;l<this.listsisa.length;l++){
+                                                this.sipo+=parseInt(this.listsisa[l].sisapo);  
+                                            }
+                                            if(this.sipo<1){
+                                                this.uppo.status="Selesai";
+                                                axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
                                                 .then(res=>{
+                                                    this.$router.push({name:'bcmcomponent'});
                                                 });
-                                                }
-                                        }
-                                    })
-                                    this.sipo=0;
-                                    axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
-                                    .then(res=>{
-                                        this.sisasemua=0;
-                                        this.listsisa=res.data.data;
-                                        for(let i=0;i<this.listsisa.length;i++){
-                                            this.sipo+=parseInt(this.listsisa[i].sisapo);  
-                                        }
-                                        if(this.sipo<1){
-                                            this.uppo.status="Selesai";
-                                            axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
-                                            .then(res=>{
+                                            }else{
                                                 this.$router.push({name:'bcmcomponent'});
-                                            });
-                                        }else{
-                                            this.$router.push({name:'bcmcomponent'});
-                                        }
-                                    });
-                                });
-                                
+                                            }
+                                        });
+                                    }); 
                             }
                         });
-                }
+            }
         },
         )}
         },

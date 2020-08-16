@@ -25,6 +25,11 @@
             </div>
             <div class="col-4">
                 <div class="form-group">
+                    <label>Nomor Kendaraan</label>
+                    <input v-if="up.status==='open' || up.status==='tolak' || up.status==='close' || up.status==='sent'" v-model="up.nopol"  type="text" class="form-control" disabled>
+                    <input v-if="up.status==='draft' || up.status==='tolak'" v-model="up.nopol"  type="text" class="form-control">
+                </div>
+                <div class="form-group">
                     <label>keterangan</label>
                     <textarea v-if="up.status==='open' || up.status==='tolak' || up.status==='close' || up.status==='sent'" v-model="up.keterangan" name="keterangan" class="form-control col-12" disabled></textarea>
                     <textarea v-if="up.status==='draft' || up.status==='tolak'" v-model="uploood.keterangan" name="keterangan" class="form-control col-12"></textarea>
@@ -52,7 +57,7 @@
                             <td style="text-align:center">{{list.kode_barang}}</td>
                             <td>{{list.nama_barang}}</td>
                             <td style="text-align:center">{{list.satuan}}</td>
-                            <td style="text-align:center">{{list.masuk+list.sisapo}}</td>
+                            <td style="text-align:center">{{arr[indexlist].qty}}</td>
                             <td  style="text-align:center" v-for="(bc,index) in bcm" :key="index">
                                 <input v-if="bc.status==='sent' || bc.status==='open' || bc.status==='close'"    v-model="list.qty" type="number" class="form-control" disabled>
                                 <input v-if="bc.status==='draft' || bc.status==='tolak'"  @input="validqty(indexlist)"  v-model="hitung.qty[indexlist]" type="number" class="form-control">
@@ -134,7 +139,10 @@ export default {
             list:{
                 qty:[],
             },
-            listrso:{}
+            listrso:{},
+            totalmasuk:{},
+            masuk:{},
+            arr:[]
         }
     },
     created(){
@@ -157,7 +165,14 @@ export default {
                     this.listbcm=res.data.data;
                     for(let i=0;i<this.listbcm.length;i++){
                         this.hitung.qty[i]=this.listbcm[i].masuk; 
-                        this.hitung.keterangan[i]=this.listbcm[i].keterangan; 
+                        this.hitung.keterangan[i]=this.listbcm[i].keterangan;
+                        axios.get("/api/listbcm/data/"+this.$route.params.nomor+"/"+this.listbcm[i].kode_barang)
+                        .then(res=>{
+                            this.totalmasuk=res.data.data;
+                            for(let o=0;o<this.totalmasuk.length;o++){
+                                this.masuk={qty:this.totalmasuk[o].sisaporeal}; 
+                            }this.arr.push(this.masuk);
+                        });  
                     }
                 });  
         },

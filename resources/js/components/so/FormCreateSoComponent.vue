@@ -488,7 +488,7 @@ export default {
             }
         },
         submitSo(){
-            let keputusan=confirm("Simpan Draft?");
+            let keputusan=confirm("Yakin Ingin membuat SO ini?");
             this.banding2.jumlah="";
             this.banding2.penyama="";
             if(keputusan===true){
