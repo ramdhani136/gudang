@@ -20,6 +20,7 @@ class EkspedisiResource extends JsonResource
             'nama'=>$this->nama,
             'alamat'=>$this->alamat,
             'kontak'=>$this->kontak,
+            'keterangan'=>$this->keterangan,
         ];
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Model\Rso\Listrso;
 use App\Model\Sales\Custprice;
 use App\Model\Barang\Listbcm;
-use App\Model\Bbm\Bbm;
+use App\Model\Bbm\Listbbm;
 
 class Barang extends Model
 {
@@ -25,7 +25,7 @@ class Barang extends Model
         return $this->hasMany(listbcm::class,'kode_barang','kode');
     }
 
-    public function bbm(){
-        return $this->hasMany(Bbm::class,'kode_barang','kode');
+    public function listbbm(){
+        return $this->hasMany(Listbbm::class,'kode_barang','kode');
     }
 }

@@ -3,9 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Model\Barang\Barang;
 
-class BbmResource extends JsonResource
+class ListBbmResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,14 +16,13 @@ class BbmResource extends JsonResource
     {
         return 
         [
-            'bbm'=>$this->bbm,
-            'nomor_bcm'=>$this->nomor_bcm,
-            'tanggal'=>$this->tanggal,
+            'id'=>$this->id,
+            'nomor_bbm'=>$this->nomor_bbm,
+            'kode_barang'=>$this->kode_barang,
+            'qty'=>$this->qty,
             'keterangan'=>$this->keterangan,
-            'status'=>$this->status,
-            'nomor_po'=>$this->bcm->nomor_po,
-            'nopol'=>$this->bcm->nopol,
-            'supplier'=>$this->bcm->po->supplier->nama
+            'nama_barang'=>$this->barang->nama,
+            'satuan'=>$this->barang->satuan
         ];
     }
 }

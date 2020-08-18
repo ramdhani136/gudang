@@ -55,11 +55,13 @@ Route::resource('po','Po\PoController');
 Route::get('poaktif/','Po\PoController@aktif');
 Route::resource('listbcm','Barang\ListBcmController');
 Route::get('listbcm/data/{bcm}/{barang}','Barang\ListBcmController@count');
+Route::get('listbcm/data/{bcm}','Barang\ListBcmController@nnonaktif');
 Route::get('view/detailpo/{po}/{barang}','Rso\ListRsoController@detailpo');
 Route::get('view/accpo/{po}/{barang}','Rso\ListRsoController@accpo');
 
 Route::resource('ekspedisi','Ekspedisi\EkspedisiController');
 
 Route::resource('bbm','Bbm\BbmController');
+Route::resource('listbbm','Bbm\ListBbmController');
 
 

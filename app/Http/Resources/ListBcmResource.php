@@ -34,7 +34,8 @@ class ListBcmResource extends JsonResource
             'qty_po'=>$jumlah,
             'masuk'=>$jumlahmasuk,
             'sisapo'=>$jumlah-$jumlahmasuk, 
-            'sisaporeal'=>$this->sisapo, 
+            'sisaporeal'=>$this->sisapo,
+            'close_bcm'=>$this->close_bcm,  
         ];
     }
 }

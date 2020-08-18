@@ -5,8 +5,8 @@
         </div>
         <div class="form-group col-3 my-3 ml-n3 float-left">
             <select name="status" v-model="status" class="form-control">
-                <option value="open">Open</option>
-                <option value="close">Close</option>
+                <option value="open">List BBM</option>
+                <!-- <option value="close">Close</option> -->
             </select>
         </div> 
         <div class="row">
@@ -33,9 +33,9 @@
                         <td>{{bm.supplier}}</td>
                         <td style="text-align:center">
                             <router-link :to="{name:'viewbbm',params:{nomor:bm.bbm}}" class="btn btn-primary">
-                                    Edit
+                                    Lihat Detail
                             </router-link>
-                            <button class="btn btn-danger">Hapus</button>
+                            <button class="btn btn-danger">Batalkan</button>
                         </td>
                     </tr>
                 </tbody>

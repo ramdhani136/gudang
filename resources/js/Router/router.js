@@ -47,6 +47,8 @@ import SoComponentDic from '../components/distribusi/SoComponentDic.vue'
 import BckComponent from '../components/distribusi/BckComponent.vue'
 import BbkComponent from '../components/distribusi/BbkComponent.vue'
 
+import EkspedisiComponent from '../components/ekspedisi/EkspedisiComponent.vue'
+
 
 
 
@@ -98,6 +100,10 @@ const routes=[
     {name:'distribusiso', path:'/distribusi/so', component:SoComponentDic},
     {name:'distribusibck', path:'/distribusi/bck', component:BckComponent},
     {name:'distribusibbk', path:'/distribusi/bbk', component: BbkComponent},
+
+    {name:'ekspedisi', path:'/ekspedisi', component: EkspedisiComponent},
+
+    
 ]
 
 

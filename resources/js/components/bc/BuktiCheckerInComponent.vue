@@ -71,7 +71,7 @@ export default {
                     return this.bcm.filter(elem=> elem.status==="draft")
                 }else if(this.status==="open"){
                     return this.bcm.filter(elem=> elem.status==="open")
-                }else if(this.status==="open"){
+                }else if(this.status==="close"){
                     return this.bcm.filter(elem=> elem.status==="close")
                 }else if(this.status==="sent"){
                     return this.bcm.filter(elem=> elem.status==="sent")

@@ -111,7 +111,7 @@
                                 <td style="text-align:center">{{ls.satuan}}</td>
                                 <td style="text-align:center">{{ls.qty}}</td>
                                 <td style="text-align:center">
-                                    <input v-model="checker" type="checkbox" :value="ls">
+                                    <input v-model="checker" type="checkbox"  :value="ls" disabled>
                                 </td>
                             </tr>
                         </tbody>
@@ -209,6 +209,9 @@ export default {
             },
             listpost:{},
             listsisas:{},
+            listbcm:{},
+            comp:{},
+            input:{}
         }
     },
     created(){
@@ -264,9 +267,12 @@ export default {
             this.ket.supplier=aktif.supplier;
             this.up.nomor_bcm=aktif.bcm;
             this.ket.nopol=aktif.nopol;
-            axios.get("/api/listbcm/"+aktif.bcm)
+            axios.get("/api/listbcm/data/"+aktif.bcm)
             .then(res=>{
                 this.listsisa=res.data.data;
+                for (let i in this.listsisa) {
+					this.checker.push(this.listsisa[i]);
+				}
             });
         },
         checklist(){
@@ -294,15 +300,20 @@ export default {
         )
             }
         }, */
-        submitBBM(){  
+        submitBBM(){ 
             let keputusan=confirm("yakin ingin mengirim Bukti Barang Masuk ini?");
             if(keputusan===true){
                 axios.post("/api/bbm/",this.up)
                 .then(res=>{
                     for(let i=0;i<this.checker.length;i++){
-                this.uplistrso={qty:this.hitung.qty[i]};
+                this.uplistrso={close_bcm:'Y'};
                 axios.put("/api/listbcm/"+this.checker[i].id,this.uplistrso)
                 .then(res=>{
+                    this.input={qty:this.hitung.qty[i],kode_barang:this.checker[i].kode_barang,nomor_bbm:this.up.bbm,keterangan:this.hitung.keterangan[i]}
+                    axios.post("/api/listbbm/",this.input)
+                    .then(res=>{
+                    
+                    });
                     if(this.hitung.qty[i]<this.checker[i].qty){
                     axios.get("/api/view/accpo/"+this.checker[i].nomor_po+"/"+this.checker[i].kode_barang)
                     .then(res=>{
@@ -388,9 +399,26 @@ export default {
                         this.$router.push({name:'ingoods'});
                     });
                 }else{
-                    console.log('cukup');
                     this.$router.push({name:'ingoods'});
                 }
+                this.statusbcm=""; 
+                this.bandingkan="";
+                this.pembandingbcm="Y";
+                axios.get("/api/listbcm/"+this.up.nomor_bcm)
+                .then(res=>{
+                    this.listbcm=res.data.data;
+                    for(let s=0;s<this.listbcm.length;s++){
+                        this.statusbcm+=this.listbcm[s].close_bcm;
+                        this.bandingkan+=this.pembandingbcm;
+                    }
+                    if(this.statusbcm===this.bandingkan){
+                        this.comp={status:"close"};
+                        axios.put("/api/bcm/"+this.up.nomor_bcm,this.comp)
+                        .then(res=>{
+                            console.log("sudah diupdate");
+                        });
+                    }
+                });
                 })
 
             }
