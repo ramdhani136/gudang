@@ -45,6 +45,7 @@ Route::resource('supplier','Supplier\SupplierController');
 Route::resource('listrso','Rso\ListRsoController');
 Route::resource('sales','Sales\SalesController');
 Route::resource('so','So\SoController');
+Route::get('so/data/aktif','So\SoController@aktif');
 Route::resource('bcm','Barang\BcmController');
 Route::get('bcm/data/open','Barang\BcmController@open');
 Route::resource('custprice','sales\CustpriceController');
@@ -63,5 +64,11 @@ Route::resource('ekspedisi','Ekspedisi\EkspedisiController');
 
 Route::resource('bbm','Bbm\BbmController');
 Route::resource('listbbm','Bbm\ListBbmController');
+
+Route::resource('bck','Bck\BckController');
+Route::resource('listbck','Bck\ListBckController');
+Route::resource('kendaraan','Kendaraan\KendaraanController');
+Route::resource('jeniskendaraan','Kendaraan\JenisKendaraanController');
+Route::get('listrso/data/pilihso/{rso}','Rso\ListRsoController@pilihso');
 
 

@@ -183,4 +183,9 @@ class ListRsoController extends Controller
         return  ListRsoResource::collection($data);
     }
 
+    public function  pilihso($rso){
+        $data= Listrso::where('so_close','N')->where('nomor_rso',$rso)->where('so_open','Y')->get();
+        return  ListRsoResource::collection($data);
+    }
+
 }

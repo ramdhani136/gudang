@@ -100,6 +100,8 @@
                                     <router-link to="/distribusi/so" class="dropdown-item" >Sales Order</router-link>
                                     <router-link to="/distribusi/bck" class="dropdown-item" >Bukti Checker Keluar</router-link>
                                     <router-link to="/distribusi/bbk" class="dropdown-item" >Bukti Barang Keluar</router-link>
+                                    <router-link to="/distribusi/kendaraan" class="dropdown-item" >Data Kendaraan</router-link>
+                                  <!--   <router-link to="/distribusi/jkendaraan" class="dropdown-item" >Jenis Kendaraan</router-link> -->
                                 </div>
                             </li>
                             <li class="nav-item dropdown">

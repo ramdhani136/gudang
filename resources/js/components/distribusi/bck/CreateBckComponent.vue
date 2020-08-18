@@ -10,27 +10,39 @@
                     <label>Tanggal :</label>
                     <input v-model="up.tanggal" type="date" @change="validate()" :min="now()" class="form-control col-12" >
                 </div>
-            </div>
-            <div class="col-4">
-                <div class="form-group">
-                    <label>Supplier</label>
-                    <select v-model="ket.supplier" name="customer" class="col-12 form-control" disabled>
-                        <option :value="ket.supplier">{{ket.supplier}}</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Nomor PO</label>
-                    <input v-model="up.nomor_po" @click="showPo()" type="text" class="form-control" placeholder="Pilih Purchase Order">
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="form-group">
-                    <label>Nomor Kendaraan </label>
-                    <input type="text" v-model="up.nopol" class="form-control">
-                </div>
                 <div class="form-group">
                     <label>keterangan</label>
                     <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label>Customer</label>
+                    <select v-model="ket.customer" name="customer" class="col-12 form-control" disabled>
+                        <option :value="ket.customer">{{ket.customer}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nomor SO</label>
+                    <input v-model="up.nomor_so" @click="showSo()" type="text" class="form-control" placeholder="Pilih Sales Order">
+                </div>
+                <div class="form-group">
+                    <label>Kendaraan</label>
+                    <input type="text" v-model="up.nopol" class="form-control" placeholder="Pilih Kendaraan">
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label>Distribusi</label>
+                    <input v-model="ket.distribusi" type="text" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Lokasi</label>
+                    <input v-model="ket.lokasi" type="text" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Alamat</label>
+                    <textarea v-model="ket.alamat" name="keterangan" class="form-control col-12" disabled></textarea>
                 </div>
             </div>
         </div>
@@ -44,8 +56,8 @@
                             <th>Kode Barang</th>
                             <th>Nama Barang</th>
                             <th>Satuan</th>
-                            <th>Sisa PO</th>
-                            <th>Qty SJ</th>
+                            <th>Sisa SO</th>
+                            <th>Rencana Kirim</th>
                             <th>Keterangan</th>
                         </tr>
                     </thead>
@@ -71,11 +83,11 @@
                 <!-- <button @click="draftBcm()" class="btn-orange btn ml-4" >
                     Simpan Draft
                 </button> -->
-                <button v-if="jenbutton" @click="submitBCM()" class="btn-success btn ml-2" >
-                    Kirim Warehouse
+                <button v-if="jenbutton" @click="submitBck()" class="btn-success btn ml-2" >
+                    Simpan  
                 </button>
-                <button v-if="!jenbutton" @click="requestBcm()" class="btn-primary btn ml-2" >
-                    Request Acc
+                <button @click="batal()" class="btn-orange btn ml-2" >
+                    Batal
                 </button>
         </div>
         <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -89,14 +101,14 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Pilih PO</label>
-                        <select @change="pilihPo(aktif)" v-model="aktif" class="form-control">
-                            <option :value="aktif" v-for="(aktif,index) in poaktif" :key="index">{{aktif.nomor_po}}</option>
+                        <label>Pilih SO</label>
+                        <select @change="pilihSo(aktif)" v-model="aktif" class="form-control">
+                            <option :value="aktif" v-for="(aktif,index) in soaktif" :key="index">{{aktif.nomor_so}}</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Supplier</label>
-                        <input v-model="ket.supplier" type="text" class="form-control" disabled>
+                        <label>Customer</label>
+                        <input v-model="ket.customer" type="text" class="form-control" disabled>
                     </div>
                     <div id="overflowBody">
                     <table class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -105,7 +117,7 @@
                                 <th style="text-align:center">No</th>
                                 <th style="text-align:center">Item</th>
                                 <th style="text-align:center">Satuan</th>
-                                <th style="text-align:center">Sisa PO</th>
+                                <th style="text-align:center">Sisa SO</th>
                                 <th style="text-align:center">Pilih</th>
                             </tr>
                         </thead>
@@ -189,7 +201,6 @@ export default {
                 bcm:this.bcm_nomor(),
                 tanggal:this.now(),
             },
-            poaktif:{},
             ket:{},
             aktif:{},
             listsisa:{},
@@ -214,20 +225,21 @@ export default {
             persen:0,
             listrso:{},
             coba:[],
+            soaktif:{}
         }
     },
     created(){
-        this.getPoAktif();
+        this.getSoAktif();
         this.resetForm();
     },  
     computed:{  
 
     },
     methods:{
-        getPoAktif(){
-            axios.get("/api/poaktif/")
+        getSoAktif(){
+            axios.get("/api/so/data/aktif")
             .then(res=>{
-                this.poaktif=res.data.data;
+                this.soaktif=res.data.data;
             });
         },
         now(){
@@ -255,19 +267,25 @@ export default {
             var d = new Date();
             var month = d.getMonth()+1;
 
-            var output = "BCM-" + d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" ;
+            var output = "BCK-" + d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" ;
             return output
         },
-        showPo(){
+        showSo(){
             $("#modal-po").modal("show");
         },
         resetForm(){
             this.checker=[];
         },
-        pilihPo(aktif){
+        pilihSo(aktif){
             this.checker=[];
-            this.ket.supplier=aktif.supplier;
-            this.up.nomor_po=aktif.nomor_po;
+            this.ket.customer=aktif.customer;
+            this.ket.lokasi=aktif.lokasi;
+            this.ket.alamat=aktif.alamat;
+            this.ket.distribusi=aktif.distribusi;
+            this.up.nomor_so=aktif.nomor_so;
+            this.ket.status=aktif.statusso;
+            this.ket.nomor_rso=aktif.nomor_rso;
+            
             axios.get("/api/listrso/data/pilihpo/"+aktif.nomor_po)
             .then(res=>{
                 this.listsisa=res.data.data;
@@ -513,6 +531,9 @@ export default {
                     this.jenbutton=false;
                 }
 
+        },
+        batal(){
+            this.$router.push({name:'bck'});
         }
     },
 } 

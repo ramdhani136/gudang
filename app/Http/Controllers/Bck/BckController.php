@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\So;
+namespace App\Http\Controllers\Bck;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Model\So\So;
-use App\Http\Resources\SoResource;
+use App\Model\Bck\Bck;
+use App\Http\Resources\BckResource;
 use Symfony\Component\HttpFoundation\Response;
 
-class SoController extends Controller
+class BckController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class SoController extends Controller
      */
     public function index()
     {
-        return SoResource::collection(So::orderBy('updated_at','ASC')->get());
+        return BckResource::collection(Bck::latest()->get());
     }
 
     /**
@@ -38,10 +38,9 @@ class SoController extends Controller
      */
     public function store(Request $request)
     {
-        $data=So::create($request->all());
-        return response(new SoResource($data),response::HTTP_CREATED);
+        $data=Bck::create($request->all());
+        return response(new BckResource($data),response::HTTP_CREATED);
     }
-
 
     /**
      * Display the specified resource.
@@ -51,7 +50,7 @@ class SoController extends Controller
      */
     public function show($id)
     {
-        return SoResource::collection(So::Where('nomor_so',$id)->get()); 
+        return BckResource::collection(Bck::where('bck',$id)->get());
     }
 
     /**
@@ -72,10 +71,10 @@ class SoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,$id)
+    public function update(Request $request, $id)
     {
-        So::where('nomor_so',$id)->update($request->all());
-        return response('updated',response::HTTP_CREATED);
+        Bck::where('bck',$id)->update($request->all());
+        return response('update',response::HTTP_CREATED);
     }
 
     /**
@@ -86,13 +85,7 @@ class SoController extends Controller
      */
     public function destroy($id)
     {
-        So::where('nomor_so',$id)->delete();
+        Bck::where('bck',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
-
-    public function aktif()
-    {
-        return SoResource::collection(So::where('status','Acc')->orderBy('updated_at','ASC')->get());
-    }
-    
 }
