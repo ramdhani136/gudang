@@ -1,6 +1,6 @@
 <template>
     <div class="container" @keyup.esc="resetForm()">
-        <button @click="showmodal()" class="btn btn-success my-3">+ Tambah Kendaraan</button>
+        <button @click="showmodal()" class="btn btn-success my-3">+ Tambah Jenis Kendaraan</button>
         <div class="form-group col-3 my-3 float-right">
             <input v-model="search"  type="text" class="form-control" placeholder="Search">
         </div>
@@ -9,11 +9,8 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Merk</th>
-                <th>Plat.No</th>
                 <th>Jenis</th>
-                <th>Kubikasi (M3)</th>
-                <th>Tonase (KG)</th>
+                <th>Keterangan</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -21,10 +18,7 @@
             <tr v-for="(kd,index) in filterkendaraan" :key="index">
                 <td style="text-align:center">{{index+1}}</td>
                 <td>{{kd.nama}}</td>
-                <td style="text-align:center">{{kd.nopol}}</td>
-                <td style="text-align:center">{{kd.jenis}}</td>
-                <td style="text-align:center">{{kd.kubikasi}}</td>
-                <td style="text-align:center">{{kd.tonase}}</td>
+                <td>{{kd.keterangan}}</td>
                 <td style="text-align:center">
                     <button @click="updateKendaraan(kd)" class="btn btn-primary">Edit</button>
                     <button @click="deleteKendaraan(kd)" class="btn btn-danger">Hapus</button>
@@ -45,26 +39,12 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Merk</label>
+                        <label>Jenis</label>
                         <input v-model="form.nama" type="text"  autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label>Plat.No</label>
-                        <input type="text" v-model="form.nopol" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Jenis</label>
-                        <select v-model="form.id_jenis" class="form-control">
-                            <option v-for="(jn,index) in jeniskendaraan" :key="index" :value="jn.id">{{jn.nama}}</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Kubikasi Muatan (M3)</label>
-                        <input type="number" class="form-control" v-model="form.kubikasi">
-                    </div>
-                    <div class="form-group">
-                        <label>Tonase Muatan (Kg)</label>
-                        <input type="number" class="form-control" v-model="form.tonase">
+                        <label>Keterangan</label>
+                        <textarea v-model="form.keterangan" class="form-control"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -91,31 +71,24 @@ export default {
             edit:false,
             target:'',
             load:true,
-            kendaraan:[],
-            jeniskendaraan:{}
+            jeniskendaraan:[]
         }
     },
     created(){
         this.getKendaraan();
-        this.getJenis();
     },
     computed:{
         filterkendaraan(){
-            return this.kendaraan.filter(elem=>{
-            return elem.nopol.toLowerCase().includes(this.search.toLowerCase()); 
+            return this.jeniskendaraan.filter(elem=>{
+            return elem.nama.toLowerCase().includes(this.search.toLowerCase()); 
             });
         }
     },
     methods:{
         getKendaraan(){
-            axios.get("/api/kendaraan")
-            .then(res=>{this.kendaraan=res.data.data
-                this.load=false;
-            });
-        },
-        getJenis(){
             axios.get("/api/jeniskendaraan")
             .then(res=>{this.jeniskendaraan=res.data.data
+            this.load=false;
             }); 
         },
         showmodal(){
@@ -123,7 +96,7 @@ export default {
         },
         createKendaraan(){
             if(this.edit===false){
-                axios.post("/api/kendaraan",this.form)
+                axios.post("/api/jeniskendaraan",this.form)
                 .then((response)=>{
                     this.getKendaraan();
                     $("#modal-form").modal("hide");
@@ -131,7 +104,7 @@ export default {
                 })
 
             }else{
-                axios.put("/api/kendaraan/"+  this.target,this.form)
+                axios.put("/api/jeniskendaraan/"+  this.target,this.form)
                 .then((response)=>{
                     this.getKendaraan();
                     $("#modal-form").modal("hide");
@@ -151,10 +124,7 @@ export default {
         updateKendaraan(kd){
             this.getKendaraan();
             this.form.nama=kd.nama;
-            this.form.nopol=kd.nopol;
-            this.form.id_jenis=kd.id_jenis;
-            this.form.kubikasi=kd.kubikasi; 
-            this.form.tonase=kd.tonase; 
+            this.form.keterangan=kd.keterangan;
             this.target=kd.id;
             this.edit=true;
             this.showmodal();
@@ -162,7 +132,7 @@ export default {
         deleteKendaraan(kd){
             let keputusan=confirm('Apakah anda yakin?');
             if(keputusan===true){
-                axios.delete("/api/kendaraan/" + kd.id)
+                axios.delete("/api/jeniskendaraan/" + kd.id)
                 .then(response=>{
                     this.getKendaraan();
                 })

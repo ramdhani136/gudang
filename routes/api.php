@@ -66,9 +66,12 @@ Route::resource('bbm','Bbm\BbmController');
 Route::resource('listbbm','Bbm\ListBbmController');
 
 Route::resource('bck','Bck\BckController');
+Route::get('bcm/{barang}/{bcm}','Barang\ListBcmController@getbbm');
+
 Route::resource('listbck','Bck\ListBckController');
 Route::resource('kendaraan','Kendaraan\KendaraanController');
 Route::resource('jeniskendaraan','Kendaraan\JenisKendaraanController');
-Route::get('listrso/data/pilihso/{rso}','Rso\ListRsoController@pilihso');
+Route::get('listrso/data/pilihsotersedia/{rso}','Rso\ListRsoController@pilihsotersedia');
+Route::get('listrso/data/pilihsotidak/{rso}','Rso\ListRsoController@pilihsotidak');
 
 

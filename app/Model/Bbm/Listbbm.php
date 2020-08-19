@@ -15,4 +15,7 @@ class Listbbm extends Model
     public function barang(){
         return $this->belongsTo(barang::class,'kode_barang','kode');
     }
+    public function bbm(){
+        return $this->belongsTo(Bbm::class,'nomor_bbm','bbm');
+    }
 }

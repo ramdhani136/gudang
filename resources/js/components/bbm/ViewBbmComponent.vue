@@ -55,7 +55,7 @@
                             <td style="text-align:center">{{listbbm.kode_barang}}</td>
                             <td>{{listbbm.nama_barang}}</td>
                             <td style="text-align:center">{{listbbm.satuan}}</td>
-                            <td style="text-align:center"></td>
+                            <td style="text-align:center">{{ket.qty[index]}}</td>
                             <td  style="text-align:center">
                                 <input  v-model="listbbm.qty" type="number" class="form-control" disabled>
                             </td>
@@ -138,7 +138,9 @@ export default {
             load:false,
             bbm:{},
             poaktif:{},
-            ket:{},
+            ket:{
+                qty:[],
+            },
             aktif:{},
             listsisa:{},
             checker:[],
@@ -149,11 +151,13 @@ export default {
                 keterangan:[],
             },
             uploood:{},
+            listbcm:{},
         }
     },
     created(){
         this.getPoAktif();
         this.getBbm();
+        this.getListBcm();
         this.getlistbm();
         this.resetForm();
         this.default();
@@ -166,7 +170,6 @@ export default {
             axios.get("/api/listbbm/"+this.$route.params.nomor)
             .then(res=>{
                 this.checker=res.data.data;
-                console.log(this.checker)
             }); 
         },
         getBbm(){
@@ -237,6 +240,22 @@ export default {
         },
         kembali(){
             this.$router.push({name:'ingoods'});
+        },
+        getListBcm(){
+            axios.get("/api/listbbm/"+this.$route.params.nomor)
+            .then(res=>{
+                this.checker=res.data.data;
+                for(let i=0;i<this.checker.length;i++){
+                    axios.get("/api/bcm/"+this.checker[i].bcm+"/"+this.checker[i].kode_barang)
+                    .then(res=>{
+                        this.daftarbbm={};
+                        this.daftarbbm=res.data.data;
+                        this.ket.qty=[];
+                        this.ket.qty[i]=this.daftarbbm[i].qty;
+                    });
+                }
+                
+            }); 
         }
     },
 } 

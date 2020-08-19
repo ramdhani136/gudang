@@ -98,4 +98,10 @@ class ListBcmController extends Controller
     {
         return ListBcmResource::collection(Listbcm::where('close_bcm','N')->where('nomor_bcm',$bcm)->latest()->get());
     }
+
+    public function getbbm($bcm,$barang){
+        return ListBcmResource::collection(Listbcm::where('kode_barang',$barang)->where('nomor_bcm',$bcm)->latest()->get());
+    }
+
+    
 }

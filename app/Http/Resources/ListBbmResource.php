@@ -22,7 +22,8 @@ class ListBbmResource extends JsonResource
             'qty'=>$this->qty,
             'keterangan'=>$this->keterangan,
             'nama_barang'=>$this->barang->nama,
-            'satuan'=>$this->barang->satuan
+            'satuan'=>$this->barang->satuan,
+            'bcm'=>$this->bbm->nomor_bcm,
         ];
     }
 }

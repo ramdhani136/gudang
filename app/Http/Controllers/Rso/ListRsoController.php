@@ -183,8 +183,13 @@ class ListRsoController extends Controller
         return  ListRsoResource::collection($data);
     }
 
-    public function  pilihso($rso){
-        $data= Listrso::where('so_close','N')->where('nomor_rso',$rso)->where('so_open','Y')->get();
+    public function  pilihsotersedia($rso){
+        $data= Listrso::where('sotersedia_close','N')->where('nomor_rso',$rso)->where('so_open','Y')->where('qty_tersedia','>',0)->get();
+        return  ListRsoResource::collection($data);
+    }
+
+    public function  pilihsotidak($rso){
+        $data= Listrso::where('sotdk_close','N')->where('nomor_rso',$rso)->where('so_open','Y')->where('qty_tdktersedia','>',0)->get();
         return  ListRsoResource::collection($data);
     }
 

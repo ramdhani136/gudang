@@ -53,6 +53,9 @@ import BckComponent from '../components/distribusi/bck/BckComponent.vue'
 import EkspedisiComponent from '../components/ekspedisi/EkspedisiComponent.vue'
 
 import KendaraanComponent from '../components/kendaraan/KendaraanComponent.vue'
+import JenisKendaraanComponent from '../components/kendaraan/JenisKendaraanComponent.vue'
+
+
 
 
 
@@ -114,6 +117,7 @@ const routes=[
     {name:'ekspedisi', path:'/ekspedisi', component: EkspedisiComponent},
 
     {name:'kendaraan', path:'/distribusi/kendaraan', component: KendaraanComponent},
+    {name:'jkendaraan', path:'/distribusi/jkendaraan', component: JenisKendaraanComponent},
     
 
 

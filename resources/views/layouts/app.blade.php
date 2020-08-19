@@ -88,7 +88,7 @@
                                     <router-link to="/dic/bcm" class="dropdown-item" >Bukti Checker</router-link>
                                     <router-link to="/dic/rbcm" class="dropdown-item" >Request Bukti Checker</router-link>
                                     <router-link to="/dic/incoming" class="dropdown-item" >Bukti Barang Masuk</router-link>
-                                    <router-link to="/dic/incoming/confirm" class="dropdown-item" >Incoming Goods</router-link>
+                                    <!-- <router-link to="/dic/incoming/confirm" class="dropdown-item" >Incoming Goods</router-link> -->
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -101,7 +101,7 @@
                                     <router-link to="/distribusi/bck" class="dropdown-item" >Bukti Checker Keluar</router-link>
                                     <router-link to="/distribusi/bbk" class="dropdown-item" >Bukti Barang Keluar</router-link>
                                     <router-link to="/distribusi/kendaraan" class="dropdown-item" >Data Kendaraan</router-link>
-                                  <!--   <router-link to="/distribusi/jkendaraan" class="dropdown-item" >Jenis Kendaraan</router-link> -->
+                                    <router-link to="/distribusi/jkendaraan" class="dropdown-item" >Jenis Kendaraan</router-link>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">

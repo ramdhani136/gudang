@@ -88,4 +88,8 @@ class ListBbmController extends Controller
         Listbbm::where('id',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
+
+    public function getbbm(){
+        return ListBbmResource::collection(Listbbm::all());
+    }
 }

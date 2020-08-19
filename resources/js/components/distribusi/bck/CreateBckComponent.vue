@@ -11,8 +11,8 @@
                     <input v-model="up.tanggal" type="date" @change="validate()" :min="now()" class="form-control col-12" >
                 </div>
                 <div class="form-group">
-                    <label>keterangan</label>
-                    <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
+                    <label>Nomor SO</label>
+                    <input v-model="up.nomor_so" @click="showSo()" type="text" class="form-control" placeholder="Pilih Sales Order">
                 </div>
             </div>
             <div class="col-4">
@@ -23,16 +23,6 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Nomor SO</label>
-                    <input v-model="up.nomor_so" @click="showSo()" type="text" class="form-control" placeholder="Pilih Sales Order">
-                </div>
-                <div class="form-group">
-                    <label>Kendaraan</label>
-                    <input type="text" v-model="up.nopol" class="form-control" placeholder="Pilih Kendaraan">
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="form-group">
                     <label>Distribusi</label>
                     <input v-model="ket.distribusi" type="text" class="form-control" disabled>
                 </div>
@@ -40,9 +30,15 @@
                     <label>Lokasi</label>
                     <input v-model="ket.lokasi" type="text" class="form-control" disabled>
                 </div>
+            </div>
+            <div class="col-4">
                 <div class="form-group">
                     <label>Alamat</label>
                     <textarea v-model="ket.alamat" name="keterangan" class="form-control col-12" disabled></textarea>
+                </div>
+                <div class="form-group">
+                    <label>keterangan</label>
+                    <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
                 </div>
             </div>
         </div>
@@ -57,6 +53,7 @@
                             <th>Nama Barang</th>
                             <th>Satuan</th>
                             <th>Sisa SO</th>
+                            <th>Qty Tersedia</th>
                             <th>Rencana Kirim</th>
                             <th>Keterangan</th>
                         </tr>
@@ -64,10 +61,11 @@
                     <tbody>
                         <tr v-for="(listbcm,index) in checker" :key="index">
                             <td style="text-align:center">{{index+1}}</td>
-                            <td style="text-align:center">{{listbcm.kode_barang}}</td>
-                            <td>{{listbcm.nama}}</td>
+                            <td>{{listbcm.lkode_barang}}</td>
+                            <td>{{listbcm.nama_barang}}</td>
                             <td style="text-align:center">{{listbcm.satuan}}</td>
-                            <td style="text-align:center">{{listbcm.sisapo}}</td>
+                            <td style="text-align:center">{{ket.sisasopilih[index]}}</td>
+                            <td style="text-align:center">{{ket.tersedia[index]}}</td>
                             <td  style="text-align:center">
                                 <input @input="validqty(index)"  v-model="hitung.qty[index]" type="number" class="form-control">
                             </td>
@@ -83,7 +81,7 @@
                 <!-- <button @click="draftBcm()" class="btn-orange btn ml-4" >
                     Simpan Draft
                 </button> -->
-                <button v-if="jenbutton" @click="submitBck()" class="btn-success btn ml-2" >
+                <button @click="submitBck()" class="btn-success btn ml-2" >
                     Simpan  
                 </button>
                 <button @click="batal()" class="btn-orange btn ml-2" >
@@ -94,7 +92,7 @@
             <div class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Form PO</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Form SO</h5>
                     <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -115,20 +113,24 @@
                         <thead  id="rsthead">
                             <tr>
                                 <th style="text-align:center">No</th>
+                                <th style="text-align:center">Kode</th>
                                 <th style="text-align:center">Item</th>
                                 <th style="text-align:center">Satuan</th>
                                 <th style="text-align:center">Sisa SO</th>
+                                <th style="text-align:center">Qty Tersedia</th>
                                 <th style="text-align:center">Pilih</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(ls,index) in listsisa" :key="index">
+                            <tr v-for="(ls,index) in listso" :key="index">
                                 <td style="text-align:center">{{index+1}}</td>
-                                <td>{{ls.nama}}</td>
+                                <td>{{ls.lkode_barang}}</td>
+                                <td>{{ls.nama_barang}}</td>
                                 <td style="text-align:center">{{ls.satuan}}</td>
-                                <td style="text-align:center">{{ls.sisapo}}</td>
+                                <td style="text-align:center">{{ket.sisaso[index]}}</td>
+                                <td style="text-align:center">{{ket.ltersedia[index]}}</td>
                                 <td style="text-align:center">
-                                    <input v-model="checker" type="checkbox" :value="ls">
+                                    <input @change="pilihlistchecker()" v-model="checker" type="checkbox" :value="ls" :disabled="ket.ltersedia[index]===0">
                                 </td>
                             </tr>
                         </tbody>
@@ -182,7 +184,19 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
+                <div class="error-actions">
+                        <router-link to="/so"  class="btn btn-primary btn-lg">
+                                Lihat Data SO
+                        </router-link>
                 </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="gagal" class="row mt-2">
+            <div id="alastolak">
+                <div>
+                    <b>Belum ada list Request Sales Order Yang di pilih! </b> 
+                </div>                
             </div>
         </div>
     </div>
@@ -201,7 +215,12 @@ export default {
                 bcm:this.bcm_nomor(),
                 tanggal:this.now(),
             },
-            ket:{},
+            ket:{
+                sisaso:[],
+                sisasopilih:[],
+                tersedia:[],
+                ltersedia:[]
+            },
             aktif:{},
             listsisa:{},
             checker:[],
@@ -225,12 +244,15 @@ export default {
             persen:0,
             listrso:{},
             coba:[],
-            soaktif:{}
+            soaktif:{},
+            listso:{},
+            gagal:false,
         }
     },
     created(){
         this.getSoAktif();
         this.resetForm();
+        this.timer();
     },  
     computed:{  
 
@@ -277,6 +299,7 @@ export default {
             this.checker=[];
         },
         pilihSo(aktif){
+            this.hitung.qty=[];
             this.checker=[];
             this.ket.customer=aktif.customer;
             this.ket.lokasi=aktif.lokasi;
@@ -285,14 +308,43 @@ export default {
             this.up.nomor_so=aktif.nomor_so;
             this.ket.status=aktif.statusso;
             this.ket.nomor_rso=aktif.nomor_rso;
-            
-            axios.get("/api/listrso/data/pilihpo/"+aktif.nomor_po)
-            .then(res=>{
-                this.listsisa=res.data.data;
-            });
+            if(aktif.statusso==="tersedia"){
+                axios.get("/api/listrso/data/pilihsotersedia/"+aktif.nomor_rso)
+                .then(res=>{
+                    this.listso=res.data.data;
+                    for(let i=0;i<this.listso.length;i++){
+                        this.ket.sisaso[i]=parseInt(this.listso[i].qty_tersedia)-parseInt(this.listso[i].keluar_tersedia);
+                        this.ket.ltersedia[i]=parseInt(this.listso[i].qty_tersedia)-parseInt(this.listso[i].keluar_tersedia);
+                    }
+                    
+                })
+            }else if(aktif.statusso==="tidaktersedia"){
+                axios.get("/api/listrso/data/pilihsotidak/"+aktif.nomor_rso)
+                .then(res=>{
+                    this.listso=res.data.data;
+                    for(let i=0;i<this.listso.length;i++){
+                        this.ket.sisaso[i]=parseInt(this.listso[i].qty_tdktersedia)-parseInt(this.listso[i].keluar_tdktersedia);
+                        this.ket.ltersedia[i]=parseInt(this.listso[i].qty_masuk)-parseInt(this.listso[i].keluar_tdktersedia);
+                    }
+                    
+                })
+            }
+
         },
-        checklist(){
+        checklist(){ 
             $("#modal-po").modal("hide");
+        },
+        pilihlistchecker(){
+            for(let i=0;i<this.checker.length;i++){
+                if(this.aktif.statusso==="tersedia"){
+                    this.ket.sisasopilih[i]=parseInt(this.checker[i].qty_tersedia)-parseInt(this.checker[i].keluar_tersedia);
+                    this.ket.tersedia[i]=parseInt(this.checker[i].qty_tersedia)-parseInt(this.checker[i].keluar_tersedia);
+                }else{
+                    this.ket.sisasopilih[i]=parseInt(this.checker[i].qty_tdktersedia)-parseInt(this.checker[i].keluar_tdktersedia);
+                    this.ket.tersedia[i]=parseInt(this.checker[i].qty_masuk)-parseInt(this.checker[i].keluar_tdktersedia);
+                }
+                
+            }
         },
         draftBcm(){
             let jawab=confirm("Simpan Draft?");
@@ -365,176 +417,32 @@ export default {
         },
         )}
         },
-        submitBCM(){
-        let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
-        if(jawab===true){
-            this.up.status="open";
-            axios.post("/api/bcm",this.up)
-            .then(res=>{
-                for(let i=0;i<this.checker.length;i++){
-                    this.uploadlist.kode_barang=this.checker[i].kode_barang;
-                    this.uploadlist.qty=this.hitung.qty[i];
-                    this.uploadlist.keterangan=this.hitung.keterangan[i];
-                    this.uploadlist.nomor_bcm=this.up.bcm;
-                    this.uploadlist.status="open";
-                    this.uploood={kode_barang:this.uploadlist.kode_barang,nomor_bcm:this.uploadlist.nomor_bcm,
-                    qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan,nomor_po:this.up.nomor_po,sisapo:this.checker[i].sisapo,
-                    };
-                    axios.post("/api/listbcm",this.uploood)
-                    .then(res=>{ 
-                    });
+        submitBck(){
+            let yakin=confirm("Yakin ingin membuat Bukti Checker ini?");
+            if(yakin===true){
+                if(this.checker.length>0){
+
+                }else{
+                    this.gagal=true;
                 }
-                for(let h=0;h<this.checker.length;h++){
-                axios.get("/api/view/detailpo/"+this.checker[h].nomor_po+"/"+this.checker[h].kode_barang)
-                        .then(res=>{
-                            this.listpo=res.data.data;
-                            for(let j=0;j<this.listpo.length;j++){  
-                                if(this.hitung.qty[h]<=(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk))){
-                                    this.hasil=this.hitung.qty[h];
-                                    this.hitung.qty[h]=parseInt(this.hitung.qty[h])-(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk));
-                                }else if(this.hitung.qty[h]>(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk))){
-                                    this.hasil=parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk);
-                                    this.hitung.qty[h]=parseInt(this.hitung.qty[h])-(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk));
-                                }
-                                if(this.hitung.qty[h]<0){
-                                    this.hitung.qty[h]=0;
-                                }
-                                    this.uplistsisa={qty_masuk:parseInt(this.hasil)+parseInt(this.listpo[j].qty_masuk)};
-                                    axios.put("/api/listrso/"+this.listpo[j].id,this.uplistsisa)
-                                    .then(res=>{
-                                    axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
-                                        .then(res=>{
-                                            this.listsisa=res.data.data;
-                                            for(let k=0;k<this.listsisa.length;k++){
-                                                if(this.listsisa[k].sisapo<1){
-                                                    this.uplist.po_close="Y";
-                                                    axios.put("/api/listrso/data/"+this.listsisa[k].nomor_po+"/"+this.listsisa[k].kode_barang,this.uplist)
-                                                    .then(res=>{
-                                                    });
-                                                    }
-                                            }
-                                        })
-                                        this.sipo=0;
-                                        axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
-                                        .then(res=>{
-                                            this.sisasemua=0;
-                                            this.listsisa=res.data.data;
-                                            for(let l=0;l<this.listsisa.length;l++){
-                                                this.sipo+=parseInt(this.listsisa[l].sisapo);  
-                                            }
-                                            if(this.sipo<1){
-                                                this.uppo.status="Selesai";
-                                                axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
-                                                .then(res=>{
-                                                    this.$router.push({name:'bcmcomponent'});
-                                                });
-                                            }else{
-                                                this.$router.push({name:'bcmcomponent'});
-                                            }
-                                        });
-                                    }); 
-                            }
-                        });
-            }
-        },
-        )}
-        },
-        requestBcm(){   
-        let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
-        if(jawab===true){
-            this.up.status="sent";
-            axios.post("/api/bcm",this.up)
-            .then(res=>{
-                for(let i=0;i<this.checker.length;i++){
-                    this.uploadlist.kode_barang=this.checker[i].kode_barang;
-                    this.uploadlist.qty=this.hitung.qty[i];
-                    this.uploadlist.keterangan=this.hitung.keterangan[i];
-                    this.uploadlist.nomor_bcm=this.up.bcm;
-                    this.uploadlist.status="open";
-                    this.uploood={kode_barang:this.uploadlist.kode_barang,nomor_bcm:this.uploadlist.nomor_bcm,
-                    qty:this.uploadlist.qty,keterangan:this.uploadlist.keterangan,nomor_po:this.up.nomor_po,sisapo:this.checker[i].sisapo,
-                    };
-                    axios.post("/api/listbcm",this.uploood)
-                    .then(res=>{ 
-                    });
-                }
-                for(let h=0;h<this.checker.length;h++){
-                axios.get("/api/view/detailpo/"+this.checker[h].nomor_po+"/"+this.checker[h].kode_barang)
-                        .then(res=>{
-                            this.listpo=res.data.data;
-                            for(let j=0;j<this.listpo.length;j++){  
-                                if(this.hitung.qty[h]<=(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk))){
-                                    this.hasil=this.hitung.qty[h];
-                                    this.hitung.qty[h]=parseInt(this.hitung.qty[h])-(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk));
-                                }else if(this.hitung.qty[h]>(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk))){
-                                    this.hasil=parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk);
-                                    this.hitung.qty[h]=parseInt(this.hitung.qty[h])-(parseInt(this.listpo[j].qty_tdktersedia)-parseInt(this.listpo[j].qty_masuk));
-                                }
-                                if(this.hitung.qty[h]<0){
-                                    this.hitung.qty[h]=0;
-                                }
-                                    this.uplistsisa={qty_masuk:parseInt(this.hasil)+parseInt(this.listpo[j].qty_masuk)};
-                                    axios.put("/api/listrso/"+this.listpo[j].id,this.uplistsisa)
-                                    .then(res=>{
-                                    axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
-                                        .then(res=>{
-                                            this.listsisa=res.data.data;
-                                            for(let k=0;k<this.listsisa.length;k++){
-                                                if(this.listsisa[k].sisapo<1){
-                                                    this.uplist.po_close="Y";
-                                                    axios.put("/api/listrso/data/"+this.listsisa[k].nomor_po+"/"+this.listsisa[k].kode_barang,this.uplist)
-                                                    .then(res=>{
-                                                    });
-                                                    }
-                                            }
-                                        })
-                                        this.sipo=0;
-                                        axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
-                                        .then(res=>{
-                                            this.sisasemua=0;
-                                            this.listsisa=res.data.data;
-                                            for(let l=0;l<this.listsisa.length;l++){
-                                                this.sipo+=parseInt(this.listsisa[l].sisapo);  
-                                            }
-                                            if(this.sipo<1){
-                                                this.uppo.status="Selesai";
-                                                axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
-                                                .then(res=>{
-                                                    this.$router.push({name:'bcmcomponent'});
-                                                });
-                                            }else{
-                                                this.$router.push({name:'bcmcomponent'});
-                                            }
-                                        });
-                                    }); 
-                            }
-                        });
-            }
-        },
-        )}
+            }   
         },
         validqty(index){
                 this.pembanding="";
                 this.aksicek="";
-                if(parseInt(this.hitung.qty[index])>parseInt(this.checker[index].sisapo)){
-                    this.cek[index]="error"
-                }else{
-                    this.cek[index]="tidak"
-                }
-                for(let i=0;i<this.checker.length;i++){
-                    this.aksicek+=this.cek[i];
-                    this.pembanding+="tidak";
-                }
-                if(this.aksicek===this.pembanding){
-                    this.jenbutton=true;
-                }else{
-                    this.jenbutton=false;
+                if(parseInt(this.hitung.qty[index])>parseInt(this.ket.tersedia[index])){
+                    this.hitung.qty[index]=this.ket.tersedia[index];
                 }
 
         },
         batal(){
             this.$router.push({name:'bck'});
-        }
+        },
+        timer() {
+                setInterval(() => {
+                    this.gagal=false;
+                }, 5000);
+            },
     },
 } 
 </script>
