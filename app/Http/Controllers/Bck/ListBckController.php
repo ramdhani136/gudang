@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Bck;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Model\Bck\Listbck;
+use App\Http\Resources\ListBckResource;
+use Symfony\Component\HttpFoundation\Response;
 
 class ListBckController extends Controller
 {
@@ -14,7 +17,7 @@ class ListBckController extends Controller
      */
     public function index()
     {
-        //
+        return ListBckResource::collection(Listbck::all());
     }
 
     /**
@@ -35,7 +38,8 @@ class ListBckController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data=Listbck::create($request->all());
+        return response(new ListBckResource($data),response::HTTP_CREATED);
     }
 
     /**
@@ -46,7 +50,7 @@ class ListBckController extends Controller
      */
     public function show($id)
     {
-        //
+        return ListBckResourceList::collection(Listbck::where('id',$id)->get());
     }
 
     /**
@@ -69,7 +73,8 @@ class ListBckController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        Listbck::where('id',$id)->update($request->all());
+        return response('update',response::HTTP_CREATED);
     }
 
     /**
@@ -80,6 +85,7 @@ class ListBckController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Listbcl::where('id',$id)->delete();
+        return response('deleted',response::HTTP_OK);
     }
 }

@@ -23,10 +23,10 @@ class BckResource extends JsonResource
             'status'=>$this->status,
             'customer'=>$this->so->rso->customer->nama,
             'id_kendaran'=>$this->id_kendaraan,
-            'nama_kendaraan'=>$this->kendaraan->nama,
+     /*        'nama_kendaraan'=>$this->kendaraan->nama,
             'nopol'=>$this->kendaraan->nopol,
             'kubikasi'=>$this->kendaraan->kubikasi,
-            'jeniskendaraan'=>$this->kendaraan->jeniskendaraan->nama
+            'jeniskendaraan'=>$this->kendaraan->jeniskendaraan->nama */
         ];
     }
 }

@@ -5806,7 +5806,7 @@ __webpack_require__.r(__webpack_exports__);
     return {
       load: false,
       up: {
-        bcm: this.bcm_nomor(),
+        bck: this.bck_nomor(),
         tanggal: this.now()
       },
       ket: {
@@ -5824,23 +5824,16 @@ __webpack_require__.r(__webpack_exports__);
         qty: [],
         keterangan: []
       },
-      uploood: {},
-      aksicek: 'benar',
-      jenbutton: true,
-      cek: {},
       uplistsisa: {
         qty_masuk: 0
       },
-      uplist: {},
-      sipo: 0,
-      uppo: {},
-      listpo: {},
-      persen: 0,
-      listrso: {},
-      coba: [],
       soaktif: {},
       listso: {},
-      gagal: false
+      gagal: false,
+      uplist: {},
+      qty: 0,
+      listrso: {},
+      nilai: null
     };
   },
   created: function created() {
@@ -5876,7 +5869,7 @@ __webpack_require__.r(__webpack_exports__);
       var output = d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-" + (day < 10 ? '0' : '') + day;
       return output;
     },
-    bcm_nomor: function bcm_nomor() {
+    bck_nomor: function bck_nomor() {
       var d = new Date();
       var month = d.getMonth() + 1;
       var output = "BCK-" + d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-";
@@ -5935,103 +5928,144 @@ __webpack_require__.r(__webpack_exports__);
         }
       }
     },
-    draftBcm: function draftBcm() {
+    submitBck: function submitBck() {
       var _this3 = this;
 
-      var jawab = confirm("Simpan Draft?");
-
-      if (jawab === true) {
-        this.up.status = "Draft";
-        axios.post("/api/bcm", this.up).then(function (res) {
-          for (var i = 0; i < _this3.checker.length; i++) {
-            _this3.uploadlist.kode_barang = _this3.checker[i].kode_barang;
-            _this3.uploadlist.qty = _this3.hitung.qty[i];
-            _this3.uploadlist.keterangan = _this3.hitung.keterangan[i];
-            _this3.uploadlist.nomor_bcm = _this3.up.bcm;
-            _this3.uploadlist.status = "open";
-            _this3.uploood = {
-              kode_barang: _this3.uploadlist.kode_barang,
-              nomor_bcm: _this3.uploadlist.nomor_bcm,
-              qty: _this3.uploadlist.qty,
-              keterangan: _this3.uploadlist.keterangan
-            };
-            axios.post("/api/listbcm", _this3.uploood).then(function (res) {});
-          }
-
-          var _loop = function _loop(h) {
-            axios.get("/api/view/detailpo/" + _this3.checker[h].nomor_po + "/" + _this3.checker[h].kode_barang).then(function (res) {
-              _this3.listpo = res.data.data;
-              _this3.persen = 0;
-
-              for (var j = 0; j < _this3.listpo.length; j++) {
-                _this3.persen += parseInt(_this3.listpo[j].qty_tdktersedia);
-                _this3.coba = [];
-                _this3.coba = [{
-                  qty: _this3.persen / 100
-                }];
-              }
-
-              for (var z = 0; z < _this3.listpo.length; z++) {
-                _this3.uplistsisa = {
-                  qty_masuk: _this3.listpo[z].qty_tdktersedia / _this3.coba[0].qty / 100 * _this3.hitung.qty[h] + _this3.listpo[z].qty_masuk
-                };
-                axios.put("/api/listrso/" + _this3.listpo[z].id, _this3.uplistsisa).then(function (res) {
-                  axios.get("/api/listrso/data/listpo/" + _this3.aktif.nomor_po).then(function (res) {
-                    _this3.listsisa = res.data.data;
-
-                    for (var _i = 0; _i < _this3.listsisa.length; _i++) {
-                      if (_this3.listsisa[_i].sisapo < 1) {
-                        _this3.uplist.po_close = "Y";
-                        axios.put("/api/listrso/data/" + _this3.listsisa[_i].nomor_po + "/" + _this3.listsisa[_i].kode_barang, _this3.uplist).then(function (res) {});
-                      }
-                    }
-                  });
-                  _this3.sipo = 0;
-                  axios.get("/api/listrso/data/listall/" + _this3.aktif.nomor_po).then(function (res) {
-                    _this3.sisasemua = 0;
-                    _this3.listsisa = res.data.data;
-
-                    for (var _i2 = 0; _i2 < _this3.listsisa.length; _i2++) {
-                      _this3.sipo += parseInt(_this3.listsisa[_i2].sisapo);
-                    }
-
-                    if (_this3.sipo < 1) {
-                      _this3.uppo.status = "Selesai";
-                      axios.put("/api/po/" + _this3.aktif.nomor_po, _this3.uppo).then(function (res) {
-                        _this3.$router.push({
-                          name: 'bcmcomponent'
-                        });
-                      });
-                    } else {
-                      _this3.$router.push({
-                        name: 'bcmcomponent'
-                      });
-                    }
-                  });
-                });
-              }
-            });
-          };
-
-          for (var h = 0; h < _this3.checker.length; h++) {
-            _loop(h);
-          }
-        });
-      }
-    },
-    submitBck: function submitBck() {
+      /*  if(this.aktif.statusso==="tersedia"){
+           axios.get("/api/listrso/data/pilihsotersedia/"+this.aktif.nomor_rso)
+           .then(res=>{
+               this.listso=res.data.data;
+               if(this.listso.length<1){
+                   this.updateso={status:'Selesai'};
+                   axios.put("/api/so/"+this.aktif.nomor_so,this.updateso)
+                   .then(res=>{
+                       console.log("berhasil edit");
+                   });
+               }
+           });
+       }else{
+           axios.get("/api/listrso/data/pilihsotidak/"+this.aktif.nomor_rso)
+           .then(res=>{
+               this.listso=res.data.data;
+               if(this.listso.length<1){
+                   this.updateso={status:'Selesai'};
+                   axios.put("/api/so/"+this.aktif.nomor_so,this.updateso)
+                   .then(res=>{
+                       console.log("berhasil edit");
+                   });
+               }
+           });
+       } */
       var yakin = confirm("Yakin ingin membuat Bukti Checker ini?");
 
       if (yakin === true) {
-        if (this.checker.length > 0) {} else {
+        if (this.checker.length > 0) {
+          axios.post("/api/bck", this.up).then(function (res) {
+            var _loop = function _loop(i) {
+              _this3.nomor_bck = _this3.up.bck;
+              _this3.kode_barang = _this3.checker[i].lkode_barang;
+              _this3.qty = 0;
+              _this3.qty = parseInt(_this3.hitung.qty[i]);
+              _this3.keterangan = _this3.hitung.keterangan[i];
+
+              if (_this3.aktif.statusso === "tersedia") {
+                _this3.sisaso = parseInt(_this3.checker[i].qty_tersedia) - parseInt(_this3.checker[i].keluar_tersedia);
+              } else {
+                _this3.sisaso = parseInt(_this3.checker[i].qty_tdktersedia) - parseInt(_this3.checker[i].keluar_tdktersedia);
+              }
+
+              _this3.uplist = {
+                nomor_bck: _this3.nomor_bck,
+                kode_barang: _this3.kode_barang,
+                qty: _this3.qty,
+                sisaso: _this3.sisaso,
+                keterangan: _this3.keterangan
+              };
+              axios.post("/api/listbck", _this3.uplist).then(function (res) {
+                if (_this3.aktif.statusso === "tersedia") {
+                  _this3.uprso = {
+                    out_yes: parseInt(_this3.hitung.qty[i]) + parseInt(_this3.checker[i].keluar_tersedia)
+                  };
+                  axios.put("/api/listrso/" + _this3.checker[i].id, _this3.uprso).then(function (res) {
+                    axios.get("/api/listrso/" + _this3.checker[i].id + "/edit").then(function (res) {
+                      _this3.listrso = res.data.data;
+
+                      for (var k = 0; k < _this3.listrso.length; k++) {
+                        if (_this3.listrso[k].keluar_tersedia >= _this3.listrso[k].qty_tersedia) {
+                          _this3.uprso = {}, _this3.uprso = {
+                            sotersedia_close: 'Y'
+                          };
+                          axios.put("/api/listrso/" + _this3.checker[i].id, _this3.uprso).then(function (res) {
+                            axios.get("/api/listrso/data/pilihsotersedia/" + _this3.aktif.nomor_rso).then(function (res) {
+                              _this3.listso = res.data.data;
+
+                              if (_this3.listso.length < 1) {
+                                _this3.updateso = {
+                                  status: 'Selesai'
+                                };
+                                axios.put("/api/so/" + _this3.aktif.nomor_so, _this3.updateso).then(function (res) {
+                                  _this3.$router.push({
+                                    name: 'bck'
+                                  });
+                                });
+                              }
+                            });
+                          });
+                        }
+                      }
+                    });
+                  });
+                } else {
+                  _this3.uprso = {
+                    out_no: parseInt(_this3.hitung.qty[i]) + parseInt(_this3.checker[i].keluar_tdktersedia)
+                  };
+                  axios.put("/api/listrso/" + _this3.checker[i].id, _this3.uprso).then(function (res) {
+                    axios.get("/api/listrso/" + _this3.checker[i].id + "/edit").then(function (res) {
+                      _this3.listrso = res.data.data;
+
+                      for (var k = 0; k < _this3.listrso.length; k++) {
+                        if (_this3.listrso[k].keluar_tdktersedia >= _this3.listrso[k].qty_tdktersedia) {
+                          _this3.uprso = {}, _this3.uprso = {
+                            sotdk_close: 'Y'
+                          };
+                          axios.put("/api/listrso/" + _this3.checker[i].id, _this3.uprso).then(function (res) {
+                            axios.get("/api/listrso/data/pilihsotidak/" + _this3.aktif.nomor_rso).then(function (res) {
+                              _this3.listso = res.data.data;
+
+                              if (_this3.listso.length < 1) {
+                                _this3.updateso = {
+                                  status: 'Selesai'
+                                };
+                                axios.put("/api/so/" + _this3.aktif.nomor_so, _this3.updateso).then(function (res) {
+                                  _this3.$router.push({
+                                    name: 'bck'
+                                  });
+                                });
+                              }
+                            });
+                          });
+                        }
+                      }
+                    });
+                  });
+                }
+
+                _this3.$router.push({
+                  name: 'bck'
+                });
+              });
+            };
+
+            for (var i = 0; i < _this3.checker.length; i++) {
+              _loop(i);
+            }
+          });
+        } else {
           this.gagal = true;
         }
       }
     },
     validqty: function validqty(index) {
-      this.pembanding = "";
-      this.aksicek = "";
-
       if (parseInt(this.hitung.qty[index]) > parseInt(this.ket.tersedia[index])) {
         this.hitung.qty[index] = this.ket.tersedia[index];
       }
@@ -12082,6 +12116,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -12122,6 +12157,10 @@ __webpack_require__.r(__webpack_exports__);
         } else if (this.status === "Tolak") {
           return this.so.filter(function (elem) {
             return elem.status === "Tolak";
+          });
+        } else if (this.status === "Selesai") {
+          return this.so.filter(function (elem) {
+            return elem.status === "Selesai";
           });
         }
       } else {
@@ -12250,6 +12289,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -12282,6 +12322,10 @@ __webpack_require__.r(__webpack_exports__);
         } else if (this.status === "Tolak") {
           return this.so.filter(function (elem) {
             return elem.status === "Tolak";
+          });
+        } else if (this.status === "Selesai") {
+          return this.so.filter(function (elem) {
+            return elem.status === "Selesai";
           });
         }
       } else {
@@ -62590,19 +62634,19 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.up.bcm,
-                expression: "up.bcm"
+                value: _vm.up.bck,
+                expression: "up.bck"
               }
             ],
             staticClass: "form-control col-12",
             attrs: { type: "text" },
-            domProps: { value: _vm.up.bcm },
+            domProps: { value: _vm.up.bck },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.$set(_vm.up, "bcm", $event.target.value)
+                _vm.$set(_vm.up, "bck", $event.target.value)
               }
             }
           })
@@ -75037,7 +75081,9 @@ var render = function() {
           _vm._v(" "),
           _c("option", { attrs: { value: "Acc" } }, [_vm._v("Open")]),
           _vm._v(" "),
-          _c("option", { attrs: { value: "Tolak" } }, [_vm._v("Rejected")])
+          _c("option", { attrs: { value: "Tolak" } }, [_vm._v("Rejected")]),
+          _vm._v(" "),
+          _c("option", { attrs: { value: "Selesai" } }, [_vm._v("Selesai")])
         ]
       )
     ]),
@@ -75246,7 +75292,9 @@ var render = function() {
           _vm._v(" "),
           _c("option", { attrs: { value: "Acc" } }, [_vm._v("Accept")]),
           _vm._v(" "),
-          _c("option", { attrs: { value: "Tolak" } }, [_vm._v("Rejected")])
+          _c("option", { attrs: { value: "Tolak" } }, [_vm._v("Rejected")]),
+          _vm._v(" "),
+          _c("option", { attrs: { value: "Selesai" } }, [_vm._v("Selesai")])
         ]
       )
     ]),

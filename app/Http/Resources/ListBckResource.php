@@ -14,6 +14,18 @@ class ListBckResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return 
+        [
+            'id'=>$this->id,
+            'nomor_bck'=>$this->nomor_bck,
+            'kode_barang'=>$this->kode_barang,
+            'qty'=>$this->qty,
+            'sisaso'=>$this->sisaso,
+            'keterangan'=>$this->keterangan,
+            'close_bck'=>$this->close_bck,
+            'bck'=>$this->bck->nomor_so,
+            'nama_barang'=>$this->barang->nama,
+            'satuan'=>$this->barang->satuan,
+        ];
     }
 }

@@ -9,6 +9,7 @@
                 <option value="Sent">Waiting list</option>
                 <option value="Acc">Open</option>
                 <option value="Tolak">Rejected</option>
+                <option value="Selesai">Selesai</option>
             </select>
         </div>
         <div class="row">
@@ -80,6 +81,9 @@ export default {
                 }
                 else if(this.status==="Tolak"){
                     return this.so.filter(elem=> elem.status==="Tolak")
+                }
+                else if(this.status==="Selesai"){
+                    return this.so.filter(elem=> elem.status==="Selesai")
                 }
             }else{
                 return this.so.filter(elem => {
