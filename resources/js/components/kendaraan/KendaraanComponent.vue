@@ -9,7 +9,7 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Nama</th>
+                <th>Merk</th>
                 <th>Plat.No</th>
                 <th>Jenis</th>
                 <th>Kubikasi (M3)</th>
@@ -38,32 +38,38 @@
             <div class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Form Customer</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Form Kendaraan</h5>
                     <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Nama Ekspedisi</label>
+                        <label>Merk</label>
                         <input v-model="form.nama" type="text"  autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label>Alamat</label>
-                        <textarea v-model="form.alamat" class="form-control"></textarea>
+                        <label>Plat.No</label>
+                        <textarea v-model="form.nopol" class="form-control"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>No. Kontak</label>
-                        <input v-model="form.kontak" type="text" name="number"  autocomplete="off" class="form-control">
+                        <label>Jenis</label>
+                        <select v-model="form.id_jenis" class="form-control">
+                            <option v-for="(jn,index) in jeniskendaraan" :key="index" :value="jn.id">{{jn.nama}}</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>Keterangan</label>
-                        <textarea v-model="form.keterangan" class="form-control"></textarea>
+                        <label>Kubikasi Muatan (M3)</label>
+                        <input type="number" class="form-control" v-model="form.kubikasi">
+                    </div>
+                    <div class="form-group">
+                        <label>Tonase Muatan (Kg)</label>
+                        <input type="number" class="form-control" v-model="form.tonase">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="createEkspedisi()" class="btn btn-primary">Save changes</button>
+                    <button type="button" @click="createKendaraan()" class="btn btn-primary">Save changes</button>
                 </div>
                 </div>
             </div>
@@ -85,11 +91,13 @@ export default {
             edit:false,
             target:'',
             load:true,
-            kendaraan:[]
+            kendaraan:[],
+            jeniskendaraan:{}
         }
     },
     created(){
-        this.getKendaraan()
+        this.getKendaraan();
+        this.getJenis();
     },
     computed:{
         filterkendaraan(){
@@ -105,30 +113,27 @@ export default {
                 this.load=false;
             });
         },
+        getJenis(){
+            axios.get("/api/jeniskendaraan")
+            .then(res=>{this.jeniskendaraan=res.data.data
+            }); 
+        },
         showmodal(){
             $("#modal-form").modal("show");
         },
-        createEkspedisi(){
+        createKendaraan(){
             if(this.edit===false){
-                axios.post("/api/ekspedisi",this.form)
+                axios.post("/api/kendaraan",this.form)
                 .then((response)=>{
-                    this.getEkspedisi();
+                    this.getKendaraan();
                     $("#modal-form").modal("hide");
                     this.resetForm();
                 })
-                .catch(error=>{
-                    this.errors=[];
-                    if(error.response.data.errors.nama){
-                        this.errors.push(error.response.data.errors.nama[0])
-                    }
-                    if(error.response.data.errors.kode){
-                        this.errors.push(error.response.data.errors.kode[0])
-                    }
-            })
+
             }else{
-                axios.put("/api/ekspedisi/"+  this.target,this.form)
+                axios.put("/api/kendaraan/"+  this.target,this.form)
                 .then((response)=>{
-                    this.getEkspedisi();
+                    this.getKendaraan();
                     $("#modal-form").modal("hide");
                     this.resetForm()
                 })
@@ -143,22 +148,23 @@ export default {
             })
             }
         },
-        updateEkspedisi(eks){
-            this.getEkspedisi();
-            this.form.nama=eks.nama;
-            this.form.alamat=eks.alamat;
-            this.form.kontak=eks.kontak;
-            this.target=eks.id;
-            this.form.keterangan=eks.keterangan; 
+        updateKendaraan(kd){
+            this.getKendaraan();
+            this.form.nama=kd.nama;
+            this.form.nopol=kd.nopol;
+            this.form.id_jenis=kd.id_jenis;
+            this.form.kubikasi=kd.kubikasi; 
+            this.form.tonase=kd.tonase; 
+            this.target=kd.id;
             this.edit=true;
             this.showmodal();
         },
-        deleteEkspedisi(eks){
+        deleteKendaraan(kd){
             let keputusan=confirm('Apakah anda yakin?');
             if(keputusan===true){
-                axios.delete("/api/ekspedisi/" + eks.id)
+                axios.delete("/api/kendaraan/" + kd.id)
                 .then(response=>{
-                    this.getEkspedisi();
+                    this.getKendaraan();
                 })
                 .catch(error=>{
                     console.log(error)
@@ -166,11 +172,7 @@ export default {
             }
         },
         resetForm(){
-            this.form.nama="";
-            this.form.alamat="";
-            this.form.kontak="";
-            this.target="";
-            this.form.keterangan=""; 
+            this.form={};
             this.edit=false;
         },
     }

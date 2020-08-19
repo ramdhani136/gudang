@@ -6648,6 +6648,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -6661,11 +6667,13 @@ __webpack_require__.r(__webpack_exports__);
       edit: false,
       target: '',
       load: true,
-      kendaraan: []
+      kendaraan: [],
+      jeniskendaraan: {}
     };
   },
   created: function created() {
     this.getKendaraan();
+    this.getJenis();
   },
   computed: {
     filterkendaraan: function filterkendaraan() {
@@ -6685,79 +6693,73 @@ __webpack_require__.r(__webpack_exports__);
         _this2.load = false;
       });
     },
+    getJenis: function getJenis() {
+      var _this3 = this;
+
+      axios.get("/api/jeniskendaraan").then(function (res) {
+        _this3.jeniskendaraan = res.data.data;
+      });
+    },
     showmodal: function showmodal() {
       $("#modal-form").modal("show");
     },
-    createEkspedisi: function createEkspedisi() {
-      var _this3 = this;
+    createKendaraan: function createKendaraan() {
+      var _this4 = this;
 
       if (this.edit === false) {
-        axios.post("/api/ekspedisi", this.form).then(function (response) {
-          _this3.getEkspedisi();
+        axios.post("/api/kendaraan", this.form).then(function (response) {
+          _this4.getKendaraan();
 
           $("#modal-form").modal("hide");
 
-          _this3.resetForm();
-        })["catch"](function (error) {
-          _this3.errors = [];
-
-          if (error.response.data.errors.nama) {
-            _this3.errors.push(error.response.data.errors.nama[0]);
-          }
-
-          if (error.response.data.errors.kode) {
-            _this3.errors.push(error.response.data.errors.kode[0]);
-          }
+          _this4.resetForm();
         });
       } else {
-        axios.put("/api/ekspedisi/" + this.target, this.form).then(function (response) {
-          _this3.getEkspedisi();
+        axios.put("/api/kendaraan/" + this.target, this.form).then(function (response) {
+          _this4.getKendaraan();
 
           $("#modal-form").modal("hide");
 
-          _this3.resetForm();
+          _this4.resetForm();
         })["catch"](function (error) {
-          _this3.errors = [];
+          _this4.errors = [];
 
           if (error.response.data.errors.nama) {
-            _this3.errors.push(error.response.data.errors.nama[0]);
+            _this4.errors.push(error.response.data.errors.nama[0]);
           }
 
           if (error.response.data.errors.kode) {
-            _this3.errors.push(error.response.data.errors.kode[0]);
+            _this4.errors.push(error.response.data.errors.kode[0]);
           }
         });
       }
     },
-    updateEkspedisi: function updateEkspedisi(eks) {
-      this.getEkspedisi();
-      this.form.nama = eks.nama;
-      this.form.alamat = eks.alamat;
-      this.form.kontak = eks.kontak;
-      this.target = eks.id;
-      this.form.keterangan = eks.keterangan;
+    updateKendaraan: function updateKendaraan(kd) {
+      this.getKendaraan();
+      this.form.nama = kd.nama;
+      this.form.nopol = kd.nopol;
+      this.form.id_jenis = kd.id_jenis;
+      this.form.kubikasi = kd.kubikasi;
+      this.form.tonase = kd.tonase;
+      this.target = kd.id;
       this.edit = true;
       this.showmodal();
     },
-    deleteEkspedisi: function deleteEkspedisi(eks) {
-      var _this4 = this;
+    deleteKendaraan: function deleteKendaraan(kd) {
+      var _this5 = this;
 
       var keputusan = confirm('Apakah anda yakin?');
 
       if (keputusan === true) {
-        axios["delete"]("/api/ekspedisi/" + eks.id).then(function (response) {
-          _this4.getEkspedisi();
+        axios["delete"]("/api/kendaraan/" + kd.id).then(function (response) {
+          _this5.getKendaraan();
         })["catch"](function (error) {
           console.log(error);
         });
       }
     },
     resetForm: function resetForm() {
-      this.form.nama = "";
-      this.form.alamat = "";
-      this.form.kontak = "";
-      this.target = "";
-      this.form.keterangan = "";
+      this.form = {};
       this.edit = false;
     }
   }
@@ -64273,7 +64275,7 @@ var render = function() {
                         staticClass: "modal-title",
                         attrs: { id: "exampleModalLabel" }
                       },
-                      [_vm._v("Form Customer")]
+                      [_vm._v("Form Kendaraan")]
                     ),
                     _vm._v(" "),
                     _c(
@@ -64301,7 +64303,7 @@ var render = function() {
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-body" }, [
                     _c("div", { staticClass: "form-group" }, [
-                      _c("label", [_vm._v("Nama Ekspedisi")]),
+                      _c("label", [_vm._v("Merk")]),
                       _vm._v(" "),
                       _c("input", {
                         directives: [
@@ -64327,84 +64329,123 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group" }, [
-                      _c("label", [_vm._v("Alamat")]),
+                      _c("label", [_vm._v("Plat.No")]),
                       _vm._v(" "),
                       _c("textarea", {
                         directives: [
                           {
                             name: "model",
                             rawName: "v-model",
-                            value: _vm.form.alamat,
-                            expression: "form.alamat"
+                            value: _vm.form.nopol,
+                            expression: "form.nopol"
                           }
                         ],
                         staticClass: "form-control",
-                        domProps: { value: _vm.form.alamat },
+                        domProps: { value: _vm.form.nopol },
                         on: {
                           input: function($event) {
                             if ($event.target.composing) {
                               return
                             }
-                            _vm.$set(_vm.form, "alamat", $event.target.value)
+                            _vm.$set(_vm.form, "nopol", $event.target.value)
                           }
                         }
                       })
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group" }, [
-                      _c("label", [_vm._v("No. Kontak")]),
+                      _c("label", [_vm._v("Jenis")]),
+                      _vm._v(" "),
+                      _c(
+                        "select",
+                        {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.id_jenis,
+                              expression: "form.id_jenis"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          on: {
+                            change: function($event) {
+                              var $$selectedVal = Array.prototype.filter
+                                .call($event.target.options, function(o) {
+                                  return o.selected
+                                })
+                                .map(function(o) {
+                                  var val = "_value" in o ? o._value : o.value
+                                  return val
+                                })
+                              _vm.$set(
+                                _vm.form,
+                                "id_jenis",
+                                $event.target.multiple
+                                  ? $$selectedVal
+                                  : $$selectedVal[0]
+                              )
+                            }
+                          }
+                        },
+                        _vm._l(_vm.jeniskendaraan, function(jn, index) {
+                          return _c(
+                            "option",
+                            { key: index, domProps: { value: jn.id } },
+                            [_vm._v(_vm._s(jn.nama))]
+                          )
+                        }),
+                        0
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", [_vm._v("Kubikasi Muatan (M3)")]),
                       _vm._v(" "),
                       _c("input", {
                         directives: [
                           {
                             name: "model",
                             rawName: "v-model",
-                            value: _vm.form.kontak,
-                            expression: "form.kontak"
+                            value: _vm.form.kubikasi,
+                            expression: "form.kubikasi"
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: {
-                          type: "text",
-                          name: "number",
-                          autocomplete: "off"
-                        },
-                        domProps: { value: _vm.form.kontak },
+                        attrs: { type: "number" },
+                        domProps: { value: _vm.form.kubikasi },
                         on: {
                           input: function($event) {
                             if ($event.target.composing) {
                               return
                             }
-                            _vm.$set(_vm.form, "kontak", $event.target.value)
+                            _vm.$set(_vm.form, "kubikasi", $event.target.value)
                           }
                         }
                       })
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group" }, [
-                      _c("label", [_vm._v("Keterangan")]),
+                      _c("label", [_vm._v("Tonase Muatan (Kg)")]),
                       _vm._v(" "),
-                      _c("textarea", {
+                      _c("input", {
                         directives: [
                           {
                             name: "model",
                             rawName: "v-model",
-                            value: _vm.form.keterangan,
-                            expression: "form.keterangan"
+                            value: _vm.form.tonase,
+                            expression: "form.tonase"
                           }
                         ],
                         staticClass: "form-control",
-                        domProps: { value: _vm.form.keterangan },
+                        attrs: { type: "number" },
+                        domProps: { value: _vm.form.tonase },
                         on: {
                           input: function($event) {
                             if ($event.target.composing) {
                               return
                             }
-                            _vm.$set(
-                              _vm.form,
-                              "keterangan",
-                              $event.target.value
-                            )
+                            _vm.$set(_vm.form, "tonase", $event.target.value)
                           }
                         }
                       })
@@ -64433,7 +64474,7 @@ var render = function() {
                         attrs: { type: "button" },
                         on: {
                           click: function($event) {
-                            return _vm.createEkspedisi()
+                            return _vm.createKendaraan()
                           }
                         }
                       },
@@ -64458,7 +64499,7 @@ var staticRenderFns = [
       _c("tr", [
         _c("th", [_vm._v("No")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Nama")]),
+        _c("th", [_vm._v("Merk")]),
         _vm._v(" "),
         _c("th", [_vm._v("Plat.No")]),
         _vm._v(" "),
