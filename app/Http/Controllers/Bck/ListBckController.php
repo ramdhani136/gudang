@@ -50,7 +50,7 @@ class ListBckController extends Controller
      */
     public function show($id)
     {
-        return ListBckResourceList::collection(Listbck::where('id',$id)->get());
+        return ListBckResource::collection(Listbck::where('nomor_bck',$id)->get());
     }
 
     /**

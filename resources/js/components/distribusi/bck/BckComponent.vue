@@ -53,7 +53,7 @@ export default {
     data(){
         return{
             search:'',
-            load:false,
+            load:true,
             status:'open',
             bck:[],
         }
@@ -81,6 +81,7 @@ export default {
             axios.get("/api/bck")
             .then(res=>{
                 this.bck=res.data.data;
+                this.load=false;
             })
         },
     }

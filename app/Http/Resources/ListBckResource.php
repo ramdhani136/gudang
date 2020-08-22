@@ -24,8 +24,12 @@ class ListBckResource extends JsonResource
             'keterangan'=>$this->keterangan,
             'close_bck'=>$this->close_bck,
             'bck'=>$this->bck->nomor_so,
+            'nomor_rso'=>$this->bck->so->nomor_rso,
+            'statusso'=>$this->bck->so->statusso,
             'nama_barang'=>$this->barang->nama,
             'satuan'=>$this->barang->satuan,
+            'tersedia'=>$this->tersedia,
+            'harga'=>$this->harga,
         ];
     }
 }

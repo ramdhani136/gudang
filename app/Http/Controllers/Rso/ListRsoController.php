@@ -193,4 +193,9 @@ class ListRsoController extends Controller
         return  ListRsoResource::collection($data);
     }
 
+    public function  listcheckermasuk($rso,$barang){
+        $data= Listrso::where('nomor_rso',$rso)->where('kode_barang',$barang)->get();
+        return  ListRsoResource::collection($data);
+    }
+
 }

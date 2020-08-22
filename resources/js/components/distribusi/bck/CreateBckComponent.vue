@@ -43,6 +43,7 @@
             </div>
         </div>
         <div id="rsoverflowso" class="row mt-2 mx-auto">
+            <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{total | currency}}</div>
             <div class="row mt-1 mx-auto col-12" >
                 <Circle5 id="load3" v-if="load"></Circle5>
                 <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -52,6 +53,7 @@
                             <th>Kode Barang</th>
                             <th>Nama Barang</th>
                             <th>Satuan</th>
+                            <th>Harga</th>
                             <th>Sisa SO</th>
                             <th>Qty Tersedia</th>
                             <th>Rencana Kirim</th>
@@ -64,6 +66,7 @@
                             <td>{{listbcm.lkode_barang}}</td>
                             <td>{{listbcm.nama_barang}}</td>
                             <td style="text-align:center">{{listbcm.satuan}}</td>
+                            <td style="text-align:center">{{listbcm.harga | currency}}</td>
                             <td style="text-align:center">{{ket.sisasopilih[index]}}</td>
                             <td style="text-align:center">{{ket.tersedia[index]}}</td>
                             <td  style="text-align:center">
@@ -229,6 +232,7 @@ export default {
             hitung:{
                 qty:[],
                 keterangan:[],
+                jumlah:[]
             },
             uplistsisa:{
                 qty_masuk:0,
@@ -240,6 +244,9 @@ export default {
             qty:0,
             listrso:{},
             nilai:null,
+            harga:0,
+            subtotal:0,
+            total:0,
         }
     },
     created(){
@@ -302,7 +309,7 @@ export default {
             this.ket.status=aktif.statusso;
             this.ket.nomor_rso=aktif.nomor_rso;
             if(aktif.statusso==="tersedia"){
-                axios.get("/api/listrso/data/pilihsotersedia/"+aktif.nomor_rso)
+                axios.get("/api/listrso/data/pilihsotersedia/view/"+aktif.nomor_rso)
                 .then(res=>{
                     this.listso=res.data.data;
                     for(let i=0;i<this.listso.length;i++){
@@ -312,7 +319,7 @@ export default {
                     
                 })
             }else if(aktif.statusso==="tidaktersedia"){
-                axios.get("/api/listrso/data/pilihsotidak/"+aktif.nomor_rso)
+                axios.get("/api/listrso/data/pilihsotidak/view/"+aktif.nomor_rso)
                 .then(res=>{
                     this.listso=res.data.data;
                     for(let i=0;i<this.listso.length;i++){
@@ -340,32 +347,6 @@ export default {
             }
         },
         submitBck(){
-            
-           /*  if(this.aktif.statusso==="tersedia"){
-                axios.get("/api/listrso/data/pilihsotersedia/"+this.aktif.nomor_rso)
-                .then(res=>{
-                    this.listso=res.data.data;
-                    if(this.listso.length<1){
-                        this.updateso={status:'Selesai'};
-                        axios.put("/api/so/"+this.aktif.nomor_so,this.updateso)
-                        .then(res=>{
-                            console.log("berhasil edit");
-                        });
-                    }
-                });
-            }else{
-                axios.get("/api/listrso/data/pilihsotidak/"+this.aktif.nomor_rso)
-                .then(res=>{
-                    this.listso=res.data.data;
-                    if(this.listso.length<1){
-                        this.updateso={status:'Selesai'};
-                        axios.put("/api/so/"+this.aktif.nomor_so,this.updateso)
-                        .then(res=>{
-                            console.log("berhasil edit");
-                        });
-                    }
-                });
-            } */
             let yakin=confirm("Yakin ingin membuat Bukti Checker ini?");
             if(yakin===true){
                 if(this.checker.length>0){
@@ -374,6 +355,7 @@ export default {
                         for(let i=0;i<this.checker.length;i++){
                         this.nomor_bck=this.up.bck;
                         this.kode_barang=this.checker[i].lkode_barang;
+                        this.harga=this.checker[i].harga;
                         this.qty=0;
                         this.qty=parseInt(this.hitung.qty[i]);
                         this.keterangan=this.hitung.keterangan[i];
@@ -382,7 +364,7 @@ export default {
                         }else{
                             this.sisaso=parseInt(this.checker[i].qty_tdktersedia)-parseInt(this.checker[i].keluar_tdktersedia);
                         }
-                        this.uplist={nomor_bck:this.nomor_bck,kode_barang:this.kode_barang,qty:this.qty,sisaso:this.sisaso,keterangan:this.keterangan};
+                        this.uplist={nomor_bck:this.nomor_bck,kode_barang:this.kode_barang,qty:this.qty,sisaso:this.sisaso,keterangan:this.keterangan,tersedia:this.ket.tersedia[i],harga:this.harga};
                         axios.post("/api/listbck",this.uplist)
                         .then(res=>{
                             if(this.aktif.statusso==="tersedia"){
@@ -457,7 +439,16 @@ export default {
                 if(parseInt(this.hitung.qty[index])>parseInt(this.ket.tersedia[index])){
                     this.hitung.qty[index]=this.ket.tersedia[index];
                 }
-
+                this.total=0;
+                for(let i=0;i<this.checker.length;i++){
+                    if(this.hitung.qty[i]===undefined || this.hitung.qty[i]===""){
+                        this.hitung.jumlah[i]=0;
+                    }else{
+                        this.hitung.jumlah[i]=this.hitung.qty[i];
+                    }
+                    this.subtotal=parseInt(this.checker[i].harga)*parseInt(this.hitung.jumlah[i]);
+                    this.total+=parseInt(this.subtotal);
+                }
         },
         batal(){
             this.$router.push({name:'bck'});
