@@ -198,4 +198,8 @@ class ListRsoController extends Controller
         return  ListRsoResource::collection($data);
     }
 
+    public function viewlistso($rso,$barang){
+        return ListRsoResource::collection(Listrso::where('nomor_rso',$rso)->where('kode_barang',$barang)->get());
+    }
+
 }

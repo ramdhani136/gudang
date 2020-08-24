@@ -88,4 +88,9 @@ class BckController extends Controller
         Bck::where('bck',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
+
+    public function aktif()
+    {
+        return BckResource::collection(Bck::where('status','open')->orderBy('bck','ASC')->get());
+    }
 }

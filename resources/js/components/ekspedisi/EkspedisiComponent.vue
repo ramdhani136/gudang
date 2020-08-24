@@ -1,6 +1,6 @@
 <template>
     <div class="container" @keyup.esc="resetForm()">
-        <button @click="showmodal()" class="btn btn-success my-3">+ Tambah Ekspedisi</button>
+        <button @click="tambahEkspedisi()" class="btn btn-success my-3">+ Tambah Ekspedisi</button>
         <div class="form-group col-3 my-3 float-right">
             <input v-model="search"  type="text" class="form-control" placeholder="Search">
         </div>
@@ -48,7 +48,7 @@
                     </div>
                     <div class="form-group">
                         <label>No. Kontak</label>
-                        <input v-model="form.kontak" type="text" name="number"  autocomplete="off" class="form-control">
+                        <input v-model="form.kontak" type="number"   autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Keterangan</label>
@@ -98,6 +98,11 @@ export default {
             .then(res=>{this.ekspedisi=res.data.data
                 this.load=false;
             });
+        },
+        tambahEkspedisi(){
+            this.form={};
+            this.edit=false;
+            this.showmodal();
         },
         showmodal(){
             $("#modal-form").modal("show");

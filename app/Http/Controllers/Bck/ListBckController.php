@@ -85,7 +85,11 @@ class ListBckController extends Controller
      */
     public function destroy($id)
     {
-        Listbcl::where('id',$id)->delete();
+        Listbck::where('id',$id)->delete();
         return response('deleted',response::HTTP_OK);
+    }
+
+    public function aktif($bck){
+        return ListBckResource::collection(Listbck::where('close_bck','N')->where('nomor_bck',$bck)->get());
     }
 }

@@ -44,11 +44,15 @@ import RequestBcmComponent from '../components/bc/RequestBcmComponent.vue'
 import ViewRequestComponent from '../components/bc/ViewRequestComponent.vue'
 
 import SoComponentDic from '../components/distribusi/SoComponentDic.vue'
-import BbkComponent from '../components/distribusi/BbkComponent.vue'
+
+import BbkComponent from '../components/distribusi/bbk/BbkComponent.vue'
+import CreateBbkComponent from '../components/distribusi/bbk/CreateBbkComponent.vue'
+import ViewBbkComponent from '../components/distribusi/bbk/ViewBbkComponent.vue'
 
 import ViewBckComponent from '../components/distribusi/bck/ViewBckComponent.vue'
 import CreateBckComponent from '../components/distribusi/bck/CreateBckComponent.vue'
 import BckComponent from '../components/distribusi/bck/BckComponent.vue'
+
 
 import EkspedisiComponent from '../components/ekspedisi/EkspedisiComponent.vue'
 
@@ -108,7 +112,10 @@ const routes=[
 
 
     {name:'distribusiso', path:'/distribusi/so', component:SoComponentDic},
+
     {name:'distribusibbk', path:'/distribusi/bbk', component: BbkComponent},
+    {name:'createbbk', path:'/distribusi/bbk/create', component: CreateBbkComponent},
+    {name:'viewbbk', path:'/distribusi/bbk/view/:bbk', component: ViewBbkComponent},
 
     {name:'bck', path:'/distribusi/bck', component:BckComponent},
     {name:'createbck', path:'/bck/create', component:CreateBckComponent},

@@ -5,6 +5,7 @@ namespace App\Model\Bck;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\So\So;
 use App\Model\Bck\Listbck;
+use App\Model\Bbk\Bbk;
 use App\Model\Kendaraan\Kendaraan;
 
 class Bck extends Model
@@ -22,5 +23,9 @@ class Bck extends Model
 
     public function kendaraan(){
         return $this->belongsTo(kendaraan::class,'id_kendaraan','id');
+    }
+
+    public function bbk(){
+        return $this->hasMany(Bbk::class,'nomor_bck','bck');
     }
 }

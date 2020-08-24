@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ListBckResource extends JsonResource
+class ListBbkResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,20 +17,17 @@ class ListBckResource extends JsonResource
         return 
         [
             'id'=>$this->id,
-            'nomor_bck'=>$this->nomor_bck,
+            'nomor_bbk'=>$this->nomor_bbk,
+            'nomor_bck'=>$this->bbk->nomor_bck,
+            'nomor_so'=>$this->bbk->bck->so->nomor_so,
             'kode_barang'=>$this->kode_barang,
-            'qty'=>$this->qty,
-            'sisaso'=>$this->sisaso,
-            'keterangan'=>$this->keterangan,
-            'close_bck'=>$this->close_bck,
-            'bck'=>$this->bck->nomor_so,
-            'nomor_rso'=>$this->bck->so->nomor_rso,
-            'statusso'=>$this->bck->so->statusso,
             'nama_barang'=>$this->barang->nama,
             'satuan'=>$this->barang->satuan,
-            'tersedia'=>$this->tersedia,
+            'qty'=>$this->qty,
             'harga'=>$this->harga,
-            'nomor_so'=>$this->bck->nomor_so,
+            'qty_bck'=>$this->qty_bck,
+            'keterangan'=>$this->keterangan,
+            'close_bbk'=>$this->close_bbk
         ];
     }
 }

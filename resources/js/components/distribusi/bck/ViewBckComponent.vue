@@ -344,6 +344,7 @@ export default {
             for(let k=0;k<this.listbck.length;k++){
                 this.inputin.tersedia[k]=this.listbck[k].tersedia;
                 this.inputin.qty[k]=this.listbck[k].qty;
+                this.total=parseInt(this.listbck[k].qty)*parseInt(this.listbck[k].harga);
             };    
         },
         close(){

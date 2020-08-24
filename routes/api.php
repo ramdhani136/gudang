@@ -42,6 +42,7 @@ Route::get('listrso/data/group/{barang}','Rso\ListRsoController@grouplist');
 Route::get('listrso/data/{rso}/{barang}','Rso\ListRsoController@listcheckermasuk');
 Route::get('listrso/data/groupopen/{po}/{barang}','Rso\ListRsoController@groupopen');
 Route::put('listrso/data/{po}/{barang}','Rso\ListRsoController@statuspo');
+Route::get('listrso/data/{rso}/{barang}','Rso\ListRsoController@viewlistso');
 Route::resource('supplier','Supplier\SupplierController');
 Route::resource('listrso','Rso\ListRsoController');
 Route::resource('sales','Sales\SalesController');
@@ -67,12 +68,19 @@ Route::resource('bbm','Bbm\BbmController');
 Route::resource('listbbm','Bbm\ListBbmController');
 
 Route::resource('bck','Bck\BckController');
-Route::get('bcm/{barang}/{bcm}','Barang\ListBcmController@getbbm');
+Route::get('bck/data/aktif','Bck\BckController@aktif');
 
 Route::resource('listbck','Bck\ListBckController');
+Route::get('listbck/data/aktif/{bck}','Bck\ListBckController@aktif');
+
+Route::get('bcm/{barang}/{bcm}','Barang\ListBcmController@getbbm');
+
 Route::resource('kendaraan','Kendaraan\KendaraanController');
 Route::resource('jeniskendaraan','Kendaraan\JenisKendaraanController');
 Route::get('listrso/data/pilihsotersedia/view/{rso}','Rso\ListRsoController@pilihsotersedia');
 Route::get('listrso/data/pilihsotidak/view/{rso}','Rso\ListRsoController@pilihsotidak');
+
+Route::resource('bbk','Bbk\BbkController');
+Route::resource('listbbk','Bbk\ListbbkController');
 
 

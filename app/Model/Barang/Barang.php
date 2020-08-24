@@ -8,6 +8,7 @@ use App\Model\Sales\Custprice;
 use App\Model\Barang\Listbcm;
 use App\Model\Bbm\Listbbm;
 use App\Model\Bck\Listbck;
+use App\Model\Bck\Listbbk;
 
 class Barang extends Model
 {
@@ -32,5 +33,9 @@ class Barang extends Model
 
     public function listbck(){
         return $this->hasMany(Listbck::class,'kode_barang','kode');
+    }
+
+    public function listbbk(){
+        return $this->hasMany(listbbk::class,'kode_barang','kode');
     }
 }
