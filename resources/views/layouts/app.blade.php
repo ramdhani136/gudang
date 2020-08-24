@@ -104,6 +104,7 @@
                                     <router-link to="/distribusi/jkendaraan" class="dropdown-item" >Jenis Kendaraan</router-link>
                                 </div>
                             </li>
+                            @if(Auth::user()->name == "Ilham Ramdhani")
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Purchasing <span class="caret"></span>
@@ -116,7 +117,7 @@
                                     <router-link to="/purchase/barang/" class="dropdown-item" >Input Barang</router-link>
                                 </div>
                             </li>
-                                
+                            @endif   
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="caret"></span>

@@ -55,6 +55,8 @@ class ListRsoResource extends JsonResource
             'keluar_tersedia'=>$this->out_yes,
             'close_tersedia'=>$this->sotersedia_close,
             'close_tdktersedia'=>$this->sotdk_close,
+            'bbk_tersedia'=>$this->bbk_tersedia,
+            'bbk_tdktersedia'=>$this->bbk_tdktersedia,
         ];
     }
 }

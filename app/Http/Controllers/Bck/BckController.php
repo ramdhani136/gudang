@@ -93,4 +93,5 @@ class BckController extends Controller
     {
         return BckResource::collection(Bck::where('status','open')->orderBy('bck','ASC')->get());
     }
+
 }

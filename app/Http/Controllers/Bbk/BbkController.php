@@ -88,4 +88,5 @@ class BbkController extends Controller
         Bbk::where('bbk',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
+
 }

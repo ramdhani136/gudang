@@ -5929,7 +5929,8 @@ __webpack_require__.r(__webpack_exports__);
                           _this3.qtyupdate = parseInt(_this3.listrso[o].keluar_tersedia) - parseInt(_this3.checker[i].qty) + parseInt(_this3.hitung.qty[i]);
                           _this3.uplistrso = {
                             out_yes: _this3.qtyupdate,
-                            sotersedia_close: 'N'
+                            sotersedia_close: 'N',
+                            bbk_tersedia: _this3.hitung.qty[i]
                           };
                           axios.put("/api/listrso/" + _this3.listrso[o].id, _this3.uplistrso).then(function (res) {
                             _this3.upso = {
@@ -5945,7 +5946,8 @@ __webpack_require__.r(__webpack_exports__);
                           _this3.qtyupdate = parseInt(_this3.listrso[o].keluar_tdktersedia) - parseInt(_this3.checker[i].qty) + parseInt(_this3.hitung.qty[i]);
                           _this3.uplistrso = {
                             out_no: _this3.qtyupdate,
-                            sotdk_close: 'N'
+                            sotdk_close: 'N',
+                            bbk_tdktersedia: _this3.hitung.qty[i]
                           };
                           axios.put("/api/listrso/" + _this3.listrso[o].id, _this3.uplistrso).then(function (res) {
                             _this3.upso = {
@@ -5958,11 +5960,29 @@ __webpack_require__.r(__webpack_exports__);
                             });
                           });
                         }
+                      } else {
+                        if (_this3.checker[i].statusso === 'tersedia') {
+                          _this3.qtyupdate = parseInt(_this3.listrso[o].bbk_tersedia) + parseInt(_this3.hitung.qty[i]);
+                          _this3.uplistrso = {
+                            bbk_tersedia: _this3.qtyupdate
+                          };
+                          axios.put("/api/listrso/" + _this3.listrso[o].id, _this3.uplistrso).then(function (res) {
+                            _this3.$router.push({
+                              name: 'distribusibbk'
+                            });
+                          });
+                        } else {
+                          _this3.qtyupdate = parseInt(_this3.listrso[o].bbk_tdktersedia) + parseInt(_this3.hitung.qty[i]);
+                          _this3.uplistrso = {
+                            bbk_tdktersedia: _this3.qtyupdate
+                          };
+                          axios.put("/api/listrso/" + _this3.listrso[o].id, _this3.uplistrso).then(function (res) {
+                            _this3.$router.push({
+                              name: 'distribusibbk'
+                            });
+                          });
+                        }
                       }
-
-                      _this3.$router.push({
-                        name: 'distribusibbk'
-                      });
                     }
                   });
                 });
@@ -13284,6 +13304,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -13328,7 +13350,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       selected: 0,
       eks: null,
       itemHeight: 39
-    }, _defineProperty(_ref, "disabled", 1), _defineProperty(_ref, "dataekspedisi", {}), _defineProperty(_ref, "eksal", ''), _ref;
+    }, _defineProperty(_ref, "disabled", 1), _defineProperty(_ref, "dataekspedisi", {}), _defineProperty(_ref, "eksal", ''), _defineProperty(_ref, "sk", {
+      qty: []
+    }), _ref;
   },
   created: function created() {
     this.getSo();
@@ -13381,6 +13405,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               _this4.ket.qtypesan = _this4.listso[i].qty_tersedia;
               _this4.ket.subtotal += parseInt(_this4.listso[i].qty_tersedia) * parseInt(_this4.listso[i].harga);
               _this4.ket.status = "Tersedia";
+              _this4.sk.qty[i] = _this4.listso[i].keluar_tersedia;
             }
           });
         } else {
@@ -13393,6 +13418,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               _this4.ket.subtotal += parseInt(_this4.ket.qtypesan) * parseInt(_this4.listso[i].harga);
               _this4.ket.status = "Tidak Tersedia";
               _this4.ket.tanggal = _this4.listso[i].tgl_datang;
+              _this4.sk.qty[i] = _this4.listso[i].keluar_tdktersedia;
             }
           });
         }
@@ -79020,6 +79046,8 @@ var render = function() {
                           ? _c("th", [_vm._v("Estimasi Tersedia")])
                           : _vm._e(),
                         _vm._v(" "),
+                        _c("th", [_vm._v("Sudah kirim")]),
+                        _vm._v(" "),
                         lso.status == "Draft"
                           ? _c("th", [_vm._v("Aksi")])
                           : _vm._e()
@@ -79116,6 +79144,12 @@ var render = function() {
                                 [_vm._v(_vm._s(ts.tgl_datang))]
                               )
                             : _vm._e(),
+                          _vm._v(" "),
+                          _c(
+                            "td",
+                            { staticStyle: { "text-align": "center" } },
+                            [_vm._v(_vm._s(_vm.sk.qty[index]))]
+                          ),
                           _vm._v(" "),
                           _vm._l(_vm.so, function(lso, index) {
                             return lso.status == "Draft"

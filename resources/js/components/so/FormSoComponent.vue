@@ -69,6 +69,7 @@
                             <th>Sub Total</th>
                             <th>Status</th>
                             <th v-if="ket.status=='Tidak Tersedia'">Estimasi Tersedia</th>
+                            <th>Sudah kirim</th>
                             <th v-if="lso.status=='Draft'">Aksi</th>
                         </tr>
                     </thead>
@@ -84,6 +85,7 @@
                             <td style="text-align:center" v-if="ket.status=='Tidak Tersedia'">{{ts.harga*ts.qty_tdktersedia | currency}}</td>
                             <td style="text-align:center">{{ket.status}}</td>
                             <td style="text-align:center" v-if="ket.status=='Tidak Tersedia'">{{ts.tgl_datang}}</td>
+                            <td style="text-align:center">{{sk.qty[index]}}</td>
                             <td style="text-align:center" v-for="(lso,index) in so" :key="index" v-if="lso.status=='Draft'" >
                                 <button @click="hapusListSo(ts)" class="btn btn-danger">Hapus</button>
                             </td>
@@ -228,6 +230,9 @@ export default {
             disabled:1,
             dataekspedisi:{},
             eksal:'',
+            sk:{
+                qty:[],
+            },
         }
     },
     created(){
@@ -269,7 +274,8 @@ export default {
                         for(let i=0;i<this.listso.length;i++){
                             this.ket.qtypesan=this.listso[i].qty_tersedia;
                             this.ket.subtotal+=parseInt(this.listso[i].qty_tersedia)*parseInt(this.listso[i].harga);
-                            this.ket.status="Tersedia";
+                            this.ket.status="Tersedia"; 
+                            this.sk.qty[i]=this.listso[i].keluar_tersedia ;
                         }     
                     });
                 }else{
@@ -282,7 +288,8 @@ export default {
                             this.ket.subtotal+=parseInt(this.ket.qtypesan)*parseInt(this.listso[i].harga);
                             this.ket.status="Tidak Tersedia";
                             this.ket.tanggal=this.listso[i].tgl_datang;
-                        }  
+                            this.sk.qty[i]=this.listso[i].keluar_tdktersedia ;
+                        } 
                     });
                 }
             });

@@ -94,5 +94,6 @@ class SoController extends Controller
     {
         return SoResource::collection(So::where('status','Acc')->orderBy('nomor_so','ASC')->get());
     }
+
     
 }

@@ -341,7 +341,7 @@ export default {
                                         if(parseInt(this.hitung.qty[i])<this.checker[i].qty){     
                                             if(this.checker[i].statusso==='tersedia'){
                                                 this.qtyupdate=(parseInt(this.listrso[o].keluar_tersedia)-parseInt(this.checker[i].qty))+parseInt(this.hitung.qty[i]);
-                                                this.uplistrso={out_yes:this.qtyupdate,sotersedia_close:'N'};
+                                                this.uplistrso={out_yes:this.qtyupdate,sotersedia_close:'N',bbk_tersedia:this.hitung.qty[i]};
                                                 axios.put("/api/listrso/"+this.listrso[o].id,this.uplistrso)
                                                 .then(res=>{
                                                     this.upso={status:'Acc'};
@@ -352,7 +352,7 @@ export default {
                                                 })
                                             }else{
                                                 this.qtyupdate=(parseInt(this.listrso[o].keluar_tdktersedia)-parseInt(this.checker[i].qty))+parseInt(this.hitung.qty[i]);
-                                                this.uplistrso={out_no:this.qtyupdate,sotdk_close:'N'};
+                                                this.uplistrso={out_no:this.qtyupdate,sotdk_close:'N',bbk_tdktersedia:this.hitung.qty[i]};
                                                 axios.put("/api/listrso/"+this.listrso[o].id,this.uplistrso)
                                                 .then(res=>{
                                                     this.upso={status:'Acc'};
@@ -362,8 +362,23 @@ export default {
                                                     })
                                                 })
                                             }
+                                        }else{
+                                            if(this.checker[i].statusso==='tersedia'){
+                                                this.qtyupdate=parseInt(this.listrso[o].bbk_tersedia)+parseInt(this.hitung.qty[i]);
+                                                this.uplistrso={bbk_tersedia:this.qtyupdate};
+                                                axios.put("/api/listrso/"+this.listrso[o].id,this.uplistrso)
+                                                .then(res=>{ 
+                                                        this.$router.push({name:'distribusibbk'});  
+                                                })
+                                            }else{
+                                                this.qtyupdate=parseInt(this.listrso[o].bbk_tdktersedia)+parseInt(this.hitung.qty[i]);
+                                                this.uplistrso={bbk_tdktersedia:this.qtyupdate};
+                                                axios.put("/api/listrso/"+this.listrso[o].id,this.uplistrso)
+                                                .then(res=>{
+                                                        this.$router.push({name:'distribusibbk'});
+                                                })
+                                            }
                                         }
-                                        this.$router.push({name:'distribusibbk'});
                                     }
                                     
                                 });
