@@ -275,7 +275,7 @@ export default {
                             this.ket.qtypesan=this.listso[i].qty_tersedia;
                             this.ket.subtotal+=parseInt(this.listso[i].qty_tersedia)*parseInt(this.listso[i].harga);
                             this.ket.status="Tersedia"; 
-                            this.sk.qty[i]=this.listso[i].keluar_tersedia ;
+                            this.sk.qty[i]=this.listso[i].bbk_tersedia ;
                         }     
                     });
                 }else{
@@ -288,7 +288,7 @@ export default {
                             this.ket.subtotal+=parseInt(this.ket.qtypesan)*parseInt(this.listso[i].harga);
                             this.ket.status="Tidak Tersedia";
                             this.ket.tanggal=this.listso[i].tgl_datang;
-                            this.sk.qty[i]=this.listso[i].keluar_tdktersedia ;
+                            this.sk.qty[i]=this.listso[i].bbk_tdktersedia ;
                         } 
                     });
                 }

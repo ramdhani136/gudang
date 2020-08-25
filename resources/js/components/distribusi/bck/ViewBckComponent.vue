@@ -341,10 +341,11 @@ export default {
         edit(){
             this.namatombol='Edit';   
             this.disabled=1;
+            this.total=0;
             for(let k=0;k<this.listbck.length;k++){
                 this.inputin.tersedia[k]=this.listbck[k].tersedia;
                 this.inputin.qty[k]=this.listbck[k].qty;
-                this.total=parseInt(this.listbck[k].qty)*parseInt(this.listbck[k].harga);
+                this.total+=parseInt(this.listbck[k].qty)*parseInt(this.listbck[k].harga);
             };    
         },
         close(){

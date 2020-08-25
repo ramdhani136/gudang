@@ -12,7 +12,7 @@
                 </div>
                 <div class="form-group">
                     <label>Nomor BCK</label>
-                    <input v-model="up.nomor_bck" @click="showSo()" type="text" class="form-control" placeholder="Pilih Sales Order">
+                    <input v-model="up.nomor_bck" @click="showSo()" type="text" class="form-control" placeholder="Pilih BCK">
                 </div>
             </div>
             <div class="col-4">
@@ -97,14 +97,14 @@
             <div class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Form SO</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Form List Bukti Checker</h5>
                     <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Pilih SO</label>
+                        <label>Pilih BCK</label>
                         <select @change="pilihBck(aktif)" v-model="aktif" class="form-control">
                             <option :value="aktif" v-for="(aktif,index) in bckaktif" :key="index">{{aktif.bck}}</option>
                         </select>

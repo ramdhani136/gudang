@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\Rso\Rso;
 use App\Http\Resources\RsoResource;
+use App\Http\Resources\PrResource;
 use Symfony\Component\HttpFoundation\Response;
 
 class RsoController extends Controller
@@ -94,6 +95,11 @@ class RsoController extends Controller
 
     public function confirm(){
         return RsoResource::collection(Rso::where('status','Confirmed')->orderBy('updated_at','ASC')->get());
+    }
+
+    public function pr()
+    {
+        return PrResource::collection(Rso::where('pr','Y')->orderBy('updated_at','ASC')->get());
     }
 
 

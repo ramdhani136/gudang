@@ -54,10 +54,15 @@ import CreateBckComponent from '../components/distribusi/bck/CreateBckComponent.
 import BckComponent from '../components/distribusi/bck/BckComponent.vue'
 
 
+
 import EkspedisiComponent from '../components/ekspedisi/EkspedisiComponent.vue'
 
 import KendaraanComponent from '../components/kendaraan/KendaraanComponent.vue'
 import JenisKendaraanComponent from '../components/kendaraan/JenisKendaraanComponent.vue'
+
+import PrComponent from '../components/dicpr/PrComponent.vue'
+import CreatePrcomponent from '../components/dicpr/CreatePrcomponent.vue'
+
 
 
 
@@ -126,6 +131,8 @@ const routes=[
     {name:'kendaraan', path:'/distribusi/kendaraan', component: KendaraanComponent},
     {name:'jkendaraan', path:'/distribusi/jkendaraan', component: JenisKendaraanComponent},
     
+    {name:'Prcomponent', path:'/pr', component:PrComponent},
+    {name:'CreatePrcomponent', path:'/pr/create', component:CreatePrcomponent},
 
 
 

@@ -13,7 +13,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Nomor RSO</th>
+                            <th>Nomor Dokumen</th>
                             <th>Tanggal</th>
                             <th>Customer</th>
                             <th>Aksi</th>

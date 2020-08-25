@@ -22,7 +22,10 @@ Route::resource('barang','Barang\BarangController');
 Route::get('barang/data/all/','Barang\BarangController@all');
 Route::resource('customer','Customer\CustomerController');
 Route::resource('divisi','Divisi\DivisiController');
+
 Route::resource('rso','Rso\RsoController');
+Route::get('rso/data/pr','Rso\RsoController@pr');
+
 Route::get('rso/data/purch/','Rso\RsoController@purch');
 Route::get('rso/data/confirm/','Rso\RsoController@confirm');
 Route::get('listrso/data/purch/{id}','Rso\ListRsoController@purch');
