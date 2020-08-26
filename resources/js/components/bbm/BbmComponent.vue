@@ -54,7 +54,7 @@ export default {
     data(){
         return{
             search:'',
-            load:false,
+            load:true,
             status:'open',
             bbm:[],
         }
@@ -82,6 +82,7 @@ export default {
             axios.get("/api/bbm")
             .then(res=>{
                 this.bbm=res.data.data;
+                this.load=false;
             })
         },
     }

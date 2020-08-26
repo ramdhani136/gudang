@@ -55,7 +55,7 @@
                             <td style="text-align:center">{{listbbm.kode_barang}}</td>
                             <td>{{listbbm.nama_barang}}</td>
                             <td style="text-align:center">{{listbbm.satuan}}</td>
-                            <td style="text-align:center">{{ket.qty[index]}}</td>
+                            <td style="text-align:center">{{hitung.qty[index]}}</td>
                             <td  style="text-align:center">
                                 <input  v-model="listbbm.qty" type="number" class="form-control" disabled>
                             </td>
@@ -135,7 +135,7 @@ export default {
     },
     data(){
         return {
-            load:false,
+            load:true,
             bbm:{},
             poaktif:{},
             ket:{
@@ -147,17 +147,17 @@ export default {
             listbbm:{},
             uploadlist:[],
             hitung:{
-                qty:[],
-                keterangan:[],
+                qty:[]
             },
             uploood:{},
-            listbcm:{},
+            daftarbbm:{},
+            masukan:{},
+            listqty:[],
         }
     },
     created(){
         this.getPoAktif();
         this.getBbm();
-        this.getListBcm();
         this.getlistbm();
         this.resetForm();
         this.default();
@@ -170,7 +170,20 @@ export default {
             axios.get("/api/listbbm/"+this.$route.params.nomor)
             .then(res=>{
                 this.checker=res.data.data;
+                for(let i=0;i<this.checker.length;i++){
+                    axios.get("/api/bcm/"+this.checker[i].bcm+"/"+this.checker[i].kode_barang)
+                    .then(res=>{
+                        this.daftarbbm=res.data.data;
+                        this.masukan={qty:this.daftarbbm[0].qty};
+                        this.listqty.push(this.masukan);
+                        this.hitung.qty[i]=this.listqty[i].qty; 
+                        this.checker.push([{qty:this.hitung.qty[i]}])
+                        this.checker.splice(this.checker.length-1);
+                        this.load=false;
+                    });
+                }
             }); 
+            
         },
         getBbm(){
             axios.get("/api/bbm/"+this.$route.params.nomor)
@@ -241,22 +254,6 @@ export default {
         kembali(){
             this.$router.push({name:'ingoods'});
         },
-        getListBcm(){
-            axios.get("/api/listbbm/"+this.$route.params.nomor)
-            .then(res=>{
-                this.checker=res.data.data;
-                for(let i=0;i<this.checker.length;i++){
-                    axios.get("/api/bcm/"+this.checker[i].bcm+"/"+this.checker[i].kode_barang)
-                    .then(res=>{
-                        this.daftarbbm={};
-                        this.daftarbbm=res.data.data;
-                        this.ket.qty=[];
-                        this.ket.qty[i]=this.daftarbbm[i].qty;
-                    });
-                }
-                
-            }); 
-        }
     },
 } 
 </script>

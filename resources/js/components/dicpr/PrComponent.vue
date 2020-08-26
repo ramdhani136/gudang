@@ -5,9 +5,9 @@
         </div>
         <div class="form-group col-3 my-3 ml-n3 float-left">
             <select name="status" v-model="status" class="form-control">
-                <option value="Draft">Draft</option>
                 <option value="Purch">Menunggu Acc</option>
-                <option value="Confirmed">Open</option>
+                <option value="Confirmed">Konfirmasi</option>
+                <option value="So">Open</option>
             </select>
         </div> 
         <div class="row">
@@ -31,7 +31,7 @@
                         <td style="text-align:center">{{lp.tanggal_rso}}</td>
                         <td style="text-align:center">{{lp.customer}}</td>
                         <td style="text-align:center">
-                            <router-link :to="{name:'viewbcm',params:{nomor:lp.nomor_rso}}" class="btn btn-primary">
+                            <router-link :to="{name:'ViewPrcomponent',params:{nomor:lp.nomor_rso}}" class="btn btn-primary">
                                     Lihat Data
                             </router-link>
                             <button v-if="lp.status==='Tolak'||lp.status==='Draft'" class="btn btn-danger">Hapus</button>
@@ -70,6 +70,8 @@ export default {
                     return this.pr.filter(elem=> elem.status==="Purch")
                 }else if(this.status==="Confirmed"){
                     return this.pr.filter(elem=> elem.status==="Confirmed")
+                }else if(this.status==="So"){
+                    return this.pr.filter(elem=> elem.status==="So")
                 }
             }else{
                 return this.pr.filter(elem => {

@@ -25,10 +25,12 @@ Route::resource('divisi','Divisi\DivisiController');
 
 Route::resource('rso','Rso\RsoController');
 Route::get('rso/data/pr','Rso\RsoController@pr');
+Route::get('rso/data/pr/{rso}','Rso\RsoController@viewpr');
 
 Route::get('rso/data/purch/','Rso\RsoController@purch');
 Route::get('rso/data/confirm/','Rso\RsoController@confirm');
 Route::get('listrso/data/purch/{id}','Rso\ListRsoController@purch');
+Route::get('listrso/data/pr/{rso}','Rso\ListRsoController@pr');
 Route::get('listrso/data/acc/{no}','Rso\ListRsoController@purchacc');
 Route::get('listrso/data/dic/{no}','Rso\ListRsoController@dicacc');
 Route::get('listrso/data/sotersedia/{no}','Rso\ListRsoController@sotersedia');

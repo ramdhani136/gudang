@@ -43,6 +43,7 @@
                             <th>Satuan</th>
                             <th>Qty</th>
                             <th>Catatan</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,6 +57,9 @@
                             </td>
                             <td style="text-align:center">
                                 <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
+                            </td>
+                            <td>
+                                <button @click="hapus(index)" style="text-align:center" class="btn btn-danger">Hapus</button>
                             </td>
                         </tr>
                     </tbody>
@@ -128,7 +132,7 @@ export default {
     },
     data(){
         return {
-            load:false,
+            load:true,
             upload:{
                 nomor_rso:this.pr_nomor(),
                 tanggal_rso:this.now(),
@@ -170,7 +174,11 @@ export default {
     methods:{
         getBarang(){
             axios.get("/api/barang/")
-            .then(res=>this.barang=res.data.data)
+            .then(res=>{
+                this.barang=res.data.data
+                this.load=false;
+                })
+            
         },
         now(){
             var d = new Date();
@@ -266,6 +274,9 @@ export default {
                     alert("Belum menginput barang apapun!!");
                 } 
             }  
+        },
+        hapus(index){
+            this.listpr.splice(index,1)
         }
     },
 } 

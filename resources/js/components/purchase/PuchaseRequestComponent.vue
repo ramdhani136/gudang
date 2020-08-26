@@ -19,7 +19,7 @@
         <tbody>
             <tr v-for="(prlist , index) in FilteredPr" :key="index">
                 <td style="text-align:center">{{index+1}}</td>
-                <td style="text-align:center">{{prlist.kode_barang}}</td>
+                <td>{{prlist.kode_barang}}</td>
                 <td>{{prlist.nama}}</td>
                 <td style="text-align:center">{{prlist.jumlah}}</td>
                 <td style="text-align:center">{{prlist.satuan}}</td>

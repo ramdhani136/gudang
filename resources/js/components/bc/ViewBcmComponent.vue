@@ -81,6 +81,9 @@
                 <button v-if="!jenbutton && bc.status==='draft' || bc.status==='tolak'" @click="requestBcm()" class="btn-primary btn ml-2" >
                     Request Acc
                 </button>
+                <button v-if="bc.status==='close'" @click="kembali()" class="btn-primary btn ml-3" >
+                    Kembali
+                </button>
         </div>
         <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -227,6 +230,9 @@ export default {
                         } 
                     }
                 }); 
+        },
+        kembali(){
+            this.$router.push({name:'bcmcomponent'});
         },
         draftBcm(){
             /* let jawab=confirm("Simpan Draft?");

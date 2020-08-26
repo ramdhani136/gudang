@@ -37,6 +37,7 @@
                 <thead>
                     <tr>
                         <th>No</th>
+                        <th>Kode</th>
                         <th>Item</th>
                         <th>Jumlah</th>
                         <th>Satuan</th>
@@ -47,6 +48,7 @@
                 <tbody>
                     <tr v-for="(list,index) in listrso" :key="index">
                         <td style="text-align:center">{{index+1}}</td>
+                        <td>{{list.lkode_barang}}</td>
                         <td>{{list.nama_barang}}</td>
                         <td style="text-align:center">{{list.qty_tdktersedia}}</td>
                         <td style="text-align:center">{{list.satuan}}</td>
@@ -138,6 +140,13 @@ export default {
             urso:{},
             aksi:{},
             load:true,
+            cso:{},
+            listrso:{},
+            elist:{},
+            banding:{},
+            params:'',
+            upso:'',
+            value:''
         }
     },
     created(){
@@ -157,6 +166,7 @@ export default {
             axios.get(`/api/listrso/data/purch/${this.$route.params.id}`)
             .then(res=>{this.listrso=res.data.data
                 this.load=false;
+                this.banding=this.listrso;
             });
         },
         showModal(list){
@@ -186,24 +196,85 @@ export default {
                 $("#modal-form").modal("hide");
             })     
         },
-        ConfirmRso(rs){
-            this.konfirm.status='Confirmed';
-            this.konfirm.tanggal_rso=rs.tanggal_rso;
-            this.konfirm.nip_sales=rs.nip_sales;
-            this.konfirm.kode_customer=rs.kode_customer;
-            this.konfirm.keterangan=rs.keterangan;
-            this.konfirm.status="Confirmed";
-            let keputusan=confirm('Apakah anda yakin?');
-            if(keputusan===true){
-                axios.put(`/api/rso/`+rs.nomor_rso,this.konfirm)
-                    .then((response)=>{
-                    this.getRso();
-                    this.$router.push({name:'purchase'});
-            })
-                .catch(error=>{
-                    console.log(error)
-                })
-            }  
+        ConfirmRso(rs){    
+            let tanya=confirm("Yakin kirim estimasi barang ini?");
+            if(tanya===true){
+                this.ketban="";
+                this.nilai="";
+                for(let k=0;k<this.banding.length;k++){
+                    if(this.banding[k].acc_purch==="Y" && this.banding[k].tgl_datang===null){
+                        this.params='N';
+                    }else if(this.banding[k].acc_purch==="N" && this.banding[k].alastolak===null){
+                        this.params='N';
+                    }else{
+                        this.params='Y';
+                    }
+                    this.ketban+=this.params; 
+                    this.nilai+="Y";
+                }
+                if(this.ketban===this.nilai){
+                    if(rs.pr==="N"){
+                        this.konfirm.status='Confirmed';
+                        this.konfirm.tanggal_rso=rs.tanggal_rso;
+                        this.konfirm.nip_sales=rs.nip_sales;
+                        this.konfirm.kode_customer=rs.kode_customer;
+                        this.konfirm.keterangan=rs.keterangan;
+                        axios.put(`/api/rso/`+rs.nomor_rso,this.konfirm)
+                        .then((response)=>{
+                            this.$router.push({name:'purchase'});
+                        })
+                    }else{
+                        this.upso='';
+                        this.value='';
+                        for(let n=0;n<this.banding.length;n++){
+                            this.upso+=this.banding[n].acc_purch;
+                            this.value+='Y';
+                        }
+                        console.log(this.upso);
+                        console.log(this.value);
+                        if(this.upso===this.value){
+                            this.konfirm.status='So';
+                                this.konfirm.tanggal_rso=rs.tanggal_rso;
+                                this.konfirm.nip_sales=rs.nip_sales;
+                                this.konfirm.kode_customer=rs.kode_customer;
+                                this.konfirm.keterangan=rs.keterangan;
+                                axios.put(`/api/rso/`+rs.nomor_rso,this.konfirm)
+                                .then((response)=>{
+                                    this.cso={nomor_so:rs.nomor_rso,tanggal_so:rs.tanggal_rso,tanggal_kirim:rs.tanggal_rso
+                                            ,nomor_rso:rs.nomor_rso,status:'Acc',statusso:'tidaktersedia',pr:'Y',distribusi:'ambil'
+                                            ,lokasi:'PT.Ekatunggal Tunas Mandiri',alamat:'Bogor'
+                                        }
+                                    axios.post("/api/so",this.cso)
+                                    .then(res=>{
+                                    axios.get("/api/listrso/"+rs.nomor_rso)
+                                    .then(res=>{
+                                        this.listrso=res.data.data
+                                        for(let i=0;i<this.listrso.length;i++){
+                                        this.elist={so_open:'Y',open_po:'N',so_tdktersedia:'Y',booking:'Y',po_close:'N',statusso:'Y'};
+                                        axios.put("/api/listrso/"+this.listrso[i].id,this.elist)
+                                            .then(res=>{
+                                                this.$router.push({name:'purchase'});
+                                            })  
+                                        }
+                                    })
+                                    })        
+                                })
+                        }else{
+                            this.konfirm.status='Confirmed';
+                            this.konfirm.tanggal_rso=rs.tanggal_rso;
+                            this.konfirm.nip_sales=rs.nip_sales;
+                            this.konfirm.kode_customer=rs.kode_customer;
+                            this.konfirm.keterangan=rs.keterangan;
+                            axios.put(`/api/rso/`+rs.nomor_rso,this.konfirm)
+                            .then((response)=>{
+                                this.$router.push({name:'purchase'});
+                            })
+                        }              
+                    }
+                }else{
+                    alert("pastikan data sudah dilengkapi!")
+                }
+            }
         },
         resetForm(){
             this.getlistRso()

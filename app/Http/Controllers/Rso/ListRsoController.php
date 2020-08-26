@@ -120,14 +120,14 @@ class ListRsoController extends Controller
     }
 
     public function  group(){
-        $data= Listrso::where('qty_tdktersedia','>',0)->where('so_open','Y')->groupBy('kode_barang')->where('open_po','N')
+        $data= Listrso::where('acc_purch','Y')->where('qty_tdktersedia','>',0)->where('so_open','Y')->groupBy('kode_barang')->where('open_po','N')
         ->selectRaw('count(*) as total, kode_barang')->get();
         return GrouplistResource::collection($data);
     }
 
     
     public function  grouplist($barang){
-        return listGroupResource::collection(Listrso::where('statusso','Y')->where('qty_tdktersedia','>',0)->where('so_tdktersedia','Y')->where('kode_barang',$barang)->where('open_po','N')->get());
+        return listGroupResource::collection(Listrso::where('acc_purch','Y')->where('statusso','Y')->where('qty_tdktersedia','>',0)->where('so_tdktersedia','Y')->where('kode_barang',$barang)->where('open_po','N')->get());
     }
 
     public function  groupopen($po,$barang){
@@ -200,6 +200,10 @@ class ListRsoController extends Controller
 
     public function viewlistso($rso,$barang){
         return ListRsoResource::collection(Listrso::where('nomor_rso',$rso)->where('kode_barang',$barang)->get());
+    }
+
+    public function pr($rso){
+        return ListRsoResource::collection(Listrso::where('nomor_rso',$rso)->where('acc_purch','Y')->get());
     }
 
 }

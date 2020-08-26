@@ -62,14 +62,7 @@ import JenisKendaraanComponent from '../components/kendaraan/JenisKendaraanCompo
 
 import PrComponent from '../components/dicpr/PrComponent.vue'
 import CreatePrcomponent from '../components/dicpr/CreatePrcomponent.vue'
-
-
-
-
-
-
-
-
+import ViewPrcomponent from '../components/dicpr/ViewPrcomponent.vue'
 
 
 const routes=[
@@ -133,6 +126,7 @@ const routes=[
     
     {name:'Prcomponent', path:'/pr', component:PrComponent},
     {name:'CreatePrcomponent', path:'/pr/create', component:CreatePrcomponent},
+    {name:'ViewPrcomponent', path:'/pr/view/:nomor', component:ViewPrcomponent},
 
 
 

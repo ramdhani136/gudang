@@ -16,8 +16,8 @@ class BarangResource extends JsonResource
     public function toArray($request)
     {
 
-        $data=Listrso::all();
-        $book= Listrso::where('kode_barang',$this->kode)->where('booking','Y')->sum('qty_tersedia');
+       /*  $data=Listrso::all();
+        $book= Listrso::where('kode_barang',$this->kode)->where('booking','Y')->sum('qty_tersedia'); */
         
 
         return 
@@ -26,7 +26,7 @@ class BarangResource extends JsonResource
             'nama'=>$this->nama,
             'qty'=>$this->qty,
             'satuan'=>$this->satuan,
-            'dibooking'=>$book,
+           /*  'dibooking'=>$book, */
             'harga'=>$this->harga, 
             'min_stok'=>$this->min_stok, 
             'max_stok'=>$this->max_stok, 

@@ -17,7 +17,7 @@ class SalesController extends Controller
      */
     public function index()
     {
-        return SalesResource::collection(Sales::latest()->get());
+        return SalesResource::collection(Sales::where('status','AKtif')->latest()->get());
     }
 
     /**

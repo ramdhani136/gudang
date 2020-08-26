@@ -17,7 +17,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        return CustomerResource::collection(Customer::latest()->get());
+        return CustomerResource::collection(Customer::where("status","Aktif")->latest()->get());
     }
 
     /**
