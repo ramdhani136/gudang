@@ -30,6 +30,8 @@ class CustpriceResource extends JsonResource
             'created_at'=>$this->created_at,
             'updated_at'=>$this->updated_at,
             'keterangan'=>$this->keterangan,
+            'tanggal'=>$this->tanggal,
+            'alastolak'=>$this->alastolak,
         ];
     }
 }

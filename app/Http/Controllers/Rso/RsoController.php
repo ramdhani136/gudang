@@ -94,7 +94,7 @@ class RsoController extends Controller
     }
 
     public function confirm(){
-        return RsoResource::collection(Rso::where('status','Confirmed')->orderBy('updated_at','ASC')->get());
+        return RsoResource::collection(Rso::where('pr','N')->where('status','Confirmed')->orderBy('updated_at','ASC')->get());
     }
 
     public function pr()
@@ -107,5 +107,9 @@ class RsoController extends Controller
         return PrResource::collection(Rso::where('nomor_rso',$rso)->where('pr','Y')->orderBy('updated_at','ASC')->get());
     }
 
+    public function realrso()
+    {
+        return PrResource::collection(Rso::where('pr','N')->orderBy('updated_at','ASC')->get());
+    }
 
 }

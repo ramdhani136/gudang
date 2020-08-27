@@ -27,6 +27,7 @@ import ViewSoConfirmComponent from '../components/so/ViewSoConfirmComponent.vue'
 import CustPriceComponent from '../components/customer/CustPriceComponent.vue'
 import ItemPriceComponent from '../components/customer/ItemPriceComponent.vue'
 import viewPriceComponent from '../components/customer/viewPriceComponent.vue'
+import RequestPriceComponent from '../components/customer/RequestPriceComponent.vue'
 
 import PuchaseRequestComponent from '../components/purchase/PuchaseRequestComponent.vue'
 import poCreateViewComponent from '../components/purchase/poCreateViewComponent.vue'
@@ -92,6 +93,7 @@ const routes=[
     {name:'datacust', path:'/price/customer', component:CustPriceComponent},
     {name:'dataItem', path:'/price/:id', component:ItemPriceComponent},
     {name:'viewItem', path:'/price/:customer/:barang', component:viewPriceComponent},
+    {name:'rprice', path:'/data/price/request', component:RequestPriceComponent},
 
     {name:'pr', path:'/purchase/pr', component:PuchaseRequestComponent},
     {name:'poCreateView', path:'/purchase/po/view/:nomor', component:poCreateViewComponent},

@@ -392,7 +392,7 @@ export default {
             }
         },
         validqty(index){
-                if(parseInt(this.hitung.qty[index])>parseInt(this.checker[index].qty)){
+                if(parseInt(this.hitung.qty[index])>(parseInt(this.checker[index].qty)+(parseInt(this.checker[index].qty)/100*10))){
                     this.hitung.qty[index]=this.checker[index].qty;
                 }
                 this.total=0;

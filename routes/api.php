@@ -26,6 +26,7 @@ Route::resource('divisi','Divisi\DivisiController');
 Route::resource('rso','Rso\RsoController');
 Route::get('rso/data/pr','Rso\RsoController@pr');
 Route::get('rso/data/pr/{rso}','Rso\RsoController@viewpr');
+Route::get('rso/data/realrso/','Rso\RsoController@realrso');
 
 Route::get('rso/data/purch/','Rso\RsoController@purch');
 Route::get('rso/data/confirm/','Rso\RsoController@confirm');
@@ -53,13 +54,18 @@ Route::resource('listrso','Rso\ListRsoController');
 Route::resource('sales','Sales\SalesController');
 
 Route::resource('so','So\SoController');
-
+Route::get('so/data/realso','So\SoController@realso');
 Route::get('so/data/aktif','So\SoController@aktif');
+
 Route::resource('bcm','Barang\BcmController');
 Route::get('bcm/data/open','Barang\BcmController@open');
 Route::resource('custprice','sales\CustpriceController');
 Route::get('data/price/{customer}/{barang}','Sales\CustpriceController@viewprice');
 Route::get('view/price/{customer}/{barang}','Sales\CustpriceController@ambilPrice');
+Route::get('view/price/aktif/{customer}/{barang}','Sales\CustpriceController@aktif');
+Route::get('view/price/tolak/{customer}/{barang}','Sales\CustpriceController@tolak');
+Route::get('view/price/tdkaktif/{customer}/{barang}','Sales\CustpriceController@tdkaktif');
+Route::get('view/data/price/tdkaktif','Sales\CustpriceController@request');
 Route::resource('purchasing','Purchase\PurchasingController');
 Route::resource('po','Po\PoController');
 Route::get('poaktif/','Po\PoController@aktif');
@@ -90,5 +96,7 @@ Route::get('listrso/data/pilihsotidak/view/{rso}','Rso\ListRsoController@pilihso
 
 Route::resource('bbk','Bbk\BbkController');
 Route::resource('listbbk','Bbk\ListbbkController');
+
+Route::resource('listmasuk','Bbm\barangMasukController');
 
 

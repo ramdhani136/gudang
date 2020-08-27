@@ -199,7 +199,7 @@ export default {
     },
     methods:{
         getRso(){
-            axios.get("/api/rso")
+            axios.get("/api/rso/data/realrso/")
             .then(res=>{this.rso=res.data.data
                 this.statusData();
                 this.load=false;

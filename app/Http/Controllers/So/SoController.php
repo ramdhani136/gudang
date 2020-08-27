@@ -92,8 +92,12 @@ class SoController extends Controller
 
     public function aktif()
     {
-        return SoResource::collection(So::where('status','Acc')->orderBy('nomor_so','ASC')->get());
+        return SoResource::collection(So::where('status','Acc')->where('pr','N')->orderBy('nomor_so','ASC')->get());
     }
 
+    public function realso()
+    {
+        return SoResource::collection(So::where('pr','N')->orderBy('nomor_so','ASC')->get());
+    }
     
 }

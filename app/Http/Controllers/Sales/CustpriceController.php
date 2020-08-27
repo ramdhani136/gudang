@@ -93,7 +93,25 @@ class CustpriceController extends Controller
         return  CustpriceResource::collection(Custprice::where('kode_customer',$customer)->where('kode_barang',$barang)->get());
     }
 
-    public function ambilPrice($customer,$barang){
-        return CustpriceResource::collection(Custprice::where('kode_customer',$customer)->where('kode_barang',$barang)->orderBy('id','DESC')->limit(1)->get());
+    public function aktif($customer,$barang){
+        return  CustpriceResource::collection(Custprice::where('status','Aktif')->where('kode_customer',$customer)->where('kode_barang',$barang)->get());
     }
+
+    public function tdkaktif($customer,$barang){
+        return  CustpriceResource::collection(Custprice::where('status','Non Aktif')->where('kode_customer',$customer)->where('kode_barang',$barang)->get());
+    }
+
+    public function tolak($customer,$barang){
+        return  CustpriceResource::collection(Custprice::where('status','Di Tolak')->where('kode_customer',$customer)->where('kode_barang',$barang)->get());
+    }
+
+    public function ambilPrice($customer,$barang){
+        return CustpriceResource::collection(Custprice::where('status','Aktif')->where('kode_customer',$customer)->where('kode_barang',$barang)->orderBy('id','DESC')->limit(1)->get());
+    }
+
+    public function request()
+    {
+        return CustpriceResource::collection(Custprice::where('status','Non Aktif')->latest()->get());
+    }
+
 }

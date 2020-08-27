@@ -38,7 +38,7 @@
         <tbody>
                 <tr v-for="(it,index) in item" :key="index">
                 <td style="text-align:center">{{index+1}}</td>
-                <td style="text-align:center">{{it.created_at}}</td>
+                <td style="text-align:center">{{it.tanggal}}</td>
                 <td style="text-align:center">{{it.harga | currency}}</td>
                 <td style="text-align:center">{{it.sales}}</td>
                 <td>
@@ -47,8 +47,9 @@
                     </div>
                 </td>
                 <td style="text-align:center">
-                    <div v-if="status=='Aktif'" class="btn btn-orange">Aktif</div>
-                    <div v-if="status!=='Aktif'" class="btn btn-none">Non Aktif</div>
+                    <div v-if="it.status=='Aktif'" class="btn btn-orange">Di terima</div>
+                    <div v-if="it.status=='Non Aktif'" class="btn btn-none">Non Aktif</div>
+                    <div @click="viewalastolak(it)" v-if="it.status=='Di Tolak'" class="btn btn-danger">Di tolak</div>
                 </td>
             </tr>
             <div v-if="tampil" id="nocontent">Tidak ada data yang tersimpan</div>
@@ -96,6 +97,27 @@
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="modal-tolak" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div id="modal-width" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Info Penolakan</h5>
+                        <button  type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Keterangan</label>
+                            <textarea v-model="alasan" class="form-control" disabled></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
     </div>
 </template>
 
@@ -109,19 +131,29 @@ export default {
         return{
             customer:[],
             load:true,
-            status:'Aktif',
             item:{},
             barang:{},
             customer:{},
             tampil:false,
             up:{},
             sales:{},
+            tdkaktif:{},
+            tolak:{},
+            alasan:'',
         }
     },
     created(){
         this.getItem();
+        this.gettolak();
     },
     methods:{
+        gettolak(){
+            axios.get("/api/view/price/tolak/"+this.$route.params.customer+"/"+this.$route.params.barang)
+            .then(res=>{
+                this.tolak=res.data.data;
+                console.log(this.tolak);
+            });
+        },
         getItem(){
             axios.get("/api/data/price/"+this.$route.params.customer+'/'+this.$route.params.barang)
             .then(res=>{this.item=res.data.data
@@ -147,21 +179,70 @@ export default {
         },
         resetForm(){
             this.getItem();
-            this.up.no_reg="";
             this.up.nip_sales="";
             this.up.harga="";
             this.up.keterangan="";
         },
         createItem(){
-            this.up.kode_customer=this.$route.params.customer;
-            this.up.kode_barang=this.$route.params.barang;
-            axios.post("/api/custprice",this.up)
+            axios.get("/api/view/price/tdkaktif/"+this.$route.params.customer+"/"+this.$route.params.barang)
             .then(res=>{
-                this.getItem();
-                this.resetForm();
-                this.tampil=false;
-                $("#modal-form").modal("hide");    
-            })
+                this.tdkaktif=res.data.data;
+                if(this.tdkaktif.length>0 || this.tolak.length>0){
+                    for(let i=0;i<this.tdkaktif.length;i++){
+                        axios.delete("/api/custprice/"+this.tdkaktif[i].id).
+                        then(res=>{
+                    
+                        });
+                    }
+                   /*  for(let i=0;i<this.tolak.length;i++){
+                        axios.delete("/api/custprice/"+this.tolak[i].id).
+                        then(res=>{
+                    
+                        });
+                    } */
+                    this.up.kode_customer=this.$route.params.customer;
+                    this.up.kode_barang=this.$route.params.barang;
+                    this.up.tanggal=this.DateTime();
+                    axios.post("/api/custprice",this.up)
+                    .then(res=>{
+                        this.getItem();
+                        this.resetForm();
+                        this.tampil=false;
+                        $("#modal-form").modal("hide");    
+                    })
+                }else{
+                    this.up.kode_customer=this.$route.params.customer;
+                    this.up.kode_barang=this.$route.params.barang;
+                    this.up.tanggal=this.DateTime();
+                    axios.post("/api/custprice",this.up)
+                    .then(res=>{
+                    this.getItem();
+                    this.resetForm();
+                    this.tampil=false;
+                    $("#modal-form").modal("hide");    
+                    })
+                }
+            });
+        },
+        DateTime(){
+            this.date = new Date(); 
+            this.month = this.date.getMonth()+1;
+            this.year=this.date.getFullYear();
+            this.hours=this.date.getHours();
+            this.minute=this.date.getMinutes();
+            this.seconds=this.date.getSeconds();
+            if(this.month>12){
+                this.month=12;
+            }
+            this.day = this.date.getDate();
+            this.dates=this.year+"-"+(this.month<10 ? '0' : '')+this.month+"-"+this.day;
+            this.times=this.hours+":"+this.minute+":"+(this.seconds<10 ? '0' : '')+this.seconds;
+            this.datetimes=this.dates+" "+this.times;
+            return this.datetimes;
+        },
+        viewalastolak(it){
+            this.alasan=it.alastolak;
+            $("#modal-tolak").modal("show");   
         }
     }
 }

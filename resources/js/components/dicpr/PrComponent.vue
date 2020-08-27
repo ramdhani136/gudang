@@ -6,7 +6,7 @@
         <div class="form-group col-3 my-3 ml-n3 float-left">
             <select name="status" v-model="status" class="form-control">
                 <option value="Purch">Menunggu Acc</option>
-                <option value="Confirmed">Konfirmasi</option>
+                <option value="Confirmed">Confirmed</option>
                 <option value="So">Open</option>
             </select>
         </div> 
