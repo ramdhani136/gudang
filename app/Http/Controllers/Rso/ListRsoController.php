@@ -174,12 +174,12 @@ class ListRsoController extends Controller
     }
 
     public function detailpo($po,$barang){
-        $data=Listrso::where('nomor_po',$po)->where('kode_barang',$barang)->orderBy('dateaccso','ASC')->get();
+        $data=Listrso::where('nomor_po',$po)->where('kode_barang',$barang)->orderBy('pr','DESC')->orderBy('dateaccso','ASC')->get();
         return  ListRsoResource::collection($data);
     }
 
     public function accpo($po,$barang){
-        $data=Listrso::where('nomor_po',$po)->where('kode_barang',$barang)->orderBy('dateaccso','DESC')->get();
+        $data=Listrso::where('nomor_po',$po)->where('kode_barang',$barang)->orderBy('pr','ASC')->orderBy('dateaccso','DESC')->get();
         return  ListRsoResource::collection($data);
     }
 

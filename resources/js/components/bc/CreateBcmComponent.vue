@@ -276,7 +276,7 @@ export default {
         checklist(){
             $("#modal-po").modal("hide");
         },
-        /* draftBcm(){
+        draftBcm(){
             let jawab=confirm("Simpan Draft?");
         if(jawab===true){
             this.up.status="Draft";
@@ -346,10 +346,9 @@ export default {
                 }
         },
         )}
-        }, */
+        },
         submitBCM(){
-        console.log(this.checker);
-        /*  let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
+        let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
         if(jawab===true){
             this.up.status="open";
             axios.post("/api/bcm",this.up)
@@ -420,9 +419,9 @@ export default {
                         });
             }
         },
-        )} */
+        )}
         },
-       /*  requestBcm(){   
+        requestBcm(){   
         let jawab=confirm("Yakin ingin mengirim Bukti Checker Masuk ini?");
         if(jawab===true){
             this.up.status="sent";
@@ -495,7 +494,7 @@ export default {
             }
         },
         )}
-        }, */
+        },
         validqty(index){
                 this.pembanding="";
                 this.aksicek="";

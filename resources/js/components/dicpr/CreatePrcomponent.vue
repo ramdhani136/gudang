@@ -263,7 +263,7 @@ export default {
                         for(let i=0;i<this.listpr.length;i++){
                         this.uplist={nomor_rso:this.upload.nomor_rso,tanggal_rso:this.upload.tanggal_rso
                         ,kode_barang:this.listpr[i].kode,harga:0,qty:this.hitung.qty[i],qty_tdktersedia:this.hitung.qty[i]
-                        ,status:'Tidak Tersedia',catatan:this.hitung.keterangan[i]}
+                        ,status:'Tidak Tersedia',catatan:this.hitung.keterangan[i],pr:'Y',dateaccso:this.DateTime()}
                         axios.post("/api/listrso",this.uplist)
                         .then(res=>{
                             this.$router.push({name:'Prcomponent'});
@@ -277,7 +277,23 @@ export default {
         },
         hapus(index){
             this.listpr.splice(index,1)
-        }
+        },
+        DateTime(){
+            this.date = new Date(); 
+            this.month = this.date.getMonth()+1;
+            this.year=this.date.getFullYear();
+            this.hours=this.date.getHours();
+            this.minute=this.date.getMinutes();
+            this.seconds=this.date.getSeconds();
+            if(this.month>12){
+                this.month=12;
+            }
+            this.day = this.date.getDate();
+            this.dates=this.year+"-"+(this.month<10 ? '0' : '')+this.month+"-"+this.day;
+            this.times=this.hours+":"+this.minute+":"+(this.seconds<10 ? '0' : '')+this.seconds;
+            this.datetimes=this.dates+" "+this.times;
+            return this.datetimes;
+        },
     },
 } 
 </script>

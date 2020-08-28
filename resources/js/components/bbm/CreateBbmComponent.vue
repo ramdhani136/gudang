@@ -306,14 +306,17 @@ export default {
                 axios.post("/api/bbm/",this.up)
                 .then(res=>{
                     for(let i=0;i<this.checker.length;i++){
+                   /* Update status Listbcm */     
                 this.uplistrso={close_bcm:'Y'};
                 axios.put("/api/listbcm/"+this.checker[i].id,this.uplistrso)
                 .then(res=>{
+                    /* Input listbbm */
                     this.input={qty:this.hitung.qty[i],kode_barang:this.checker[i].kode_barang,nomor_bbm:this.up.bbm,keterangan:this.hitung.keterangan[i]}
                     axios.post("/api/listbbm/",this.input)
                     .then(res=>{
                     
                     });
+                   /* END */ 
                     if(this.hitung.qty[i]<this.checker[i].qty){
                     axios.get("/api/view/accpo/"+this.checker[i].nomor_po+"/"+this.checker[i].kode_barang)
                     .then(res=>{
@@ -328,11 +331,12 @@ export default {
                                 this.checker[i].qty=parseInt(this.checker[i].qty)-parseInt(this.listpo[j].qty_masuk);
                             }
                             if(this.checker[i].qty<0){
-                                this.checker[i].qty=0;
+                                this.checker[i].qty=0; 
                             }
                             this.uplistsisa={qty_masuk:this.hasil};
                             axios.put("/api/listrso/"+this.listpo[j].id, this.uplistsisa)
                             .then(res=>{
+                            /* Update status po_close di listrso */
                             axios.get("/api/listrso/data/listpo/"+this.checker[i].nomor_po)
                                 .then(res=>{
                                     this.listsisa=res.data.data;
@@ -344,7 +348,8 @@ export default {
                                             });
                                             }
                                             }
-                                })
+                                }) 
+                             /* Update apabila masih ada sisa status po masih open */   
                             this.sipo=0;
                             axios.get("/api/listrso/data/listall/"+this.checker[i].nomor_po)
                             .then(res=>{
@@ -361,24 +366,26 @@ export default {
                                     });
                                 }
                                 });
+                                /* End */
                         });
                         } 
+                        /* Mengupdate qty barang masuk di listrso */
                         axios.get("/api/view/detailpo/"+this.checker[i].nomor_po+"/"+this.checker[i].kode_barang)
                         .then(res=>{
                             this.listpost=res.data.data;
                             for(let m=0;m<this.listpost.length;m++){  
-                                if(this.hitung.qty[i]<=(parseInt(this.listpost[m].qty_tdktersedia)-parseInt(this.listpost[m].qty_masuk))){
+                                this.sisa=this.listpost[m].qty_tdktersedia-this.listpost[m].qty_masuk;
+                                if(this.hitung.qty[i]<=this.sisa){
                                     this.hasil=this.hitung.qty[i];
-                                    this.hitung.qty[i]=parseInt(this.hitung.qty[i])-(parseInt(this.listpost[m].qty_tdktersedia)-parseInt(this.listpost[m].qty_masuk));
-                                }else if(this.hitung.qty[i]>(parseInt(this.listpost[m].qty_tdktersedia)-parseInt(this.listpost[m].qty_masuk))){
-                                    this.hasil=parseInt(this.listpost[m].qty_tdktersedia)-parseInt(this.listpost[m].qty_masuk);
-                                    this.hitung.qty[i]=parseInt(this.hitung.qty[m])-(parseInt(this.listpost[m].qty_tdktersedia)-parseInt(this.listpost[m].qty_masuk));
+                                    this.hitung.qty[i]=this.hitung.qty[i]-this.sisa;
+                                }else{
+                                    this.hasil=this.sisa;
+                                    this.hitung.qty[i]=this.hitung.qty[i]-this.sisa;
                                 }
                                 if(this.hitung.qty[i]<0){
                                     this.hitung.qty[i]=0;
                                 }
                                     this.uplistsisa2={qty_masuk:parseInt(this.hasil)+parseInt(this.listpost[m].qty_masuk)};
-                                    console.log(this.uplistsisa2);
                                     axios.put("/api/listrso/"+this.listpost[m].id,this.uplistsisa2)
                                     .then(res=>{
                                     axios.get("/api/listrso/data/listpo/"+this.checker[i].nomor_po)
@@ -395,7 +402,7 @@ export default {
                                         })
                                     }); 
                             }
-                        });
+                        }); 
                         this.$router.push({name:'ingoods'});
                     });
                 }else{
