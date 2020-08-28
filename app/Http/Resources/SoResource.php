@@ -34,6 +34,9 @@ class SoResource extends JsonResource
             'lokasi'=>$this->lokasi,
             'alamat'=>$this->alamat,
             'distribusi'=>$this->distribusi,
+            'rs'=>$this->rs,
+            'alasselesai'=>$this->alasselesai,
+            'alastolakselesai'=>$this->alastolakselesai,
         ];
     }
 }

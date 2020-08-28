@@ -100,4 +100,8 @@ class SoController extends Controller
         return SoResource::collection(So::where('pr','N')->orderBy('nomor_so','ASC')->get());
     }
     
+    public function sselesai()
+    {
+        return SoResource::collection(So::where('status','Acc')->where('rs','Y')->orderBy('nomor_so','ASC')->get());
+    }
 }

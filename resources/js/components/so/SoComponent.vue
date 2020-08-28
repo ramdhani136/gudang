@@ -10,6 +10,7 @@
                 <option value="Acc">Open</option>
                 <option value="Tolak">Rejected</option>
                 <option value="Selesai">Selesai</option>
+                <option value="Di Selesaikan">Di Selesaikan</option>
             </select>
         </div>
         <div class="row">
@@ -39,12 +40,60 @@
                                     Lihat Detail
                                 </router-link>
                                 <button @click="deleteSo(rs)" v-if="rs.status=='Draft' || rs.status=='Tolak'" class="btn btn-danger">Hapus</button>
+                                <button @click="requestselesai(rs)"  v-if="rs.status==='Acc' && rs.rs==='N'" class="btn btn-orange">Request Selesai</button>
+                                <button @click="batalselesai(rs)"  v-if="rs.status==='Acc' && rs.rs==='Y'" class="btn btn-none">Batal Request</button>
+                                <button @click="bukalagi(rs)" v-if="rs.status=='Di Selesaikan'" class="btn btn-orange">Reopen SO</button>
+                                <button  @click="infoTolak(rs)" v-if="rs.status=='Acc' && rs.rs==='T'" class="btn btn-danger">R. Selesai di tolak</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
                 <Circle5 id="load" v-if="load"></Circle5>
             </div>
+            <div class="modal fade" id="modal-selesai" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Permintaan Selesai SO</h5>
+                    <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <textarea v-model="input.alasselesai" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="kirimselesai()" class="btn btn-primary">kirim permintaan</button>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal-tolak" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Informasi Penolakan SO Selesai</h5>
+                    <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <textarea v-model="alastolak" class="form-control" disabled></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button @click="requlang()" type="button" class="btn btn-orange">Request Ulang Selesai</button>
+                </div>
+                </div>
+            </div>
+        </div>
         </div>
 </template>
 
@@ -64,6 +113,9 @@ export default {
             listrso:{},
             uplsoneg:{},
             uplsopos:{},
+            nso:null,
+            input:{},
+            alastolak:null,
         }
     },
     created(){
@@ -81,9 +133,11 @@ export default {
                 }
                 else if(this.status==="Tolak"){
                     return this.so.filter(elem=> elem.status==="Tolak")
-                }
-                else if(this.status==="Selesai"){
+                }else if(this.status==="Selesai"){
                     return this.so.filter(elem=> elem.status==="Selesai")
+                }
+                else if(this.status==="Di Selesaikan"){
+                    return this.so.filter(elem=> elem.status==="Di Selesaikan")
                 }
             }else{
                 return this.so.filter(elem => {
@@ -152,6 +206,51 @@ export default {
                     });
                     
                 }
+            }
+        },
+        requestselesai(rs){
+            this.nso=rs.nomor_so;
+            $("#modal-selesai").modal("show");
+        },
+        kirimselesai(){
+            let tanya=confirm("Apakah anda yakin?");
+            if(tanya===true){
+                this.input.rs="Y";
+                console.log(this.input);
+                axios.put("/api/so/"+this.nso,this.input)
+                .then(res=>{
+                    this.getSo();
+                    $("#modal-selesai").modal("hide");
+                });
+            }
+        },
+        batalselesai(rs){
+            let tanya=confirm("Apakah anda yakin?");
+            if(tanya===true){
+            this.input.rs="N";
+            this.input.alasselesai="";
+                axios.put("/api/so/"+rs.nomor_so,this.input)
+                .then(res=>{
+                    this.getSo();
+                });
+            }
+        },
+        infoTolak(rs){
+            this.nso=rs.nomor_so;
+            this.alastolak=rs.alastolakselesai;
+            $("#modal-tolak").modal("show");
+        },
+        requlang(){
+            $("#modal-tolak").modal("hide");
+            $("#modal-selesai").modal("show");
+        },
+        bukalagi(rs){
+            let tanya=confirm("Apakah anda yakin");
+            if(tanya===true){
+                axios.put("/api/so/"+rs.nomor_so,{status:'Acc',rs:'N',alasselesai:'',alastolakselesai:''})
+                .then(res=>{
+                    this.getSo();
+                })
             }
         }
     }

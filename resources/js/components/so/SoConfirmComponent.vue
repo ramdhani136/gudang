@@ -9,6 +9,7 @@
                 <option value="Acc">Accept</option>
                 <option value="Tolak">Rejected</option>
                 <option value="Selesai">Selesai</option>
+                <option value="Di Selesaikan">Di Selesaikan</option>
             </select>
         </div>
             <div id="overflow" class="border-top">
@@ -71,6 +72,8 @@ export default {
                     return this.so.filter(elem=> elem.status==="Tolak")
                 }else if(this.status==="Selesai"){
                     return this.so.filter(elem=> elem.status==="Selesai")
+                }else if(this.status==="Di Selesaikan"){
+                    return this.so.filter(elem=> elem.status==="Di Selesaikan")
                 }
             }else{
                 return this.so.filter(elem => {

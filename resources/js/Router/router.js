@@ -22,7 +22,7 @@ import SoComponent from '../components/so/SoComponent.vue'
 import FormSoComponent from '../components/so/FormSoComponent.vue'
 import SoConfirmComponent from '../components/so/SoConfirmComponent.vue'
 import ViewSoConfirmComponent from '../components/so/ViewSoConfirmComponent.vue'
-
+import RSelesaiSoComponent from '../components/so/RSelesaiSoComponent.vue'
 
 import CustPriceComponent from '../components/customer/CustPriceComponent.vue'
 import ItemPriceComponent from '../components/customer/ItemPriceComponent.vue'
@@ -92,6 +92,7 @@ const routes=[
     {name:'viewso', path:'/so/confirm/:id', component:ViewSoConfirmComponent},
     {name:'so', path:'/so', component:SoComponent},
     {name:'formso', path:'/so/form/:id', component:FormSoComponent},
+    {name:'requestselesaiso', path:'/so/data/selesai', component:RSelesaiSoComponent},
 
     {name:'datacust', path:'/price/customer', component:CustPriceComponent},
     {name:'dataItem', path:'/price/:id', component:ItemPriceComponent},
