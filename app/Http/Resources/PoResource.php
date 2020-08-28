@@ -26,6 +26,9 @@ class PoResource extends JsonResource
             'status'=>$this->status,
             'keterangan'=>$this->keterangan,
             'alastolak'=>$this->alastolak,
+            'rs'=>$this->rs,
+            'alasselesai'=>$this->alasselesai,
+            'alastolakrequest'=>$this->alastolakrequest,
         ];
     }
 }

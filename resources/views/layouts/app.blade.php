@@ -116,6 +116,7 @@
                                     <router-link to="/purchase" class="dropdown-item" >Estimation Request RSO</router-link>
                                     <router-link to="/purchase/pr" class="dropdown-item" >Purchasing Request</router-link>
                                     <router-link to="/purchase/po/" class="dropdown-item" >Purchasing Order</router-link>
+                                    <router-link to="/purchase/po/selesai" class="dropdown-item" >Request Selesai PO</router-link>
                                     <router-link to="/purchase/barang/" class="dropdown-item" >Input Barang</router-link>
                                 </div>
                             </li>

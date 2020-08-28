@@ -92,4 +92,9 @@ class PoController extends Controller
     {
         return PoResource::collection(Po::orderBy('updated_at','ASC')->where('status','Acc')->get());
     }
+
+    public function rselesai()
+    {
+        return PoResource::collection(Po::orderBy('updated_at','ASC')->where('status','Acc')->where('rs','Y')->get());
+    }
 }

@@ -69,6 +69,7 @@ Route::get('view/data/price/tdkaktif','Sales\CustpriceController@request');
 Route::resource('purchasing','Purchase\PurchasingController');
 Route::resource('po','Po\PoController');
 Route::get('poaktif/','Po\PoController@aktif');
+Route::get('po/selesai/view','Po\PoController@rselesai');
 Route::resource('listbcm','Barang\ListBcmController');
 Route::get('listbcm/data/{bcm}/{barang}','Barang\ListBcmController@count');
 Route::get('listbcm/data/{bcm}','Barang\ListBcmController@nnonaktif');

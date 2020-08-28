@@ -10,6 +10,7 @@
                 <option value="Acc">Open</option>
                 <option value="Tolak">Rejected</option>
                 <option value="Selesai">Selesai</option>
+                <option value="Di Selesaikan">Di Selesaikan</option>
             </select>
         </div> 
         <div class="row">
@@ -38,7 +39,11 @@
                                 <router-link :to="{name:'poCreateView',params:{nomor:pl.nomor_po}}" class="btn btn-primary" >
                                     Lihat Detail
                                 </router-link>
+                                <button @click="bukalagi(pl)" v-if="pl.status=='Di Selesaikan'" class="btn btn-orange">Reopen PO</button>
                                 <button @click="getHapus(pl)" v-if="pl.status=='Draft'" class="btn btn-danger">Hapus</button>
+                                <button @click="requestSelesai(pl)" v-if="pl.status=='Acc' && pl.rs==='N'" class="btn btn-orange">Request Selesai</button>
+                                <button @click="batalselesai(pl)" v-if="pl.status=='Acc' && pl.rs==='Y'" class="btn btn-none">Batal Selesai</button>
+                                <button  @click="infoTolak(pl)" v-if="pl.status=='Acc' && pl.rs==='T'" class="btn btn-danger">R. Selesai di tolak</button>
                             </td>
                         </tr>
                     </tbody>
@@ -109,6 +114,50 @@
                 </div>
             </div>
         </div>
+            <div class="modal fade" id="modal-selesai" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Permintaan PO Selesai</h5>
+                    <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <textarea v-model="input.alasselesai" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="kirimselesai()" class="btn btn-primary">kirim permintaan</button>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal-tolak" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Informasi Tolak Selesai PO</h5>
+                    <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <textarea v-model="alastolak" class="form-control" disabled></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button @click="requlang()" type="button" class="btn btn-orange">Request Ulang Selesai</button>
+                </div>
+                </div>
+            </div>
+        </div>
         </div>
 </template>
 
@@ -136,7 +185,10 @@ export default {
                 tanggal_po:this.now(),
                 tanggal_datang:this.now(),
             },
-            file:{}
+            file:{},
+            input:{},
+            tujuanid:0,
+            alastolak:null,
         }
     },
     created(){
@@ -157,10 +209,12 @@ export default {
                     return this.po.filter(elem=> elem.status==="Tolak")
                 }else if(this.status==="Selesai"){
                     return this.po.filter(elem=> elem.status==="Selesai")
+                }else if(this.status==="Di Selesaikan"){
+                    return this.po.filter(elem=> elem.status==="Di Selesaikan")
                 }
             }else{
                 return this.po.filter(elem => {
-                return elem.nomor_po.toLowerCase().includes(this.search);
+                return elem.nomor_po.toLowerCase().includes(this.search.toLowerCase());
             });
             }
         },
@@ -271,6 +325,56 @@ export default {
                             this.getPurchasing();
                         });
                 });
+            }
+        },
+        requestSelesai(pl){
+            this.tujuanid=pl.nomor_po;
+            $("#modal-selesai").modal("show");
+        },
+        kirimselesai(){
+            let tanya=confirm("Apakah anda yakin?");
+            if(tanya===true){
+                this.input.rs="Y";
+                axios.put("/api/po/"+this.tujuanid,this.input)
+                .then(res=>{
+                    this.getPo();
+                    this.getSupplier();
+                    this.getPurchasing();
+                    $("#modal-selesai").modal("hide");
+                });
+            }
+        },
+        batalselesai(pl){
+            let tanya=confirm("Apakah anda yakin?");
+            if(tanya===true){
+            this.input.rs="N";
+            this.input.alasselesai="";
+                axios.put("/api/po/"+pl.nomor_po,this.input)
+                .then(res=>{
+                    this.getPo();
+                    this.getSupplier();
+                    this.getPurchasing();
+                });
+            }
+        },
+        infoTolak(pl){
+            this.tujuanid=pl.nomor_po;
+            this.alastolak=pl.alastolakrequest;
+            $("#modal-tolak").modal("show");
+        },
+        requlang(){
+            $("#modal-tolak").modal("hide");
+            $("#modal-selesai").modal("show");
+        },
+        bukalagi(pl){
+            let tanya=confirm("Apakah anda yakin");
+            if(tanya===true){
+                axios.put("/api/po/"+pl.nomor_po,{status:'Acc',rs:'N'})
+                .then(res=>{
+                    this.getPo();
+                    this.getSupplier();
+                    this.getPurchasing();
+                })
             }
         }
     }
