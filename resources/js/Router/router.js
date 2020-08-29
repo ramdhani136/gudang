@@ -34,8 +34,8 @@ import poCreateViewComponent from '../components/purchase/poCreateViewComponent.
 import poComponent from '../components/purchase/poComponent.vue'
 import dicPoComponent from '../components/purchase/dicPoComponent.vue'
 import PoSelesaiComponent from '../components/purchase/PoSelesaiComponent.vue'
-
-
+import AccPoComponent from '../components/purchase/AccPoComponent.vue'
+import poAccViewComponent from '../components/purchase/poAccViewComponent.vue'
 
 import BbmComponent from '../components/bbm/BbmComponent.vue'
 import CreateBbmComponent from '../components/bbm/CreateBbmComponent.vue'
@@ -104,6 +104,9 @@ const routes=[
     {name:'po', path:'/purchase/po/', component:poComponent},
     {name:'dpo', path:'/purchase/dpo', component:dicPoComponent},
     {name:'porequestselesai', path:'/purchase/po/selesai', component:PoSelesaiComponent},
+    {name:'accpo', path:'/purchase/po/acc', component:AccPoComponent},
+    {name:'poAccView', path:'/purchase/po/acc/:nomor', component:poAccViewComponent},
+    
 
     {name:'ingoods', path:'/dic/incoming', component:BbmComponent},
     {name:'creategoods', path:'/dic/incoming/view', component:CreateBbmComponent},

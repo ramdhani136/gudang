@@ -76,12 +76,7 @@
                 <button v-if="lpo.status=='Tolak'"  @click="submitPo(lpo)" class="btn-orange btn ml-4" >
                     Request Ulang
                 </button>
-                <button @click="terimaPo(lpo)" v-if="lpo.status=='Request'" class="btn-success btn ml-4" >
-                    Terima PO
-                </button>
-                <button @click="formTolak(lpo)" v-if="lpo.status=='Request'" class="btn-danger btn ml-1" >
-                    Tolak PO
-                </button>
+                <button v-if="lpo.status=='Request'" @click="kembali()" class="btn btn-none ml-3">Kembali</button>
         </div>
         <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -158,7 +153,7 @@
                                     <th>Customer</th>
                                     <th style="text-align:center">Jumlah</th>
                                     <th style="text-align:center">Satuan</th>
-                                    <th v-if="lpo.status=='Draft'" style="text-align:center">Aksi</th>
+                                    <th v-if="lpo.status=='Draft'||lpo.status=='Tolak'" style="text-align:center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody v-for="(lpo,index) in po" :key="index">
@@ -363,30 +358,8 @@ export default {
             });
             }
         },
-        terimaPo(lpo){
-            let tanyakan=confirm("Apakah anda yakin ingin menerima PO ini?");
-            if(tanyakan===true){
-                this.confirm.status="Acc";
-                axios.put("/api/po/"+lpo.nomor_po,this.confirm)
-                .then(res=>{
-                this.$router.push({name:'po'})
-            });
-            }
-        },
-        formTolak(){
-            $("#modal-tolak").modal("show");
-        },
-        tolakPo(lpo){
-            let tanyakan=confirm("Apakah anda yakin ingin menolak PO ini?");
-            if(tanyakan===true){
-                this.up.status="Tolak";
-                axios.put("/api/po/"+lpo.nomor_po,this.up)
-                .then(res=>{
-                $("#modal-tolak").modal("hide");
-                this.$router.push({name:'po'})
-            });
-            }
-
+        kembali(){
+            this.$router.push({name:'po'})
         }
     },
 }

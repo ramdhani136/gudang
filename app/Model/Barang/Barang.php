@@ -9,6 +9,7 @@ use App\Model\Barang\Listbcm;
 use App\Model\Bbm\Listbbm;
 use App\Model\Bck\Listbck;
 use App\Model\Bck\Listbbk;
+use App\Model\Retur\Listretur;
 
 class Barang extends Model
 {
@@ -37,5 +38,9 @@ class Barang extends Model
 
     public function listbbk(){
         return $this->hasMany(listbbk::class,'kode_barang','kode');
+    }
+
+    public function listretur(){
+        return $this->hasMany(listretur::class,'kode_barang','kode');
     }
 }

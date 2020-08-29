@@ -101,4 +101,6 @@ Route::resource('listbbk','Bbk\ListbbkController');
 
 Route::resource('listmasuk','Bbm\barangMasukController');
 
+Route::resource('retur','Retur\ReturController');
+Route::resource('listretur','Retur\ListReturController');
 
