@@ -21,7 +21,7 @@ class ReturResource extends JsonResource
             'nomor_so'=>$this->nomor_so,
             'status'=>$this->status,
             'keterangan'=>$this->keterangan,
-            'coba'=>$this->so->rso->customer->nama,
+            'customer'=>$this->so->rso->customer->nama,
             'sostatus'=>$this->so->status,
             'statusada'=>$this->so->statusso,
             'alastolak'=>$this->alastolak,

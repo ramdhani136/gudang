@@ -68,6 +68,10 @@ import PrComponent from '../components/dicpr/PrComponent.vue'
 import CreatePrcomponent from '../components/dicpr/CreatePrcomponent.vue'
 import ViewPrcomponent from '../components/dicpr/ViewPrcomponent.vue'
 
+import ReturComponent from '../components/retur/ReturComponent.vue'
+import CreateReturComponent from '../components/retur/CreateReturComponent.vue'
+import ViewReturComponent from '../components/retur/ViewReturComponent.vue'
+
 
 const routes=[
     {name:'barang', path:'/barang', component:BarangComponent},
@@ -138,9 +142,9 @@ const routes=[
     {name:'CreatePrcomponent', path:'/pr/create', component:CreatePrcomponent},
     {name:'ViewPrcomponent', path:'/pr/view/:nomor', component:ViewPrcomponent},
 
-
-
-    
+    {name:'returcomponent', path:'/retur', component:ReturComponent},
+    {name:'createretur', path:'/retur/create', component:CreateReturComponent},
+    {name:'viewretur', path:'/retur/view/:nomor', component:ViewReturComponent},  
 ]
 
 

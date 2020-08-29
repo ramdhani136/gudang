@@ -77,6 +77,7 @@
                                     <router-link to="/price/customer" class="dropdown-item" >Special Price</router-link>
                                     <router-link to="/data/price/request" class="dropdown-item" >Request Special Price</router-link>
                                     <router-link to="/ekspedisi" class="dropdown-item" >Data Ekspedisi</router-link>
+                                    <router-link to="/retur" class="dropdown-item" >Data Retur Barang</router-link>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
