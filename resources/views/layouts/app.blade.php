@@ -40,22 +40,26 @@
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
                         @guest
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                            </li>
+                            </li> -->
                             @if (Route::has('register'))
-                                <li class="nav-item">
+                                <!-- <li class="nav-item">
                                     <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
+                                </li> -->
                             @endif
                         @else
 
+
+                            <!-- Halaman Acc -->
+                            @if(Auth::user()->Acc == 1 || Auth::user()->superadmin == 1 )
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Data <span class="caret"></span>
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <router-link to="/user" class="dropdown-item" >User</router-link>
                                     <router-link to="/barang" class="dropdown-item" >Barang</router-link>
                                     <router-link to="/customer" class="dropdown-item" >Customer</router-link>
                                     <router-link to="/divisi" class="dropdown-item" >Divisi</router-link>
@@ -63,23 +67,42 @@
                                     <router-link to="/sales" class="dropdown-item" >Sales</router-link>
                                 </div>
                             </li>
+                            @endif
 
+                            <!-- halaman sales -->
+                            @if(Auth::user()->sales == 1 || Auth::user()->superadmin == 1 )
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    Marketing <span class="caret"></span>
+                                    Sales <span class="caret"></span>
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/rso" class="dropdown-item" >Request Sales Order</router-link>
-                                    <router-link to="/confirmso" class="dropdown-item" >SO Confirmation</router-link>
                                     <router-link to="/so" class="dropdown-item" >Sales Order</router-link>
-                                    <router-link to="/so/data/selesai" class="dropdown-item" >Request SO Selesai</router-link>
                                     <router-link to="/price/customer" class="dropdown-item" >Special Price</router-link>
-                                    <router-link to="/data/price/request" class="dropdown-item" >Request Special Price</router-link>
                                     <router-link to="/ekspedisi" class="dropdown-item" >Data Ekspedisi</router-link>
-                                    <router-link to="/retur" class="dropdown-item" >Data Retur Barang</router-link>
+                                   <!--  <router-link to="/retur" class="dropdown-item" >Data Retur Barang</router-link> -->
                                 </div>
                             </li>
+                            @endif
+
+                            <!-- Halaman Sales SPV -->
+                            @if(Auth::user()->susales == 1 || Auth::user()->superadmin == 1 )
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Sales SPV <span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <router-link to="/confirmso" class="dropdown-item" >SO Confirmation</router-link>
+                                    <router-link to="/so/data/selesai" class="dropdown-item" >Request SO Selesai</router-link>
+                                    <router-link to="/data/price/request" class="dropdown-item" >Request Special Price</router-link>
+                                </div>
+                            </li>
+                            @endif
+
+                            <!-- Halaman Inventory -->
+                            @if(Auth::user()->inventory == 1 || Auth::user()->superadmin == 1 )
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Inventory Control <span class="caret"></span>
@@ -89,12 +112,31 @@
                                     <router-link to="/dic" class="dropdown-item" >Request Sales Order</router-link>
                                     <router-link to="/pr" class="dropdown-item" >Item Request</router-link>
                                     <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link>
+                                    <!-- <router-link to="/dic/incoming/confirm" class="dropdown-item" >Incoming Goods</router-link> -->
+                                </div>
+                            </li>
+                            @endif
+
+                            <!-- halaman Incoming -->
+                            @if(Auth::user()->incoming == 1 || Auth::user()->superadmin == 1 )
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Incoming Goods<span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link>
                                     <router-link to="/dic/bcm" class="dropdown-item" >Bukti Checker</router-link>
                                     <router-link to="/dic/rbcm" class="dropdown-item" >Request Bukti Checker</router-link>
                                     <router-link to="/dic/incoming" class="dropdown-item" >Bukti Barang Masuk</router-link>
                                     <!-- <router-link to="/dic/incoming/confirm" class="dropdown-item" >Incoming Goods</router-link> -->
                                 </div>
                             </li>
+                            @endif
+
+
+                            <!-- Halaman Distribusi -->
+                            @if(Auth::user()->distribusi == 1 || Auth::user()->superadmin == 1 )
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Distribution Control <span class="caret"></span>
@@ -108,7 +150,10 @@
                                     <router-link to="/distribusi/jkendaraan" class="dropdown-item" >Jenis Kendaraan</router-link>
                                 </div>
                             </li>
-                            @if(Auth::user()->name == "Ilham Ramdhani")
+                            @endif
+
+                            <!-- Halaman Purchasing -->
+                            @if(Auth::user()->purch == 1 || Auth::user()->superadmin == 1 )
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Purchasing <span class="caret"></span>
@@ -118,12 +163,27 @@
                                     <router-link to="/purchase" class="dropdown-item" >Estimation Request RSO</router-link>
                                     <router-link to="/purchase/pr" class="dropdown-item" >Purchasing Request</router-link>
                                     <router-link to="/purchase/po/" class="dropdown-item" >Purchasing Order</router-link>
-                                    <router-link to="/purchase/po/acc" class="dropdown-item" >Request Acc PO</router-link>
-                                    <router-link to="/purchase/po/selesai" class="dropdown-item" >Request Selesai PO</router-link>
                                     <router-link to="/purchase/barang/" class="dropdown-item" >Input Barang</router-link>
                                 </div>
                             </li>
+                            @endif  
+
+                            <!-- Halaman Purch SPV -->
+                            @if(Auth::user()->suppurch == 1 || Auth::user()->superadmin == 1 )
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Purchasing SPV <span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <router-link to="/purchase/po/" class="dropdown-item" >Purchasing Order</router-link>
+                                    <router-link to="/purchase/po/acc" class="dropdown-item" >Request Acc PO</router-link>
+                                    <router-link to="/purchase/po/selesai" class="dropdown-item" >Request Selesai PO</router-link>
+                                </div>
+                            </li>
                             @endif   
+
+
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="caret"></span>

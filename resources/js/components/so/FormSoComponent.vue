@@ -25,7 +25,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Marketing</label>
+                    <label>Sales</label>
                     <select v-model="vso.nip_sales" name="marketing" class="col-12 form-control" disabled>
                         <option :value="vso.nip_sales">{{vso.sales}}</option>
                     </select>

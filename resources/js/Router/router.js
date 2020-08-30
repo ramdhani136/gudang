@@ -57,6 +57,8 @@ import ViewBckComponent from '../components/distribusi/bck/ViewBckComponent.vue'
 import CreateBckComponent from '../components/distribusi/bck/CreateBckComponent.vue'
 import BckComponent from '../components/distribusi/bck/BckComponent.vue'
 
+import userComponent from '../components/user/userComponent.vue'
+
 
 
 import EkspedisiComponent from '../components/ekspedisi/EkspedisiComponent.vue'
@@ -71,6 +73,8 @@ import ViewPrcomponent from '../components/dicpr/ViewPrcomponent.vue'
 import ReturComponent from '../components/retur/ReturComponent.vue'
 import CreateReturComponent from '../components/retur/CreateReturComponent.vue'
 import ViewReturComponent from '../components/retur/ViewReturComponent.vue'
+
+import homeComponent from '../components/home/homeComponent.vue'
 
 
 const routes=[
@@ -144,7 +148,12 @@ const routes=[
 
     {name:'returcomponent', path:'/retur', component:ReturComponent},
     {name:'createretur', path:'/retur/create', component:CreateReturComponent},
-    {name:'viewretur', path:'/retur/view/:nomor', component:ViewReturComponent},  
+    {name:'viewretur', path:'/retur/view/:nomor', component:ViewReturComponent}, 
+    
+    {name:'user', path:'/user', component:userComponent},
+
+    {name:'home', path:'/', component:homeComponent},
+    
 ]
 
 

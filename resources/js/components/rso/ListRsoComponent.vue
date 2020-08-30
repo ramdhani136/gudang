@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Marketing</label>
+                    <label>Sales</label>
                     <select  v-if="disabled"  v-model="rlist.nip_sales" name="marketing" class="col-12 form-control" :disabled="disabled == 1">
                         <option v-for="sl in sales" :key="sl.nip" :value="sl.nip">{{sl.nama}}</option>
                     </select>

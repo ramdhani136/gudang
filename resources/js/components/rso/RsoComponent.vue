@@ -88,7 +88,7 @@
                         <input v-model="form.tanggal_rso" @change="validate()" type="date" :min="now()" name="tanggal_rso"  autocomplete="off" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label>Marketing</label>
+                        <label>Sales</label>
                         <select v-model="form.nip_sales" class="form-control" name="user">
                             <option v-for="sl in sales" :key="sl.nip" :value="sl.nip">{{sl.nama}}</option>
                         </select>

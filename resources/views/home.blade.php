@@ -6,6 +6,8 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
+                   <!--  {{Request::path() === '/' ? 'tes':'no'}} -->
+                  <!--  {{Request::is('/')? 'aktif':'tdk aktif'}} -->
                     <router-view></router-view>
                 </div>
             </div>

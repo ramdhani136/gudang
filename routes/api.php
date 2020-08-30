@@ -104,3 +104,5 @@ Route::resource('listmasuk','Bbm\barangMasukController');
 Route::resource('retur','Retur\ReturController');
 Route::resource('listretur','Retur\ListReturController');
 
+Route::resource('user','User\UserController');
+
