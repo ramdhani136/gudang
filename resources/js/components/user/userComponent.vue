@@ -113,6 +113,13 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label>Warehouse</label>
+                        <select v-model="form.warehouse" class="form-control" >
+                            <option value="0">Tidak Aktif</option>
+                            <option value="1">Aktif</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Super Admin</label>
                         <select v-model="form.superadmin" class="form-control" >
                             <option value="0">Tidak Aktif</option>
@@ -149,6 +156,7 @@ export default {
                 incoming:0,
                 superadmin:0,
                 acc:0,
+                warehouse:0,
                 distribusi:0,
                 password:'',
             },

@@ -89,9 +89,9 @@
                 <button v-if="!aktiftombol"  class="btn-success btn ml-2" >
                     Simpan  
                 </button>
-                <button @click="aktiftombol=!aktiftombol" class="btn-orange btn ml-2" >
+                <!-- <button @click="aktiftombol=!aktiftombol" class="btn-orange btn ml-2" >
                     {{namatombol}} {{aktiftombol? edit():close()}}  
-                </button>
+                </button> -->
                 <button v-if="aktiftombol" @click="batal()" class="btn-primary btn ml-1" >
                     Kembali
                 </button>

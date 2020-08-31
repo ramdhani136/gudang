@@ -76,6 +76,9 @@ import ViewReturComponent from '../components/retur/ViewReturComponent.vue'
 
 import homeComponent from '../components/home/homeComponent.vue'
 
+import muatBarangComponent from '../components/warehouse/muatBarangComponent.vue'
+import bongkarBarangComponent from '../components/warehouse/bongkarBarangComponent.vue'
+
 
 const routes=[
     {name:'barang', path:'/barang', component:BarangComponent},
@@ -153,6 +156,10 @@ const routes=[
     {name:'user', path:'/user', component:userComponent},
 
     {name:'home', path:'/', component:homeComponent},
+
+
+    {name:'muatan', path:'/warehouse/muatan', component:muatBarangComponent},
+    {name:'bongkaran', path:'/warehouse/bongkar', component:bongkarBarangComponent},
     
 ]
 

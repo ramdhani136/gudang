@@ -44,6 +44,18 @@
                             <th v-if="status==='Confirmed'">Status</th>
                         </tr>
                     </thead>
+                    <!-- Status Menunggu -->
+                    <tbody v-if="status==='Purch'">
+                        <tr v-for="(lp,index) in listpr" :key="index">
+                            <td style="text-align:center">{{index+1}}</td>
+                            <td>{{lp.lkode_barang}}</td>
+                            <td>{{lp.nama_barang}}</td>
+                            <td style="text-align:center">{{lp.satuan}}</td>
+                            <td  style="text-align:center">
+                                <input  v-model="hitung.qty[index]" type="number" class="form-control" :disabled="disabled===1">
+                            </td>
+                        </tr>
+                    </tbody>
                     <!-- Status Konfirmasi -->
                     <tbody v-if="status==='Confirmed'">
                         <tr v-for="(lp,index) in listpr" :key="index">
@@ -139,7 +151,7 @@ export default {
             rsoketerangan:'',
             cso:{},
             elist:{},
-            listprso:{}
+            listprso:{},
         }
     },
     created(){

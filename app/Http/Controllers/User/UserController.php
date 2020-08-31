@@ -52,6 +52,7 @@ class UserController extends Controller
             'purch' => $request->purch,
             'supurch' => $request->supurch,
             'acc' => $request->acc,
+            'warehouse' => $request->warehouse,
             'superadmin' => $request->superadmin,
         ]);
     }

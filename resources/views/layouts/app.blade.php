@@ -52,7 +52,7 @@
 
 
                             <!-- Halaman Acc -->
-                            @if(Auth::user()->Acc == 1 || Auth::user()->superadmin == 1 )
+                            @if(Auth::user()->acc == 1 || Auth::user()->superadmin == 1 )
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Data <span class="caret"></span>
@@ -90,7 +90,7 @@
                             @if(Auth::user()->susales == 1 || Auth::user()->superadmin == 1 )
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    Sales SPV <span class="caret"></span>
+                                    Sales <span class="caret"></span>
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -172,13 +172,27 @@
                             @if(Auth::user()->suppurch == 1 || Auth::user()->superadmin == 1 )
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    Purchasing SPV <span class="caret"></span>
+                                    Purchasing <span class="caret"></span>
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/purchase/po/" class="dropdown-item" >Purchasing Order</router-link>
                                     <router-link to="/purchase/po/acc" class="dropdown-item" >Request Acc PO</router-link>
                                     <router-link to="/purchase/po/selesai" class="dropdown-item" >Request Selesai PO</router-link>
+                                </div>
+                            </li>
+                            @endif   
+
+                            <!-- Halaman Warehouse -->
+                            @if(Auth::user()->warehouse == 1 || Auth::user()->superadmin == 1 )
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Warehouse <span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <router-link to="/warehouse/muatan" class="dropdown-item" >List Muat Barang</router-link>
+                                    <router-link to="/warehouse/bongkar" class="dropdown-item" >List Bongkar Barang</router-link>
                                 </div>
                             </li>
                             @endif   

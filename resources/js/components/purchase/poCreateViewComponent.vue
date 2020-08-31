@@ -14,8 +14,8 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>Supplier</label>
-                    <select  v-model="lpo.kode_supplier" name="customer" class="col-12 form-control" disabled>
-                        <option :value="lpo.kode_supplier">{{lpo.supplier}}</option>
+                    <select @click="pilihsupplier()"  v-model="ket.kode_supplier" name="customer" class="col-12 form-control" :disabled="lpo.status==='Request' || lpo.status==='Acc' || lpo.status==='Selesai'">
+                        <option :value="ket.kode_supplier">{{ket.nama}}</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -28,11 +28,11 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>Tanggal Datang :</label>
-                    <input v-model="lpo.tanggal_datang" type="date" @change="validate()" :min="now()" class="form-control col-12" disabled>
+                    <input v-model="ket.tanggal_datang" type="date" @change="validate()" :min="now()" class="form-control col-12" disabled  :disabled="lpo.status==='Request' || lpo.status==='Acc' || lpo.status==='Selesai'">
                 </div>
                 <div class="form-group">
                     <label>keterangan</label>
-                    <textarea v-model="lpo.keterangan"   name="keterangan" class="form-control col-12" disabled></textarea>
+                    <textarea v-model="ket.keterangan"   name="keterangan" class="form-control col-12"  :disabled="lpo.status==='Request' || lpo.status==='Acc' || lpo.status==='Selesai'"></textarea>
                 </div>
             </div>
         </div>
@@ -206,6 +206,47 @@
                 </div>                
             </div>
         </div>
+        <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div  class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Purchase</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Suplier</label>
+                        <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisible" v-text="supply ? supply.nama:''"></div>
+                        <div class="placeholder" v-if="supply==null">Pilih Supplier</div>
+                        <div class="popover" v-show="visible">
+                            <input type="text"
+                            @keydown.up="atas"
+                            @keydown.down="down"
+                            @keydown.enter="selectItem"
+                            v-model="query"
+                            placeholder="Masukan nama Supplier .."
+                            >
+                            <div class="option" ref="optionList">
+                                <ul>
+                                    <li v-for="(match,index) in matches" 
+                                    :key="match.kode"
+                                    v-text="match.nama"
+                                    :class="{'selected':(selected==index)}"
+                                    @click="itemClicked(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button @click="resetForm()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -231,19 +272,34 @@ export default {
             confirm:{
                 status:'Request'
             },
-            up:{}
+            up:{},
+            visible:false,
+            query:'',
+            selected:0,
+            supply:null,
+            itemHeight:39,
+            supplier:[],
+            ket:{},
+            upload:{}
         }
     },
     created(){
         this.getPr();
         this.getPo();
         this.getListPo();
+        this.getSupplier();
     },  
     computed:{  
             FilteredSatuan(){
             return this.pr.filter(elem => {
             return elem.kode_barang.toLowerCase().includes(this.chooseItem);
             })
+        },
+            matches(){
+                if(this.query==''){
+                    return [];
+                }
+                return this.supplier.filter((item)=> item.nama.toLowerCase().includes(this.query.toLowerCase()))
         }
     },
     methods:{
@@ -271,7 +327,17 @@ export default {
         },
         getPo(){
             axios.get("/api/po/"+ this.$route.params.nomor)
-            .then(res=>this.po=res.data.data);
+            .then(res=>{this.po=res.data.data
+                this.ket.kode_supplier=this.po[0].kode_supplier;
+                this.ket.nama=this.po[0].supplier;
+                this.ket.keterangan=this.po[0].keterangan;
+                this.ket.tanggal_datang=this.po[0].tanggal_datang;
+            });
+        },
+        getSupplier(){
+            axios.get("/api/supplier")
+            .then(res=>{this.supplier=res.data.data;
+            });
         },
         now(){
             var d = new Date();
@@ -282,8 +348,8 @@ export default {
             return output
             },
         validate(){
-            if(this.so.tanggal_so < this.now()){
-                this.so.tanggal_so=this.now();
+            if(this.po.tanggal_po < this.now()){
+                this.po.tanggalpso=this.now();
             }
         },
         tglKirim(){
@@ -350,6 +416,9 @@ export default {
             }
         },
         submitPo(lpo){
+            this.confirm.kode_supplier=this.ket.kode_supplier;
+            this.confirm.keterangan=this.ket.keterangan;
+            this.confirm.tanggal_datang=this.ket.tanggal_datang;
             let tanya=confirm("Apakah anda yakin ingin mengirim PO ini?");
             if(tanya===true){
             axios.put("/api/po/"+lpo.nomor_po,this.confirm)
@@ -360,7 +429,43 @@ export default {
         },
         kembali(){
             this.$router.push({name:'po'})
-        }
+        },
+        pilihsupplier(){
+            $("#modal-po").modal("show");
+        },
+        toggleVisible(){
+            this.visible = !this.visible;
+        },
+        itemClicked(index){
+            this.selected=index;
+            this.selectItem();
+        },
+        selectItem(){
+            this.supply = this.matches[this.selected];
+            this.ket.kode_supplier=this.supply.kode_supplier;
+            this.ket.nama=this.supply.nama;
+            this.visible=false;
+        },
+        atas(){
+            if(this.selected==0){
+                return;
+            }
+            this.selected -= 1;
+            this.scrollToItem();
+        },
+        down(){
+            if(this.selected >= this.matches.length -1 ){
+                return;
+            }
+            this.selected += 1;
+            this.scrollToItem();
+        },
+        scrollToItem(){
+            this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
+        },
+
+
+
     },
 }
 </script>
