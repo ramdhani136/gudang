@@ -1,5 +1,5 @@
 <template>
-    <div class="container"  @keyup.esc="resetForm()">
+    <div id="barang" class="container"  @keyup.esc="resetForm()">
         <button @click="showmodal()" class="btn btn-success my-3">+ Tambah Barang</button>
         <div class="form-group col-3 my-3 float-right">
             <input v-model="search"  type="text" class="form-control" placeholder="Search">
@@ -139,7 +139,7 @@ export default {
         }
     },
     created(){
-        this.getBarang()
+        this.getBarang();
     },
     computed:{
         filteredMembers(){
@@ -151,10 +151,10 @@ export default {
                 }
             }else{
                 return this.barang.filter(elem => {
-            return elem.nama.toLowerCase().includes(this.search);
+            return elem.nama.toLowerCase().includes(this.search.toLowerCase());
             });
             }
-        }
+        },
     },
     methods:{
         getBarang(){

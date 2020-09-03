@@ -66,6 +66,7 @@
                             <th>Harga</th>
                             <th>Sub Total</th>
                             <th>Status</th>
+                            <th>Sudah kirim</th>
                             <th v-if="ket.status=='Tidak Tersedia'">Estimasi Tersedia</th>
                         </tr>
                     </thead>
@@ -80,6 +81,7 @@
                             <td style="text-align:center" v-if="ket.status=='Tersedia'">{{ts.harga*ts.qty_tersedia | currency}}</td>
                             <td style="text-align:center" v-if="ket.status=='Tidak Tersedia'">{{ts.harga*ts.qty_tdktersedia | currency}}</td>
                             <td style="text-align:center">{{ket.status}}</td>
+                            <td style="text-align:center">{{sk.qty[index]}}</td>
                             <td style="text-align:center" v-if="ket.status=='Tidak Tersedia'">{{ts.tgl_datang}}</td>
                         </tr>
                     </tbody>
@@ -149,6 +151,9 @@ export default {
             },
             uplist:[],
             aksiup:{},
+            sk:{
+                qty:[],
+            },
         }
     },
     created(){
@@ -178,6 +183,7 @@ export default {
                             this.ket.qtypesan=this.listso[i].qty_tersedia;
                             this.ket.subtotal+=parseInt(this.listso[i].qty_tersedia)*parseInt(this.listso[i].harga);
                             this.ket.status="Tersedia";
+                            this.sk.qty[i]=this.listso[i].bbk_tersedia ;
                             this.uplist[i]={
                                 id:this.listso[i].id,
                                 statusso:this.listso[i].statusso,
@@ -193,6 +199,7 @@ export default {
                             this.ket.qtypesan=this.listso[i].qty_tdktersedia;
                             this.ket.subtotal+=parseInt(this.ket.qtypesan)*parseInt(this.listso[i].harga);
                             this.ket.status="Tidak Tersedia";
+                             this.sk.qty[i]=this.listso[i].bbk_tdktersedia ;
                             this.ket.tanggal=this.listso[i].tgl_datang;
                             this.uplist[i]={
                                 id:this.listso[i].id,

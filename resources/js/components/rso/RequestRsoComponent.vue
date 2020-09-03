@@ -132,7 +132,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="updateStatusklik(list)" class="btn btn-primary">Save changes</button>
+                    <button v-if="selesaikah" type="button" @click="updateStatusklik(list)" class="btn btn-primary">Save changes</button>
                 </div>
                 </div>
             </div>
@@ -166,6 +166,7 @@ export default {
             akses:'',
             up:{},
             load:true,
+            selesaikah:false,
         }
     },
     created(){
@@ -204,6 +205,7 @@ export default {
             $("#modal-form").modal("show");
         },
         updateStatus(list){
+            this.selesaikah=false;
             axios.put(`/api/listrso/`+this.dic.id,this.update)
             .then((response)=>{
                 this.getlistRso()
@@ -214,6 +216,7 @@ export default {
                     this.update.qty_tdktersedia=this.dic.jumlahrso
                     axios.put(`/api/listrso/`+this.dic.id,this.update)
                     this.tujuanConfirm()
+                    this.selesaikah=true;
                 }else  if(this.update.status==="Tersedia"){
                     this.getlistRso()
                     this.update.so_tdktersedia="Y";
@@ -223,6 +226,7 @@ export default {
                     axios.put(`/api/listrso/`+this.dic.id,this.update)
                     .then((response)=>{
                     this.tujuanConfirm()
+                    this.selesaikah=true;
                     })
                 }else if(this.update.status==="Tersedia Sebagian"){
                     this.getlistRso()
@@ -231,6 +235,7 @@ export default {
                     axios.put(`/api/listrso/`+this.dic.id,this.update)
                     .then((response)=>{
                     this.tujuanConfirm()
+                    this.selesaikah=true;
                     })
                 }
             })     

@@ -32,7 +32,7 @@
                             <router-link :to="{name:'viewbck',params:{bck:bk.bck}}" class="btn btn-primary">
                                     Lihat Data
                             </router-link>
-                            <button v-if="bk.status==='open'" class="btn btn-none">Print Bukti Checker</button>
+                            <button @click="print()" v-if="bk.status==='open'" class="btn btn-none">Print Bukti Checker</button>
                         </td>
                     </tr>
                 </tbody>
@@ -44,6 +44,9 @@
 
 <script>
 import {Circle5} from 'vue-loading-spinner'
+import { jsPDF } from "jspdf";
+import 'jspdf-autotable'
+
 export default {
     components: {
         Circle5
@@ -82,6 +85,16 @@ export default {
                 this.load=false;
             })
         },
+        print(){
+            const doc = new jsPDF({
+            orientation: "landscape",
+            unit: "in",
+            });
+            doc.setFontSize(16);
+            doc.text("Form Bukti Checker Keluar", 0.3, 0.3);
+            window.open(doc.output('bloburl'), '_blank')
+            /*doc.save("bck.pdf"); */  
+        }
     }
 }
 </script>
