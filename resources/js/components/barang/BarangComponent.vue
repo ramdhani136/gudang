@@ -287,7 +287,8 @@ export default {
                 this.getBarang();
                 $("#modal-form").modal("hide");
             }
-        }
+        },
+        
     }
 }
 </script>

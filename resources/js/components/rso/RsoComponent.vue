@@ -1,6 +1,7 @@
 <template>
     <div class="container">
-        <button @click="showmodal()" class="btn btn-success my-3">+ Tambah RSO</button>
+        <router-link to="/rso/create" class="btn btn-success my-3" >+ Input RSO</router-link>
+        <!-- <button @click="showmodal()" class="btn btn-success my-3">+ Tambah RSO</button> -->
         <div class="form-group col-3 my-3 float-right">
             <input v-model="search"  type="text" class="form-control" placeholder="Search">
         </div>
@@ -32,7 +33,7 @@
                             <td>{{rs.customer}}</td>
                             <td v-if="rs.status=='Draft'" style="text-align:center">
                                 <router-link :to="{name:'formrso',params:{id:rs.nomor_rso}}" class="btn btn-primary" >
-                                    Input Detail
+                                    Pilih RSO
                                 </router-link>
                                 <button @click="deleteRso(rs)" class="btn btn-danger">Hapus</button>
                             </td>
@@ -206,16 +207,47 @@ export default {
             });
         },
         deleteRso(rso){
-            let keputusan=confirm('Apakah anda yakin?');
-            if(keputusan===true){
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin menghapus RSO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, hapus!',
+            cancelButtonText: 'Batalkan!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
                 axios.delete("/api/rso/" + rso.nomor_rso)
                 .then(response=>{
                     this.getRso();
+                    swalWithBootstrapButtons.fire(
+                    'Deleted!',
+                    'Berhasil Menghapus RSO.',
+                    'success'
+                    )
                 })
                 .catch(error=>{
                     console.log(error)
                 })
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batal menghapus RSO ini :)',
+                'error'
+                )
             }
+            })
         },
         showmodal(){
             $("#modal-form").modal("show");

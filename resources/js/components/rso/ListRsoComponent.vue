@@ -18,10 +18,10 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>Customer</label>
-                    <select v-if="disabled"  v-model="rlist.kode_customer" name="customer" class="col-12 form-control" :disabled="disabled == 1">
+                    <select v-model="rlist.kode_customer" name="customer" class="col-12 form-control" disabled>
                         <option v-for="custom in customers" :key="custom.kode" :value="custom.kode" >{{custom.nama}}</option>
                     </select>
-                    <div v-if="!disabled">
+<!--                     <div v-if="!disabled">
                     <div class="autocomplete"></div>
                         <div class="input" @click="toggleVisiblecust" v-text="custom2 ? custom2.nama:''"></div>
                         <div class="placeholder" v-if="custom2==null" v-text="ketcust.customer">Pilih Customer</div>
@@ -43,7 +43,7 @@
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="form-group">
                     <label>Sales</label>
@@ -68,10 +68,10 @@
             </div>
         </div>
         <div class="row m-auto" v-for="rlist in form" :key="rlist.id">
-            <button v-if="rlist.status=='Draft'" @click="showmodal()" type="button" class="btn btn-success mt-3">+ Tambah Barang</button>
-            <div v-if="rlist.status=='Draft'" id="total" class="mt-3 ml-auto">Total Invoice :&nbsp; {{total | currency}}</div>
+            <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{total | currency}}</div>
         </div>
         <div id="rsoverflow" class="row mt-2 mx-auto" v-for="rlist in form" :key="rlist.id">
+            <button v-if="rlist.status=='Draft'" @click="showmodal()" type="button" class="btn btn-success mt-3">+ Tambah Barang</button>
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
                 <thead>
                     <tr>
@@ -332,7 +332,7 @@ export default {
                 this.inprso.nomor_rso=rlist.nomor_rso
                 this.inprso.tanggal_rso=rlist.tanggal_rso  
                 this.inprso.nip_sales=rlist.nip_sales 
-                this.inprso.kode_customer=rlist.kode_customer 
+               /*  this.inprso.kode_customer=rlist.kode_customer */ 
                 this.inprso.keterangan=rlist.keterangan 
     
             }else{
@@ -345,7 +345,7 @@ export default {
                 this.inprso.nip_sales=rlist.nip_sales 
                 this.inprso.kode_customer=rlist.kode_customer 
                 this.inprso.keterangan=rlist.keterangan 
-                this.inprso.kode_customer=rlist.kode_customer
+               /*  this.inprso.kode_customer=rlist.kode_customer */
                 this.ketcust.customer=rlist.customer
                 this.visiblecust=false
             }
@@ -450,14 +450,46 @@ export default {
             .then(res=>this.sales=res.data.data)
         },
         updateStatus(){
-            let tanya=confirm('Apakah yakin ingin mengirim RSO ini ke DIC?');
-            if(tanya===true){
-                this.urso.status="Sent"
-                axios.put(`/api/rso/${this.$route.params.id}`,this.urso)
-                .then((response)=>{
-                    this.$router.push({name:'rso'}) 
+                const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
                 })
-            }
+
+                swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin mengirim RSO ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, yakin!',
+                cancelButtonText: 'Batalkan!',
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    this.urso.status="Sent"
+                    axios.put(`/api/rso/${this.$route.params.id}`,this.urso)
+                    .then((response)=>{
+                        this.$router.push({name:'rso'}) 
+                        swalWithBootstrapButtons.fire(
+                        'Success!',
+                        'RSO berhasil di kirim.',
+                        'success'
+                        )
+                    })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    this.$router.push({name:'rso'}) 
+                    swalWithBootstrapButtons.fire(
+                    'Cancelled',
+                    'Batal mengirim RSO :)',
+                    'error'
+                    )
+                }
+                })
         },
         resetform(){
             this.getlistRso()
@@ -549,7 +581,7 @@ export default {
         },
         selectItemCust(){
             this.custom2 = this.custmatches[this.selected];
-            this.inprso.kode_customer=this.custom2.kode
+            /* this.inprso.kode_customer=this.custom2.kode */
             this.visiblecust=false;
         },
         upcust(){

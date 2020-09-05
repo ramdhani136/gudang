@@ -11,6 +11,7 @@ import Vue from 'vue'
 import router from './Router/router.js'
 import VueCurrencyFilter from 'vue-currency-filter'
 
+
 Vue.use(VueCurrencyFilter,
     {
         symbol : 'Rp.',
@@ -20,10 +21,6 @@ Vue.use(VueCurrencyFilter,
         symbolPosition: 'front',
         symbolSpacing: true
     })
-
-
-
-
 
 
 /**
