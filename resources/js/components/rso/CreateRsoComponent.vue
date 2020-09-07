@@ -237,7 +237,10 @@ export default {
             subtotal:0,
             inhitung:{
                 qty:[]
-            }
+            },
+            cek:'',
+            init:'',
+            banding:''
         }
     },
     created(){
@@ -408,11 +411,21 @@ export default {
                 reverseButtons: true
                 }).then((result) => {
                 if (result.value) {
-
-                    /* script input */
                     if(this.listpr.length>0){
-                            this.upload.status="Draft";
-                            console.log(this.upload);
+                        this.init="";
+                        this.cek="";
+                        this.banding="";
+                        for(let j=0;j<this.listpr.length;j++){
+                            if(this.hitung.qty[j]===undefined || this.hitung.qty[j]==="" ){
+                                this.init="N";
+                            }else{
+                                this.init="Y";
+                            }
+                            this.cek+=this.init;
+                            this.banding+="Y";
+                        }
+                        if(this.cek===this.banding){
+                            this.upload.status="Sent";
                             axios.post("/api/rso",this.upload)
                             .then(res=>{
                                 for(let i=0;i<this.listpr.length;i++){
@@ -424,15 +437,28 @@ export default {
                                     ,catatan:this.hitung.keterangan[i],}
                                     axios.post("/api/listrso",this.uplist)
                                     .then(res=>{
-                                        swalWithBootstrapButtons.fire(
-                                        'Save!',
-                                        'Berhasil menambahkan RSO.',
-                                        'success'
-                                        )
                                         this.$router.push({name:'rso'}) 
                                     })
                                 }
+                                swalWithBootstrapButtons.fire(
+                                        'Save!',
+                                        'Berhasil mengirimkan RSO.',
+                                        'success'
+                                    )
+                            }).catch(error=>{
+                                Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Cek kembali rincian rso anda!',
+                                })
                             })
+                        }else{
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Qty item tidak boleh kosong',
+                                })
+                        }      
                         }else{
                             Swal.fire({
                             icon: 'error',
@@ -441,7 +467,7 @@ export default {
                         })
                         } 
                 } else if (
-                    /* Read more about handling dismissals below */
+
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
                     swalWithBootstrapButtons.fire(
@@ -471,11 +497,21 @@ export default {
                 reverseButtons: true
                 }).then((result) => {
                 if (result.value) {
-
-                    /* script input */
                     if(this.listpr.length>0){
+                        this.init="";
+                        this.cek="";
+                        this.banding="";
+                        for(let j=0;j<this.listpr.length;j++){
+                            if(this.hitung.qty[j]===undefined || this.hitung.qty[j]==="" ){
+                                this.init="N";
+                            }else{
+                                this.init="Y";
+                            }
+                            this.cek+=this.init;
+                            this.banding+="Y";
+                        }
+                        if(this.cek===this.banding){
                             this.upload.status="Draft";
-                            console.log(this.upload);
                             axios.post("/api/rso",this.upload)
                             .then(res=>{
                                 for(let i=0;i<this.listpr.length;i++){
@@ -487,15 +523,28 @@ export default {
                                     ,catatan:this.hitung.keterangan[i],}
                                     axios.post("/api/listrso",this.uplist)
                                     .then(res=>{
-                                        swalWithBootstrapButtons.fire(
-                                        'Save!',
-                                        'Berhasil menambahkan Draft RSO.',
-                                        'success'
-                                        )
                                         this.$router.push({name:'rso'}) 
                                     })
                                 }
+                                swalWithBootstrapButtons.fire(
+                                        'Save!',
+                                        'Berhasil menyimpan draft RSO.',
+                                        'success'
+                                    )
+                            }).catch(error=>{
+                                Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Cek kembali rincian rso anda!',
+                                })
                             })
+                        }else{
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Qty item tidak boleh kosong',
+                                })
+                        }      
                         }else{
                             Swal.fire({
                             icon: 'error',
@@ -504,12 +553,12 @@ export default {
                         })
                         } 
                 } else if (
-                    /* Read more about handling dismissals below */
+
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
                     swalWithBootstrapButtons.fire(
                     'Cancelled',
-                    'Batal mengirim RSO :)',
+                    'Batal menyimpan Draft :)',
                     'error'
                     )
                 }

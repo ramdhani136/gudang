@@ -272,7 +272,11 @@ export default {
                         }              
                     }
                 }else{
-                    alert("pastikan data sudah dilengkapi!")
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Pastikan data sudah di input semua!',
+                        })
                 }
             }
         },
