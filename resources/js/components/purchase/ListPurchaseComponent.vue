@@ -196,9 +196,25 @@ export default {
                 $("#modal-form").modal("hide");
             })     
         },
-        ConfirmRso(rs){    
-            let tanya=confirm("Yakin kirim estimasi barang ini?");
-            if(tanya===true){
+        ConfirmRso(rs){  
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin mengkonfirmasi RSO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Yakin!',
+            cancelButtonText: 'Batalkan!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
                 this.ketban="";
                 this.nilai="";
                 for(let k=0;k<this.banding.length;k++){
@@ -221,6 +237,11 @@ export default {
                         this.konfirm.keterangan=rs.keterangan;
                         axios.put(`/api/rso/`+rs.nomor_rso,this.konfirm)
                         .then((response)=>{
+                             swalWithBootstrapButtons.fire(
+                                    'Berhasil!',
+                                    'RSO berhasil di konfirmasi.',
+                                    'success'
+                                    ) 
                             this.$router.push({name:'purchase'});
                         })
                     }else{
@@ -257,7 +278,12 @@ export default {
                                             })  
                                         }
                                     })
-                                    })        
+                                    })  
+                                    swalWithBootstrapButtons.fire(
+                                    'Berhasil!',
+                                    'RSO berhasil di konfirmasi.',
+                                    'success'
+                                    )        
                                 })
                         }else{
                             this.konfirm.status='Confirmed';
@@ -269,7 +295,12 @@ export default {
                             .then((response)=>{
                                 this.$router.push({name:'purchase'});
                             })
-                        }              
+                        }   
+                        swalWithBootstrapButtons.fire(
+                        'Berhasil!',
+                        'RSO berhasil di konfirmasi.',
+                        'success'
+                        )           
                     }
                 }else{
                     Swal.fire({
@@ -278,7 +309,17 @@ export default {
                         text: 'Pastikan data sudah di input semua!',
                         })
                 }
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Batal',
+                'RSO batal di konfirmasi :)',
+                'error'
+                )
             }
+            })
         },
         resetForm(){
             this.getlistRso()

@@ -13,9 +13,12 @@
                 <option value="Di Selesaikan">Di Selesaikan</option>
             </select>
         </div>
-        <div class="row">
+        <!-- <div class="row">
             <router-link to="/so/create/" class="btn btn-success my-3" >+ Create SO</router-link>
-        </div> 
+        </div>  -->
+            <div class="row">
+                <router-link to="/so/new" class="btn btn-success my-3" >+ Create SO</router-link>
+            </div> 
             <div id="overflow" class="border-top">
             <table id="thead" class="table table-striped table-bordered" style="width:100%">
                     <thead>
@@ -31,14 +34,16 @@
                     <tbody>
                         <tr v-for="(rs , index) in FilterKategori" :key="rs.nomor_so">
                             <td style="text-align:center">{{index+1}}</td>
-                            <td style="text-align:center">{{rs.nomor_so}}</td>
+                            <td style="text-align:center">
+                                <router-link :to="{name:'formso',params:{id:rs.nomor_so,rso:rs.nomor_rso}}" class="btn btn-none " >
+                                    {{rs.nomor_so}}
+                                </router-link>
+                            </td>
                             <td style="text-align:center">{{rs.tanggal_so}}</td>
                             <td>{{rs.customer}}</td>
                             <td style="text-align:center">{{rs.tanggal_kirim}}</td>
                             <td  style="text-align:center">
-                                <router-link :to="{name:'formso',params:{id:rs.nomor_so,rso:rs.nomor_rso}}" class="btn btn-primary" >
-                                    Lihat Detail
-                                </router-link>
+                                <button @click="batalSo(rs)" v-if="rs.status=='Acc' || rs.status=='Sent'" class="btn btn-danger">Batalkan</button>
                                 <button @click="deleteSo(rs)" v-if="rs.status=='Draft' || rs.status=='Tolak'" class="btn btn-danger">Hapus</button>
                                 <button @click="requestselesai(rs)"  v-if="rs.status==='Acc' && rs.rs==='N'" class="btn btn-orange">Request Selesai</button>
                                 <button @click="batalselesai(rs)"  v-if="rs.status==='Acc' && rs.rs==='Y'" class="btn btn-none">Batal Request</button>
@@ -154,9 +159,25 @@ export default {
             });
         },
         deleteSo(rs){
-            let keputusan=confirm('yakin ingin menghapus SO ini?');
-            if(keputusan==true){
-                if(rs.statusso==="tersedia"){
+                const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+                })
+
+                swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menghapus SO ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin',
+                cancelButtonText: 'Tidak',
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    if(rs.statusso==="tersedia"){
                     this.update.status="Confirmed";
                     axios.put("/api/rso/"+rs.nomor_rso,this.update)
                     .then(res=>{
@@ -181,6 +202,11 @@ export default {
                                 this.getSo();
                             })
                         });
+                        swalWithBootstrapButtons.fire(
+                        'Deleted!',
+                        'SO berhasil di hapus.',
+                        'success'
+                        )
                     });
                 }else{
                     this.update.status="Confirmed";
@@ -202,38 +228,115 @@ export default {
                             .then(res=>{
                                 this.getSo();
                             })
+                            swalWithBootstrapButtons.fire(
+                            'Deleted!',
+                            'SO berhasil di hapus.',
+                            'success'
+                            )
                         });
                     });
                     
                 }
-            }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                    'Cancelled',
+                    'Batal menghapus SO ini :)',
+                    'error'
+                    )
+                }
+                })
         },
         requestselesai(rs){
             this.nso=rs.nomor_so;
             $("#modal-selesai").modal("show");
         },
         kirimselesai(){
-            let tanya=confirm("Apakah anda yakin?");
-            if(tanya===true){
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin menyelesaikan SO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, Yakin!',
+            cancelButtonText: 'Tidak',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
                 this.input.rs="Y";
-                console.log(this.input);
                 axios.put("/api/so/"+this.nso,this.input)
                 .then(res=>{
                     this.getSo();
+                    this.input={};
+                    swalWithBootstrapButtons.fire(
+                    'Sukses!',
+                    'Berhasil melakukan request pembatalan SO.',
+                    'success'
+                    )
                     $("#modal-selesai").modal("hide");
                 });
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batal melakukan request pembatalan:)',
+                'error'
+                )
             }
+            })
         },
         batalselesai(rs){
-            let tanya=confirm("Apakah anda yakin?");
-            if(tanya===true){
-            this.input.rs="N";
-            this.input.alasselesai="";
-                axios.put("/api/so/"+rs.nomor_so,this.input)
-                .then(res=>{
-                    this.getSo();
-                });
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin membatalkan request Selesai SO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, Yakin!',
+            cancelButtonText: 'Tidak!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
+                this.input.rs="N";
+                this.input.alasselesai="";
+                    axios.put("/api/so/"+rs.nomor_so,this.input)
+                    .then(res=>{
+                        this.getSo();
+                        swalWithBootstrapButtons.fire(
+                        'Sukses!',
+                        'Request Selesai berhasil dibatalkan.',
+                        'success'
+                        )
+                    });
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batalkan melakukan permintaan :)',
+                'error'
+                )
             }
+            })
         },
         infoTolak(rs){
             this.nso=rs.nomor_so;
@@ -245,13 +348,44 @@ export default {
             $("#modal-selesai").modal("show");
         },
         bukalagi(rs){
-            let tanya=confirm("Apakah anda yakin");
-            if(tanya===true){
-                axios.put("/api/so/"+rs.nomor_so,{status:'Acc',rs:'N',alasselesai:'',alastolakselesai:''})
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin membuka kembali SO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, Yakin!',
+            cancelButtonText: 'Tidak!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
+                 axios.put("/api/so/"+rs.nomor_so,{status:'Acc',rs:'N',alasselesai:'',alastolakselesai:''})
                 .then(res=>{
                     this.getSo();
+                    swalWithBootstrapButtons.fire(
+                    'Sukses!',
+                    'Berhasil membuka ulang SO.',
+                    'success'
+                    )
                 })
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batal membuka ulang SO :)',
+                'error'
+                )
             }
+            })
         }
     }
 }

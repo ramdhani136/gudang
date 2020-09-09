@@ -113,6 +113,11 @@ export default {
                 .then((response)=>{
                     this.getEkspedisi();
                     $("#modal-form").modal("hide");
+                    Swal.fire({
+                    icon: 'success',
+                    title: 'Sukses...',
+                    text: 'Data ekspedisi berhasil ditambahkan!',
+                    })
                     this.resetForm();
                 })
                 .catch(error=>{
@@ -129,6 +134,11 @@ export default {
                 .then((response)=>{
                     this.getEkspedisi();
                     $("#modal-form").modal("hide");
+                    Swal.fire({
+                    icon: 'success',
+                    title: 'Sukses...',
+                    text: 'Data ekspedisi berhasil di perbarui!',
+                    })
                     this.resetForm()
                 })
                 .catch(error=>{
@@ -153,16 +163,47 @@ export default {
             this.showmodal();
         },
         deleteEkspedisi(eks){
-            let keputusan=confirm('Apakah anda yakin?');
-            if(keputusan===true){
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin menghapus data ekspedisi ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, Yakin!',
+            cancelButtonText: 'Tidak!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
                 axios.delete("/api/ekspedisi/" + eks.id)
                 .then(response=>{
                     this.getEkspedisi();
+                    swalWithBootstrapButtons.fire(
+                    'Deleted!',
+                    'Data ekspedisi berhasil di hapus.',
+                    'success'
+                    )
                 })
                 .catch(error=>{
                     console.log(error)
                 })
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batal menghapus ekspedisi ini :)',
+                'error'
+                )
             }
+            })
         },
         resetForm(){
             this.form.nama="";

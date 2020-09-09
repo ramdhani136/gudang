@@ -436,14 +436,45 @@ export default {
             this.$router.push({name:'so'})
         },
         submitSend(){
-            let keputusan=confirm("yakin ingin mengirim SO ini?");
-            if(keputusan===true){
-                this.ubah.status="Sent";
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin mengirim SO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, Yakin!',
+            cancelButtonText: 'Tidak!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
+                 this.ubah.status="Sent";
                 axios.put("/api/so/"+this.$route.params.id,this.ubah)
                 .then(res=>{
+                    swalWithBootstrapButtons.fire(
+                    'Sukses!',
+                    'Berhasil mengirim SO.',
+                    'success'
+                    )
                     this.$router.push({name:'so'})
                 });
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batal melakukan permintaan :)',
+                'error'
+                )
             }
+            })
         },
         getdisabled(){
             this.disabled = (this.disabled + 1) % 2;

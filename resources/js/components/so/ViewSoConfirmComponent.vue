@@ -237,8 +237,24 @@ export default {
             }
         },
         confirmSO(lso){
-            let keputusan=confirm('Apakah anda yakin ingin menerima SO ini?');
-            if(keputusan===true){
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin menerima SO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, Yakin!',
+            cancelButtonText: 'Tidak!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
                 this.up.nomor_so=lso.nomor_so;
                 this.up.tanggal_so=lso.tanggal_so;
                 this.up.tanggal_kirim=lso.tanggal_kirim;
@@ -256,15 +272,45 @@ export default {
                         this.aksiup={statusso:this.uplist[d].statusso,dateaccso:this.DateTime(),};
                         axios.put("/api/listrso/"+this.uplist[d].id,this.aksiup)
                         .then(res=>{
-                            console.log("tes");
                         });
                     }
-                })
+                    swalWithBootstrapButtons.fire(
+                    'Selesai!',
+                    'SO Berhasil di terima !',
+                    'success'
+                    )
+                })  
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Batal',
+                'SO Batal diterima :)',
+                'error'
+                )
             }
+            })
         },
         tolakSo(lso){
-            let keputusan=confirm('Apakah anda yakin ingin menolak SO ini?');
-            if(keputusan===true){
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin menolak SO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, Yakin!',
+            cancelButtonText: 'Tidak!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
                 this.up.nomor_so=lso.nomor_so;
                 this.up.tanggal_so=lso.tanggal_so;
                 this.up.tanggal_kirim=lso.tanggal_kirim;
@@ -274,9 +320,24 @@ export default {
                 axios.put("/api/so/"+this.up.nomor_so,this.up)
                 .then((response)=>{
                         $("#modal-form").modal("hide");
+                        swalWithBootstrapButtons.fire(
+                        'Sukses!',
+                        'SO berhasil di tolak !',
+                        'success'
+                         )
                         this.$router.push({name:'soconfirm'})
                 })
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batal melakukan penolakan :)',
+                'error'
+                )
             }
+            })
         },
         DateTime(){
             this.date = new Date(); 

@@ -7,6 +7,7 @@ use App\Model\Rso\Rso;
 use App\Model\Rso\Listrso;
 use App\Model\Bck\Bck;
 use App\Model\Retur\Retur;
+use App\Model\So\Listso;
 
 class So extends Model
 {
@@ -23,6 +24,10 @@ class So extends Model
 
     public function retur(){
         return $this->hasMany(retur::class,'nomor_so','nomor_so');
+    }
+
+    public function listso(){
+        return $this->hasMany(listso::class,'nomor_so','nomor_so');
     }
 
 

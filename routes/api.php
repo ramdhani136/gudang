@@ -106,3 +106,5 @@ Route::resource('listretur','Retur\ListReturController');
 
 Route::resource('user','User\UserController');
 
+Route::resource('listso','So\ListSoController');
+

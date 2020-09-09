@@ -208,6 +208,11 @@ export default {
                         this.getItem();
                         this.resetForm();
                         this.tampil=false;
+                        Swal.fire({
+                        icon: 'success',
+                        title: 'Done...',
+                        text: 'Berhasil menambahkan harga spesial!',
+                        })
                         $("#modal-form").modal("hide");    
                     })
                 }else{
@@ -219,6 +224,11 @@ export default {
                     this.getItem();
                     this.resetForm();
                     this.tampil=false;
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Done...',
+                        text: 'Berhasil menambahkan harga spesial!',
+                        })
                     $("#modal-form").modal("hide");    
                     })
                 }

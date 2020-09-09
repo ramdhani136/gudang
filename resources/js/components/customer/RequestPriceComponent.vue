@@ -176,29 +176,91 @@ export default {
             this.edit=false;
         },
         terima(ln){
-            let tanya=confirm("Yakin menerima permintaan ini?");
-            if(tanya===true){
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin menerima permintaan ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, Yakin!',
+            cancelButtonText: 'Tidak!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
                 axios.put("/api/custprice/"+ln.id,{status:'Aktif'})
                 .then(res=>{
                     this.getlist();
+                    swalWithBootstrapButtons.fire(
+                    'Sukses!',
+                    'Menerima permintaan harga.',
+                    'success'
+                    )
                 })
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batal menerima permintaa harga :)',
+                'error'
+                )
             }
+            })
         },
         tolak(ln){
             this.ket.id=ln.id;
             $("#modal-tolak").modal("show");
         },
         kirimTolak(){
-            let tanya=confirm("Yakin ingin menolak permintaan ini?");
-            if(tanya===true){
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin menolak permintaan ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, Yakin!',
+            cancelButtonText: 'Tidak!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
                 this.up.alastolak=this.ket.tolak;
                 this.up.status="Di Tolak";
                 axios.put("/api/custprice/"+this.ket.id,this.up)
                 .then(res=>{
                     this.getlist();
                     $("#modal-tolak").modal("hide");
+                    swalWithBootstrapButtons.fire(
+                    'Sukses!',
+                    'Berhasil menolak permintaan ini.',
+                    'success'
+                    )
                 })
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batal menolak permintaan ini :)',
+                'error'
+                )
             }
+            })
         }
     }
 }

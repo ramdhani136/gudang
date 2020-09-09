@@ -276,8 +276,24 @@ export default {
             this.dic.kode="";
         },
         ConfirmRso(up){
-            let keputusan=confirm('Apakah anda yakin ingin mengkonfirmasi RSO ini?');
-            if(keputusan===true){
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Anda ingin mengkonfirmasi RSO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Yakin!',
+            cancelButtonText: 'Batalkan!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
                 this.urso.kode_customer=up.kode_customer
                 this.urso.status=this.akses
                 this.urso.nomor_rso=up.nomor_rso
@@ -291,7 +307,22 @@ export default {
                     }) 
                     this.$router.push({name:'dic'})
                 })
+                swalWithBootstrapButtons.fire(
+                'Berhasil!',
+                'RSO berhasil di konfirmasi!.',
+                'success'
+                )
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Batal',
+                'RSO batal di konfirmasi :)',
+                'error'
+                )
             }
+            })
         },
         tujuanConfirm(){
             axios.get(`/api/listrso/${this.$route.params.id}`)

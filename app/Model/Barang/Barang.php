@@ -10,6 +10,7 @@ use App\Model\Bbm\Listbbm;
 use App\Model\Bck\Listbck;
 use App\Model\Bck\Listbbk;
 use App\Model\Retur\Listretur;
+use App\Model\So\Listso;
 
 class Barang extends Model
 {
@@ -42,5 +43,9 @@ class Barang extends Model
 
     public function listretur(){
         return $this->hasMany(listretur::class,'kode_barang','kode');
+    }
+
+    public function listso(){
+        return $this->hasMany(Listso::class,'kode_barang','kode');
     }
 }

@@ -416,11 +416,27 @@ export default {
             $("#modal-po").modal("hide"); 
         },
         draftSo(){
-            let keputusan=confirm("Simpan Draft?");
+             const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "ingin menyimpan draft SO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Yakin!',
+            cancelButtonText: 'Batalkan!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
             this.banding2.jumlah="";
             this.banding2.penyama="";
-            if(keputusan===true){
-                if(this.listso.length>0){
+                if(this.listso.length>0)    {
                     if(this.statuspo===true){
                         this.up.statusso="tersedia";
                         axios.post("/api/so",this.up)
@@ -450,6 +466,11 @@ export default {
                                             });
                                         });
                                 };
+                                 Swal.fire({
+                                    icon: 'success',
+                                    title: 'Save!...',
+                                    text: 'berhasil menyimpan draft SO!',
+                                    })  
                             });    
                     }else{
                         this.up.statusso="tidaktersedia";
@@ -480,19 +501,54 @@ export default {
                                             });
                                         });
                                 };
+                                 Swal.fire({
+                                    icon: 'success',
+                                    title: 'Save!...',
+                                    text: 'Berhasil menyimpan draft SO!',
+                                    })  
                             }); 
                     }
                 }else{
-                    this.gagal=true;
+                    Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal menyimpan draft SO...',
+                    text: 'Periksa kembali form SO anda!',
+                    })
                 }
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Batal',
+                'Batal menyimpan draft SO ini :)',
+                'error'
+                )
             }
+            })      
         },
         submitSo(){
-            let keputusan=confirm("Yakin Ingin membuat SO ini?");
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "ingin mengirim SO ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Yakin!',
+            cancelButtonText: 'Batalkan!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
             this.banding2.jumlah="";
             this.banding2.penyama="";
-            if(keputusan===true){
-                if(this.listso.length>0){
+                if(this.listso.length>0)    {
                     if(this.statuspo===true){
                         this.up.statusso="tersedia";
                         this.up.status="Sent";
@@ -523,6 +579,11 @@ export default {
                                             });
                                         });
                                 };
+                                 Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sent!...',
+                                    text: 'berhasil mengirim SO!',
+                                    })  
                             });    
                     }else{
                         this.up.statusso="tidaktersedia";
@@ -554,12 +615,31 @@ export default {
                                             });
                                         });
                                 };
+                                 Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sent!...',
+                                    text: 'Berhasil mengirim SO!',
+                                    })  
                             }); 
                     }
                 }else{
-                    this.gagal=true;
+                    Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal mengirim SO...',
+                    text: 'Periksa kembali form SO anda!',
+                    })
                 }
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Batal',
+                'Batal mengirim SO ini :)',
+                'error'
+                )
             }
+            })      
         },
         hapuslistSo(ls){
             let keputusan=confirm("Yakin ingin menghapus item ini?");
