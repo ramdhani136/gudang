@@ -22,7 +22,7 @@ class ListSoResource extends JsonResource
             'statusso'=>$this->so->statusso,
             'kode_barang'=>$this->kode_barang,
             'nama_barang'=>$this->barang->nama,
-            'satuan '=>$this->barang->satuan,
+            'satuan'=>$this->barang->satuan,
             'harga'=>$this->harga,
             'id_custprice'=>$this->id_custprice,
             'qty'=>$this->qty,
@@ -31,6 +31,7 @@ class ListSoResource extends JsonResource
             'bck'=>$this->bck,
             'bbk'=>$this->bbk,
             'tersedia'=>$this->tersedia,
+            'qtyrso'=>$this->qtyrso,
         ];
     }
 }

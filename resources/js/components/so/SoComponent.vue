@@ -35,7 +35,7 @@
                         <tr v-for="(rs , index) in FilterKategori" :key="rs.nomor_so">
                             <td style="text-align:center">{{index+1}}</td>
                             <td style="text-align:center">
-                                <router-link :to="{name:'formso',params:{id:rs.nomor_so,rso:rs.nomor_rso}}" class="btn btn-none " >
+                                <router-link :to="{name:'viewnewso',params:{id:rs.nomor_so}}" class="btn btn-none " >
                                     {{rs.nomor_so}}
                                 </router-link>
                             </td>

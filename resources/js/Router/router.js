@@ -20,7 +20,9 @@ import ListPurchaseComponent from '../components/purchase/ListPurchaseComponent.
 import CreateSoComponent from '../components/so/CreateSoComponent.vue'
 import FormCreateSoComponent from '../components/so/FormCreateSoComponent.vue'
 
+/* SO baru */
 import FormNewSoComponent from '../components/so/FormNewSoComponent.vue'
+import ViewNewSoComponent from '../components/so/ViewNewSoComponent.vue'
 
 import SoComponent from '../components/so/SoComponent.vue'
 import FormSoComponent from '../components/so/FormSoComponent.vue'
@@ -112,6 +114,7 @@ const routes=[
 
     /* coba bikin create so baru */
     {name:'formnewso', path:'/so/new', component:FormNewSoComponent},
+    {name:'viewnewso', path:'/so/view/:id', component:ViewNewSoComponent},
     
 
     {name:'datacust', path:'/price/customer', component:CustPriceComponent},

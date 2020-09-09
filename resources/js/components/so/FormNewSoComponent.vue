@@ -497,11 +497,11 @@ export default {
                         this.upload={};
                         for(let i=0;i<this.checkrso.length;i++){
                             if(this.status==='Tersedia'){
-                                this.ada=this.checkrso[i].qty_tersedia;
+                                this.ada=this.hitung.qty[i];
                             }else{
                                 this.ada=0;
                             }
-                            this.upload={nomor_so:this.up.nomor_so,kode_barang:this.checkrso[i].lkode_barang,
+                            this.upload={qtyrso:this.ket.coba[i],nomor_so:this.up.nomor_so,kode_barang:this.checkrso[i].lkode_barang,
                             harga:this.checkrso[i].harga,id_custprice:this.checkrso[i].id_custprice,qty:this.hitung.qty[i],
                             tersedia:this.ada}
                             axios.post("/api/listso",this.upload)
@@ -622,11 +622,11 @@ export default {
                         this.upload={};
                         for(let i=0;i<this.checkrso.length;i++){
                             if(this.status==='Tersedia'){
-                                this.ada=this.checkrso[i].qty_tersedia;
+                                this.ada=this.hitung.qty[i];
                             }else{
                                 this.ada=0;
                             }
-                            this.upload={nomor_so:this.up.nomor_so,kode_barang:this.checkrso[i].lkode_barang,
+                            this.upload={qtyrso:this.ket.coba[i],nomor_so:this.up.nomor_so,kode_barang:this.checkrso[i].lkode_barang,
                             harga:this.checkrso[i].harga,id_custprice:this.checkrso[i].id_custprice,qty:this.hitung.qty[i],
                             tersedia:this.ada}
                             axios.post("/api/listso",this.upload)
