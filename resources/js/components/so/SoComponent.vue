@@ -1,10 +1,10 @@
 <template>
     <div class="container">
         <div class="form-group col-3 my-3 float-right">
-            <input v-model="search"  type="text" class="form-control" placeholder="Search">
+            <input @input="pilihstatus()" v-model="search"  type="text" class="form-control" placeholder="Search">
         </div>
         <div class="form-group col-3 my-3 ml-n3 float-left">
-            <select name="status" v-model="status" class="form-control">
+            <select @change="pilihstatus()" name="status" v-model="status" class="form-control">
                 <option value="Draft">Draft SO</option>
                 <option value="Sent">Waiting list</option>
                 <option value="Acc">Open</option>
@@ -32,7 +32,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(rs , index) in FilterKategori" :key="rs.nomor_so">
+                        <tr v-for="(rs , index) in FilterKategori" :key="index">
                             <td style="text-align:center">{{index+1}}</td>
                             <td style="text-align:center">
                                 <router-link :to="{name:'viewnewso',params:{id:rs.nomor_so}}" class="btn btn-none " >
@@ -43,11 +43,13 @@
                             <td>{{rs.customer}}</td>
                             <td style="text-align:center">{{rs.tanggal_kirim}}</td>
                             <td  style="text-align:center">
-                                <button @click="batalSo(rs)" v-if="rs.status=='Acc' || rs.status=='Sent'" class="btn btn-danger">Batalkan</button>
-                                <button @click="deleteSo(rs)" v-if="rs.status=='Draft' || rs.status=='Tolak'" class="btn btn-danger">Hapus</button>
-                                <button @click="requestselesai(rs)"  v-if="rs.status==='Acc' && rs.rs==='N'" class="btn btn-orange">Request Selesai</button>
+                                <button @click="deleteSo(rs)" v-if="rs.status!=='Selesai' && rs.status!=='Di Selesaikan'  && ket.aktif[index]==true" class="btn btn-danger">Batalkan</button>
+                                <button @click="requestselesai(rs)"  v-if="rs.status==='Acc' && rs.rs==='N' && ket.aktif[index]==false" class="btn btn-orange">Request Selesai</button>
                                 <button @click="batalselesai(rs)"  v-if="rs.status==='Acc' && rs.rs==='Y'" class="btn btn-none">Batal Request</button>
-                                <button @click="bukalagi(rs)" v-if="rs.status=='Di Selesaikan'" class="btn btn-orange">Reopen SO</button>
+                                <!-- <button @click="bukalagi(rs)" v-if="rs.status=='Di Selesaikan'" class="btn btn-orange">Reopen SO</button> -->
+                                <router-link v-if="rs.status=='Di Selesaikan'"  :to="{name:'viewnewso',params:{id:rs.nomor_so}}" class="btn btn-primary " >
+                                    Lihat Detail
+                                </router-link>
                                 <button  @click="infoTolak(rs)" v-if="rs.status=='Acc' && rs.rs==='T'" class="btn btn-danger">R. Selesai di tolak</button>
                             </td>
                         </tr>
@@ -121,10 +123,18 @@ export default {
             nso:null,
             input:{},
             alastolak:null,
+            ket:{
+                aktif:[]
+            },
+            listso:{},
+            bbk:0,
+            aktifin:true,
+            hh:[]
         }
     },
     created(){
         this.getSo();
+        this.filter();
     },
     computed:{
         FilterKategori(){
@@ -154,100 +164,62 @@ export default {
     methods:{
         getSo(){
             axios.get("/api/so/data/realso")
-            .then(res=>{this.so=res.data.data
+            .then(res=>{
+                this.so=res.data.data
+                this.status="Draft";
+                this.status="Acc";
                 this.load=false;
             });
         },
+        pilihstatus(){
+            for(let i=0;i<this.FilterKategori.length;i++){
+                    axios.get("/api/listso/"+this.FilterKategori[i].nomor_so)
+                    .then(res=>{
+                        this.listso=res.data.data;
+                        this.bbk=0;
+                        for(let n=0;n<this.listso.length;n++){
+                            this.bbk+=parseInt(this.listso[n].bbk);
+                        }
+                        if(this.bbk<1){
+                            this.aktifin=true;
+                        }else{
+                            this.aktifin=false;
+                        }
+                        this.ket.aktif[i]=this.aktifin;
+                        this.load=true;
+                        this.load=false;
+                    })
+            }
+        },
+        filter(){
+            axios.get("/api/so/data/realso")
+            .then(res=>{
+                this.so=res.data.data;
+                this.hh= this.so.filter(elem=> elem.status==="Acc")
+                this.FilterKategori.push(this.hh);
+                this.FilterKategori.splice(this.FilterKategori.length-1,1)
+                for(let i=0;i<this.FilterKategori.length;i++){
+                    axios.get("/api/listso/"+this.FilterKategori[i].nomor_so)
+                    .then(res=>{
+                        this.listso=res.data.data;
+                        this.bbk=0;
+                        for(let n=0;n<this.listso.length;n++){
+                            this.bbk+=parseInt(this.listso[n].bbk);
+                        }
+                        if(this.bbk<1){
+                            this.aktifin=true;
+                        }else{
+                            this.aktifin=false;
+                        }
+                        this.ket.aktif[i]=this.aktifin;
+                        this.load=true;
+                        this.load=false;
+                    })
+            }
+                });
+        },
         deleteSo(rs){
-                const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: 'btn btn-success ml-2',
-                    cancelButton: 'btn btn-danger'
-                },
-                buttonsStyling: false
-                })
-
-                swalWithBootstrapButtons.fire({
-                title: 'Apakah anda yakin?',
-                text: "Ingin menghapus SO ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Iya, Yakin',
-                cancelButtonText: 'Tidak',
-                reverseButtons: true
-                }).then((result) => {
-                if (result.value) {
-                    if(rs.statusso==="tersedia"){
-                    this.update.status="Confirmed";
-                    axios.put("/api/rso/"+rs.nomor_rso,this.update)
-                    .then(res=>{
-                        axios.get("/api/listrso/"+rs.nomor_rso)
-                        .then(res=>{
-                            this.listrso=res.data.data;
-                            for(let i=0;i<this.listrso.length;i++){
-                                if(this.listrso[i].qty_tersedia>0){
-                                    this.uplsoneg.so_tersedia="N";
-                                    axios.put("/api/listrso/"+this.listrso[i].id,this.uplsoneg)
-                                        .then(res=>{
-                                        });
-                                    }else{
-                                        this.uplsopos.so_tersedia="Y";
-                                        axios.put("/api/listrso/"+this.listrso[i].id,this.uplsopos)
-                                            .then(res=>{
-                                        });
-                                    }
-                            }
-                            axios.delete("/api/so/"+rs.nomor_so)
-                            .then(res=>{
-                                this.getSo();
-                            })
-                        });
-                        swalWithBootstrapButtons.fire(
-                        'Deleted!',
-                        'SO berhasil di hapus.',
-                        'success'
-                        )
-                    });
-                }else{
-                    this.update.status="Confirmed";
-                    axios.put("/api/rso/"+rs.nomor_rso,this.update)
-                    .then(res=>{
-                        axios.get("/api/listrso/"+rs.nomor_rso)
-                        .then(res=>{
-                            this.listrso=res.data.data;
-                            for(let i=0;i<this.listrso.length;i++){
-                                if(this.listrso[i].qty_tdktersedia>0 && this.listrso[i].acc_purch==="Y"){
-                                    this.uplsopos.so_tdktersedia="N";
-                                    axios.put("/api/listrso/"+this.listrso[i].id,this.uplsopos)
-                                }else if(this.listrso[i].qty_tdktersedia>0 && this.listrso[i].acc_purch==="N"){
-                                    this.uplsoneg.so_tdktersedia="Y";
-                                    axios.put("/api/listrso/"+this.listrso[i].id,this.uplsoneg)
-                                }
-                            }
-                            axios.delete("/api/so/"+rs.nomor_so)
-                            .then(res=>{
-                                this.getSo();
-                            })
-                            swalWithBootstrapButtons.fire(
-                            'Deleted!',
-                            'SO berhasil di hapus.',
-                            'success'
-                            )
-                        });
-                    });
-                    
-                }
-                } else if (
-                    /* Read more about handling dismissals below */
-                    result.dismiss === Swal.DismissReason.cancel
-                ) {
-                    swalWithBootstrapButtons.fire(
-                    'Cancelled',
-                    'Batal menghapus SO ini :)',
-                    'error'
-                    )
-                }
-                })
+        
         },
         requestselesai(rs){
             this.nso=rs.nomor_so;

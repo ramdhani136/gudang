@@ -64,6 +64,7 @@
                             <th>Satuan</th>
                             <th>Harga</th>
                             <th>Status</th>
+                            <th>Sub Total</th>
                             <th v-if="tampil">Estimasi</th>
                             <th>Aksi</th>
                         </tr>
@@ -79,6 +80,7 @@
                             <td style="text-align:center">{{ch.satuan}}</td>
                             <td style="text-align:center">{{ch.harga |currency}}</td>
                             <td style="text-align:center">{{lstatus}}</td>
+                            <td>{{ch.harga * ch.qty |currency}}</td>
                             <td v-if="tampil" style="text-align:center">{{ch.tgl_datang}}</td>
                             <td  style="text-align:center">
                                 <button @click="hapuslistSo(index)" class="btn btn-danger">Hapus</button>
@@ -90,7 +92,7 @@
         </div>   
         <div class="row mt-2">
                 <button @click="draftSo()" class="btn-orange btn ml-4" >
-                    Simpan Draft
+                    Simpan
                 </button>
                 <button @click="submitSo()" class="btn-success btn ml-2" >
                     Kirim SO
@@ -144,7 +146,7 @@
                             <td style="text-align:center">{{ket.qty[index]}}</td>
                             <td style="text-align:center">{{ls.satuan}}</td>
                             <td style="text-align:center">
-                                <input :value="ls" v-model="checkrso" type="checkbox">
+                                <input  :value="ls" v-model="checkrso" type="checkbox">
                             </td>
                         </tr>
                     </tbody>
@@ -502,7 +504,7 @@ export default {
                                 this.ada=0;
                             }
                             this.upload={qtyrso:this.ket.coba[i],nomor_so:this.up.nomor_so,kode_barang:this.checkrso[i].lkode_barang,
-                            harga:this.checkrso[i].harga,id_custprice:this.checkrso[i].id_custprice,qty:this.hitung.qty[i],
+                            harga:this.checkrso[i].harga,tanggal_datang:this.checkrso[i].tgl_datang,id_custprice:this.checkrso[i].id_custprice,qty:this.hitung.qty[i],
                             tersedia:this.ada}
                             axios.post("/api/listso",this.upload)
                             .then(res=>{
@@ -589,7 +591,7 @@ export default {
 
             swalWithBootstrapButtons.fire({
             title: 'Apakah anda yakin?',
-            text: "Ingin menyimpan draft SO ini!",
+            text: "Barang yang tidak di input akan di unbooking",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Iya, Yakin',

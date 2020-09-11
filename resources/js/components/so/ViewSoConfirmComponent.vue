@@ -53,12 +53,13 @@
             </div>
         </div>
         <div id="rsoverflowso" class="row mt-2 mx-auto">
-            <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ket.subtotal | currency}}</div>
+            <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ket.total | currency}}</div>
             <div class="row mt-1 mx-auto col-12">
                 <Circle5 id="load3" v-if="load"></Circle5>
                 <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
                     <thead>
                         <tr>
+                            <tr>
                             <th>No</th>
                             <th>Nama Barang</th>
                             <th>Qty</th>
@@ -66,23 +67,22 @@
                             <th>Harga</th>
                             <th>Sub Total</th>
                             <th>Status</th>
-                            <th>Sudah kirim</th>
-                            <th v-if="ket.status=='Tidak Tersedia'">Estimasi Tersedia</th>
+                            <th v-if="lstatus==='Tidak Tersedia'">Estimasi</th>
+                            <th>Sudah Kirim</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(ts,index) in listso" :key="index">
+                        <tr>
+                        <tr v-for="(ch,index) in listso" :key="index">
                             <td style="text-align:center">{{index+1}}</td>
-                            <td>{{ts.nama_barang}}</td>
-                            <td style="text-align:center" v-if="ket.status=='Tersedia'">{{ts.qty_tersedia}}</td>
-                            <td style="text-align:center" v-if="ket.status=='Tidak Tersedia'">{{ts.qty_tdktersedia}}</td>
-                            <td style="text-align:center">{{ts.satuan}}</td>
-                            <td style="text-align:center">{{ts.harga | currency}}</td>
-                            <td style="text-align:center" v-if="ket.status=='Tersedia'">{{ts.harga*ts.qty_tersedia | currency}}</td>
-                            <td style="text-align:center" v-if="ket.status=='Tidak Tersedia'">{{ts.harga*ts.qty_tdktersedia | currency}}</td>
-                            <td style="text-align:center">{{ket.status}}</td>
-                            <td style="text-align:center">{{sk.qty[index]}}</td>
-                            <td style="text-align:center" v-if="ket.status=='Tidak Tersedia'">{{ts.tgl_datang}}</td>
+                            <td>{{ch.nama_barang}}</td>
+                            <td style="text-align:center">{{ch.qty}}</td>
+                            <td style="text-align:center">{{ch.satuan}}</td>
+                            <td style="text-align:center">{{ch.harga |currency}}</td>
+                            <td>{{ch.harga * ch.qty |currency}}</td>
+                            <td style="text-align:center">{{lstatus}}</td>
+                            <td v-if="lstatus==='Tidak Tersedia'" style="text-align:center">{{ch.tgl_datang}}</td>
+                            <td>{{ch.bbk}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -140,25 +140,21 @@ export default {
             tujuan:'',
             up:{},
             load:true,
-            totalt:0,
-            subTotalt:0,
-            totald:0,
-            subTotald:0,
             statusSo: {'so_open': 'Y'},
             ket:{
                 qtypesan:0,
-                subtotal:0,
+                total:0,
             },
             uplist:[],
             aksiup:{},
             sk:{
                 qty:[],
             },
+            lstatus:'',
         }
     },
     created(){
         this.getSo();
-        this.getlistso();
     },  
     computed:{       
     },
@@ -168,46 +164,22 @@ export default {
         },
         getSo(){
             axios.get(`/api/so/${this.$route.params.id}`)
-            .then(res=>this.so=res.data.data);
-        },
-        getlistso(){
-            axios.get("/api/so/"+this.$route.params.id)
             .then(res=>{
-                this.so=res.data.data;
+                this.so=res.data.data
                 if(this.so[0].statusso==="tersedia"){
-                    axios.get(`/api/listrso/data/sotersedia/`+this.so[0].nomor_rso)
-                    .then(res=>{
-                        this.listso=res.data.data;
-                        this.load=false;
-                        for(let i=0;i<this.listso.length;i++){
-                            this.ket.qtypesan=this.listso[i].qty_tersedia;
-                            this.ket.subtotal+=parseInt(this.listso[i].qty_tersedia)*parseInt(this.listso[i].harga);
-                            this.ket.status="Tersedia";
-                            this.sk.qty[i]=this.listso[i].bbk_tersedia ;
-                            this.uplist[i]={
-                                id:this.listso[i].id,
-                                statusso:this.listso[i].statusso,
-                            };     
-                        }     
-                    });
+                    this.lstatus="Tersedia";
                 }else{
-                    axios.get(`/api/listrso/data/sott/`+this.so[0].nomor_rso)
-                    .then(res=>{
-                        this.listso=res.data.data;
-                        this.load=false;
-                        for(let i=0;i<this.listso.length;i++){
-                            this.ket.qtypesan=this.listso[i].qty_tdktersedia;
-                            this.ket.subtotal+=parseInt(this.ket.qtypesan)*parseInt(this.listso[i].harga);
-                            this.ket.status="Tidak Tersedia";
-                             this.sk.qty[i]=this.listso[i].bbk_tdktersedia ;
-                            this.ket.tanggal=this.listso[i].tgl_datang;
-                            this.uplist[i]={
-                                id:this.listso[i].id,
-                                statusso:"Y",
-                            };
-                        }  
-                    });
+                    this.lstatus="Tidak Tersedia";
                 }
+                axios.get("/api/listso/"+this.$route.params.id)
+                .then(res=>{
+                    this.listso=res.data.data;
+                    this.ket.tolak=0;
+                    for(let i=0;i<this.listso.length;i++){
+                        this.ket.total+=parseInt(this.listso[i].qty)*parseInt(this.listso[i].harga);
+                    }
+                    this.load=false;
+                })
             });
         },
         now(){

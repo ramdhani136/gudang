@@ -4,7 +4,7 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>Nomor SO :</label>
-                    <input v-model="vso.nomor_so" type="text" class="form-control col-12" :disabled="ket.statusnya!=='Draft'">
+                    <input v-model="vso.nomor_so" type="text" class="form-control col-12" :disabled="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">
                 </div>
                 <div class="form-group">
                     <label>Tanggal :</label>
@@ -12,7 +12,7 @@
                 </div>
                 <div class="form-group">
                     <label>Tanggal Kirim :</label>
-                    <input v-model="vso.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="ket.statusnya!=='Draft'" >
+                    <input v-model="vso.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">
                 </div>
             </div>
             <div class="col-4">
@@ -28,13 +28,13 @@
                 </div>
                 <div class="form-group">
                     <label>keterangan</label>
-                    <textarea v-model="vso.keterangan" name="keterangan" class="form-control col-12" :disabled="ket.statusnya!=='Draft'"></textarea>
+                    <textarea v-model="vso.keterangan" name="keterangan" class="form-control col-12" :disabled="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'"></textarea>
                 </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
                     <label>Distribusi :</label>
-                    <select class="form-control" v-model="vso.distribusi"  @change="aksidistribusi(vso)" :disabled="ket.statusnya!=='Draft'">
+                    <select class="form-control" v-model="vso.distribusi"  @change="aksidistribusi(vso)" :disabled="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">
                         <option value="default">- Masukan pilihan anda -</option>
                         <option value="kirim">Di Kirim</option>
                         <option value="ambil">Ambil Sendiri</option>
@@ -63,10 +63,10 @@
                             <th>Qty</th>
                             <th>Satuan</th>
                             <th>Harga</th>
-                            <th v-if="ket.statusnya!=='Draft'">Sudah Kirim</th>
                             <th>Status</th>
-                            <th v-if="tampil">Estimasi</th>
-                            <th v-if="ket.statusnya==='Draft'">Aksi</th>
+                            <th v-if="ket.status==='Tidak Tersedia'">Estimasi</th>
+                            <th v-if="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">Sudah Kirim</th>
+                            <th v-if="ket.statusnya==='Draft' || ket.statusnya==='Tolak'">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,14 +75,14 @@
                             <td>{{ch.kode_barang}}</td>
                             <td>{{ch.nama_barang}}</td>
                             <td style="text-align:center">
-                                <input @input="validasiqty"  v-model="hitung.qty[index]" type="number" class="form-control" :disabled="ket.statusnya!=='Draft'">
+                                <input style="text-align:center" @input="validasiqty"  v-model="hitung.qty[index]" type="number" class="form-control" :disabled="ket.statusnya!=='Draft'">
                             </td>
                             <td style="text-align:center">{{ch.satuan}}</td>
                             <td style="text-align:center">{{ch.harga |currency}}</td>
-                            <td v-if="ket.statusnya!=='Draft'" style="text-align:center">{{ch.bbk}}</td>
                             <td style="text-align:center">{{ket.status}}</td>
-                            <td v-if="tampil" style="text-align:center">{{ch.tgl_datang}}</td>
-                            <td v-if="ket.statusnya==='Draft'" style="text-align:center">
+                            <td v-if="ket.status==='Tidak Tersedia'" style="text-align:center">{{ch.tgl_datang}}</td>
+                            <td v-if="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'" style="text-align:center">{{ch.bbk}}</td>
+                            <td v-if="ket.statusnya==='Draft' || ket.statusnya==='Tolak'" style="text-align:center">
                                 <button @click="hapuslistSo(index)" class="btn btn-danger">Hapus</button>
                             </td>
                         </tr>
@@ -91,18 +91,26 @@
             </div>
         </div>   
         <div class="row mt-2"  v-for="(vso,index) in so" :key="index">
-                <button v-if="ket.statusnya==='Draft'" @click="draftSo()" class="btn-orange btn ml-4" >
-                    Simpan Draft
-                </button>
-                <button v-if="ket.statusnya==='Draft'" @click="submitSo(vso)" class="btn-success btn ml-2" >
+                <!-- <button v-if="ket.statusnya==='Di Selesaikan' || ket.statusnya==='Draft' || ket.statusnya==='Tolak' || ket.statusnya==='Selesai'" @click="kembali()" class="btn-primary btn ml-4 mt-2" >
+                    Kembali
+                </button> -->
+                <button v-if="ket.statusnya==='Draft'" @click="submitSo(vso)" class="btn-success btn ml-4 mt-2" >
                     Kirim SO
                 </button>
-                <button v-if="ket.statusnya!=='Draft'" @click="reqedit()" class="btn-orange btn ml-4 mt-2" >
+                <button v-if="ket.statusnya==='Tolak'" @click="submitSo(vso)" class="btn-success btn ml-4 mt-2" >
+                    Kirim Ulang SO
+                </button>
+                <button v-if="ket.statusnya==='Sent' || ket.statusnya==='Acc'" @click="reqedit(vso)" class="btn-orange btn ml-4 mt-2" >
                     Request Edit SO
                 </button>
-                <button v-if="ket.statusnya!=='Draft'" @click="reqbatal()" class="btn-danger btn ml-2 mt-2" >
+                <button v-if="ket.statusnya==='Sent' || ket.statusnya==='Draft' " @click="reqbatal(vso)" class="btn-none btn ml-1 mt-2" >
                     Batalkan SO
                 </button>
+        </div>
+        <div v-if="vso.status=='Tolak'" v-for="vso in so" :key="index" id="alastolak" class="mt-3">
+            <div v-for="(lso,index) in so" :key="index">
+                <b>{{lso.alastolak}}</b> 
+            </div>    
         </div>
             <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
@@ -263,7 +271,9 @@ export default {
             listfull:{},
             diisi:'',
             banding:'',
-            aksi:''
+            aksi:'',
+            akses:true,
+            bbk:0,
         }
     },
     created(){
@@ -395,7 +405,7 @@ export default {
                                         }else{
                                             this.ada=0;
                                         }
-                                        this.uplist={nomor_so:vso.nomor_so,kode_barang:this.listnewso[i].kode_barang,harga:this.listnewso[i].harga,
+                                        this.uplist={tanggal_datang:this.listnewso[i].tgl_datang,nomor_so:vso.nomor_so,kode_barang:this.listnewso[i].kode_barang,harga:this.listnewso[i].harga,
                                             id_custprice:this.listnewso[i].id_custprice,qty:this.hitung.qty[i],qtyrso:0,tersedia:this.ada}
                                         axios.post("/api/listso",this.uplist)
                                         .then(res=>{
@@ -460,8 +470,132 @@ export default {
             }
             })
         },
-        draftSo(){
-            
+        kembali(){
+            this.$router.push({name:'so'})
+        },
+        reqedit(vso){
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Ingin melakukan permintaan ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, yakin!',
+            cancelButtonText: 'Batalkan!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.isConfirmed) {
+                    if(vso.statusso==="tersedia"){
+                    axios.get("/api/listso/"+this.$route.params.id)
+                    .then(res=>{
+                        this.listfull=res.data.data;
+                        for(let i=0;i<this.listfull.length;i++){
+                            if(this.listfull[i].bbk===null || this.listfull[i].bbk==="" ){
+                                this.listfull[i].bbk=0;
+                            }
+                            this.bbk+=this.listfull[i].bbk;
+                        }
+                        if(this.bbk<1){
+                            axios.put("/api/so/"+this.$route.params.id,{status:'Draft'})
+                            .then(res=>{
+                                this.$router.push({name:'so'})
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil...',
+                                    text: 'Silahkan edit SO anda di list draft SO',
+                                })
+                            });
+                        }else{
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim',
+                            })
+                        }
+                    });
+                }else{
+                    /* Belum ada file ponya */
+                }
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batal melakukan permintaan :)',
+                'error'
+                )
+            }
+            })
+        },
+        reqbatal(vso){
+            const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success ml-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+            title: 'Apakah anda yakin?',
+            text: "Semua item pada SO ini akan di unbooking",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, yakin!',
+            cancelButtonText: 'Batalkan!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.isConfirmed) {
+                    if(vso.statusso==="tersedia"){
+                    axios.get("/api/listso/"+this.$route.params.id)
+                    .then(res=>{
+                        this.listfull=res.data.data;
+                        for(let i=0;i<this.listfull.length;i++){
+                            if(this.listfull[i].bbk===null || this.listfull[i].bbk==="" ){
+                                this.listfull[i].bbk=0;
+                            }
+                            this.bbk+=this.listfull[i].bbk;
+                        }
+                        if(this.bbk<1){
+                            axios.delete("/api/so/"+this.$route.params.id)
+                            .then(res=>{
+                                this.$router.push({name:'so'})
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sukses...',
+                                    text: 'SO berhasil dihapus dari database',
+                                })
+                            });
+                        }else{
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim',
+                            })
+                        }
+                    });
+                }else{
+                    /* Belum ada file ponya */
+                }
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                'Cancelled',
+                'Batal melakukan permintaan :)',
+                'error'
+                )
+            }
+            })
         },
         validasiqty(){
             this.invoice=0;

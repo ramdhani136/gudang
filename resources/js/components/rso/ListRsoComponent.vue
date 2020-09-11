@@ -1,136 +1,101 @@
 <template>
-    <div class="container" @keyup.esc="resetform()">
-        <div class="row row-cols-2" v-for="rlist in form" :key="rlist.nomor_rso">
+    <div class="container">
+        <div class="row row-cols-2">
             <div class="col-4">
-                    <input v-if="disabled"  v-model="rlist.status" type="hidden"  :disabled="disabled == 1">
-                    <input v-if="!disabled"  v-model="inprso.status" type="hidden" >
                 <div class="form-group">
-                    <label>Nomor Rso :</label>
-                    <input v-if="disabled"  v-model="rlist.nomor_rso" type="text" class="form-control col-12" :disabled="disabled == 1">
-                    <input v-if="!disabled"  v-model="inprso.nomor_rso" type="text" class="form-control col-12">
+                    <label>Nomor RSO :</label>
+                    <input v-model="upload.nomor_rso" type="text" class="form-control col-12" :disabled="status!=='Draft' && status!=='Confirmed' " >
                 </div>
                 <div class="form-group">
                     <label>Tanggal :</label>
-                    <input v-if="disabled" v-model="rlist.tanggal_rso"  type="date" class="form-control col-12" :disabled="disabled == 1">
-                    <input v-if="!disabled" v-model="inprso.tanggal_rso"  type="date" class="form-control col-12" :disabled="disabled == 0" >
+                    <input v-model="upload.tanggal_rso" type="date" :min="now()" class="form-control col-12" :disabled="status!=='Draft' && status!=='Confirmed' " >
                 </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
                     <label>Customer</label>
-                    <select v-model="rlist.kode_customer" name="customer" class="col-12 form-control" disabled>
-                        <option v-for="custom in customers" :key="custom.kode" :value="custom.kode" >{{custom.nama}}</option>
-                    </select>
-<!--                     <div v-if="!disabled">
-                    <div class="autocomplete"></div>
-                        <div class="input" @click="toggleVisiblecust" v-text="custom2 ? custom2.nama:''"></div>
-                        <div class="placeholder" v-if="custom2==null" v-text="ketcust.customer">Pilih Customer</div>
-                        <div class="popovercs" v-show="visiblecust">
-                            <input type="text"
-                            @keydown.up="upcust"
-                            @keydown.down="downcust"
-                            @keydown.enter="selectItemCust"
-                            v-model="query2"
-                            placeholder="Masukan nama customer .."
-                            >
-                            <div class="optionbr" ref="optionListcust">
-                                <ul>
-                                    <li v-for="(match,index) in custmatches" 
-                                    :key="match.kode"
-                                    v-text="match.nama"
-                                    :class="{'selected':(selected==index)}"
-                                    @click="itemClickedCust(index)"></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div> -->
+                    <input @click="showcustomer()" v-model="namacustomer" type="text" class="form-control" placeholder="Pilih Customer" :disabled="listpr.length > 0">
                 </div>
                 <div class="form-group">
                     <label>Sales</label>
-                    <select  v-if="disabled"  v-model="rlist.nip_sales" name="marketing" class="col-12 form-control" :disabled="disabled == 1">
-                        <option v-for="sl in sales" :key="sl.nip" :value="sl.nip">{{sl.nama}}</option>
-                    </select>
-                    <select v-if="!disabled" v-model="inprso.nip_sales" name="marketing" class="col-12 form-control" >
-                        <option v-for="sl in sales" :key="sl.nip" :value="sl.nip">{{sl.nama}}</option>
+                    <select class="form-control" v-model="upload.nip_sales" :disabled="status!=='Draft' && status!=='Confirmed' " >
+                        <option v-for="(sl,index) in sales" :key="index" :value="sl.nip">{{sl.nama}}</option>
                     </select>
                 </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
                     <label>keterangan</label>
-                    <textarea v-if="disabled" v-model="rlist.keterangan"  name="keterangan" class="form-control col-12" :disabled="disabled == 1"></textarea>
-                    <textarea v-if="!disabled" v-model="inprso.keterangan"  name="keterangan" class="form-control col-12" ></textarea>
-                </div>
-                <div v-if="rlist.status=='Draft'" class="form-group">
-                    <button @click="getdisabled(rlist)" class="btn btn-primary col-4 ">{{tombol}}</button>
-                    <button @click="updateRso()" v-if="tbsukses" class="btn btn-success col-4 ml-1">Update</button>
+                    <textarea v-model="upload.keterangan" name="keterangan" class="form-control col-12" :disabled="status!=='Draft' && status!=='Confirmed' " ></textarea>
                 </div>
             </div>
         </div>
-        <div class="row m-auto" v-for="rlist in form" :key="rlist.id">
-            <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{total | currency}}</div>
+        <div  id="total" class="mt-3 ml-auto mr-4">Total Invoice :&nbsp; {{invoice | currency}}</div>
+        <div id="rsoverflowso" class="row mt-2 mx-auto">
+            <button v-if="status==='Draft' || status==='Confirmed'" @click="showmodal()" class="btn btn-orange mt-2">+ Tambah Item</button>
+            <div class="row mt-1 mx-auto col-12" >
+                <Circle5 id="load3" v-if="load"></Circle5>
+                <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Kode Barang</th>
+                            <th>Nama Barang</th>
+                            <th>Satuan</th>
+                            <th>Harga</th>
+                            <th>Qty</th>
+                            <th v-if="status==='Draft'">Catatan</th>
+                            <th v-if="status==='So' || status==='Confirmed'">Status</th>
+                            <th v-if="status==='So' || status==='Confirmed'">Tersedia</th>
+                            <th v-if="status==='So' || status==='Confirmed'">Tidak Tersedia</th>
+                            <th v-if="status==='So' || status==='Confirmed'">Estimasi Kedatangan</th>
+                            <th v-if="status==='Draft' || status==='Confirmed'">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(lp,index) in listpr" :key="index">
+                            <td style="text-align:center">{{index+1}}</td>
+                            <td>{{lp.lkode_barang}}</td>
+                            <td>{{lp.nama_barang}}</td>
+                            <td style="text-align:center">{{lp.satuan}}</td>
+                            <td style="text-align:center">{{lp.harga | currency}}</td>
+                            <td  style="text-align:center">
+                                <input style="text-align:center" :disabled="status!=='Draft' && status!=='Confirmed'  " @input="hitunginvoice()" v-model="hitung.qty[index]" type="number" class="form-control">
+                            </td>
+                            <td  v-if="status==='Draft'" style="text-align:center">
+                                <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
+                            </td>
+                            <td style="text-align:center" v-if="status==='So' || status==='Confirmed'">{{lp.status}}</td>
+                            <td style="text-align:center" v-if="status==='So' || status==='Confirmed'">{{lp.qty_tersedia}}</td>
+                            <td style="text-align:center" v-if="status==='So' || status==='Confirmed'">{{lp.qty_tdktersedia}}</td>
+                            <td style="text-align:center" v-if="status==='So' || status==='Confirmed'">
+                                <div v-if="lp.acc_purch==='Y'">{{lp.tgl_datang}}</div>
+                                <button @click="aksiDetail(lp)" v-if="lp.acc_purch==='N'" style="text-align:center" class="btn btn-primary">Lihat</button>
+                            </td>
+                            <td v-if="status==='Draft' || status==='Confirmed'" >
+                                <button @click="hapus(index)" style="text-align:center" class="btn btn-danger">Hapus</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>   
+        <div class="row mt-2">
+                <button  v-if="status==='Draft'" class="btn btn-primary ml-3" @click="createDraft()">
+                    Simpan Draft
+                </button>
+                <button  v-if="status==='Draft'" @click="kirimrso()" class="btn-success btn ml-2" >
+                    Kirim Permintaan
+                </button>
+                <button  v-if="status==='Confirmed'"  @click="requlang()" class="btn-none btn ml-3" >
+                    Request Ulang
+                </button>   
+                <router-link v-if="status==='Confirmed'" to="/so/new" class="btn btn-success ml-2" >+ Create SO</router-link>
+                <button  v-if="status==='Sent'" @click="reqedit()" class="btn-orange btn ml-3" >
+                    Request Edit
+                </button>  
         </div>
-        <div id="rsoverflow" class="row mt-2 mx-auto" v-for="rlist in form" :key="rlist.id">
-            <button v-if="rlist.status=='Draft'" @click="showmodal()" type="button" class="btn btn-success mt-3">+ Tambah Barang</button>
-            <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Barang</th>
-                        <th>Satuan</th>
-                        <th>Qty</th>
-                        <th>Harga</th>
-                        <th>Sub Total</th>
-                        <th v-if="rlist.status=='Sent'">Catatan</th>
-                        <th v-if="rlist.status=='Confirmed'">Status</th>
-                        <th v-if="rlist.status=='Confirmed'">Tersedia</th>
-                        <th v-if="rlist.status=='Confirmed'">Tidak Tersedia</th>
-                        <th v-if="rlist.status=='Confirmed'">Estimasi Kedatangan</th>
-                        <th v-if="rlist.status=='Draft'">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(list,index) in listrso" :key="list.nomor_rso">
-                        <td style="text-align:center">{{index+1}}</td>
-                        <td>{{list.nama_barang}}</td>
-                        <td style="text-align:center">{{list.satuan}}</td>
-                        <td style="text-align:center">{{list.qty}}</td>
-                        <td style="text-align:center">{{list.harga | currency}}</td>
-                        <td style="text-align:center">{{list.harga * list.qty | currency}}</td>
-                        <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.status}}</td>
-                        <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tersedia}}</td>
-                        <td style="text-align:center" v-if="rlist.status=='Confirmed'" >{{list.qty_tdktersedia}}</td>
-                        <td style="text-align:center" v-if="rlist.status=='Confirmed'" >
-                            {{list.tgl_datang}}
-                            <button v-if="list.acc_purch=='N'" @click="aksiDetail(list)" class="btn btn-orange">Detail Penolakan</button>
-                        </td>
-                        <td v-if="rlist.status=='Sent'" style="text-align:center">{{list.catatan}}</td>
-                        <td  v-if="rlist.status=='Draft'" style="text-align:center">
-                            <button @click="editListRso(list)"  class="btn btn-primary">Edit</button>
-                            <button @click="deleteListRso(list)"  class="btn btn-danger">Hapus</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <Circle5 id="load2" v-if="load"></Circle5>
-        </div>
-        <div  class="row mt-2"  v-for="rlist in form" :key="rlist.id">
-                <!-- <router-link :to="{name:'createso',params:{id:rlist.nomor_rso}}" v-if="rlist.status=='Confirmed'" class="btn-success btn ml-3" >
-                    Proses SO
-                </router-link> -->
-                <router-link :to="{name:'formcreateso'}" v-if="rlist.status=='Confirmed'" class="btn-success btn ml-3" >
-                    Proses SO
-                </router-link>
-        </div>
-        <div  class="row mt-2"  v-for="rlist in form" :key="rlist.id">
-                <router-link :to="{name:'createso',params:{id:rlist.nomor_rso}}" v-if="rlist.status=='So'" class="btn-orange btn ml-3" >
-                    Lihat Sales Order
-                </router-link>
-        </div>
-        <div class="row mt-2"  v-for="rlist in form" :key="rlist.id">
-            <button v-if="rlist.status=='Draft'"  @click="updateStatus()" class="btn-orange btn ml-3">Kirim RSO</button>
-        </div>
-        <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="modal-form" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
                 <div class="modal-header">
@@ -140,10 +105,6 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label>kode Barang</label>
-                        <input v-model="ket.kode_barang"  type="text" name="qty"  autocomplete="off" class="form-control" disabled>
-                    </div>
                     <div class="form-group">
                         <label>Nama Barang</label>
                         <div class="autocomplete"></div>
@@ -169,39 +130,79 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Jumlah</label>
-                        <input v-model="inputlrso.qty"  type="number" name="qty"  autocomplete="off" class="form-control">
+                        <label>kode Barang</label>
+                        <input v-model="ket.kode" type="text" name="qty"  autocomplete="off" class="form-control" disabled>
                     </div>
                     <div class="form-group">
                         <label>Satuan</label>
-                        <input v-model="ket.satuan"  type="text"  class="form-control" disabled>
+                        <input v-model="ket.satuan" type="text" class="form-control" disabled>
                     </div>
-                    <div class="form-group">
-                        <select @change="selectItem()" v-model="jenisHarga" class="form-control">
+                    <div class="form-group" v-if="hs">
+                        <label>Jenis Harga</label>
+                        <select @change="selectItem()" class="form-control" v-model="jenisharga">
                             <option value="N">Default</option>
                             <option value="Y">Harga Spesial</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Harga</label>
-                        <input v-model="inputlrso.harga" type="number" class="form-control" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label>Catatan</label>
-                        <textarea v-model="inputlrso.catatan" name="catatan"  class="form-control"></textarea>
+                        <input v-model="ket.harga" type="text" class="form-control" disabled>
                     </div>
                 </div>
-                <div class="modal-footer" v-for="rlist in form" :key="rlist.nomor_rso">
-                    <button type="button" @click="resetform()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button"  @click="createListRso(rlist)" class="btn btn-primary">Save changes</button>
+                <div class="modal-footer" >
+                    <button type="button"  class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button @click="tambahList()" type="button" class="btn btn-primary">Input Item</button>
                 </div>
                 </div>
             </div>
-        </div>
-        
-
-
-        <div  v-for="list in listrso" :key="list.nomor_rso">
+        </div> 
+        <div class="modal fade" id="modal-customer" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div  class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Barang</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Customer</label>
+                        <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisible2" v-text="custom2 ? custom2.nama:''"></div>
+                        <div class="placeholder" v-if="custom2==null" v-text="ket2.nama">Pilih Customer</div>
+                        <div class="popover" v-show="visible2">
+                            <input type="text"
+                            @keydown.up="up2"
+                            @keydown.down="down2"
+                            @keydown.enter="selectItem2"
+                            v-model="query2"
+                            placeholder="Masukan nama customer .."
+                            >
+                            <div class="optionbr" ref="optionList">
+                                <ul>
+                                    <li v-for="(match2,index) in matches2" 
+                                    :key="match2.kode"
+                                    v-text="match2.nama"
+                                    :class="{'selected':(selected2==index)}"
+                                    @click="itemClicked2(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Kode Customer</label>
+                        <input type="text" class="form-control" disabled v-model="ket2.kode">
+                    </div>
+                </div>
+                <div class="modal-footer" >
+                    <button type="button"  class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="savecustomer()" class="btn btn-primary">Save Change</button>
+                </div>
+                </div>
+            </div>
+        </div> 
+        <div >
         <div class="modal fade" id="modal-detail" tabindex="-1"  data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div  class="modal-dialog" role="document">
                 <div id="modal-width" class="modal-content">
@@ -218,7 +219,7 @@
                     </div>
                     <div class="form-group">
                         <label>Jumlah</label>
-                        <input  v-model="detail.qty"  type="number" name="qty"  autocomplete="off" class="form-control" disabled>
+                        <input  v-model="detail.qty_tdktersedia"  type="number" name="qty"  autocomplete="off" class="form-control" disabled>
                     </div>
                     <div class="form-group">
                         <label>Satuan</label>
@@ -228,27 +229,15 @@
                         <label>Alasan Penolakan</label>
                         <textarea v-model="detail.alastolak" name="catatan"  class="form-control" disabled></textarea>
                     </div>
-                    <div class="form-group">
-                        <label>Aksi</label>
-                        <select v-model="aksi" class="form-control">
-                            <option value="N">Tidak Ada</option>
-                            <option value="Y">Request Ulang</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label v-if="aksi=='Y'">Jumlah</label>
-                        <input v-model="upDetail.qty_tdktersedia"  v-if="aksi=='Y'" type="number" name="qty"  autocomplete="off" class="form-control">
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button v-if="aksi=='Y'" type="button" @click="kirimPurch(list)"  class="btn btn-primary">Kirim Permintaan</button>
                 </div>
                 </div>
             </div>
             </div>
-        </div>
-    </div>   
+        </div>    
+    </div>
 </template>
 
 <script>
@@ -259,303 +248,171 @@ export default {
     },
     data(){
         return {
-            form:{},
-            tbsukses:false,
-            tombol:'Edit RSO',
-            disabled:1,
-            customers:{},  
-            listrso:{},
-            inputlrso:{
-                nomor_rso:this.$route.params.id,
+            load:true,
+            upload:{},
+            listpr:[],
+            hitung:{
+                qty:[],
+                keterangan:[],
+                barang:{},
             },
-            barang:{},
-            edit:false,
-            inprso:{},
-            sales:{},
-            urso:{},
+            visible:true,
+            query:'',
+            selected:0,
+            itemHeight:39,
+            custom:null,
             ket:{
                 nama:"Pilih Barang"
             },
-            visible:false,
-            visiblecust:false,
-            query:'',
+            /* Customer */
+            visible2:true,
             query2:'',
-            selected:0,
-            custom:null,
+            selected2:0,
+            itemHeight2:39,
             custom2:null,
-            itemHeight:39,
-            ketcust:{},
-            aksi:'N',
-            detail:{},
-            upDetail:{
-                qty:0,
+            ket2:{
+                nama:"Pilih Customer"
             },
-            qtyupdate:0,
-            statusup:{},
-            load:true,
+            /* End */
+            barangs:{},
+            sales:{},
+            customer:{},
+            namacustomer:null,
+            kodecustomer:null,
+            item:false,
+            jenisharga:'N',
+            hs:false,
             hargaSpecial:{},
-            coba:{},
-            jenisHarga:'N',
-            subTotal:0,
-            total:0,
+            invoice:0,
+            subtotal:0,
+            inhitung:{
+                qty:[]
+            },
+            cek:'',
+            init:'',
+            banding:'',
+            rso:{},
+            listrso:{},
+            status:'',
+            detail:{}
         }
     },
     created(){
-        this.getRso();
-        this.getCustomer();
-        this.getSales();
-        this.getlistRso();
         this.getBarang();
-        this.getSales();
+        this.getrso();
     },  
-    computed:{
+    computed:{  
         matches(){
             if(this.query==''){
                 return [];
             }
             return this.barang.filter((item)=> item.nama.toLowerCase().includes(this.query.toLowerCase()))
         },
-        custmatches(){
+        matches2(){
             if(this.query2==''){
                 return [];
             }
-            return this.customers.filter((item)=> item.nama.toLowerCase().includes(this.query2.toLowerCase()))
+            return this.customer.filter((item)=> item.nama.toLowerCase().includes(this.query2.toLowerCase()))
         },
+        Filteredlist(){
+            return this.listpr.filter(elem => {
+            return elem.lkode_barang.toLowerCase().includes(this.ket.kode.toLowerCase());
+            })
+        }
     },
     methods:{
-        getdisabled(rlist){
-            this.disabled = (this.disabled + 1) % 2;
-            if(this.disabled==1){
-                this.tombol="Edit Rso";
-                this.tbsukses=false;
-                this.getRso()
-                this.inprso.nomor_rso=rlist.nomor_rso
-                this.inprso.tanggal_rso=rlist.tanggal_rso  
-                this.inprso.nip_sales=rlist.nip_sales 
-               /*  this.inprso.kode_customer=rlist.kode_customer */ 
-                this.inprso.keterangan=rlist.keterangan 
-    
-            }else{
-                this.tombol="Close";
-                this.tbsukses=true;
-                this.getRso()
-                this.inprso.status=rlist.status
-                this.inprso.nomor_rso=rlist.nomor_rso
-                this.inprso.tanggal_rso=rlist.tanggal_rso  
-                this.inprso.nip_sales=rlist.nip_sales 
-                this.inprso.kode_customer=rlist.kode_customer 
-                this.inprso.keterangan=rlist.keterangan 
-               /*  this.inprso.kode_customer=rlist.kode_customer */
-                this.ketcust.customer=rlist.customer
-                this.visiblecust=false
-            }
-        },
-        getRso(){
-            axios.get(`/api/rso/${this.$route.params.id}`)
-            .then(res=>this.form=res.data.data);
-        },
-        updateRso(){
-            this.getRso()
-            axios.put(`/api/rso/${this.$route.params.id}`,this.inprso)
-            .then((response)=>{
-                    this.load=true;
-                    this.getRso();
-                    this.getCustomer();
-                    this.getSales();
-                    this.getlistRso();
-                    this.getBarang();
-                    this.getSales();
-                    this.load=false;
-                    this.tbsukses=false
-                    this.disabled=1
-                    this.tombol="Edit RSO"
-                })
-        },
-        showmodal(){
-            $("#modal-form").modal("show");
-        },
-        showDetail(){
-            $("#modal-detail").modal("show");
-        },
-        getlistRso(){
-            axios.get(`/api/listrso/${this.$route.params.id}`)
-            .then(res=>{this.listrso=res.data.data
-                this.total=0;
-                for (let i = 0; i < this.listrso.length; i++) {
-                    this.subTotal=parseInt(this.listrso[i].qty)*parseInt(this.listrso[i].harga);
-                    this.total += this.subTotal;     
-                }
-                this.load=false;
-            });
-        },
         getBarang(){
             axios.get("/api/barang/")
-            .then(res=>this.barang=res.data.data)
-        },
-        createListRso(rlist){
-            if(this.edit===false){
-                this.inputlrso.tanggal_rso=rlist.tanggal_rso
-                axios.post("/api/listrso",this.inputlrso)
-                .then((response)=>{
-                    this.getRso();
-                    this.getlistRso();
-                    this.getBarang();
-                    this.resetform();
-                    $("#modal-form").modal("hide");
-                })
-                
-            }else{
-                this.inputlrso.tanggal_rso=rlist.tanggal_rso
-                axios.put("/api/listrso/"+  this.inputlrso.id,this.inputlrso)
-                .then((response)=>{
-                    this.resetform()
-                    this.getRso();
-                    this.getlistRso();
-                    this.getBarang(); 
-                    $("#modal-form").modal("hide");
-                })
-            }
-        },
-        editListRso(list){
-            this.getlistRso();
-            this.inputlrso.id=list.id
-            this.ket.satuan=list.satuan
-            this.ket.nama=list.nama_barang
-            this.inputlrso.nomor_rso=list.lno_rso
-            this.inputlrso.kode_barang=list.lkode_barang
-            this.inputlrso.qty=list.qty
-            this.inputlrso.catatan=list.catatan
-            this.edit=true
-            this.inputlrso.harga=list.harga
-            this.inputlrso.id_custprice=list.id_custprice
-            this.ket.kode_barang=list.lkode_barang;
-            this.showmodal()
-        },
-        deleteListRso(list){
-            let keputusan=confirm('Apakah anda yakin?');
-            if(keputusan===true){
-                axios.delete("/api/listrso/" + list.id)
-                .then(response=>{
-                    this.getRso();
-                    this.getlistRso();
-                    this.getBarang();
-                })
-                .catch(error=>{
-                    console.log(error)
-                })
-            }
-        },
-        getSales(){
-            axios.get("/api/sales")
-            .then(res=>this.sales=res.data.data)
-        },
-        updateStatus(){
-                const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: 'btn btn-success ml-2',
-                    cancelButton: 'btn btn-danger'
-                },
-                buttonsStyling: false
-                })
-
-                swalWithBootstrapButtons.fire({
-                title: 'Apakah anda yakin?',
-                text: "Ingin mengirim RSO ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, yakin!',
-                cancelButtonText: 'Batalkan!',
-                reverseButtons: true
-                }).then((result) => {
-                if (result.value) {
-                    this.urso.status="Sent"
-                    axios.put(`/api/rso/${this.$route.params.id}`,this.urso)
-                    .then((response)=>{
-                        this.$router.push({name:'rso'}) 
-                        swalWithBootstrapButtons.fire(
-                        'Success!',
-                        'RSO berhasil di kirim.',
-                        'success'
-                        )
+            .then(res=>{
+                this.barang=res.data.data
+                axios.get("/api/sales")
+                .then(res=>{
+                    this.sales=res.data.data;
+                    axios.get("/api/customer")
+                    .then(res=>{
+                        this.customer=res.data.data;
+                        this.load=false;
                     })
-                } else if (
-                    /* Read more about handling dismissals below */
-                    result.dismiss === Swal.DismissReason.cancel
-                ) {
-                    this.$router.push({name:'rso'}) 
-                    swalWithBootstrapButtons.fire(
-                    'Cancelled',
-                    'Batal mengirim RSO :)',
-                    'error'
-                    )
-                }
                 })
+                })
+            
         },
-        resetform(){
-            this.getlistRso()
-            this.inputlrso.id="";
-            this.ket.satuan="";
-            this.ket.kode_barang="";
-            this.inputlrso.kode_barang="";
-            this.inputlrso.qty="";
-            this.inputlrso.catatan="";
-            this.ket.nama="Pilih Barang";
-            this.custom=null;
-            this.edit=false;
-            this.visible=false;
-            this.inputlrso.harga="";
-            this.jenisHarga='N';
-            this.ket.kode_barang="";
+        getrso(){
+            axios.get("/api/rso/"+this.$route.params.id)
+            .then(res=>{
+                this.rso=res.data.data;
+                this.upload.nomor_rso=this.rso[0].nomor_rso;
+                this.upload.tanggal_rso=this.rso[0].tanggal_rso;
+                this.upload.nip_sales=this.rso[0].nip_sales;
+                this.namacustomer=this.rso[0].customer;
+                this.kodecustomer=this.rso[0].kode_customer;
+                this.upload.keterangan=this.rso[0].keterangan;
+                this.status=this.rso[0].status;
+                axios.get("/api/listrso/"+this.$route.params.id)
+                .then(res=>{
+                    this.listpr=res.data.data;
+                    for(let i=0;i<this.listpr.length;i++){
+                        this.hitung.qty[i]=this.listpr[i].qty;
+                        this.hitung.keterangan[i]=this.listpr[i].catatan;
+                    }
+                    this.hitunginvoice();
+                })
+            });
+        },
+        now(){
+            var d = new Date();
+            var month = d.getMonth()+1;
+            var day = d.getDate();
+
+            var output = d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" + (day<10 ? '0' : '') + day;
+            return output
+            },
+        rso_nomor(){
+            var d = new Date();
+            var month = d.getMonth()+1;
+
+            var output = "RSO-" + d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" ;
+            return output
         },
         toggleVisible(){
             this.visible = !this.visible;
-        },
-        toggleVisiblecust(){
-            this.visiblecust = !this.visiblecust;
         },
         itemClicked(index){
             this.selected=index;
             this.selectItem();
         },
         selectItem(){
-            this.custom = this.matches[this.selected];
-            this.inputlrso.kode_barang= this.custom.kode;     
-            axios.get(`/api/rso/${this.$route.params.id}`)
-            .then(res=>{this.coba=res.data.data
-                this.cust=this.coba[0].kode_customer;
-                this.convertCust=this.coba[0].kode_customer;
-                // this.convertCust.toString()
-                // this.convertCust=this.convertCust.replace('/','');
-                // console.log(this.convertCust);
-                // console.log(this.custom.kode);
-                axios.get("/api/view/price/"+this.cust+"/"+this.custom.kode)
+            this.custom = this.matches[this.selected];  
+            this.ket.kode=this.custom.kode;
+
+            axios.get("/api/view/price/"+this.kodecustomer+"/"+this.custom.kode)
                 .then(res=>{this.hargaSpecial=res.data.data;
                 if(this.hargaSpecial.length<1){
-                    this.visible=true;
-                    this.visible=false;
-                    this.inputlrso.harga=this.custom.harga;
-                    this.inputlrso.id_custprice="";
+                    this.hs=false;
+                    this.ket.harga=this.custom.harga;
                 }else{
-                    if(this.jenisHarga=='N'){
+                        this.hs=true;
+                    if(this.jenisharga=='N'){
                         this.visible=true;
                         this.visible=false;
-                        this.inputlrso.harga=this.custom.harga;
-                        this.inputlrso.id_custprice="";
+                        this.ket.harga=this.custom.harga;
+                        this.ket.id_custprice="";
                     }else{
+                        this.hs=true;
                         this.visible=true;
-                        this.visible=false
-                        this.hargas=this.hargaSpecial[0].harga;
-                        this.id=this.hargaSpecial[0].id;
-                        this.inputlrso.harga=this.hargas;
-                        this.inputlrso.id_custprice=this.id;
+                        this.visible=false;
+                        this.ket.harga=this.hargaSpecial[0].harga;
+                        this.ket.id_custprice=this.hargaSpecial[0].id;
                     }
+                    
                 }
-                });
-            });
-
-            this.ket.kode_barang= this.custom.kode;
-            this.ket.satuan= this.custom.satuan;
+                });    
+            this.ket.satuan=this.custom.satuan;
+            this.ket.nama=this.custom.nama;
+            this.ket.harga=this.custom.harga;
+            this.hs=true;
             this.visible=false;
+            this.ket.id_custprice="";
         },
         up(){
             if(this.selected==0){
@@ -574,84 +431,500 @@ export default {
         scrollToItem(){
             this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
         },
-        
-        itemClickedCust(index){
-            this.selected=index;
-            this.selectItemCust();
+        showmodal(){
+            this.hs=false;
+            this.jenisharga='N';
+            $("#modal-form").modal("show");
         },
-        selectItemCust(){
-            this.custom2 = this.custmatches[this.selected];
-            /* this.inprso.kode_customer=this.custom2.kode */
-            this.visiblecust=false;
-        },
-        upcust(){
-            if(this.selected==0){
-                return;
-            }
-            this.selected -= 1;
-            this.scrollToItem();
-        },
-        downcust(){
-            if(this.selected >= this.custmatches.length -1 ){
-                return;
-            }
-            this.selected += 1;
-            this.scrollToItem();
-        },
-        scrollToItemcust(){
-            this.$refs.optionListCust.scrollTop = this.selected * this.itemHeight;
-        },
-        getCustomer(){
-            axios.get("/api/customer")
-            .then(res=>this.customers=res.data.data)
-        },
-        aksiDetail(list){
-            this.getlistRso();
-            this.upDetail.id=list.id
-            this.upDetail.nomor_rso=list.lno_rso;
-            this.upDetail.tanggal_rso=list.tanggal_rso;
-            this.upDetail.kode_barang=list.lkode_barang;
-            this.upDetail.qty_tersedia=list.qty_tersedia;
-            this.upDetail.status=list.status;
-            this.upDetail.alastolak="";
-            this.upDetail.acc_purch="";
-            this.upDetail.booking="N";
-            this.detail.nama_barang=list.nama_barang;
-            this.detail.qty=list.qty_tdktersedia;
-            this.detail.satuan=list.satuan;
-            this.detail.kode_barang=list.lkode_barang;
-            this.detail.alastolak=list.alastolak;
-            this.statusup.status="Sent";
-            this.statusup.nomor_rso=list.lno_rso;
-            this.statusup.tanggal_rso=list.tanggal_rso;
-            this.statusup.nip_sales=list.nip_sales;
-            this.statusup.kode_customer=list.kode_customer;
-            this.statusup.keterangan=list.so_ket;
-            this.showDetail(); 
-        },
-        kirimPurch(list){
-            let tanya=confirm('Yakin kirim ulang permintaan?');
-            if(tanya==true){
-                if(this.upDetail.qty_tersedia===null){
-                this.qtyupdate=0;
-                }else{
-                this.qtyupdate=this.upDetail.qty_tersedia;
-                }
-                this.upDetail.qty=parseInt(this.upDetail.qty_tdktersedia)+parseInt(this.qtyupdate);
-            
-                axios.put("/api/listrso/"+this.upDetail.id,this.upDetail)
-                .then(response=>{
-                    axios.put("/api/rso/"+this.upDetail.nomor_rso,this.statusup)
-                    .then(response=>{
-                        $("#modal-detail").modal("hide");
-                        this.$router.push({name:'rso'})
+        tambahList(){
+            if(this.listpr.length==0){
+                this.barangs={id_custprice:this.ket.id_custprice,harga:this.ket.harga,lkode_barang:this.ket.kode,nama_barang:this.ket.nama,satuan:this.ket.satuan};
+                this.listpr.push(this.barangs);
+            }else{
+                if(this.Filteredlist.length>0){
+                    Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Item sudah diinput sebelumnya, hapus terlebih dahulu untuk memperbarui item!',
                     })
-                })
+                }else{
+                    if(this.listpr.length<=5){
+                        this.barangs={id_custprice:this.ket.id_custprice,harga:this.ket.harga,lkode_barang:this.ket.kode,nama_barang:this.ket.nama,satuan:this.ket.satuan};
+                        this.listpr.push(this.barangs);
+                    }else{
+                        Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Maksimal input 6 item!',
+                        })
+                    }
+                }
             }
+            this.visible=true,
+            this.query='',
+            this.selected=0,
+            this.custom=null,
+            this.ket={
+                nama:"Pilih Barang"
+            },
+            $("#modal-form").modal("hide");
         },
-    },
+        kirimrso(){
+                const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+                })
 
-}
+                swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Kirim RSO ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, yakin',
+                cancelButtonText: 'Batalkan',
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    if(this.listpr.length>0){
+                        this.init="";
+                        this.cek="";
+                        this.banding="";
+                        for(let j=0;j<this.listpr.length;j++){
+                            if(this.hitung.qty[j]===undefined || this.hitung.qty[j]==="" ){
+                                this.init="N";
+                            }else{
+                                this.init="Y";
+                            }
+                            this.cek+=this.init;
+                            this.banding+="Y";
+                        }
+                        if(this.cek===this.banding){
+                            this.upload.status="Sent";
+                            this.upload.kode_customer=this.kodecustomer;
+                            axios.put("/api/rso/"+this.$route.params.id,this.upload)
+                            .then(res=>{
+                                axios.get("/api/listrso/"+this.upload.nomor_rso)
+                                .then(res=>{
+                                    this.listrso=res.data.data;
+                                        for(let o=0;o<this.listrso.length;o++){
+                                            axios.delete("/api/listrso/"+this.listrso[o].id)
+                                        } 
+                                        for(let i=0;i<this.listpr.length;i++){
+                                            if(this.hitung.keterangan[i]===undefined){
+                                                this.hitung.keterangan[i]="";
+                                            }
+                                                this.uplist={nomor_rso:this.upload.nomor_rso,tanggal_rso:this.upload.tanggal_rso
+                                                ,kode_barang:this.listpr[i].lkode_barang,harga:this.listpr[i].harga,id_custprice:this.listpr[i].id_custprice,qty:this.hitung.qty[i]
+                                                ,catatan:this.hitung.keterangan[i],}
+                                                axios.post("/api/listrso",this.uplist)
+                                        }
+                                })
+                                this.$router.push({name:'rso'}) 
+                                swalWithBootstrapButtons.fire(
+                                        'Save!',
+                                        'Berhasil mengirimkan RSO.',
+                                        'success'
+                                )
+                            }).catch(error=>{
+                                Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Cek kembali rincian rso anda!',
+                                })
+                            })
+                        }else{
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Qty item tidak boleh kosong',
+                                })
+                        }      
+                        }else{
+                            Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Anda belum menginput item apapun!',
+                        })
+                        } 
+                } else if (
+
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                    'Cancelled',
+                    'Batal mengirim RSO :)',
+                    'error'
+                    )
+                }
+            })
+        },
+        reqedit(){
+                const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+                })
+
+                swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin merubah RSO ini",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, yakin',
+                cancelButtonText: 'Batalkan',
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    if(this.listpr.length>0){
+                        this.init="";
+                        this.cek="";
+                        this.banding="";
+                        for(let j=0;j<this.listpr.length;j++){
+                            if(this.hitung.qty[j]===undefined || this.hitung.qty[j]==="" ){
+                                this.init="N";
+                            }else{
+                                this.init="Y";
+                            }
+                            this.cek+=this.init;
+                            this.banding+="Y";
+                        }
+                        if(this.cek===this.banding){
+                            this.upload.status="Draft";
+                            this.upload.kode_customer=this.kodecustomer;
+                            axios.put("/api/rso/"+this.$route.params.id,this.upload)
+                            .then(res=>{
+                                axios.get("/api/listrso/"+this.upload.nomor_rso)
+                                .then(res=>{
+                                    this.listrso=res.data.data;
+                                        for(let o=0;o<this.listrso.length;o++){
+                                            axios.delete("/api/listrso/"+this.listrso[o].id)
+                                        } 
+                                        for(let i=0;i<this.listpr.length;i++){
+                                            if(this.hitung.keterangan[i]===undefined){
+                                                this.hitung.keterangan[i]="";
+                                            }
+                                                this.uplist={nomor_rso:this.upload.nomor_rso,tanggal_rso:this.upload.tanggal_rso
+                                                ,kode_barang:this.listpr[i].lkode_barang,harga:this.listpr[i].harga,id_custprice:this.listpr[i].id_custprice,qty:this.hitung.qty[i]
+                                                ,catatan:this.hitung.keterangan[i],}
+                                                axios.post("/api/listrso",this.uplist)
+                                        }
+                                })
+                                this.$router.push({name:'rso'}) 
+                                swalWithBootstrapButtons.fire(
+                                        'Save!',
+                                        'Silahkan edit RSO ini di list draft RSO.',
+                                        'success'
+                                )
+                            }).catch(error=>{
+                                Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Cek kembali rincian rso anda!',
+                                })
+                            })
+                        }else{
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Qty item tidak boleh kosong',
+                                })
+                        }      
+                        }else{
+                            Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Anda belum menginput item apapun!',
+                        })
+                        } 
+                } else if (
+
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                    'Cancelled',
+                    'Permintaan ini di batalkan :)',
+                    'error'
+                    )
+                }
+            })
+        },
+        requlang(){
+                const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+                })
+
+                swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Semua item pada RSO ini akan di unbooking dan melakukan konfirmasi ulang oleh Inventory Control",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, yakin',
+                cancelButtonText: 'Batalkan',
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    if(this.listpr.length>0){
+                        this.init="";
+                        this.cek="";
+                        this.banding="";
+                        for(let j=0;j<this.listpr.length;j++){
+                            if(this.hitung.qty[j]===undefined || this.hitung.qty[j]==="" ){
+                                this.init="N";
+                            }else{
+                                this.init="Y";
+                            }
+                            this.cek+=this.init;
+                            this.banding+="Y";
+                        }
+                        if(this.cek===this.banding){
+                            this.upload.status="Sent";
+                            this.upload.kode_customer=this.kodecustomer;
+                            axios.put("/api/rso/"+this.$route.params.id,this.upload)
+                            .then(res=>{
+                                axios.get("/api/listrso/"+this.upload.nomor_rso)
+                                .then(res=>{
+                                    this.listrso=res.data.data;
+                                        for(let o=0;o<this.listrso.length;o++){
+                                            axios.delete("/api/listrso/"+this.listrso[o].id)
+                                        } 
+                                        for(let i=0;i<this.listpr.length;i++){
+                                            if(this.hitung.keterangan[i]===undefined){
+                                                this.hitung.keterangan[i]="";
+                                            }
+                                                this.uplist={nomor_rso:this.upload.nomor_rso,tanggal_rso:this.upload.tanggal_rso
+                                                ,kode_barang:this.listpr[i].lkode_barang,harga:this.listpr[i].harga,id_custprice:this.listpr[i].id_custprice,qty:this.hitung.qty[i]
+                                                ,catatan:this.hitung.keterangan[i],}
+                                                axios.post("/api/listrso",this.uplist)
+                                        }
+                                })
+                                this.$router.push({name:'rso'}) 
+                                swalWithBootstrapButtons.fire(
+                                        'Save!',
+                                        'Berhasil mengirimkan ulang RSO.',
+                                        'success'
+                                )
+                            }).catch(error=>{
+                                Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Cek kembali rincian rso anda!',
+                                })
+                            })
+                        }else{
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Qty item tidak boleh kosong',
+                                })
+                        }      
+                        }else{
+                            Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Anda belum menginput item apapun!',
+                        })
+                        } 
+                } else if (
+
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                    'Cancelled',
+                    'Batal mengirim ulang RSO :)',
+                    'error'
+                    )
+                }
+            })
+        },
+        createDraft(){
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+                })
+
+                swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Simpan RSO ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, yakin',
+                cancelButtonText: 'Batalkan',
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    if(this.listpr.length>0){
+                        this.init="";
+                        this.cek="";
+                        this.banding="";
+                        for(let j=0;j<this.listpr.length;j++){
+                            if(this.hitung.qty[j]===undefined || this.hitung.qty[j]==="" ){
+                                this.init="N";
+                            }else{
+                                this.init="Y";
+                            }
+                            this.cek+=this.init;
+                            this.banding+="Y";
+                        }
+                        if(this.cek===this.banding){
+                            this.upload.status="Draft";
+                            this.upload.kode_customer=this.kodecustomer;
+                            axios.put("/api/rso/"+this.$route.params.id,this.upload)
+                            .then(res=>{
+                                axios.get("/api/listrso/"+this.upload.nomor_rso)
+                                .then(res=>{
+                                    this.listrso=res.data.data;
+                                        for(let o=0;o<this.listrso.length;o++){
+                                            axios.delete("/api/listrso/"+this.listrso[o].id)
+                                        } 
+                                        for(let i=0;i<this.listpr.length;i++){
+                                            if(this.hitung.keterangan[i]===undefined){
+                                                this.hitung.keterangan[i]="";
+                                            }
+                                                this.uplist={nomor_rso:this.upload.nomor_rso,tanggal_rso:this.upload.tanggal_rso
+                                                ,kode_barang:this.listpr[i].lkode_barang,harga:this.listpr[i].harga,id_custprice:this.listpr[i].id_custprice,qty:this.hitung.qty[i]
+                                                ,catatan:this.hitung.keterangan[i],}
+                                                axios.post("/api/listrso",this.uplist)
+                                        }
+                                })
+                                this.$router.push({name:'rso'}) 
+                                swalWithBootstrapButtons.fire(
+                                        'Save!',
+                                        'Berhasil menyimpan RSO.',
+                                        'success'
+                                )
+                            }).catch(error=>{
+                                Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Cek kembali rincian rso anda!',
+                                })
+                            })
+                        }else{
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Qty item tidak boleh kosong',
+                                })
+                        }      
+                        }else{
+                            Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Anda belum menginput item apapun!',
+                        })
+                        } 
+                } else if (
+
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                    'Cancelled',
+                    'Batal menyimpan RSO :)',
+                    'error'
+                    )
+                }
+            })
+        },
+        hapus(index){
+            this.listpr.splice(index,1);
+            this.hitung.qty.splice(index,1);
+            this.hitung.keterangan.splice(index,1);
+            this.hitunginvoice();
+        },
+        aksiDetail(lp){
+            $("#modal-detail").modal("show");
+            this.detail=lp;
+        },
+        DateTime(){
+            this.date = new Date(); 
+            this.month = this.date.getMonth()+1;
+            this.year=this.date.getFullYear();
+            this.hours=this.date.getHours();
+            this.minute=this.date.getMinutes();
+            this.seconds=this.date.getSeconds();
+            if(this.month>12){
+                this.month=12;
+            }
+            this.day = this.date.getDate();
+            this.dates=this.year+"-"+(this.month<10 ? '0' : '')+this.month+"-"+this.day;
+            this.times=this.hours+":"+this.minute+":"+(this.seconds<10 ? '0' : '')+this.seconds;
+            this.datetimes=this.dates+" "+this.times;
+            return this.datetimes;
+        },
+        showcustomer(){
+            $("#modal-customer").modal("show");
+        },
+        /* pilih barang customer */
+        toggleVisible2(){
+            this.visible2 = !this.visible2;
+        },
+        itemClicked2(index){
+            this.selected2=index;
+            this.selectItem2();
+        },
+        selectItem2(){
+            this.custom2 = this.matches2[this.selected2];  
+            this.ket2.kode=this.custom2.kode;
+            this.ket2.nama=this.custom2.nama;
+            this.item=true;
+            this.visible2=false;
+        },
+        up2(){
+            if(this.selected2==0){
+                return;
+            }
+            this.selected2 -= 1;
+            this.scrollToItem2();
+        },
+        down2(){
+            if(this.selected2 >= this.matches2.length -1 ){
+                return;
+            }
+            this.selected2 += 1;
+            this.scrollToItem2();
+        },
+        scrollToItem2(){
+            this.$refs.optionList.scrollTop = this.selected2 * this.itemHeight2;
+        },
+        /* End */
+        savecustomer(){     
+            this.namacustomer= this.ket2.nama;
+            this.kodecustomer= this.ket2.kode;
+            this.upload.kode_customer= this.ket2.kode;
+            $("#modal-customer").modal("hide"); 
+        },
+        pilihjenisharga(){
+            console.log(this.ket.harga);
+        },
+        hitunginvoice(){
+            this.subtotal=0;
+            this.invoice=0;
+            for(let i=0;i<this.listpr.length;i++){
+                if(this.hitung.qty[i]===""){
+                    this.inhitung.qty[i]=0;
+                }else if(this.hitung.qty[i]===undefined){
+                    this.inhitung.qty[i]=0;
+                }else{
+                    this.inhitung.qty[i]=this.hitung.qty[i];
+                }
+                this.subtotal=parseInt(this.listpr[i].harga)*parseInt( this.inhitung.qty[i])
+                this.invoice+=this.subtotal;
+            }
+        }
+    },
+} 
 </script>
 
 <style>
@@ -753,6 +1026,4 @@ export default {
         border:solid 1px lightgray;
         padding-left: 8px;
     }
-
-    
 </style>

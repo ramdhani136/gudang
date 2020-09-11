@@ -32,6 +32,7 @@ class ListSoResource extends JsonResource
             'bbk'=>$this->bbk,
             'tersedia'=>$this->tersedia,
             'qtyrso'=>$this->qtyrso,
+            'tgl_datang'=>$this->tanggal_datang,
         ];
     }
 }

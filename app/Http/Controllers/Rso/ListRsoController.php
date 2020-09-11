@@ -55,7 +55,7 @@ class ListRsoController extends Controller
      */
     public function show($listrso)
     {
-        return ListRsoResource::collection(Listrso::where('nomor_rso',$listrso)->latest()->get());
+        return ListRsoResource::collection(Listrso::where('nomor_rso',$listrso)->orderBy('updated_at','ASC')->get());
     }
 
     /**
