@@ -82,6 +82,7 @@ Route::resource('ekspedisi','Ekspedisi\EkspedisiController');
 Route::resource('bbm','Bbm\BbmController');
 Route::resource('listbbm','Bbm\ListBbmController');
 
+
 Route::resource('bck','Bck\BckController');
 
 Route::get('bck/data/aktif','Bck\BckController@aktif');
@@ -107,4 +108,6 @@ Route::resource('listretur','Retur\ListReturController');
 Route::resource('user','User\UserController');
 
 Route::resource('listso','So\ListSoController');
+
+Route::resource('pr','Pr\PrController');
 

@@ -2,6 +2,7 @@
 
 namespace App\Model\customer;
 
+use App\Model\Pr\Pr;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Rso\Rso;
 use App\Model\Sales\Sales;
@@ -21,6 +22,10 @@ class Customer extends Model
 
     public function custprice(){
         return $this->hasMany(Custprice::class,'kode_customer','kode');
+    }
+
+    public function pr(){
+        return $this->hasMany(Pr::class,'kode_customer','kode');
     }
 }
 

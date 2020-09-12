@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\So;
+namespace App\Http\Controllers\Pr;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\SoResource;
-use App\Model\So\So;
+use App\Http\Resources\PrResource;
+use App\Model\Pr\Pr;
 use Illuminate\Http\Request;
-
-
 use Symfony\Component\HttpFoundation\Response;
 
-class SoController extends Controller
+class PrController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +17,7 @@ class SoController extends Controller
      */
     public function index()
     {
-        return SoResource::collection(So::orderBy('updated_at','ASC')->get());
+        return PrResource::collection(Pr::orderby('created_at','ASC')->get());
     }
 
     /**
@@ -40,10 +38,9 @@ class SoController extends Controller
      */
     public function store(Request $request)
     {
-        $data=So::create($request->all());
-        return response(new SoResource($data),response::HTTP_CREATED);
+        $data= Pr::create($request->all());
+        return response(new PrResource($data),response::HTTP_CREATED);
     }
-
 
     /**
      * Display the specified resource.
@@ -53,7 +50,7 @@ class SoController extends Controller
      */
     public function show($id)
     {
-        return SoResource::collection(So::Where('nomor_so',$id)->get()); 
+        return PrResource::collection(Pr::where('nomor_pr',$id)->get());
     }
 
     /**
@@ -74,10 +71,10 @@ class SoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,$id)
+    public function update(Request $request, $id)
     {
-        So::where('nomor_so',$id)->update($request->all());
-        return response('updated',response::HTTP_CREATED);
+        Pr::where('nomor_pr',$id)->update($request->all());
+        return response('update',response::HTTP_CREATED);
     }
 
     /**
@@ -88,22 +85,7 @@ class SoController extends Controller
      */
     public function destroy($id)
     {
-        So::where('nomor_so',$id)->delete();
+        Pr::where('nomor_pr',$id)->delete();
         return response('deleted',response::HTTP_OK);
-    }
-
-    public function aktif()
-    {
-        return SoResource::collection(So::where('status','Acc')->where('pr','N')->orderBy('nomor_so','ASC')->get());
-    }
-
-    public function realso()
-    {
-        return SoResource::collection(So::where('pr','N')->orderBy('nomor_so','ASC')->get());
-    }
-    
-    public function sselesai()
-    {
-        return SoResource::collection(So::where('status','Acc')->where('rs','Y')->orderBy('nomor_so','ASC')->get());
     }
 }
