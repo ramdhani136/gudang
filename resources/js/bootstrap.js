@@ -31,13 +31,41 @@ window.Swal = require('sweetalert2');
  * allows your team to easily build robust real-time web applications.
  */
 
-// import Echo from 'laravel-echo';
+let token = document.head.querySelector('meta[name="csrf-token"]');
 
-// window.Pusher = require('pusher-js');
+if (token) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+} else {
+    console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+}
 
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: process.env.MIX_PUSHER_APP_KEY,
-//     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-//     forceTLS: true
-// });
+
+
+
+import Echo from 'laravel-echo';
+
+window.Pusher = require('pusher-js');
+
+window.Echo = new Echo({
+    broadcaster: "pusher",
+    key: process.env.MIX_PUSHER_APP_KEY,
+    encrypted: false,
+    wsHost: window.location.hostname,
+    wsPort: 6001,
+    disableStats: true,
+    cluster: 'eu',
+    forceTLS: false,
+    enabledTransports: ['ws', 'wss'],
+    disabledTransports: ['sockjs', 'xhr_polling', 'xhr_streaming']
+});
+
+/* window.Echo.channel("DemoChannel")
+.listen('WebsocketDemoEvent',(e) => {
+    console.log(e)
+});
+
+window.Echo.channel("chat")
+.listen('MessageSent',(e) => {
+    console.log(e)
+});
+ */

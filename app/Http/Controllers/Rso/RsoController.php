@@ -109,7 +109,7 @@ class RsoController extends Controller
 
     public function realrso()
     {
-        return PrResource::collection(Rso::where('pr','N')->orderBy('updated_at','ASC')->get());
+        return RsoResource::collection(Rso::where('pr','N')->orderBy('updated_at','ASC')->get());
     }
 
 }
