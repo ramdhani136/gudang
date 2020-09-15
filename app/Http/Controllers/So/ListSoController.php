@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\So;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ListGroupSoResource;
 use Illuminate\Http\Request;
 use App\Model\So\Listso;
 use App\Http\Resources\ListSoResource;
+use App\Http\Resources\SoGroupResource;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListSoController extends Controller
@@ -88,4 +90,16 @@ class ListSoController extends Controller
         Listso::where('id',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
+
+    public function  group(){
+        $data= Listso::groupBy('kode_barang')->where('statuspo','N')
+        ->selectRaw('count(*) as total, kode_barang')->get();
+        return SoGroupResource::collection($data);
+    }
+
+    public function  grouplist($barang){
+        return ListGroupSoResource::collection(Listso::where('statuspo','N')->where('kode_barang',$barang)->get());
+    }
+
+
 }

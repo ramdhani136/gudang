@@ -43,6 +43,8 @@ import PoSelesaiComponent from '../components/purchase/PoSelesaiComponent.vue'
 import AccPoComponent from '../components/purchase/AccPoComponent.vue'
 import poAccViewComponent from '../components/purchase/poAccViewComponent.vue'
 
+import PoCreateComponent from '../components/purchase/PoCreateComponent.vue'
+
 import BbmComponent from '../components/bbm/BbmComponent.vue'
 import CreateBbmComponent from '../components/bbm/CreateBbmComponent.vue'
 import ViewBbmComponent from '../components/bbm/ViewBbmComponent.vue'
@@ -129,6 +131,8 @@ const routes=[
     {name:'porequestselesai', path:'/purchase/po/selesai', component:PoSelesaiComponent},
     {name:'accpo', path:'/purchase/po/acc', component:AccPoComponent},
     {name:'poAccView', path:'/purchase/po/acc/:nomor', component:poAccViewComponent},
+
+    {name:'createpo', path:'/purchase/po/create/', component:PoCreateComponent},
     
 
     {name:'ingoods', path:'/dic/incoming', component:BbmComponent},

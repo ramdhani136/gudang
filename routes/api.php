@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+return $request->user();
 });
 
 Route::resource('barang','Barang\BarangController');
@@ -108,6 +108,8 @@ Route::resource('listretur','Retur\ListReturController');
 Route::resource('user','User\UserController');
 
 Route::resource('listso','So\ListSoController');
+Route::get('listso/data/group','So\ListSoController@group');
+Route::get('listso/data/group/{barang}','So\ListSoController@grouplist');
 
 Route::resource('pr','Pr\PrController');
 

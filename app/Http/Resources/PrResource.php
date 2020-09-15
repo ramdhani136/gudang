@@ -16,14 +16,15 @@ class PrResource extends JsonResource
     {
         return 
         [
-            'nomor_pr'=>$this->nomor_pr,
-            'tanggal'=>$this->tanggal,
-            'id_user'=>$this->id_user,
-            'kode_customer'=>$this->kode_customer,
+            'nomor_rso'=>$this->nomor_rso,
+            'tanggal_rso'=>$this->tanggal_rso,
+            'nip_sales'=>$this->nip_sales,
+            'customer'=>$this->customer->nama,
             'alamat'=>$this->customer->alamat,
-            'nama_customer'=>$this->customer->nama,
+            'kontak'=>$this->customer->kontak,
             'keterangan'=>$this->keterangan,
             'status'=>$this->status,
+            'kode_customer'=>$this->kode_customer,
         ];
     }
 }

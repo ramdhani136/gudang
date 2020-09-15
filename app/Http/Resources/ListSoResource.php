@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Model\Barang\Barang;
+use App\Model\So\Listso;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ListSoResource extends JsonResource
