@@ -30,9 +30,11 @@
             </div>
         </div>
     </div>
-    <div id="total" class="mt-3 ml-auto mr-4">Total Invoice :&nbsp; {{invoice | currency}}</div>
+    <div class="row">
+        <button v-if="item" @click="showmodal()" class="btn btn-orange mt-4 ml-3" style="height:40px;">+ Tambah Item</button>
+        <div id="total" class="mt-3 ml-auto mr-4">Total Invoice :&nbsp; {{invoice | currency}}</div>
+    </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
-        <button v-if="item" @click="showmodal()" class="btn btn-orange mt-2">+ Tambah Item</button>
         <div class="row mt-1 mx-auto col-12">
             <Circle5 id="load3" v-if="load"></Circle5>
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -44,6 +46,7 @@
                         <th>Satuan</th>
                         <th>Harga</th>
                         <th>Qty</th>
+                        <th>Sub Total</th>
                         <th>Catatan</th>
                         <th>Aksi</th>
                     </tr>
@@ -58,6 +61,7 @@
                         <td style="text-align:center">
                             <input @input="hitunginvoice()" v-model="hitung.qty[index]" type="number" class="form-control">
                         </td>
+                        <td style="text-align:center">{{lp.harga * hitung.qty[index] | currency}}</td>
                         <td style="text-align:center">
                             <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
                         </td>
@@ -579,6 +583,8 @@ export default {
         },
         hapus(index) {
             this.listpr.splice(index, 1)
+            this.hitung.qty.splice(index, 1)
+            this.hitung.keterangan.splice(index, 1)
         },
         DateTime() {
             this.date = new Date();

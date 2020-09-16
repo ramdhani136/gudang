@@ -36,9 +36,11 @@
             </div>
         </div>
     </div>
-    <div id="rsoverflowso" class="row mt-2 mx-auto">
+    <div class="row">
         <button @click="showmodal()" class="row float-left  ml-3 mt-4 label">Ambil Permintaan</button>
         <div id="totalpo" class="mt-3 ml-auto mr-3">Total Invoice &nbsp; : &nbsp;{{totalPrice | currency}}</div>
+    </div>
+    <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
             <Circle5 id="load3" v-if="load"></Circle5>
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -47,7 +49,8 @@
                         <th>No</th>
                         <th>Kode</th>
                         <th>Nama Barang</th>
-                        <th>Qty</th>
+                        <th>Jumlah PR</th>
+                        <th>Qty PO</th>
                         <th>Satuan</th>
                         <th>Harga</th>
                         <th>Sub Total</th>
@@ -55,16 +58,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(list,index) in arrFiltered" :key="index">
+                    <tr v-for="(list,index) in listfix" :key="index">
                         <td style="text-align:center">{{index+1}}</td>
-                        <td>{{list.kode}}</td>
+                        <td>{{list.kode_barang}}</td>
                         <td>{{list.nama_barang}}</td>
-                        <td style="text-align:center">{{hitung.qty[index]}}</td>
+                        <td style="text-align:center">{{list.qty}}</td>
+                        <td style="text-align:center">
+                            <input @input="hitunginv()" type="number" class="form-control" v-model="hitung.qty[index]">
+                        </td>
                         <td style="text-align:center">{{list.satuan}}</td>
                         <td style="text-align:center">
                             <input @input="hitunginv()" v-model="hitung.harga[index]" type="number" class="form-control">
                         </td>
-                        <td style="text-align:center">{{hitung.qty[index]*hitung.harga[index] | currency}}</td>
+                        <td style="text-align:center">{{hitung.qty[index]*hitung.sub[index] | currency}}</td>
                         <td style="text-align:center">
                             <button @click="deletelist(index)" class="btn btn-danger">Hapus</button>
                         </td>
@@ -75,57 +81,41 @@
     </div>
     <div class="row mt-2">
         <button @click="submitPo()" class="btn-success btn ml-4">
-            Kirim PO
+            Create PO
         </button>
     </div>
     <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Form Customer</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Form Barang</h5>
                     <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
+                        <label>Kode</label>
+                        <input v-model="form.kode_barang" type="text" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
                         <label>Pilih Barang</label>
-                        <select @change="getList()" v-model="chooseItem" class="form-control">
-                            <option v-for="(prl,index) in pr" :key="index" :value="prl.kode_barang">{{prl.nama}}</option>
+                        <select @change="getList(chooseItem)" v-model="chooseItem" class="form-control">
+                            <option v-for="(prl,index) in pr" :key="index" :value="prl">{{prl.nama}}</option>
                         </select>
                     </div>
-                    <div class="form-group" v-if="aktif">
-                        <label>Satuan</label>
-                        <input v-for="(fill,index) in FilteredSatuan" :key="index" v-model="fill.satuan" type="text" class="form-control" disabled>
+                    <div class="form-group">
+                        <label>Total Permintaan</label>
+                        <input v-model="form.jumlah" type="text" class="form-control" disabled>
                     </div>
-                    <div id="overflowBody">
-                        <table class="table mt-2 table-striped table-bordered" style="width:100%">
-                            <thead id="rsthead">
-                                <tr>
-                                    <th style="text-align:center">No</th>
-                                    <th style="text-align:center">Nomor SO</th>
-                                    <th style="text-align:center">Customer</th>
-                                    <th style="text-align:center">Jumlah</th>
-                                    <th style="text-align:center">Tandai</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(choosepr,index) in prlist" :key="index">
-                                    <td style="text-align:center">{{index+1}}</td>
-                                    <td style="text-align:center">{{choosepr.nomor_so}}</td>
-                                    <td>{{choosepr.customer}}</td>
-                                    <td style="text-align:center">{{choosepr.jumlah}}</td>
-                                    <td style="text-align:center">
-                                        <input v-model="checked" type="checkbox" :value="choosepr">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="form-group">
+                        <label>Satuan</label>
+                        <input v-model="ket.satuan" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="TambahItem()" class="btn btn-primary">Save changes</button>
+                    <button type="button" @click="TambahItem()" class="btn btn-primary">Input Item</button>
                 </div>
             </div>
         </div>
@@ -163,12 +153,16 @@
         <div class="modal-dialog" role="document">
             <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Form Purchase</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">List Supplier</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="form-group">
+                        <label>kode</label>
+                        <input v-model="ket.kode_supplier" type="text" class="form-control" disabled>
+                    </div>
                     <div class="form-group">
                         <label>Suplier</label>
                         <div class="autocomplete"></div>
@@ -176,16 +170,28 @@
                         <div class="placeholder" v-if="supply==null">Pilih Supplier</div>
                         <div class="popover" v-show="visible">
                             <input type="text" @keydown.up="atas" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nama Supplier ..">
-                            <div class="option" ref="optionList">
+                            <div class="heightcust option" ref="optionList">
                                 <ul>
                                     <li v-for="(match,index) in matches" :key="match.kode" v-text="match.nama" :class="{'selected':(selected==index)}" @click="itemClicked(index)"></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>Alamat</label>
+                        <textarea name="alamat" class="form-control" disabled></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>PIC</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Telepon/HP</label>
+                        <input type="text" class="form-control" disabled>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button @click="resetForm()" type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+                    <button @click="resetForm()" type="button" class="btn btn-primary" data-dismiss="modal">Pilih</button>
                 </div>
             </div>
         </div>
@@ -203,7 +209,7 @@ export default {
     },
     data() {
         return {
-            load: false,
+            load: true,
             checked: [],
             pr: {},
             chooseItem: '',
@@ -218,7 +224,7 @@ export default {
                 status: 'Request'
             },
             up: {},
-            visible: false,
+            visible: true,
             query: '',
             selected: 0,
             supply: null,
@@ -237,15 +243,20 @@ export default {
             hitung: {
                 qty: [],
                 harga: [],
-                sub: []
+                sub: [],
+                subqty: []
             },
-            jumlah: 0
+            jumlah: 0,
+            form: {
+                jumlah: ''
+            },
+            listfix: [],
+            ada: '',
+            bandiing: ''
         }
     },
     created() {
         this.getPr();
-        /*  this.getListPo(); */
-        this.getSupplier();
     },
     computed: {
         FilteredSatuan() {
@@ -261,36 +272,31 @@ export default {
         }
     },
     methods: {
-        /*    getListPo() {
-               axios.get("/api/listso/data/listpo/" + this.$route.params.nomor)
-                   .then(res => {
-                       this.listpo = res.data.data;
-                       this.totalPrice = 0;
-                       for (let i = 0; i < this.listpo.length; i++) {
-                           this.subTotal = parseInt(this.listpo[i].subtotal);
-                           this.totalPrice += this.subTotal;
-                       }
-                       this.load = false;
-                   });
-           }, */
         getPr() {
             axios.get("/api/listso/data/group")
                 .then(res => {
                     this.pr = res.data.data
+                    axios.get("/api/supplier")
+                        .then(res => {
+                            this.supplier = res.data.data;
+                            this.load = false;
+                        });
                 });
         },
-        getList() {
-            axios.get("/api/listso/data/group/" + this.chooseItem)
+        getList(chooseItem) {
+            this.load = true;
+            axios.get("/api/listso/data/group/" + chooseItem.kode_barang)
                 .then(res => {
                     this.prlist = res.data.data;
-                    this.aktif = true;
+                    this.form.jumlah = 0;
+                    for (let i = 0; i < this.prlist.length; i++) {
+                        this.form.jumlah += parseInt(this.prlist[i].jumlah);
+                    }
+                    this.load = false;
+                    this.form.kode_barang = this.prlist[0].kode;
+                    this.form.nama_barang = this.prlist[0].nama_barang;
+                    this.ket.satuan = this.prlist[0].satuan;
                 })
-        },
-        getSupplier() {
-            axios.get("/api/supplier")
-                .then(res => {
-                    this.supplier = res.data.data;
-                });
         },
         now() {
             var d = new Date();
@@ -331,29 +337,70 @@ export default {
             /* this.checked = []; */
             this.file = {};
             this.up.alastolak = "";
+            this.form = {};
+            this.ket.satuan = '';
         },
         TambahItem() {
-            var uniq = {}
-            this.arrFiltered = this.checked.filter(obj => !uniq[obj.kode] && (uniq[obj.kode] = true));
-            for (let i = 0; i < this.arrFiltered.length; i++) {
-                var unik = {};
-                this.barangFiltered = this.checked.filter(obj => obj.kode.includes(this.arrFiltered[i].kode));
-                this.jumlah = 0;
-                for (let u = 0; u < this.barangFiltered.length; u++) {
-                    this.jumlah += parseInt(this.barangFiltered[u].jumlah);
+            if (this.listfix.length === 0) {
+                this.listfix.push({
+                    kode_barang: this.form.kode_barang,
+                    nama_barang: this.form.nama_barang,
+                    qty: this.form.jumlah,
+                    satuan: this.ket.satuan,
+                })
+            } else {
+                this.ada = "";
+                this.banding = "";
+                for (let i = 0; i < this.listfix.length; i++) {
+                    if (this.form.kode_barang === this.listfix[i].kode_barang) {
+                        this.result = "Y";
+                    } else {
+                        this.result = "N";
+                    }
+                    this.ada += this.result;
+                    this.banding += "N";
                 }
-                this.hitung.qty[i] = this.jumlah;
-                this.hitung.harga[i] = "";
-                this.hitunginv();
+                if (this.ada === this.banding) {
+                    this.listfix.push({
+                        kode_barang: this.form.kode_barang,
+                        nama_barang: this.form.nama_barang,
+                        qty: this.form.jumlah,
+                        satuan: this.ket.satuan,
+                    })
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal menambahkan item...',
+                        text: 'Item ini sudah di input!',
+                    })
+                }
             }
 
             $("#modal-form").modal("hide");
             this.resetForm();
+
+            /*  var uniq = {}
+             this.arrFiltered = this.checked.filter(obj => !uniq[obj.kode] && (uniq[obj.kode] = true));
+             for (let i = 0; i < this.arrFiltered.length; i++) {
+                 var unik = {};
+                 this.barangFiltered = this.checked.filter(obj => obj.kode.includes(this.arrFiltered[i].kode));
+                 this.jumlah = 0;
+                 for (let u = 0; u < this.barangFiltered.length; u++) {
+                     this.jumlah += parseInt(this.barangFiltered[u].jumlah);
+                 }
+                 this.hitung.qty[i] = this.jumlah;
+                 this.hitung.harga[i] = "";
+                 this.hitunginv();
+             }
+
+             $("#modal-form").modal("hide");
+             this.resetForm(); */
         },
         deletelist(index) {
-            this.arrFiltered.splice(index, 1);
+            /*    this.arrFiltered.splice(index, 1); */
             this.hitung.qty.splice(index, 1);
             this.hitung.harga.splice(index, 1);
+            this.listfix.splice(index, 1);
             this.resetForm();
             this.hitunginv();
 
@@ -383,8 +430,9 @@ export default {
             }
         },
         submitPo() {
-            this.lpo.kode_customer = this.ket.kode_supplier;
-            console.log(this.lpo);
+            for (let i = 0; i < this.listfix.length; i++) {
+                console.log(this.hitung.harga[i]);
+            }
         },
         kembali() {
             this.$router.push({
@@ -405,6 +453,10 @@ export default {
             this.supply = this.matches[this.selected];
             this.ket.kode_supplier = this.supply.kode_supplier;
             this.ket.nama = this.supply.nama;
+            this.ket.alamat = this.supply.alamat;
+            this.ket.pic = this.supply.pic;
+            this.ket.telepon = this.supply.telepon;
+            this.ket.email = this.supply.email;
             this.visible = false;
         },
         atas() {
@@ -427,14 +479,25 @@ export default {
         hitunginv() {
             this.totalPrice = 0;
             this.sub = [];
-            for (let i = 0; i < this.arrFiltered.length; i++) {
+            this.subqty = [];
+            for (let i = 0; i < this.listfix.length; i++) {
                 if (this.hitung.harga[i] === undefined || this.hitung.harga[i] === "") {
                     this.hitung.sub[i] = 0;
                 } else {
                     this.hitung.sub[i] = this.hitung.harga[i]
                 }
 
-                this.totalPrice += parseInt(this.hitung.qty[i]) * parseInt(this.hitung.sub[i]);
+                if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === "") {
+                    this.hitung.subqty[i] = 0;
+                } else {
+                    this.hitung.subqty[i] = this.hitung.qty[i]
+                }
+
+                if (this.hitung.qty[i] > this.listfix[i].qty) {
+                    this.hitung.qty[i] = this.listfix[i].qty;
+                }
+
+                this.totalPrice += parseInt(this.hitung.subqty[i]) * parseInt(this.hitung.sub[i]);
             }
         }
     },
@@ -461,5 +524,9 @@ export default {
     max-height: 220px;
     font-size: 0.9em;
     overflow-y: scroll;
+}
+
+.heightcust {
+    max-height: 320px;
 }
 </style>

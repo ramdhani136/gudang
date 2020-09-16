@@ -309,7 +309,8 @@ export default {
                                                         pr: "Y",
                                                         lokasi: "PT. Ekatunggal Tunas Mandiri",
                                                         alamat: "Jl. Pahlawan No.29A, RT.003/005 Citeureup, Kab. Bogor",
-                                                        tanggal_kirim: rs.tanggal_rso
+                                                        tanggal_kirim: rs.tanggal_rso,
+                                                        statusso: 'tidaktersedia'
                                                     })
                                                     .then(res => {
                                                         for (let s = 0; s < this.listrso.length; s++) {
@@ -321,6 +322,9 @@ export default {
                                                                 qty: this.listrso[s].qty,
                                                                 catatan: this.listrso[s].catatan,
                                                                 qtyrso: this.listrso[s].qty,
+                                                                openso: "Y",
+                                                                statusso: "Tidak Tersedia",
+                                                                qtyrso: this.listrso[s].qty,
                                                             }
                                                             axios.post("/api/listso", this.uplist)
                                                         }
@@ -329,11 +333,6 @@ export default {
                                         this.$router.push({
                                             name: 'purchase'
                                         });
-                                        swalWithBootstrapButtons.fire(
-                                            'Berhasil!',
-                                            'RSO berhasil di konfirmasi.',
-                                            'success'
-                                        )
                                     })
                             } else {
                                 this.konfirm.status = 'Confirmed';

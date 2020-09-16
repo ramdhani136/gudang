@@ -92,13 +92,13 @@ class ListSoController extends Controller
     }
 
     public function  group(){
-        $data= Listso::groupBy('kode_barang')->where('statuspo','N')
+        $data= Listso::groupBy('kode_barang')->where('statuspo','N')->where('openso','Y')->where('statusso','Tidak Tersedia')
         ->selectRaw('count(*) as total, kode_barang')->get();
         return SoGroupResource::collection($data);
     }
 
     public function  grouplist($barang){
-        return ListGroupSoResource::collection(Listso::where('statuspo','N')->where('kode_barang',$barang)->get());
+        return ListGroupSoResource::collection(Listso::where('openso','Y')->where('statusso','Tidak Tersedia')->where('statuspo','N')->where('kode_barang',$barang)->get());
     }
 
 

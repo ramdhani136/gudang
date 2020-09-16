@@ -238,23 +238,9 @@ export default {
                     this.up.status = "Dic";
                     axios.put("/api/so/" + this.up.nomor_so, this.up)
                         .then((response) => {
-                            this.statusSo = {
-                                'so_open': 'Y'
-                            };
-                            axios.put("/api/listrso/data/sopen/" + this.up.nomor_rso, this.statusSo)
-                                .then(res => {
-                                    this.$router.push({
-                                        name: 'soconfirm'
-                                    })
-                                });
-                            for (let d = 0; d < this.uplist.length; d++) {
-                                this.aksiup = {
-                                    statusso: this.uplist[d].statusso,
-                                    dateaccso: this.DateTime(),
-                                };
-                                axios.put("/api/listrso/" + this.uplist[d].id, this.aksiup)
-                                    .then(res => {});
-                            }
+                            this.$router.push({
+                                name: 'soconfirm'
+                            })
                             swalWithBootstrapButtons.fire(
                                 'Selesai!',
                                 'SO Berhasil di terima !',

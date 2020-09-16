@@ -222,7 +222,44 @@ export default {
                 });
         },
         deleteSo(rs) {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
 
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin ingin menghapus SO ini?',
+                text: "SO akan di hapus permanen dari database!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.delete("/api/so/" + rs.nomor_so)
+                        .then(res => {
+                            this.getSo();
+                            swalWithBootstrapButtons.fire(
+                                'Deleted!',
+                                'SO berhasil di hapus.',
+                                'success'
+                            )
+                        });
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal hapus SO ini :)',
+                        'error'
+                    )
+                }
+            })
         },
         requestselesai(rs) {
             this.nso = rs.nomor_so;

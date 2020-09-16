@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor SO :</label>
-                <input v-model="vso.nomor_so" type="text" class="form-control col-12" :disabled="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">
+                <input v-model="vso.nomor_so" type="text" class="form-control col-12" :disabled="ket.statusnya!=='Draft'">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -12,7 +12,7 @@
             </div>
             <div class="form-group">
                 <label>Tanggal Kirim :</label>
-                <input v-model="vso.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">
+                <input v-model="vso.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="ket.statusnya!=='Draft'">
             </div>
         </div>
         <div class="col-4">
@@ -28,13 +28,13 @@
             </div>
             <div class="form-group">
                 <label>keterangan</label>
-                <textarea v-model="vso.keterangan" name="keterangan" class="form-control col-12" :disabled="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'"></textarea>
+                <textarea v-model="vso.keterangan" name="keterangan" class="form-control col-12" :disabled="ket.statusnya!=='Draft'"></textarea>
             </div>
         </div>
         <div class="col-4">
             <div class="form-group">
                 <label>Distribusi :</label>
-                <select class="form-control" v-model="vso.distribusi" @change="aksidistribusi(vso)" :disabled="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">
+                <select class="form-control" v-model="vso.distribusi" @change="aksidistribusi(vso)" :disabled="ket.statusnya!=='Draft'">
                     <option value="default">- Masukan pilihan anda -</option>
                     <option value="kirim">Di Kirim</option>
                     <option value="ambil">Ambil Sendiri</option>
@@ -97,19 +97,19 @@
         <button v-if="ket.statusnya==='Draft'" @click="submitSo(vso)" class="btn-success btn ml-4 mt-2">
             Kirim SO
         </button>
-        <button v-if="ket.statusnya==='Tolak'" @click="submitSo(vso)" class="btn-success btn ml-4 mt-2">
-            Kirim Ulang SO
-        </button>
-        <button v-if="ket.statusnya==='Sent' || ket.statusnya==='Acc' && ambiluser.sales===1 || ambiluser.superadmin===0" @click="reqedit(vso)" class="btn-orange btn ml-4 mt-2">
+        <button v-if="(ket.statusnya==='Sent' || ket.statusnya==='Acc'  || ket.statusnya==='Tolak') && (ambiluser.sales===1 || ambiluser.superadmin===1)" @click="reqedit(vso)" class="btn-orange btn ml-4 mt-2">
             Request Edit SO
+        </button>
+        <button v-if="ket.statusnya==='Tolak'" @click="submitSo(vso)" class="btn-success btn ml-2 mt-2">
+            Kirim Ulang SO
         </button>
         <button v-if="ket.statusnya==='Sent' || ket.statusnya==='Draft' " @click="reqbatal(vso)" class="btn-none btn ml-1 mt-2">
             Batalkan SO
         </button>
-        <button v-if="ket.statusnya==='Dic' " @click="formtolak(vso)" class="btn-none btn ml-4 mt-2">
+        <button v-if="ambiluser.distribusi===1 && ket.statusnya==='Dic' " @click="formtolak(vso)" class="btn-none btn ml-4 mt-2">
             Tolak SO
         </button>
-        <button v-if="ket.statusnya==='Dic'" @click="AccDic(vso)" class="btn-success btn ml-2 mt-2">
+        <button v-if="ambiluser.distribusi===1  && ket.statusnya==='Dic'" @click="AccDic(vso)" class="btn-success btn ml-2 mt-2">
             Terima SO
         </button>
     </div>
@@ -226,6 +226,28 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-tolak" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Penolakan SO</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Alasan Penolakan</label>
+                        <textarea v-model="up.alastolak" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="tolakSo()" class="btn btn-primary">Konfirmasi Tolak</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -273,6 +295,8 @@ export default {
             aksi: '',
             akses: true,
             bbk: 0,
+            up: {},
+            listsoup: {}
         }
     },
     created() {
@@ -393,6 +417,7 @@ export default {
                                 alamat: vso.alamat,
                                 lokasi: vso.lokasi,
                                 status: 'Sent',
+                                alastolak: '',
                                 id_ekspedisi: vso.id_ekspedisi
                             };
                             axios.put("/api/so/" + this.listnewso[0].nomor_so, this.uploadso)
@@ -419,7 +444,8 @@ export default {
                                                     id_custprice: this.listnewso[i].id_custprice,
                                                     qty: this.hitung.qty[i],
                                                     qtyrso: 0,
-                                                    tersedia: this.ada
+                                                    tersedia: this.ada,
+                                                    statusso: this.ket.status
                                                 }
                                                 axios.post("/api/listso", this.uplist)
                                                     .then(res => {
@@ -528,41 +554,38 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    if (vso.statusso === "tersedia") {
-                        axios.get("/api/listso/" + this.$route.params.id)
-                            .then(res => {
-                                this.listfull = res.data.data;
-                                for (let i = 0; i < this.listfull.length; i++) {
-                                    if (this.listfull[i].bbk === null || this.listfull[i].bbk === "") {
-                                        this.listfull[i].bbk = 0;
-                                    }
-                                    this.bbk += this.listfull[i].bbk;
+                    axios.get("/api/listso/" + this.$route.params.id)
+                        .then(res => {
+                            this.listfull = res.data.data;
+                            for (let i = 0; i < this.listfull.length; i++) {
+                                if (this.listfull[i].bbk === null || this.listfull[i].bbk === "") {
+                                    this.listfull[i].bbk = 0;
                                 }
-                                if (this.bbk < 1) {
-                                    axios.put("/api/so/" + this.$route.params.id, {
-                                            status: 'Draft'
-                                        })
-                                        .then(res => {
-                                            this.$router.push({
-                                                name: 'so'
-                                            })
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Berhasil...',
-                                                text: 'Silahkan edit SO anda di list draft SO',
-                                            })
-                                        });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim',
+                                this.bbk += this.listfull[i].bbk;
+                            }
+                            if (this.bbk < 1) {
+                                axios.put("/api/so/" + this.$route.params.id, {
+                                        alastolak: '',
+                                        status: 'Draft'
                                     })
-                                }
-                            });
-                    } else {
-                        /* Belum ada file ponya */
-                    }
+                                    .then(res => {
+                                        this.$router.push({
+                                            name: 'so'
+                                        })
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Berhasil...',
+                                            text: 'Silahkan edit SO anda di list draft SO',
+                                        })
+                                    });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim',
+                                })
+                            }
+                        });
                 } else if (
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
@@ -794,11 +817,19 @@ export default {
                     axios.put("/api/so/" + vso.nomor_so, {
                         status: "Acc"
                     }).then(res => {
+                        axios.get("/api/listso/" + vso.nomor_so).then(res => {
+                            this.listsoup = res.data.data;
+                            for (let y = 0; y < this.listsoup.length; y++) {
+                                axios.put("/api/listso/" + this.listsoup[y].id, {
+                                    openso: 'Y'
+                                })
+                            }
+                        })
                         this.$router.push({
                             name: 'distribusiso'
                         })
                         swalWithBootstrapButtons.fire(
-                            'DI Konfirmasi!',
+                            'Sukses!',
                             'SO berhasil di terima.',
                             'success'
                         )
@@ -811,6 +842,63 @@ export default {
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal menerima SO :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        formtolak() {
+            $("#modal-tolak").modal("show");
+        },
+        tolakSo() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin',
+                text: "Ingin menolak SO ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya,Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.put("/api/so/" + this.$route.params.id, {
+                        status: "Tolak",
+                        alastolak: this.up.alastolak,
+                    }).then(res => {
+                        axios.get("/api/listso/" + this.$route.params.id).then(res => {
+                            this.listsoup = res.data.data;
+                            for (let y = 0; y < this.listsoup.length; y++) {
+                                axios.put("/api/listso/" + this.listsoup[y].id, {
+                                    openso: 'N'
+                                })
+                            }
+                        })
+
+                        swalWithBootstrapButtons.fire(
+                            'Sukses!',
+                            'So berhasil di tolak.',
+                            'success'
+                        )
+                        $("#modal-tolak").modal("hide");
+                        this.$router.push({
+                            name: 'distribusiso'
+                        })
+                    })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal melakukan penolakan :)',
                         'error'
                     )
                 }

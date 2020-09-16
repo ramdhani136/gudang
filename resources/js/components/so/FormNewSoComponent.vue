@@ -50,8 +50,10 @@
             </div>
         </div>
     </div>
-    <div id="rsoverflowso" class="row mt-2 mx-auto">
+    <div class="row">
         <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{invoice | currency}}</div>
+    </div>
+    <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
             <Circle5 id="load3" v-if="load"></Circle5>
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -80,7 +82,7 @@
                         <td style="text-align:center">{{ch.satuan}}</td>
                         <td style="text-align:center">{{ch.harga |currency}}</td>
                         <td style="text-align:center">{{lstatus}}</td>
-                        <td>{{ch.harga * ch.qty |currency}}</td>
+                        <td>{{ch.harga * hitung.qty[index] | currency}}</td>
                         <td v-if="tampil" style="text-align:center">{{ch.tgl_datang}}</td>
                         <td style="text-align:center">
                             <button @click="hapuslistSo(index)" class="btn btn-danger">Hapus</button>
@@ -284,7 +286,7 @@ export default {
     },
     data() {
         return {
-            load: false,
+            load: true,
             up: {
                 nomor_so: this.so_nomor(),
                 tanggal_so: this.now(),
@@ -327,13 +329,13 @@ export default {
             pembanding: '',
             lisallrso: {},
             statpo: 'Y',
+            statusso: ''
         }
     },
     created() {
         this.getRso();
         this.resetForm();
         this.timer();
-        this.getekspedisi();
     },
     computed: {
         matches() {
@@ -348,12 +350,11 @@ export default {
             axios.get("/api/rso/data/confirm/")
                 .then(res => {
                     this.rso = res.data.data;
-                });
-        },
-        getekspedisi() {
-            axios.get("/api/ekspedisi")
-                .then(res => {
-                    this.dataekspedisi = res.data.data;
+                    axios.get("/api/ekspedisi")
+                        .then(res => {
+                            this.dataekspedisi = res.data.data;
+                            this.load = false;
+                        });
                 });
         },
         now() {
@@ -503,9 +504,11 @@ export default {
                                     if (this.status === 'Tersedia') {
                                         this.ada = this.hitung.qty[i];
                                         this.statpo = "Y";
+                                        this.statusso = "Tersedia";
                                     } else {
                                         this.ada = 0;
                                         this.statpo = "N";
+                                        this.statusso = "Tidak Tersedia";
                                     }
                                     this.upload = {
                                         qtyrso: this.ket.coba[i],
@@ -517,6 +520,7 @@ export default {
                                         qty: this.hitung.qty[i],
                                         tersedia: this.ada,
                                         statuspo: this.statpo,
+                                        statusso: this.statusso
                                     }
                                     axios.post("/api/listso", this.upload)
                                         .then(res => {
@@ -644,9 +648,11 @@ export default {
                                     if (this.status === 'Tersedia') {
                                         this.ada = this.hitung.qty[i];
                                         this.statpo = "Y";
+                                        this.statusso = "Tersedia";
                                     } else {
                                         this.ada = 0;
                                         this.statpo = "N";
+                                        this.statusso = "Tidak Tersedia"
                                     }
                                     this.upload = {
                                         qtyrso: this.ket.coba[i],
@@ -657,6 +663,7 @@ export default {
                                         qty: this.hitung.qty[i],
                                         tersedia: this.ada,
                                         statuspo: this.statpo,
+                                        statusso: this.statusso,
                                     }
                                     axios.post("/api/listso", this.upload)
                                         .then(res => {
