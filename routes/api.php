@@ -110,6 +110,10 @@ Route::resource('user','User\UserController');
 Route::resource('listso','So\ListSoController');
 Route::get('listso/data/group','So\ListSoController@group');
 Route::get('listso/data/group/{barang}','So\ListSoController@grouplist');
+Route::get('listso/data/antrianpo/{barang}','So\ListSoController@antrianpo');
 
 Route::resource('pr','Pr\PrController');
+
+Route::resource('listpo','Po\ListpoController');
+Route::get('listpo/data/aktif','Po\ListpoController@sisalist');
 

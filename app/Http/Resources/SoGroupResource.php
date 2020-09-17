@@ -16,7 +16,7 @@ class SoGroupResource extends JsonResource
      */
     public function toArray($request)
     {
-        $jumlah= Listso::where('kode_barang',$this->kode_barang)->where('tersedia','<',1)->where('statuspo','N')->sum('qty');
+        $jumlah= Listso::where('kode_barang',$this->kode_barang)->where('statusso','Tidak Tersedia')->where('statuspo','N')->where('openso','Y')->sum('sisapo');
         $groupList= Barang::where('kode',$this->kode_barang)->get();
 
        return 

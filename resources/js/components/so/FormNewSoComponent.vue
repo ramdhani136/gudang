@@ -505,10 +505,12 @@ export default {
                                         this.ada = this.hitung.qty[i];
                                         this.statpo = "Y";
                                         this.statusso = "Tersedia";
+                                        this.sisapo = 0;
                                     } else {
                                         this.ada = 0;
                                         this.statpo = "N";
                                         this.statusso = "Tidak Tersedia";
+                                        this.sisapo = this.hitung.qty[i];
                                     }
                                     this.upload = {
                                         qtyrso: this.ket.coba[i],
@@ -520,7 +522,8 @@ export default {
                                         qty: this.hitung.qty[i],
                                         tersedia: this.ada,
                                         statuspo: this.statpo,
-                                        statusso: this.statusso
+                                        statusso: this.statusso,
+                                        sisapo: this.sisapo,
                                     }
                                     axios.post("/api/listso", this.upload)
                                         .then(res => {
@@ -649,10 +652,12 @@ export default {
                                         this.ada = this.hitung.qty[i];
                                         this.statpo = "Y";
                                         this.statusso = "Tersedia";
+                                        this.sisapo = 0;
                                     } else {
                                         this.ada = 0;
                                         this.statpo = "N";
-                                        this.statusso = "Tidak Tersedia"
+                                        this.statusso = "Tidak Tersedia";
+                                        this.sisapo = this.hitung.qty[i];
                                     }
                                     this.upload = {
                                         qtyrso: this.ket.coba[i],
@@ -664,6 +669,7 @@ export default {
                                         tersedia: this.ada,
                                         statuspo: this.statpo,
                                         statusso: this.statusso,
+                                        sisapo: this.sisapo,
                                     }
                                     axios.post("/api/listso", this.upload)
                                         .then(res => {

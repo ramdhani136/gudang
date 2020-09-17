@@ -4,6 +4,7 @@ namespace App\Http\Controllers\So;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ListGroupSoResource;
+use App\Http\Resources\ListRsoResource;
 use Illuminate\Http\Request;
 use App\Model\So\Listso;
 use App\Http\Resources\ListSoResource;
@@ -99,6 +100,10 @@ class ListSoController extends Controller
 
     public function  grouplist($barang){
         return ListGroupSoResource::collection(Listso::where('openso','Y')->where('statusso','Tidak Tersedia')->where('statuspo','N')->where('kode_barang',$barang)->get());
+    }
+
+    public function antrianpo($barang){
+         return ListSoResource::collection(Listso::where("openso","Y")->where('kode_barang',$barang)->where('statusso','Tidak Tersedia')->where('closepo','N')->get());
     }
 
 

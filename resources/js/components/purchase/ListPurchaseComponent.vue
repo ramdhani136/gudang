@@ -201,37 +201,6 @@ export default {
                 })
         },
         ConfirmRso(rs) {
-            /* axios.post("/api/so", {
-                    nomor_so: rs.nomor_rso,
-                    tanggal_so: rs.tanggal_rso,
-                    nomor_rso: rs.nomor_rso,
-                    keterangan: rs.keterangan,
-                    status: "Acc",
-                    distribusi: "Ambil",
-                    statusso: "tidaktersedia",
-                    pr: "Y",
-                    lokasi: "PT. Ekatunggal Tunas Mandiri",
-                    alamat: "Jl. Pahlawan No.29A, RT.003/005 Citeureup, Kab. Bogor",
-                    tanggal_kirim: rs.tanggal_rso
-                })
-                .then(res => {
-                    for (let s = 0; s < this.listrso.length; s++) {
-                        this.uplist = {
-                            nomor_so: rs.nomor_rso,
-                            kode_barang: this.listrso[s].lkode_barang,
-                            harga: this.listrso[s].harga,
-                            id_custprice: this.listrso[s].id_custprice,
-                            qty: this.listrso[s].qty,
-                            catatan: this.listrso[s].catatan,
-                            qtyrso: this.listrso[s].qty,
-                        }
-                        axios.post("/api/listso", this.uplist)
-                            .then(res => {
-                                console.log("sukses");
-                            })
-                    }
-                })
- */
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success ml-2',
@@ -325,6 +294,9 @@ export default {
                                                                 openso: "Y",
                                                                 statusso: "Tidak Tersedia",
                                                                 qtyrso: this.listrso[s].qty,
+                                                                pr: "Y",
+                                                                accdate: this.DateTime(),
+                                                                sisapo: this.listrso[s].qty,
                                                             }
                                                             axios.post("/api/listso", this.uplist)
                                                         }
@@ -416,7 +388,24 @@ export default {
                     }
                 })
 
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
         }
+
     },
 }
 </script>

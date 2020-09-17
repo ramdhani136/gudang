@@ -313,7 +313,10 @@ export default {
                                                 catatan: this.listsoacc[i].catatan,
                                                 statusso: "Tidak Tersedia",
                                                 tanggal_datang: this.listsoacc[i].tgl_datang,
-                                                openso: "Y"
+                                                openso: "Y",
+                                                pr: "Y",
+                                                accdate: this.DateTime(),
+                                                sisapo: this.listsoacc[i].qty,
                                             }
                                             axios.post("/api/listso", this.uplist)
                                                 .then(res => {
@@ -388,6 +391,22 @@ export default {
                     )
                 }
             })
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
         }
     },
 }

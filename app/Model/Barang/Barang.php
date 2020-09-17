@@ -9,6 +9,7 @@ use App\Model\Barang\Listbcm;
 use App\Model\Bbm\Listbbm;
 use App\Model\Bck\Listbck;
 use App\Model\Bck\Listbbk;
+use App\Model\Po\Listpo;
 use App\Model\Retur\Listretur;
 use App\Model\So\Listso;
 
@@ -47,5 +48,9 @@ class Barang extends Model
 
     public function listso(){
         return $this->hasMany(Listso::class,'kode_barang','kode');
+    }
+
+    public function listpo(){
+        return $this->hasMany(Listpo::class,'kode_barang','kode');
     }
 }

@@ -17,7 +17,7 @@ class PoController extends Controller
      */
     public function index()
     {
-        return PoResource::collection(Po::orderBy('updated_at','ASC')->get());
+        return PoResource::collection(Po::orderBy('nomor_po','ASC')->get());
     }
 
     /**

@@ -821,7 +821,8 @@ export default {
                             this.listsoup = res.data.data;
                             for (let y = 0; y < this.listsoup.length; y++) {
                                 axios.put("/api/listso/" + this.listsoup[y].id, {
-                                    openso: 'Y'
+                                    openso: 'Y',
+                                    accdate: this.DateTime(),
                                 })
                             }
                         })
@@ -903,6 +904,22 @@ export default {
                     )
                 }
             })
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
         }
     }
 }

@@ -14,14 +14,12 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Supplier</label>
-                <select @click="pilihsupplier()" v-model="ket.kode_supplier" name="customer" class="col-12 form-control" :disabled="lpo.status==='Request' || lpo.status==='Acc' || lpo.status==='Selesai'">
-                    <option :value="ket.kode_supplier">{{ket.nama}}</option>
-                </select>
+                <input @click="pilihsupplier()" v-model="ket.nama" type="text" placeholder="Pilih Supplier" class="form-control">
             </div>
             <div class="form-group">
                 <label>Purchasing</label>
                 <select v-model="lpo.nip_purchasing" class="col-12 form-control">
-                    <option :value="0">Dida</option>
+                    <option v-for="(purch,index) in purchasing" :key="index" :value="purch.nip">{{purch.nama}}</option>
                 </select>
             </div>
         </div>
@@ -37,7 +35,7 @@
         </div>
     </div>
     <div class="row">
-        <button @click="showmodal()" class="row float-left  ml-3 mt-4 label">Ambil Permintaan</button>
+        <button @click="showmodal()" class="row float-left  ml-4 mt-4 label">Ambil Permintaan</button>
         <div id="totalpo" class="mt-3 ml-auto mr-3">Total Invoice &nbsp; : &nbsp;{{totalPrice | currency}}</div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
@@ -161,7 +159,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>kode</label>
-                        <input v-model="ket.kode_supplier" type="text" class="form-control" disabled>
+                        <input v-model="lpo.kode_supplier" type="text" class="form-control" disabled>
                     </div>
                     <div class="form-group">
                         <label>Suplier</label>
@@ -252,7 +250,17 @@ export default {
             },
             listfix: [],
             ada: '',
-            bandiing: ''
+            bandiing: '',
+            purchasing: {},
+            uplistpo: {},
+            lengkap: '',
+            subl: '',
+            subban: '',
+            listbagi: {},
+            kasihso: 0,
+            sisapembagi: 0,
+            masihsisa: 0,
+            sisapo: 0
         }
     },
     created() {
@@ -279,7 +287,11 @@ export default {
                     axios.get("/api/supplier")
                         .then(res => {
                             this.supplier = res.data.data;
-                            this.load = false;
+                            axios.get("/api/purchasing")
+                                .then(res => {
+                                    this.purchasing = res.data.data
+                                    this.load = false;
+                                })
                         });
                 });
         },
@@ -430,9 +442,134 @@ export default {
             }
         },
         submitPo() {
+            this.kasihso = 0;
+            this.sisapembagi = 0;
+            this.masihsisa = 0;
+            this.sisapo = 0;
             for (let i = 0; i < this.listfix.length; i++) {
-                console.log(this.hitung.harga[i]);
+                axios.get("/api/listso/data/antrianpo/" + this.listfix[i].kode_barang)
+                    .then(res => {
+                        this.listbagi = res.data.data;
+                        this.kasihso = 0;
+                        this.sisapembagi = 0;
+                        this.masihsisa = 0;
+                        this.sisapo = 0;
+                        for (let k = 0; k < this.listbagi.length; k++) {
+                            /* ini sisa sonya */
+                            this.sisapembagi = parseInt(this.listbagi[k].qty) - parseInt(this.listbagi[k].openpo);
+                            /* end */
+                            if (this.hitung.qty[i] < this.sisapembagi) {
+                                this.kasihso = this.hitung.qty[i];
+                                this.hitung.qty[i] = 0;
+                            } else {
+                                this.kasihso = this.sisapembagi;
+                                this.hitung.qty[i] = parseInt(this.hitung.qty[i]) - parseInt(this.sisapembagi);
+                            }
+                            /* console.log(this.listfix[i].kode_barang)
+                            console.log(this.listbagi[k].id) */
+                            /*  this.sisaso = parseInt(this.listbagi[k].sisapo) + parseInt(this.kasihso); */
+                            /*  console.log(this.sisaso) */
+                            this.sisapo = parseInt(this.listbagi[k].openpo) + parseInt(this.kasihso);
+                            /*  console.log(this.sisapo)
+                             console.log(this.kasihso) */
+                            console.log({
+                                id: this.listbagi[k].id,
+                                sisapo: this.sisapo,
+                                openpo: this.kasihso
+                            });
+                        }
+                    })
             }
+            // const swalWithBootstrapButtons = Swal.mixin({
+            //     customClass: {
+            //         confirmButton: 'btn btn-success ml-2',
+            //         cancelButton: 'btn btn-danger'
+            //     },
+            //     buttonsStyling: false
+            // })
+
+            // swalWithBootstrapButtons.fire({
+            //     title: 'Apakah anda yakin?',
+            //     text: "Ingin membuat PO ini!",
+            //     icon: 'warning',
+            //     showCancelButton: true,
+            //     confirmButtonText: 'Iya, Yakin!',
+            //     cancelButtonText: 'Tidak!',
+            //     reverseButtons: true
+            // }).then((result) => {
+            //     if (result.isConfirmed) {
+            //         if (this.listfix.length < 1) {
+            //             Swal.fire({
+            //                 icon: 'error',
+            //                 title: 'Oops...',
+            //                 text: 'Anda belum menginput data barang!',
+            //             })
+            //         } else {
+            //             this.hitunginv();
+            //             this.lengkap = "";
+            //             this.subl = '';
+            //             this.subban = ''
+            //             for (let i = 0; i < this.listfix.length; i++) {
+            //                 if (this.hitung.sub[i] > 0 && this.hitung.subqty[i] > 0) {
+            //                     this.lengkap = "Y";
+            //                 } else {
+            //                     this.lengkap = "N";
+            //                 }
+            //                 this.subl += this.lengkap;
+            //                 this.subban += "Y";
+            //             }
+            //             if (this.subl === this.subban) {
+            //                 /* input po */
+            //                 axios.post("/api/po", this.lpo)
+            //                     .then(res => {
+            //                         /* input listpo */
+            //                         for (let i = 0; i < this.listfix.length; i++) {
+            //                             this.uplistpo = {
+            //                                 nomor_po: this.lpo.nomor_po,
+            //                                 kode_barang: this.listfix[i].kode_barang,
+            //                                 harga: this.hitung.harga[i],
+            //                                 qty: this.hitung.qty[i],
+            //                                 sisapo: this.hitung.qty[i]
+            //                             }
+            //                             axios.post("/api/listpo/", this.uplistpo)
+            //                         }
+            //                         /* end input listpo */
+            //                         this.$router.push({
+            //                             name: 'po'
+            //                         })
+            //                         swalWithBootstrapButtons.fire(
+            //                             'Sukses!',
+            //                             'PO berhasil di buat.',
+            //                             'success'
+            //                         )
+            //                     })
+            //                     .catch(error => {
+            //                         Swal.fire({
+            //                             icon: 'error',
+            //                             title: 'Oops...',
+            //                             text: 'Cek kembali data PO anda!',
+            //                         })
+            //                     })
+            //                 /* End input PO */
+            //             } else {
+            //                 Swal.fire({
+            //                     icon: 'error',
+            //                     title: 'Oops...',
+            //                     text: 'Qty & Harga barang tidak boleh kosong!',
+            //                 })
+            //             }
+            //         }
+            //     } else if (
+            //         /* Read more about handling dismissals below */
+            //         result.dismiss === Swal.DismissReason.cancel
+            //     ) {
+            //         swalWithBootstrapButtons.fire(
+            //             'Cancelled',
+            //             'Batal membuat PO ini :)',
+            //             'error'
+            //         )
+            //     }
+            // })
         },
         kembali() {
             this.$router.push({
@@ -451,7 +588,7 @@ export default {
         },
         selectItem() {
             this.supply = this.matches[this.selected];
-            this.ket.kode_supplier = this.supply.kode_supplier;
+            this.lpo.kode_supplier = this.supply.kode_supplier;
             this.ket.nama = this.supply.nama;
             this.ket.alamat = this.supply.alamat;
             this.ket.pic = this.supply.pic;
@@ -483,12 +620,18 @@ export default {
             for (let i = 0; i < this.listfix.length; i++) {
                 if (this.hitung.harga[i] === undefined || this.hitung.harga[i] === "") {
                     this.hitung.sub[i] = 0;
+                } else if (this.hitung.harga[i] < 1) {
+                    this.hitung.sub[i] = 0;
+                    this.hitung.harga[i] = 0;
                 } else {
                     this.hitung.sub[i] = this.hitung.harga[i]
                 }
 
                 if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === "") {
                     this.hitung.subqty[i] = 0;
+                } else if (this.hitung.qty[i] < 1) {
+                    this.hitung.subqty[i] = 0;
+                    this.hitung.qty[i] = 0;
                 } else {
                     this.hitung.subqty[i] = this.hitung.qty[i]
                 }

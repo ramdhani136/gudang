@@ -2,10 +2,11 @@
 
 namespace App\Model\Po;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model\Po\Listpo;
+use App\Model\Barang\Bbm;
 use App\Model\Supplier\Supplier;
 use App\Model\Purchase\Purchasing;
-use App\Model\Barang\Bbm;
+use Illuminate\Database\Eloquent\Model;
 
 class Po extends Model
 {
@@ -22,5 +23,9 @@ class Po extends Model
 
     public function bbm(){
         return $this->hasMany(Bbm::class,'nomor_po','nomor_po');
+    }
+
+    public function listpo(){
+        return $this->hasMany(Listpo::class,'nomor_po','nomor_po');
     }
 }
