@@ -103,8 +103,11 @@ class ListSoController extends Controller
     }
 
     public function antrianpo($barang){
-         return ListSoResource::collection(Listso::where("openso","Y")->where('kode_barang',$barang)->where('statusso','Tidak Tersedia')->where('closepo','N')->get());
+        return ListSoResource::collection(Listso::where('statuspo','N')->where("openso","Y")->where('kode_barang',$barang)->where('statusso','Tidak Tersedia')->orderBy('pr','ASC')->orderBy('accdate','ASC')->get());
     }
 
+    public function kembalikanpo($barang){
+        return ListSoResource::collection(Listso::where('openpo','>',0)->where("openso","Y")->where('kode_barang',$barang)->where('statusso','Tidak Tersedia')->orderBy('pr','DESC')->orderBy('accdate','DESC')->get());
+    }
 
 }

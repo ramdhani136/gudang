@@ -24,7 +24,7 @@ class ListPoResource extends JsonResource
             'harga'=>$this->harga,
             'qty'=>$this->qty,
             'bcm'=>$this->bcm,
-            'bbk'=>$this->bbk,
+            'bbm'=>$this->bbm,
             'closepo'=>$this->closepo,
             'sisapo'=>$this->sisapo,
         ];

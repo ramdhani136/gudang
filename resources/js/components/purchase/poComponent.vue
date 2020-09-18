@@ -5,6 +5,7 @@
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select name="status" v-model="status" class="form-control">
+            <option value="Draft">Draft</option>
             <option value="Request">Request</option>
             <option value="Acc">Open</option>
             <option value="Tolak">Rejected</option>
@@ -30,19 +31,22 @@
             <tbody>
                 <tr v-for="(pl , index) in FilterKategori" :key="index">
                     <td style="text-align:center">{{index+1}}</td>
-                    <td style="text-align:center">{{pl.nomor_po}}</td>
+                    <td style="text-align:center">
+                        <router-link :to="{name:'poView',params:{nomor:pl.nomor_po}}" class="btn btn-none">
+                            {{pl.nomor_po}}
+                        </router-link>
+                    </td>
                     <td style="text-align:center">{{pl.tanggal_po}}</td>
                     <td>{{pl.supplier}}</td>
                     <td style="text-align:center">{{pl.tanggal_datang}}</td>
                     <td style="text-align:center">
-                        <router-link :to="{name:'poCreateView',params:{nomor:pl.nomor_po}}" class="btn btn-primary">
+                        <router-link v-if="ambiluser.superadmin===1 || ambiluser.suppurch===1" :to="{name:'poView',params:{nomor:pl.nomor_po}}" class="btn btn-primary">
                             Lihat Detail
                         </router-link>
-                        <button @click="bukalagi(pl)" v-if="pl.status=='Di Selesaikan'" class="btn btn-orange">Reopen PO</button>
-                        <button @click="getHapus(pl)" v-if="pl.status=='Draft'" class="btn btn-danger">Hapus</button>
-                        <button @click="requestSelesai(pl)" v-if="pl.status=='Acc' && pl.rs==='N'" class="btn btn-orange">Request Selesai</button>
-                        <button @click="batalselesai(pl)" v-if="pl.status=='Acc' && pl.rs==='Y'" class="btn btn-none">Batal Selesai</button>
-                        <button @click="infoTolak(pl)" v-if="pl.status=='Acc' && pl.rs==='T'" class="btn btn-danger">R. Selesai di tolak</button>
+                        <button @click="getHapus(pl)" v-if="ambiluser.superadmin===1 || ambiluser.purch===1" class="btn btn-danger">Batalkan</button>
+                        <button @click="requestSelesai(pl)" v-if="pl.status=='Acc' && pl.rs==='N' && (ambiluser.superadmin===1 || ambiluser.purch===1)" class="btn btn-orange">Request Selesai</button>
+                        <button @click="batalselesai(pl)" v-if="pl.status=='Acc' && pl.rs==='Y' &&  (ambiluser.superadmin===1 || ambiluser.purch===1)" class="btn btn-none">Batal Selesai</button>
+                        <button @click="infoTolak(pl)" v-if="pl.status=='Acc' && pl.rs==='T' &&  (ambiluser.superadmin===1 || ambiluser.purch===1)" class="btn btn-none">R. Selesai di tolak</button>
                     </td>
                 </tr>
             </tbody>
@@ -101,13 +105,14 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
     data() {
         return {
             search: '',
-            status: 'Acc',
+            status: 'Request',
             po: [],
             load: true,
             supplier: [],
@@ -121,6 +126,11 @@ export default {
             input: {},
             tujuanid: 0,
             alastolak: null,
+            listpo: {},
+            listhapus: {},
+            sisapo: 0,
+            openpo: 0,
+            statuspo: ''
         }
     },
     created() {
@@ -212,7 +222,7 @@ export default {
                 .then(res => {
                     $("#modal-po").modal("hide");
                     this.$router.push({
-                        name: 'poCreateView',
+                        name: 'poView',
                         params: {
                             nomor: this.upload.nomor_po
                         }
@@ -220,21 +230,86 @@ export default {
                 });
         },
         getHapus(pl) {
-            let jawab = confirm("Apakah anda yakin ingin menghapus PO Ini?");
-            if (jawab === true) {
-                axios.delete("/api/po/" + pl.nomor_po)
-                    .then(res => {
-                        this.file.open_po = "N";
-                        this.file.harga_supplier = 0;
-                        this.file.nomor_po = "";
-                        axios.put("/api/listrso/data/deletePo/" + pl.nomor_po, this.file)
-                            .then(res => {
-                                this.getPo();
-                                this.getSupplier();
-                                this.getPurchasing();
-                            });
-                    });
-            }
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menghapus PO ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.get("/api/listpo/" + pl.nomor_po)
+                        .then(res => {
+                            this.listpo = res.data.data;
+                            this.sisapo = 0;
+                            this.openpo = 0;
+                            this.statuspo = "";
+                            for (let i = 0; i < this.listpo.length; i++) {
+                                axios.get("/api/listso/data/kembalikanpo/" + this.listpo[i].kode_barang)
+                                    .then(res => {
+                                        this.listhapus = res.data.data;
+                                        for (let k = 0; k < this.listhapus.length; k++) {
+                                            if (this.listpo[i].qty >= this.listhapus[k].openpo) {
+                                                this.sisapo = this.listhapus[k].openpo + this.listhapus[k].sisapo;
+                                                this.openpo = 0;
+                                                this.statuspo = "N";
+                                                this.listpo[i].qty = parseInt(this.listpo[i].qty) - parseInt(this.listhapus[k].openpo);
+                                            } else {
+                                                this.openpo = parseInt(this.listhapus[k].openpo) - parseInt(this.listpo[i].qty);
+                                                if (this.listpo[i].qty > this.listhapus[k].qty) {
+                                                    this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listhapus[k].open);
+                                                } else {
+                                                    this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listpo[i].qty);
+                                                }
+                                                if (this.sisapo < 1) {
+                                                    this.statuspo = "Y";
+                                                } else {
+                                                    this.statuspo = "N";
+                                                }
+                                                this.listpo[i].qty = parseInt(this.listpo[i].qty) - parseInt(this.listhapus[k].openpo);
+                                                if (this.listpo[i].qty < 1) {
+                                                    this.listpo[i].qty = 0;
+                                                }
+                                            }
+                                            axios.put("/api/listso/" + this.listhapus[k].id, {
+                                                sisapo: this.sisapo,
+                                                openpo: this.openpo,
+                                                statuspo: this.statuspo
+                                            })
+                                        }
+                                    })
+                            }
+                            axios.delete("/api/po/" + pl.nomor_po)
+                                .then(res => {
+                                    swalWithBootstrapButtons.fire(
+                                        'Deleted!',
+                                        'PO berhasil di hapus.',
+                                        'success'
+                                    )
+                                    this.getPo();
+                                })
+                        })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menghapis PO ini :)',
+                        'error'
+                    )
+                }
+            })
         },
         requestSelesai(pl) {
             this.tujuanid = pl.nomor_po;

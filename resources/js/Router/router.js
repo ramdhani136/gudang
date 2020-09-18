@@ -36,7 +36,7 @@ import viewPriceComponent from '../components/customer/viewPriceComponent.vue'
 import RequestPriceComponent from '../components/customer/RequestPriceComponent.vue'
 
 import PuchaseRequestComponent from '../components/purchase/PuchaseRequestComponent.vue'
-import poCreateViewComponent from '../components/purchase/poCreateViewComponent.vue'
+import poViewComponent from '../components/purchase/poViewComponent.vue'
 import poComponent from '../components/purchase/poComponent.vue'
 import dicPoComponent from '../components/purchase/dicPoComponent.vue'
 import PoSelesaiComponent from '../components/purchase/PoSelesaiComponent.vue'
@@ -125,7 +125,7 @@ const routes=[
     {name:'rprice', path:'/data/price/request', component:RequestPriceComponent},
 
     {name:'pr', path:'/purchase/pr', component:PuchaseRequestComponent},
-    {name:'poCreateView', path:'/purchase/po/view/:nomor', component:poCreateViewComponent},
+    {name:'poView', path:'/purchase/po/view/:nomor', component:poViewComponent},
     {name:'po', path:'/purchase/po/', component:poComponent},
     {name:'dpo', path:'/purchase/dpo', component:dicPoComponent},
     {name:'porequestselesai', path:'/purchase/po/selesai', component:PoSelesaiComponent},

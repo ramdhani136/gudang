@@ -4,21 +4,21 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor PO :</label>
-                <input v-model="lpo.nomor_po" type="text" class="form-control col-12">
+                <input v-model="lpo.nomor_po" type="text" class="form-control col-12" :disabled="statusnya!=='Draft'">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
-                <input v-model="lpo.tanggal_po" type="date" @change="validate()" :min="now()" class="form-control col-12">
+                <input v-model="lpo.tanggal_po" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="statusnya!=='Draft'">
             </div>
         </div>
         <div class="col-4">
             <div class="form-group">
                 <label>Supplier</label>
-                <input @click="pilihsupplier()" v-model="ket.nama" type="text" placeholder="Pilih Supplier" class="form-control">
+                <input @click="pilihsupplier()" v-model="ket.nama" type="text" placeholder="Pilih Supplier" class="form-control" :disabled="statusnya!=='Draft'">
             </div>
             <div class="form-group">
                 <label>Purchasing</label>
-                <select v-model="lpo.nip_purchasing" class="col-12 form-control">
+                <select v-model="lpo.nip_purchasing" class="col-12 form-control" :disabled="statusnya!=='Draft'">
                     <option v-for="(purch,index) in purchasing" :key="index" :value="purch.nip">{{purch.nama}}</option>
                 </select>
             </div>
@@ -26,16 +26,16 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Tanggal Datang :</label>
-                <input v-model="lpo.tanggal_datang" type="date" @change="validate()" :min="now()" class="form-control col-12">
+                <input v-model="lpo.tanggal_datang" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="statusnya!=='Draft'">
             </div>
             <div class="form-group">
                 <label>keterangan</label>
-                <textarea v-model="lpo.keterangan" name="keterangan" class="form-control col-12" :disabled="lpo.status==='Request' || lpo.status==='Acc' || lpo.status==='Selesai'"></textarea>
+                <textarea v-model="lpo.keterangan" name="keterangan" class="form-control col-12" :disabled="statusnya!=='Draft'"></textarea>
             </div>
         </div>
     </div>
     <div class="row">
-        <button @click="showmodal()" class="row float-left  ml-4 mt-4 label">Ambil Permintaan</button>
+        <button v-if="statusnya==='Draft'" @click=" showmodal()" class="row float-left  ml-4 mt-4 label">Ambil Permintaan</button>
         <div id="totalpo" class="mt-3 ml-auto mr-3">Total Invoice &nbsp; : &nbsp;{{totalPrice | currency}}</div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
@@ -52,7 +52,7 @@
                         <th>Satuan</th>
                         <th>Harga</th>
                         <th>Sub Total</th>
-                        <th>Aksi</th>
+                        <th v-if="statusnya==='Draft'">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,14 +62,14 @@
                         <td>{{list.nama_barang}}</td>
                         <td style="text-align:center">{{list.qty}}</td>
                         <td style="text-align:center">
-                            <input @input="hitunginv()" type="number" class="form-control" v-model="hitung.qty[index]">
+                            <input :disabled="statusnya!=='Draft'" @input="hitunginv()" type="number" class="form-control" v-model="hitung.qty[index]">
                         </td>
                         <td style="text-align:center">{{list.satuan}}</td>
                         <td style="text-align:center">
-                            <input @input="hitunginv()" v-model="hitung.harga[index]" type="number" class="form-control">
+                            <input :disabled="statusnya!=='Draft'" @input="hitunginv()" v-model="hitung.harga[index]" type="number" class="form-control">
                         </td>
                         <td style="text-align:center">{{hitung.qty[index]*hitung.sub[index] | currency}}</td>
-                        <td style="text-align:center">
+                        <td v-if="statusnya==='Draft'" style="text-align:center">
                             <button @click="deletelist(index)" class="btn btn-danger">Hapus</button>
                         </td>
                     </tr>
@@ -78,8 +78,11 @@
         </div>
     </div>
     <div class="row mt-2">
-        <button @click="submitPo()" class="btn-success btn ml-4">
-            Create PO
+        <button @click="kembali()" class="btn-primary btn ml-4">
+            Kembali
+        </button>
+        <button v-if="statusnya==='Draft'" @click="submitPo()" class="btn-success btn ml-1">
+            Simpan PO
         </button>
     </div>
     <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -165,7 +168,7 @@
                         <label>Suplier</label>
                         <div class="autocomplete"></div>
                         <div class="input" @click="toggleVisible" v-text="supply ? supply.nama:''"></div>
-                        <div class="placeholder" v-if="supply==null">Pilih Supplier</div>
+                        <div class="placeholder" v-if="supply==null">{{ket.nama}}</div>
                         <div class="popover" v-show="visible">
                             <input type="text" @keydown.up="atas" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nama Supplier ..">
                             <div class="heightcust option" ref="optionList">
@@ -222,7 +225,7 @@ export default {
                 status: 'Request'
             },
             up: {},
-            visible: true,
+            visible: false,
             query: '',
             selected: 0,
             supply: null,
@@ -230,11 +233,7 @@ export default {
             supplier: [],
             ket: {},
             upload: {},
-            lpo: {
-                tanggal_po: this.now(),
-                nomor_po: this.po_nomor(),
-                tanggal_datang: this.tglKirim(),
-            },
+            lpo: {},
             viewlist: [],
             urut: 0,
             ambilbarang: {},
@@ -262,10 +261,14 @@ export default {
             masihsisa: 0,
             sisapo: 0,
             openpo: 0,
+            po: {},
+            sisalain: [],
+            qtysisa: 0,
+            statusnya: ''
         }
     },
     created() {
-        this.getPr();
+        this.getall();
     },
     computed: {
         FilteredSatuan() {
@@ -281,18 +284,52 @@ export default {
         }
     },
     methods: {
-        getPr() {
-            axios.get("/api/listso/data/group")
+        getall() {
+            axios.get("/api/po/" + this.$route.params.nomor)
                 .then(res => {
-                    this.pr = res.data.data
-                    axios.get("/api/supplier")
+                    this.po = res.data.data;
+                    this.lpo.nomor_po = this.po[0].nomor_po;
+                    this.lpo.tanggal_po = this.po[0].tanggal_po;
+                    this.lpo.kode_supplier = this.po[0].kode_supplier;
+                    this.ket.nama = this.po[0].supplier;
+                    this.lpo.nip_purchasing = this.po[0].nip_purchasing;
+                    this.lpo.tanggal_datang = this.po[0].tanggal_datang;
+                    this.lpo.keterangan = this.po[0].keterangan;
+                    this.statusnya = this.po[0].status;
+
+                    axios.get('/api/listpo/' + this.$route.params.nomor)
                         .then(res => {
-                            this.supplier = res.data.data;
-                            axios.get("/api/purchasing")
+                            this.listfix = res.data.data
+                            for (let i = 0; i < this.listfix.length; i++) {
+                                this.qtysisa = 0;
+                                axios.get("/api/listso/data/group/" + this.listfix[i].kode_barang)
+                                    .then(res => {
+                                        this.sisalain = res.data.data;
+                                        if (this.sisalain.length < 1) {
+                                            this.qtysisa = 0;
+                                        } else {
+                                            this.qtysisa = this.sisalain[0].jumlah;
+                                        }
+                                        this.hitung.qty[i] = this.listfix[i].qty;
+                                        this.listfix[i].qty = parseInt(this.listfix[i].qty) + parseInt(this.qtysisa);
+                                        this.hitung.harga[i] = this.listfix[i].harga;
+                                    })
+                            }
+                        })
+
+                    axios.get("/api/listso/data/group")
+                        .then(res => {
+                            this.pr = res.data.data
+                            axios.get("/api/supplier")
                                 .then(res => {
-                                    this.purchasing = res.data.data
-                                    this.load = false;
-                                })
+                                    this.supplier = res.data.data;
+                                    axios.get("/api/purchasing")
+                                        .then(res => {
+                                            this.purchasing = res.data.data
+                                            this.hitunginv();
+                                            this.load = false;
+                                        })
+                                });
                         });
                 });
         },
@@ -650,34 +687,16 @@ export default {
 
                 this.totalPrice += parseInt(this.hitung.subqty[i]) * parseInt(this.hitung.sub[i]);
             }
+        },
+        kembali() {
+            this.$router.push({
+                name: 'po'
+            })
         }
     },
 }
 </script>
 
 <style>
-#totalpo {
-    width: 30%;
-    height: 40px;
-    padding: 1%;
-    border: solid 1px rgb(209, 209, 209);
-    text-align: center;
-    align-items: center;
-    font-size: 1.1em;
-    border-radius: 3px;
-    color: #666;
-    background-color: #fff;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
 
-#overflowBody {
-    max-height: 220px;
-    font-size: 0.9em;
-    overflow-y: scroll;
-}
-
-.heightcust {
-    max-height: 320px;
-}
 </style>

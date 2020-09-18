@@ -39,6 +39,13 @@ class RsoController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request,[
+            'nomor_rso'=>'required|unique',
+            'tanggal_rso'=>'required',
+            'kode_customer'=>'required', 
+            'nip_sales'=>'required',              
+        ]);
+
         $data=Rso::create($request->all());
         return response(new RsoResource($data),response::HTTP_CREATED);
     }

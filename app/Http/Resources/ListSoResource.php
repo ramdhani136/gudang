@@ -35,9 +35,10 @@ class ListSoResource extends JsonResource
             'tersedia'=>$this->tersedia,
             'qtyrso'=>$this->qtyrso,
             'tgl_datang'=>$this->tanggal_datang,
-            'closepo'=>$this->closepo,
             'openpo'=>$this->openpo,
             'sisapo'=>$this->sisapo,
+            'pr'=>$this->pr,
+            'accdate'=>$this->accdate,
         ];
     }
 }
