@@ -128,6 +128,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -241,6 +242,14 @@ export default {
                             this.konfirm.keterangan = rs.keterangan;
                             axios.put(`/api/rso/` + rs.nomor_rso, this.konfirm)
                                 .then((response) => {
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.$route.params.id,
+                                        id_user: this.ambiluser.id,
+                                        notif: "RSO nomor : " + this.$route.params.id + " di konfirmasi Purchasing",
+                                        keterangan: "RSO di konfirmasi Purchasing",
+                                        jenis: "RSO",
+                                        tanggal: this.DateTime(),
+                                    })
                                     swalWithBootstrapButtons.fire(
                                         'Berhasil!',
                                         'RSO berhasil di konfirmasi.',

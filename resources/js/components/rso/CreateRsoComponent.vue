@@ -176,6 +176,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -448,6 +449,14 @@ export default {
                                                 })
                                             })
                                     }
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.upload.nomor_rso,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan RSO baru!",
+                                        keterangan: "RSO di kirim ke Inventory Control",
+                                        jenis: "RSO",
+                                        tanggal: this.DateTime(),
+                                    })
                                     swalWithBootstrapButtons.fire(
                                         'Save!',
                                         'Berhasil mengirimkan RSO.',

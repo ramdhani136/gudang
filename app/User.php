@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Message;
-
+use App\Model\History\History;
 
 class User extends Authenticatable
 {
@@ -41,6 +41,10 @@ class User extends Authenticatable
 
     public function messages(){
         return $this->hasMany(Message::class);
+    }
+
+    public function history(){
+        return $this->hasMany(History::class,'id_user','id');
     }
 
 

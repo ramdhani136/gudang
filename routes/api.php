@@ -1,5 +1,6 @@
 <?php
 
+use App\Model\Rso\Rso;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -118,3 +119,5 @@ Route::resource('pr','Pr\PrController');
 Route::resource('listpo','Po\ListpoController');
 Route::get('listpo/data/aktif','Po\ListpoController@sisalist');
 
+Route::resource('history','History\HistoryController');
+Route::get('history/data/{nomorso}/{jenis}','History\HistoryController@historyview');
