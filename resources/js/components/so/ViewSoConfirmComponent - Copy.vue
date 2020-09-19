@@ -135,6 +135,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },

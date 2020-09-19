@@ -113,7 +113,7 @@
             Terima SO
         </button>
     </div>
-    <div v-if="vso.status=='Tolak'" v-for="vso in so" :key="index" id="alastolak" class="mt-3">
+    <div v-if="vso.status=='Tolak'" v-for="(vso,index) in so" :key="index" id="alastolak" class="mt-3">
         <div v-for="(lso,index) in so" :key="index">
             <b>{{lso.alastolak}}</b>
         </div>
@@ -296,7 +296,9 @@ export default {
             akses: true,
             bbk: 0,
             up: {},
-            listsoup: {}
+            listsoup: {},
+            history: {},
+            nomorso: ''
         }
     },
     created() {
@@ -319,6 +321,7 @@ export default {
                     this.so = res.data.data;
                     this.ket.customer = this.so[0].customer;
                     this.ket.statusnya = this.so[0].status;
+                    this.nomorso = this.so[0].nomor_so;
                     if (this.so[0].statusso === "tersedia") {
                         this.ket.status = "Tersedia"
                     } else {
@@ -448,13 +451,19 @@ export default {
                                                     statusso: this.ket.status
                                                 }
                                                 axios.post("/api/listso", this.uplist)
-                                                    .then(res => {
-                                                        this.$router.push({
-                                                            name: 'so'
-                                                        })
-                                                    })
                                             }
                                         })
+                                    axios.post("/api/history", {
+                                        nomor_dok: vso.nomor_so,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan SO baru",
+                                        keterangan: "So di kirim ke Sales Supervisor",
+                                        jenis: "So",
+                                        tanggal: this.DateTime(),
+                                    })
+                                    this.$router.push({
+                                        name: 'so'
+                                    })
                                     swalWithBootstrapButtons.fire(
                                         'Terkirim!',
                                         'So berhasil di kirim.',
@@ -569,6 +578,14 @@ export default {
                                         status: 'Draft'
                                     })
                                     .then(res => {
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.$route.params.id,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Rso nomor : " + this.$route.params.id + "di tarik sales",
+                                            keterangan: "Sales menarik kembali SO (Edit SO)",
+                                            jenis: "So",
+                                            tanggal: this.DateTime(),
+                                        })
                                         this.$router.push({
                                             name: 'so'
                                         })
@@ -617,39 +634,42 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    if (vso.statusso === "tersedia") {
-                        axios.get("/api/listso/" + this.$route.params.id)
-                            .then(res => {
-                                this.listfull = res.data.data;
-                                for (let i = 0; i < this.listfull.length; i++) {
-                                    if (this.listfull[i].bbk === null || this.listfull[i].bbk === "") {
-                                        this.listfull[i].bbk = 0;
-                                    }
-                                    this.bbk += this.listfull[i].bbk;
+                    axios.get("/api/listso/" + this.$route.params.id)
+                        .then(res => {
+                            this.listfull = res.data.data;
+                            for (let i = 0; i < this.listfull.length; i++) {
+                                if (this.listfull[i].bbk === null || this.listfull[i].bbk === "") {
+                                    this.listfull[i].bbk = 0;
                                 }
-                                if (this.bbk < 1) {
-                                    axios.delete("/api/so/" + this.$route.params.id)
-                                        .then(res => {
-                                            this.$router.push({
-                                                name: 'so'
-                                            })
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Sukses...',
-                                                text: 'SO berhasil dihapus dari database',
-                                            })
-                                        });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim',
-                                    })
-                                }
-                            });
-                    } else {
-                        /* Belum ada file ponya */
-                    }
+                                this.bbk += this.listfull[i].bbk;
+                            }
+                            if (this.bbk < 1) {
+                                axios.delete("/api/so/" + this.$route.params.id)
+                                    .then(res => {
+                                        axios.get("/api/history/data/" + this.$route.params.id + "/So")
+                                            .then(res => {
+                                                this.history = res.data.data;
+                                                for (let i = 0; i < this.history.length; i++) {
+                                                    axios.delete("/api/history/" + this.history[i].id);
+                                                }
+                                            });
+                                        this.$router.push({
+                                            name: 'so'
+                                        })
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Sukses...',
+                                            text: 'SO berhasil dihapus dari database',
+                                        })
+                                    });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim',
+                                })
+                            }
+                        });
                 } else if (
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
@@ -826,6 +846,14 @@ export default {
                                 })
                             }
                         })
+                        axios.post("/api/history", {
+                            nomor_dok: vso.nomor_so,
+                            id_user: this.ambiluser.id,
+                            notif: "So nomor : " + vso.nomor_so + " di terima DIC",
+                            keterangan: "SO di terima DIC",
+                            jenis: "So",
+                            tanggal: this.DateTime(),
+                        })
                         this.$router.push({
                             name: 'distribusiso'
                         })
@@ -882,7 +910,14 @@ export default {
                                 })
                             }
                         })
-
+                        axios.post("/api/history", {
+                            nomor_dok: this.nomorso,
+                            id_user: this.ambiluser.id,
+                            notif: "So nomor : " + this.nomorso + " di tolak DIC",
+                            keterangan: "SO di tolak DIC",
+                            jenis: "So",
+                            tanggal: this.DateTime(),
+                        })
                         swalWithBootstrapButtons.fire(
                             'Sukses!',
                             'So berhasil di tolak.',

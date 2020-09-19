@@ -281,6 +281,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -547,16 +548,7 @@ export default {
                                                                 }
                                                                 if (this.done === this.pembanding) {
                                                                     axios.put("/api/rso/" + this.up.nomor_rso, {
-                                                                            status: 'So'
-                                                                        })
-                                                                        .then(res => {
-                                                                            this.$router.push({
-                                                                                name: 'so'
-                                                                            })
-                                                                        })
-                                                                } else {
-                                                                    this.$router.push({
-                                                                        name: 'so'
+                                                                        status: 'So'
                                                                     })
                                                                 }
                                                             })
@@ -564,6 +556,19 @@ export default {
                                             }
                                         })
                                 }
+                                axios.post("/api/history", {
+                                        nomor_dok: this.up.nomor_so,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan SO baru",
+                                        keterangan: "SO di kirim ke Sales Supervisor",
+                                        jenis: "So",
+                                        tanggal: this.DateTime(),
+                                    })
+                                    .then(res => {
+                                        this.$router.push({
+                                            name: 'so'
+                                        })
+                                    })
                                 swalWithBootstrapButtons.fire(
                                     'Sukses!',
                                     'SO berhasil di kirim.',
@@ -805,6 +810,22 @@ export default {
         },
         scrollToItem() {
             this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
         },
     }
 }

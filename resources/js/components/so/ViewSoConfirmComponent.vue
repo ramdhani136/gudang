@@ -131,6 +131,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -238,6 +239,14 @@ export default {
                     this.up.status = "Dic";
                     axios.put("/api/so/" + this.up.nomor_so, this.up)
                         .then((response) => {
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.id,
+                                id_user: this.ambiluser.id,
+                                notif: "So nomor : " + this.$route.params.id + " DI konfirmasi SPV",
+                                keterangan: "SO di terima Sales Supervisor",
+                                jenis: "So",
+                                tanggal: this.DateTime(),
+                            })
                             this.$router.push({
                                 name: 'soconfirm'
                             })
@@ -287,6 +296,14 @@ export default {
                     axios.put("/api/so/" + this.up.nomor_so, this.up)
                         .then((response) => {
                             $("#modal-form").modal("hide");
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.id,
+                                id_user: this.ambiluser.id,
+                                notif: "So nomor : " + this.$route.params.id + " Di tolak SPV",
+                                keterangan: "SO di tolak Sales Supervisor",
+                                jenis: "So",
+                                tanggal: this.DateTime(),
+                            })
                             swalWithBootstrapButtons.fire(
                                 'Sukses!',
                                 'SO berhasil di tolak !',

@@ -44,6 +44,7 @@
                     <td>{{rs.customer}}</td>
                     <td style="text-align:center">{{rs.tanggal_kirim}}</td>
                     <td style="text-align:center">
+                        <button v-if="rs.status!=='Draft'" @click="showhistory(rs)" class="btn btn-primary">Lihat History</button>
                         <button @click="deleteSo(rs)" v-if="rs.status!=='Selesai' && rs.status!=='Di Selesaikan'  && ket.aktif[index]==true" class="btn btn-danger">Batalkan</button>
                         <button @click="requestselesai(rs)" v-if="rs.status==='Acc' && rs.rs==='N' && ket.aktif[index]==false" class="btn btn-orange">Request Selesai</button>
                         <button @click="batalselesai(rs)" v-if="rs.status==='Acc' && rs.rs==='Y'" class="btn btn-none">Batal Request</button>
@@ -102,6 +103,41 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-history" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Rincian History RSO</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="thead" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>tanggal</th>
+                                <th>Nomor RSO</th>
+                                <th>keterangan</th>
+                                <th>Oleh</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(hs,index) in historyview" :key="index">
+                                <td>{{hs.tanggal}}</td>
+                                <td>{{hs.nomor_dok}}</td>
+                                <td>{{hs.keterangan}}</td>
+                                <td>{{hs.user}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -132,7 +168,9 @@ export default {
             listso: {},
             bbk: 0,
             aktifin: true,
-            hh: []
+            hh: [],
+            history: {},
+            historyview: {}
         }
     },
     created() {
@@ -221,6 +259,14 @@ export default {
                     }
                 });
         },
+        showhistory(rs) {
+            $("#modal-history").modal("show");
+            axios.get("/api/history/data/" + rs.nomor_so + "/So")
+                .then(res => {
+                    this.historyview = res.data.data;
+                    console.log(this.historyview);
+                })
+        },
         deleteSo(rs) {
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
@@ -242,6 +288,13 @@ export default {
                 if (result.isConfirmed) {
                     axios.delete("/api/so/" + rs.nomor_so)
                         .then(res => {
+                            axios.get("/api/history/data/" + rs.nomor_so + "/So")
+                                .then(res => {
+                                    this.history = res.data.data;
+                                    for (let n = 0; n < this.history.length; n++) {
+                                        axios.delete("/api/history/" + this.history[n].id);
+                                    }
+                                })
                             this.getSo();
                             swalWithBootstrapButtons.fire(
                                 'Deleted!',
