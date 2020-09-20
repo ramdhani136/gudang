@@ -40,9 +40,9 @@
                     <td>{{pl.supplier}}</td>
                     <td style="text-align:center">{{pl.tanggal_datang}}</td>
                     <td style="text-align:center">
-                        <router-link v-if="ambiluser.superadmin===1 || ambiluser.suppurch===1" :to="{name:'poView',params:{nomor:pl.nomor_po}}" class="btn btn-primary">
-                            Lihat Detail
-                        </router-link>
+                        <button @click="showhistory(pl)" class="btn btn-primary">
+                            Lihat Rincian
+                        </button>
                         <button @click="getHapus(pl)" v-if="ambiluser.superadmin===1 || ambiluser.purch===1" class="btn btn-danger">Batalkan</button>
                         <button @click="requestSelesai(pl)" v-if="pl.status=='Acc' && pl.rs==='N' && (ambiluser.superadmin===1 || ambiluser.purch===1)" class="btn btn-orange">Request Selesai</button>
                         <button @click="batalselesai(pl)" v-if="pl.status=='Acc' && pl.rs==='Y' &&  (ambiluser.superadmin===1 || ambiluser.purch===1)" class="btn btn-none">Batal Selesai</button>
@@ -97,6 +97,41 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-history" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Rincian History PO</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="thead" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>tanggal</th>
+                                <th>Nomor RSO</th>
+                                <th>keterangan</th>
+                                <th>Oleh</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(hs,index) in historyview" :key="index">
+                                <td>{{hs.tanggal}}</td>
+                                <td>{{hs.nomor_dok}}</td>
+                                <td>{{hs.keterangan}}</td>
+                                <td>{{hs.user}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -130,7 +165,8 @@ export default {
             listhapus: {},
             sisapo: 0,
             openpo: 0,
-            statuspo: ''
+            statuspo: '',
+            historyview: {}
         }
     },
     created() {
@@ -363,6 +399,29 @@ export default {
                         this.getPurchasing();
                     })
             }
+        },
+        showhistory(pl) {
+            $("#modal-history").modal("show");
+            axios.get("/api/history/data/" + pl.nomor_po + "/Po")
+                .then(res => {
+                    this.historyview = res.data.data;
+                })
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
         }
     }
 }

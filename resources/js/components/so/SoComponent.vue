@@ -49,9 +49,6 @@
                         <button @click="requestselesai(rs)" v-if="rs.status==='Acc' && rs.rs==='N' && ket.aktif[index]==false" class="btn btn-orange">Request Selesai</button>
                         <button @click="batalselesai(rs)" v-if="rs.status==='Acc' && rs.rs==='Y'" class="btn btn-none">Batal Request</button>
                         <!-- <button @click="bukalagi(rs)" v-if="rs.status=='Di Selesaikan'" class="btn btn-orange">Reopen SO</button> -->
-                        <router-link v-if="rs.status=='Di Selesaikan'" :to="{name:'viewnewso',params:{id:rs.nomor_so}}" class="btn btn-primary ">
-                            Lihat Detail
-                        </router-link>
                         <button @click="infoTolak(rs)" v-if="rs.status=='Acc' && rs.rs==='T'" class="btn btn-danger">R. Selesai di tolak</button>
                     </td>
                 </tr>
@@ -107,7 +104,7 @@
         <div class="modal-dialog" role="document">
             <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Rincian History RSO</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Rincian History SO</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -146,6 +143,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -170,7 +168,8 @@ export default {
             aktifin: true,
             hh: [],
             history: {},
-            historyview: {}
+            historyview: {},
+            nrso: null,
         }
     },
     created() {
@@ -197,7 +196,7 @@ export default {
                 }
             } else {
                 return this.so.filter(elem => {
-                    return elem.nomor_so.toLowerCase().includes(this.search);
+                    return elem.nomor_so.toLowerCase().includes(this.search.toLowerCase());
                 });
             }
         },
@@ -264,7 +263,6 @@ export default {
             axios.get("/api/history/data/" + rs.nomor_so + "/So")
                 .then(res => {
                     this.historyview = res.data.data;
-                    console.log(this.historyview);
                 })
         },
         deleteSo(rs) {
@@ -295,6 +293,16 @@ export default {
                                         axios.delete("/api/history/" + this.history[n].id);
                                     }
                                 })
+                            axios.post("/api/history", {
+                                nomor_dok: rs.nomor_rso,
+                                nomor_ref: rs.nomor_so,
+                                id_user: this.ambiluser.id,
+                                notif: "So di hapus",
+                                keterangan: "Membatalkan SO nomor : " + rs.nomor_so,
+                                jenis: "RSO",
+                                tanggal: this.DateTime(),
+                                aktif: "N",
+                            })
                             this.getSo();
                             swalWithBootstrapButtons.fire(
                                 'Deleted!',
@@ -316,6 +324,7 @@ export default {
         },
         requestselesai(rs) {
             this.nso = rs.nomor_so;
+            this.nrso = rs.nomor_rso;
             $("#modal-selesai").modal("show");
         },
         kirimselesai() {
@@ -342,6 +351,15 @@ export default {
                         .then(res => {
                             this.getSo();
                             this.input = {};
+                            axios.post("/api/history", {
+                                nomor_dok: this.nso,
+                                nomor_ref: this.nrso,
+                                id_user: this.ambiluser.id,
+                                notif: "Anda mendapatkan permintaan Selesai SO baru",
+                                keterangan: "Mengirim permintaan penyelesaian SO",
+                                jenis: "So",
+                                tanggal: this.DateTime(),
+                            })
                             swalWithBootstrapButtons.fire(
                                 'Sukses!',
                                 'Berhasil melakukan request pembatalan SO.',
@@ -384,12 +402,21 @@ export default {
                     this.input.alasselesai = "";
                     axios.put("/api/so/" + rs.nomor_so, this.input)
                         .then(res => {
-                            this.getSo();
+                            axios.post("/api/history", {
+                                nomor_dok: rs.nomor_so,
+                                nomor_ref: rs.nomor_rso,
+                                id_user: this.ambiluser.id,
+                                notif: "RSO pembatalan di batalkan",
+                                keterangan: "Membatalkan permintaan penyelesaian SO",
+                                jenis: "So",
+                                tanggal: this.DateTime(),
+                            })
                             swalWithBootstrapButtons.fire(
                                 'Sukses!',
                                 'Request Selesai berhasil dibatalkan.',
                                 'success'
                             )
+                            this.getSo();
                         });
                 } else if (
                     /* Read more about handling dismissals below */
@@ -456,6 +483,22 @@ export default {
                     )
                 }
             })
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
         }
     }
 }

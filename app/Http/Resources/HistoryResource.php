@@ -18,6 +18,7 @@ class HistoryResource extends JsonResource
         [
             'id'=>$this->id,
             'nomor_dok'=>$this->nomor_dok,
+            'nomor_ref'=>$this->nomor_ref,
             'id_user'=>$this->id_user,
             'user'=>$this->user->name,
             'notif'=>$this->notif,

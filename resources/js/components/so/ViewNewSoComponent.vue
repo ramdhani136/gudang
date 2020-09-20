@@ -97,7 +97,7 @@
         <button v-if="ket.statusnya==='Draft'" @click="submitSo(vso)" class="btn-success btn ml-4 mt-2">
             Kirim SO
         </button>
-        <button v-if="(ket.statusnya==='Sent' || ket.statusnya==='Acc'  || ket.statusnya==='Tolak') && (ambiluser.sales===1 || ambiluser.superadmin===1)" @click="reqedit(vso)" class="btn-orange btn ml-4 mt-2">
+        <button v-if="(ket.statusnya==='Dic' || ket.statusnya==='Sent' || ket.statusnya==='Acc'  || ket.statusnya==='Tolak') && (ambiluser.sales===1 || ambiluser.superadmin===1)" @click="reqedit(vso)" class="btn-orange btn ml-4 mt-2">
             Request Edit SO
         </button>
         <button v-if="ket.statusnya==='Tolak'" @click="submitSo(vso)" class="btn-success btn ml-2 mt-2">
@@ -505,18 +505,54 @@ export default {
                                                     tersedia: this.ada
                                                 }
                                                 axios.post("/api/listso", this.uplist)
-                                                    .then(res => {
-                                                        this.$router.push({
-                                                            name: 'so'
-                                                        })
-                                                    })
                                             }
                                         })
+                                    this.history = {};
+                                    axios.get("/api/history/" + this.$route.params.id)
+                                        .then(res => {
+                                            this.history = res.data.data;
+                                            for (let j = 0; j < this.history.length; j++) {
+                                                axios.put("/api/history/" + this.history[j].id, {
+                                                    nomor_dok: vso.nomor_so
+                                                })
+                                            }
+                                        })
+                                    axios.post("/api/history", {
+                                        nomor_dok: vso.nomor_so,
+                                        nomor_ref: vso.nomor_rso,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan SO baru",
+                                        keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso.nomor_so,
+                                        jenis: "So",
+                                        tanggal: this.DateTime(),
+                                    })
+                                    axios.post("/api/history", {
+                                        nomor_dok: vso.nomor_so,
+                                        nomor_ref: vso.nomor_rso,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan SO baru",
+                                        keterangan: "Mengirim SO ke Sales Supervisor",
+                                        jenis: "So",
+                                        tanggal: this.DateTime(),
+                                    })
+                                    axios.post("/api/history", {
+                                        nomor_dok: vso.nomor_rso,
+                                        nomor_ref: vso.nomor_so,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan SO baru",
+                                        keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso.nomor_so,
+                                        jenis: "RSO",
+                                        tanggal: this.DateTime(),
+                                        aktif: "N",
+                                    })
                                     swalWithBootstrapButtons.fire(
                                         'Terkirim!',
                                         'So berhasil di kirim.',
                                         'success'
                                     )
+                                    this.$router.push({
+                                        name: 'so'
+                                    })
                                 })
                         }
                     } else {
@@ -653,13 +689,23 @@ export default {
                                                     axios.delete("/api/history/" + this.history[i].id);
                                                 }
                                             });
-                                        this.$router.push({
-                                            name: 'so'
+                                        axios.post("/api/history", {
+                                            nomor_dok: vso.nomor_rso,
+                                            nomor_ref: this.$route.params.id,
+                                            id_user: this.ambiluser.id,
+                                            notif: "So di hapus",
+                                            keterangan: "Membatalkan SO nomor : " + this.$route.params.id,
+                                            jenis: "RSO",
+                                            tanggal: this.DateTime(),
+                                            aktif: "N",
                                         })
                                         Swal.fire({
                                             icon: 'success',
                                             title: 'Sukses...',
                                             text: 'SO berhasil dihapus dari database',
+                                        })
+                                        this.$router.push({
+                                            name: 'so'
                                         })
                                     });
                             } else {

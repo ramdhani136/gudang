@@ -37,7 +37,7 @@
                     <td>{{rs.customer}}</td>
                     <td style="text-align:center">
                         <button @click="showhistory(rs)" class="btn btn-primary">Lihat History</button>
-                        <button v-if="rs.status=='Confirmed'" @click="deleteRso(rs)" class="btn btn-danger">Batalkan</button>
+                        <button v-if="rs.status!=='So'" @click="deleteRso(rs)" class="btn btn-danger">Batalkan</button>
                     </td>
                 </tr>
             </tbody>
@@ -121,7 +121,9 @@ export default {
             load: true,
             tampil: false,
             history: {},
-            historyview: {}
+            historyview: {},
+            dataso: {},
+            openso: false,
         }
     },
     created() {
@@ -147,7 +149,7 @@ export default {
 
             } else {
                 return this.rso.filter(elem => {
-                    return elem.nomor_rso.toLowerCase().includes(this.search);
+                    return elem.nomor_rso.toLowerCase().includes(this.search.toLowerCase());
                 });
             }
         },
@@ -186,24 +188,41 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {
-                    axios.delete("/api/rso/" + rso.nomor_rso)
-                        .then(response => {
-                            axios.get("/api/history/" + rso.nomor_rso)
-                                .then(res => {
-                                    this.history = res.data.data;
-                                    for (let i = 0; i < this.history.length; i++) {
-                                        axios.delete("/api/history/" + this.history[i].id)
-                                    }
-                                    this.getRso();
+                    axios.get("api/so/rso/" + rso.nomor_rso)
+                        .then(res => {
+                            this.dataso = res.data.data;
+                            if (this.dataso.length < 1) {
+                                this.openso = false;
+                            } else {
+                                this.openso = true;
+                            }
+                            if (this.openso === false) {
+                                axios.delete("/api/rso/" + rso.nomor_rso)
+                                    .then(response => {
+                                        axios.get("/api/history/" + rso.nomor_rso)
+                                            .then(res => {
+                                                this.history = res.data.data;
+                                                for (let i = 0; i < this.history.length; i++) {
+                                                    axios.delete("/api/history/" + this.history[i].id)
+                                                }
+                                                this.getRso();
+                                            })
+                                        swalWithBootstrapButtons.fire(
+                                            'Deleted!',
+                                            'Berhasil Menghapus RSO.',
+                                            'success'
+                                        )
+                                    })
+                                    .catch(error => {
+                                        console.log(error)
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Tidak dapat menghapus RSO ini.',
+                                    text: 'RSO ini sudah digunakan untuk pembuatan SO',
                                 })
-                            swalWithBootstrapButtons.fire(
-                                'Deleted!',
-                                'Berhasil Menghapus RSO.',
-                                'success'
-                            )
-                        })
-                        .catch(error => {
-                            console.log(error)
+                            }
                         })
                 } else if (
                     /* Read more about handling dismissals below */

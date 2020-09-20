@@ -277,7 +277,10 @@ export default {
             rso: {},
             listrso: {},
             status: '',
-            detail: {}
+            detail: {},
+            history: {},
+            dso: {},
+            openso: false,
         }
     },
     created() {
@@ -524,15 +527,43 @@ export default {
                                                 axios.post("/api/listrso", this.uplist)
                                             }
                                         })
-                                    axios.post("/api/history", {
-                                        nomor_dok: this.$route.params.id,
-                                        id_user: this.ambiluser.id,
-                                        notif: "Anda mendapatkan permintaan RSO baru",
-                                        keterangan: "RSO di kirim ke Inventory Control",
-                                        jenis: "RSO",
-                                        tanggal: this.DateTime(),
-
-                                    })
+                                    if (this.$route.params.id === this.upload.nomor_rso) {
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.$route.params.id,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Anda mendapatkan permintaan RSO baru",
+                                            keterangan: "RSO di kirim ke Inventory Control",
+                                            jenis: "RSO",
+                                            tanggal: this.DateTime(),
+                                        })
+                                    } else {
+                                        axios.get("/api/history/" + this.$route.params.id)
+                                            .then(res => {
+                                                this.history = res.data.data;
+                                                for (let i = 0; 1 < this.history.length; i++) {
+                                                    axios.put("/api/history/" + this.history[i].id, {
+                                                        nomor_dok: this.upload.nomor_rso
+                                                    })
+                                                }
+                                            })
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.upload.nomor_rso,
+                                            id_user: this.ambiluser.id,
+                                            notif: "RSO " + this.$route.params.id + " di ganti dengan RSO " + this.upload.nomor_rs,
+                                            keterangan: "Mengubah nomor RSO lama : " + this.$route.params.id,
+                                            jenis: "RSO",
+                                            tanggal: this.DateTime(),
+                                            aktif: "N",
+                                        })
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.upload.nomor_rso,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Anda mendapatkan permintaan RSO baru",
+                                            keterangan: "RSO di kirim ke Inventory Control",
+                                            jenis: "RSO",
+                                            tanggal: this.DateTime(),
+                                        })
+                                    }
                                     this.$router.push({
                                         name: 'rso'
                                     })
@@ -716,55 +747,101 @@ export default {
                             this.banding += "Y";
                         }
                         if (this.cek === this.banding) {
-                            this.upload.status = "Sent";
-                            this.upload.kode_customer = this.kodecustomer;
-                            axios.put("/api/rso/" + this.$route.params.id, this.upload)
+                            axios.get("/api/so/rso/" + this.$route.params.id)
                                 .then(res => {
-                                    axios.get("/api/listrso/" + this.upload.nomor_rso)
-                                        .then(res => {
-                                            this.listrso = res.data.data;
-                                            for (let o = 0; o < this.listrso.length; o++) {
-                                                axios.delete("/api/listrso/" + this.listrso[o].id)
-                                            }
-                                            for (let i = 0; i < this.listpr.length; i++) {
-                                                if (this.hitung.keterangan[i] === undefined) {
-                                                    this.hitung.keterangan[i] = "";
+                                    this.dso = res.data.data;
+                                    if (this.dso.length < 1) {
+                                        this.openso = false;
+                                    } else {
+                                        this.openso = true;
+                                    }
+                                    if (this.openso === false) {
+                                        this.upload.status = "Sent";
+                                        this.upload.kode_customer = this.kodecustomer;
+                                        axios.put("/api/rso/" + this.$route.params.id, this.upload)
+                                            .then(res => {
+                                                axios.get("/api/listrso/" + this.upload.nomor_rso)
+                                                    .then(res => {
+                                                        this.listrso = res.data.data;
+                                                        for (let o = 0; o < this.listrso.length; o++) {
+                                                            axios.delete("/api/listrso/" + this.listrso[o].id)
+                                                        }
+                                                        for (let i = 0; i < this.listpr.length; i++) {
+                                                            if (this.hitung.keterangan[i] === undefined) {
+                                                                this.hitung.keterangan[i] = "";
+                                                            }
+                                                            this.uplist = {
+                                                                nomor_rso: this.upload.nomor_rso,
+                                                                tanggal_rso: this.upload.tanggal_rso,
+                                                                kode_barang: this.listpr[i].lkode_barang,
+                                                                harga: this.listpr[i].harga,
+                                                                id_custprice: this.listpr[i].id_custprice,
+                                                                qty: this.hitung.qty[i],
+                                                                catatan: this.hitung.keterangan[i],
+                                                            }
+                                                            axios.post("/api/listrso", this.uplist)
+                                                        }
+                                                    })
+                                                if (this.$route.params.id === this.upload.nomor_rso) {
+                                                    axios.post("/api/history", {
+                                                        nomor_dok: this.$route.params.id,
+                                                        id_user: this.ambiluser.id,
+                                                        notif: "Anda mendapatkan permintaan RSO baru",
+                                                        keterangan: "RSO di kirim ulang ke Inventory Control",
+                                                        jenis: "RSO",
+                                                        tanggal: this.DateTime(),
+                                                    })
+                                                } else {
+                                                    axios.get("/api/history/" + this.$route.params.id)
+                                                        .then(res => {
+                                                            this.history = res.data.data;
+                                                            for (let i = 0; 1 < this.history.length; i++) {
+                                                                axios.put("/api/history/" + this.history[i].id, {
+                                                                    nomor_dok: this.upload.nomor_rso
+                                                                })
+                                                            }
+                                                        })
+                                                    axios.post("/api/history", {
+                                                        nomor_dok: this.upload.nomor_rso,
+                                                        id_user: this.ambiluser.id,
+                                                        notif: "RSO " + this.$route.params.id + " di ganti dengan RSO " + this.upload.nomor_rs,
+                                                        keterangan: "Mengubah nomor RSO lama : " + this.$route.params.id,
+                                                        jenis: "RSO",
+                                                        tanggal: this.DateTime(),
+                                                        aktif: "N",
+                                                    })
+                                                    axios.post("/api/history", {
+                                                        nomor_dok: this.$route.params.id,
+                                                        id_user: this.ambiluser.id,
+                                                        notif: "Anda mendapatkan permintaan ulang RSO!",
+                                                        keterangan: "RSO di kirim ulang ke Inventory Control",
+                                                        jenis: "RSO",
+                                                        tanggal: this.DateTime(),
+                                                    })
                                                 }
-                                                this.uplist = {
-                                                    nomor_rso: this.upload.nomor_rso,
-                                                    tanggal_rso: this.upload.tanggal_rso,
-                                                    kode_barang: this.listpr[i].lkode_barang,
-                                                    harga: this.listpr[i].harga,
-                                                    id_custprice: this.listpr[i].id_custprice,
-                                                    qty: this.hitung.qty[i],
-                                                    catatan: this.hitung.keterangan[i],
-                                                }
-                                                axios.post("/api/listrso", this.uplist)
-                                            }
+                                                this.$router.push({
+                                                    name: 'rso'
+                                                })
+                                                swalWithBootstrapButtons.fire(
+                                                    'Save!',
+                                                    'Berhasil mengirimkan ulang RSO.',
+                                                    'success'
+                                                )
+                                            }).catch(error => {
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: 'Oops...',
+                                                    text: 'Cek kembali rincian rso anda!',
+                                                })
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Tidak dapat mengirim ulang RSO ini.',
+                                            text: 'RSO ini sudah digunakan untuk pembuatan SO',
                                         })
-                                    axios.post("/api/history", {
-                                        nomor_dok: this.$route.params.id,
-                                        id_user: this.ambiluser.id,
-                                        notif: "Anda mendapatkan permintaan ulang RSO!",
-                                        keterangan: "RSO di kirim ulang ke Inventory Control",
-                                        jenis: "RSO",
-                                        tanggal: this.DateTime(),
-                                    })
-                                    this.$router.push({
-                                        name: 'rso'
-                                    })
-                                    swalWithBootstrapButtons.fire(
-                                        'Save!',
-                                        'Berhasil mengirimkan ulang RSO.',
-                                        'success'
-                                    )
-                                }).catch(error => {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Cek kembali rincian rso anda!',
-                                    })
-                                })
+                                    }
+                                });
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -850,6 +927,26 @@ export default {
                                                 axios.post("/api/listrso", this.uplist)
                                             }
                                         })
+                                    if (this.$route.params.id !== this.upload.nomor_rso) {
+                                        axios.get("/api/history/" + this.$route.params.id)
+                                            .then(res => {
+                                                this.history = res.data.data;
+                                                for (let i = 0; 1 < this.history.length; i++) {
+                                                    axios.put("/api/history/" + this.history[i].id, {
+                                                        nomor_dok: this.upload.nomor_rso
+                                                    })
+                                                }
+                                            })
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.upload.nomor_rso,
+                                            id_user: this.ambiluser.id,
+                                            notif: "RSO " + this.$route.params.id + " di ganti dengan RSO " + this.upload.nomor_rs,
+                                            keterangan: "Mengubah nomor RSO lama : " + this.$route.params.id,
+                                            jenis: "RSO",
+                                            tanggal: this.DateTime(),
+                                            aktif: "N",
+                                        })
+                                    }
                                     this.$router.push({
                                         name: 'rso'
                                     })
@@ -960,7 +1057,7 @@ export default {
             $("#modal-customer").modal("hide");
         },
         pilihjenisharga() {
-            console.log(this.ket.harga);
+            /*  console.log(this.ket.harga); */
         },
         hitunginvoice() {
             this.subtotal = 0;

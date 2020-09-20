@@ -202,6 +202,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -542,14 +543,22 @@ export default {
                                             })
                                     }
                                     /* end input listpo */
-                                    this.$router.push({
-                                        name: 'po'
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.lpo.nomor_po,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Terdapat permintaan PO baru",
+                                        keterangan: "Mengirim PO ke Purch Supervisor",
+                                        jenis: "Po",
+                                        tanggal: this.DateTime(),
                                     })
                                     swalWithBootstrapButtons.fire(
                                         'Sukses!',
                                         'PO berhasil di buat.',
                                         'success'
                                     )
+                                    this.$router.push({
+                                        name: 'po'
+                                    })
                                 })
                                 .catch(error => {
                                     Swal.fire({
@@ -650,6 +659,22 @@ export default {
 
                 this.totalPrice += parseInt(this.hitung.subqty[i]) * parseInt(this.hitung.sub[i]);
             }
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
         }
     },
 }

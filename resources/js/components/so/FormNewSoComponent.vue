@@ -330,7 +330,8 @@ export default {
             pembanding: '',
             lisallrso: {},
             statpo: 'Y',
-            statusso: ''
+            statusso: '',
+            statusnya: ''
         }
     },
     created() {
@@ -557,12 +558,28 @@ export default {
                                         })
                                 }
                                 axios.post("/api/history", {
-                                        nomor_dok: this.up.nomor_so,
+                                    nomor_dok: this.up.nomor_so,
+                                    nomor_ref: this.up.nomor_rso,
+                                    id_user: this.ambiluser.id,
+                                    notif: "Anda mendapatkan permintaan SO baru",
+                                    keterangan: "SO di kirim ke Sales Supervisor",
+                                    jenis: "So",
+                                    tanggal: this.DateTime(),
+                                })
+                                if (this.status === "Tersedia") {
+                                    this.statusnya = "Tersedia";
+                                } else {
+                                    this.statusnya = "Tidak Tersedia";
+                                }
+                                axios.post("/api/history", {
+                                        nomor_dok: this.up.nomor_rso,
+                                        nomor_ref: this.up.nomor_so,
                                         id_user: this.ambiluser.id,
                                         notif: "Anda mendapatkan permintaan SO baru",
-                                        keterangan: "SO di kirim ke Sales Supervisor",
-                                        jenis: "So",
+                                        keterangan: "Membuat SO " + this.statusnya + " nomor : " + this.up.nomor_so,
+                                        jenis: "RSO",
                                         tanggal: this.DateTime(),
+                                        aktif: "N",
                                     })
                                     .then(res => {
                                         this.$router.push({

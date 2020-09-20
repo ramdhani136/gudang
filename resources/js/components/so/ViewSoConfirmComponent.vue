@@ -247,6 +247,14 @@ export default {
                                 jenis: "So",
                                 tanggal: this.DateTime(),
                             })
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.id,
+                                id_user: this.ambiluser.id,
+                                notif: "So nomor : " + this.$route.params.id + " DI konfirmasi SPV",
+                                keterangan: "Menunggu konfirmasi DIC",
+                                jenis: "So",
+                                tanggal: this.DateTime(),
+                            })
                             this.$router.push({
                                 name: 'soconfirm'
                             })

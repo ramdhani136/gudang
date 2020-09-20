@@ -307,7 +307,6 @@ export default {
                         .then((response) => {
                             this.up.booking = "Y";
                             axios.put(`/api/listrso/data/booking/` + this.urso.nomor_rso, this.up)
-                                .then((response) => {})
                             axios.post("/api/history", {
                                 nomor_dok: this.$route.params.id,
                                 id_user: this.ambiluser.id,
@@ -316,6 +315,16 @@ export default {
                                 jenis: "RSO",
                                 tanggal: this.DateTime(),
                             })
+                            if (this.akses === "Purch") {
+                                axios.post("/api/history", {
+                                    nomor_dok: this.$route.params.id,
+                                    id_user: this.ambiluser.id,
+                                    notif: "Menunggu konfirmasi Purchasing",
+                                    keterangan: "Menunggu konfirmasi Purchasing",
+                                    jenis: "RSO",
+                                    tanggal: this.DateTime(),
+                                })
+                            }
                             this.$router.push({
                                 name: 'dic'
                             })
