@@ -86,7 +86,7 @@ class ListpoController extends Controller
      */
     public function destroy($id)
     {
-        Listpo::where('nomor_po',$id)->delete();
+        Listpo::where('id',$id)->delete();
     }
 
     public function sisalist(){

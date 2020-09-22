@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Model\Rso\Listrso;
 
 class BarangResource extends JsonResource
 {
@@ -15,10 +14,7 @@ class BarangResource extends JsonResource
      */
     public function toArray($request)
     {
-
-       /*  $data=Listrso::all();
-        $book= Listrso::where('kode_barang',$this->kode)->where('booking','Y')->sum('qty_tersedia'); */
-        
+ 
 
         return 
         [
@@ -26,6 +22,8 @@ class BarangResource extends JsonResource
             'nama'=>$this->nama,
             'qty'=>$this->qty,
             'satuan'=>$this->satuan,
+            'id_kategori'=>$this->kategoribarang->id,
+            'kategori'=>$this->kategoribarang->nama,
            /*  'dibooking'=>$book, */
             'harga'=>$this->harga, 
             'min_stok'=>$this->min_stok, 

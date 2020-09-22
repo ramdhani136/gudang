@@ -134,6 +134,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -172,7 +173,6 @@ export default {
                     this.rso = res.data.data;
                     this.status = this.rso[0].status;
                     this.rsoketerangan = this.rso[0].keterangan;
-                    console.log(this.status)
                     axios.get("/api/listrso/" + this.$route.params.nomor)
                         .then(res => {
                             this.listpr = res.data.data;
@@ -239,17 +239,23 @@ export default {
                                     qty_tdktersedia: this.hitung.qty[i]
                                 };
                                 axios.put("/api/listrso/" + this.listpr[i].id, this.kirimlagi)
-                                    .then(res => {
-                                        swalWithBootstrapButtons.fire(
-                                            'Terkirim!',
-                                            'Silahkan tunggu konfirmasi purchasing.',
-                                            'success'
-                                        )
-                                        this.$router.push({
-                                            name: 'Prcomponent'
-                                        });
-                                    })
                             }
+                            swalWithBootstrapButtons.fire(
+                                'Terkirim!',
+                                'Silahkan tunggu konfirmasi purchasing.',
+                                'success'
+                            )
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.nomor,
+                                id_user: this.ambiluser.id,
+                                notif: "PR nomor : " + this.$route.params.nomor + " di kirim ulang ke Purchasing",
+                                keterangan: "PR di kirim ulang ke Purchasing",
+                                jenis: "RSO",
+                                tanggal: this.DateTime(),
+                            })
+                            this.$router.push({
+                                name: 'Prcomponent'
+                            });
                         })
                 } else if (
                     /* Read more about handling dismissals below */
@@ -319,17 +325,23 @@ export default {
                                                 sisapo: this.listsoacc[i].qty,
                                             }
                                             axios.post("/api/listso", this.uplist)
-                                                .then(res => {
-                                                    this.$router.push({
-                                                        name: 'Prcomponent'
-                                                    });
-                                                    swalWithBootstrapButtons.fire(
-                                                        'Terkirim!',
-                                                        'Berhasil mnengirim permintaan.',
-                                                        'success'
-                                                    )
-                                                })
                                         }
+                                        swalWithBootstrapButtons.fire(
+                                            'Terkirim!',
+                                            'Berhasil mengirim permintaan.',
+                                            'success'
+                                        )
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.$route.params.nomor,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Pemesanan barang pr " + this.$route.params.nomor,
+                                            keterangan: "Proses permintaan buka PO",
+                                            jenis: "RSO",
+                                            tanggal: this.DateTime(),
+                                        })
+                                        this.$router.push({
+                                            name: 'Prcomponent'
+                                        });
                                     });
                             })
                     } else if (

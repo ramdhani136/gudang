@@ -14,9 +14,10 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Customer</label>
-                <select v-model="rlist.kode_customer" name="customer" class="col-12 form-control" disabled>
+                <select v-if="apapr==='N'" v-model="rlist.kode_customer" name="customer" class="col-12 form-control" disabled>
                     <option v-for="custom in customers" :key="custom.kode" :value="custom.kode">{{custom.nama}}</option>
                 </select>
+                <input v-if="apapr==='Y'" value="Gudang Stok" type="text" class="form-control" disabled>
             </div>
             <div class="form-group">
                 <label>Marketing</label>
@@ -151,6 +152,7 @@ export default {
             upso: '',
             value: '',
             uplist: {},
+            apapr: '',
         }
     },
     created() {
@@ -164,7 +166,10 @@ export default {
     methods: {
         getRso() {
             axios.get(`/api/rso/${this.$route.params.id}`)
-                .then(res => this.form = res.data.data)
+                .then(res => {
+                    this.form = res.data.data;
+                    this.apapr = this.form[0].pr;
+                })
         },
         getlistRso() {
             axios.get(`/api/listrso/data/purch/${this.$route.params.id}`)
@@ -311,6 +316,14 @@ export default {
                                                         }
                                                     })
                                             })
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.$route.params.id,
+                                            id_user: this.ambiluser.id,
+                                            notif: "PR nomor : " + this.$route.params.id + " Siap di pesankan",
+                                            keterangan: "Purchase menerima PR untuk di bukakan PO",
+                                            jenis: "RSO",
+                                            tanggal: this.DateTime(),
+                                        })
                                         this.$router.push({
                                             name: 'purchase'
                                         });
@@ -323,6 +336,14 @@ export default {
                                 this.konfirm.keterangan = rs.keterangan;
                                 axios.put(`/api/rso/` + rs.nomor_rso, this.konfirm)
                                     .then((response) => {
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.$route.params.id,
+                                            id_user: this.ambiluser.id,
+                                            notif: "PR nomor : " + this.$route.params.id + " di konfirmasi Purchasing",
+                                            keterangan: "PR di konfirmasi Purchasing",
+                                            jenis: "RSO",
+                                            tanggal: this.DateTime(),
+                                        })
                                         this.$router.push({
                                             name: 'purchase'
                                         });

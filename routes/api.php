@@ -122,3 +122,7 @@ Route::get('listpo/data/aktif','Po\ListpoController@sisalist');
 
 Route::resource('history','History\HistoryController');
 Route::get('history/data/{nomorso}/{jenis}','History\HistoryController@historyview');
+
+Route::resource('kategoribarang','Barang\KategoriBarangController');
+
+Route::resource('satuan','Barang\SatuanController');

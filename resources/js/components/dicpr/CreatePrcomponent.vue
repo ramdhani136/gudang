@@ -119,6 +119,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -136,7 +137,7 @@ export default {
                 keterangan: [],
                 barang: {},
             },
-            visible: false,
+            visible: true,
             query: '',
             selected: 0,
             itemHeight: 39,
@@ -290,14 +291,22 @@ export default {
                                     axios.post("/api/listrso", this.uplist)
                                         .then(res => {})
                                 }
-                                this.$router.push({
-                                    name: 'Prcomponent'
-                                });
+                                axios.post("/api/history", {
+                                    nomor_dok: this.upload.nomor_rso,
+                                    id_user: this.ambiluser.id,
+                                    notif: "Anda mendapatkan permintaan PR baru!",
+                                    keterangan: "Mengirim permintaan ke purchasing",
+                                    jenis: "RSO",
+                                    tanggal: this.DateTime(),
+                                })
                                 swalWithBootstrapButtons.fire(
                                     'Terkirim!',
                                     'PR Berhasil di kirim.',
                                     'success'
                                 )
+                                this.$router.push({
+                                    name: 'Prcomponent'
+                                });
                             })
                     } else {
                         Swal.fire({

@@ -114,7 +114,7 @@
                         <thead>
                             <tr>
                                 <th>tanggal</th>
-                                <th>Nomor RSO</th>
+                                <th>Nomor SO</th>
                                 <th>keterangan</th>
                                 <th>Oleh</th>
                             </tr>

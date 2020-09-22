@@ -99,7 +99,7 @@ class RsoController extends Controller
 
     public function pr()
     {
-        return PrResource::collection(Rso::where('pr','Y')->orderBy('updated_at','ASC')->get());
+        return PrResource::collection(Rso::where('pr','Y')->orderBy('nomor_rso','ASC')->get());
     }
 
     public function viewpr($rso)

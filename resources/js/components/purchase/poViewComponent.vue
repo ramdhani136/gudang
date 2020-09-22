@@ -4,21 +4,21 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor PO :</label>
-                <input v-model="lpo.nomor_po" type="text" class="form-control col-12" :disabled="statusnya!=='Draft'">
+                <input v-model="lpo.nomor_po" type="text" class="form-control col-12" :disabled="disedit">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
-                <input v-model="lpo.tanggal_po" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="statusnya!=='Draft'">
+                <input v-model="lpo.tanggal_po" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="disedit">
             </div>
         </div>
-        <div class="col-4">
+        <div class=" col-4">
             <div class="form-group">
                 <label>Supplier</label>
-                <input @click="pilihsupplier()" v-model="ket.nama" type="text" placeholder="Pilih Supplier" class="form-control" :disabled="statusnya!=='Draft'">
+                <input @click="pilihsupplier()" v-model="ket.nama" type="text" placeholder="Pilih Supplier" class="form-control" :disabled="disedit">
             </div>
             <div class="form-group">
                 <label>Purchasing</label>
-                <select v-model="lpo.nip_purchasing" class="col-12 form-control" :disabled="statusnya!=='Draft'">
+                <select v-model="lpo.nip_purchasing" class="col-12 form-control" :disabled="disedit">
                     <option v-for="(purch,index) in purchasing" :key="index" :value="purch.nip">{{purch.nama}}</option>
                 </select>
             </div>
@@ -26,16 +26,16 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Tanggal Datang :</label>
-                <input v-model="lpo.tanggal_datang" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="statusnya!=='Draft'">
+                <input v-model="lpo.tanggal_datang" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="disedit">
             </div>
             <div class="form-group">
                 <label>keterangan</label>
-                <textarea v-model="lpo.keterangan" name="keterangan" class="form-control col-12" :disabled="statusnya!=='Draft'"></textarea>
+                <textarea v-model="lpo.keterangan" name="keterangan" class="form-control col-12" :disabled="disedit"></textarea>
             </div>
         </div>
     </div>
     <div class="row">
-        <button v-if="statusnya==='Draft'" @click=" showmodal()" class="row float-left  ml-4 mt-4 label">Ambil Permintaan</button>
+        <button v-if="statusnya==='Draft' && (ambiluser.purch===1 || ambiluser.superadmin===1)" @click=" showmodal()" class="row float-left  ml-4 mt-4 label">Ambil Permintaan</button>
         <div id="totalpo" class="mt-3 ml-auto mr-3">Total Invoice &nbsp; : &nbsp;{{totalPrice | currency}}</div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
@@ -51,25 +51,27 @@
                         <th>Qty PO</th>
                         <th>Satuan</th>
                         <th>Harga</th>
+                        <th v-if="statusnya!=='Draft' && statusnya!=='Request'">Qty Masuk</th>
                         <th>Sub Total</th>
-                        <th v-if="statusnya==='Draft'">Aksi</th>
+                        <th v-if="statusnya==='Draft' && (ambiluser.purch===1 || ambiluser.superadmin===1)">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(list,index) in listfix" :key="index">
+                    <tr v-for=" (list,index) in listfix" :key="index">
                         <td style="text-align:center">{{index+1}}</td>
                         <td>{{list.kode_barang}}</td>
                         <td>{{list.nama_barang}}</td>
                         <td style="text-align:center">{{list.qty}}</td>
                         <td style="text-align:center">
-                            <input :disabled="statusnya!=='Draft'" @input="hitunginv()" type="number" class="form-control" v-model="hitung.qty[index]">
+                            <input :disabled="disedit" @input="hitunginv()" type="number" class="form-control" v-model="hitung.qty[index]">
                         </td>
                         <td style="text-align:center">{{list.satuan}}</td>
                         <td style="text-align:center">
-                            <input :disabled="statusnya!=='Draft'" @input="hitunginv()" v-model="hitung.harga[index]" type="number" class="form-control">
+                            <input :disabled="disedit" @input="hitunginv()" v-model="hitung.harga[index]" type="number" class="form-control">
                         </td>
+                        <td v-if="statusnya!=='Draft' && statusnya!=='Request'" style="text-align:center">{{list.bbm}}</td>
                         <td style="text-align:center">{{hitung.qty[index]*hitung.sub[index] | currency}}</td>
-                        <td v-if="statusnya==='Draft'" style="text-align:center">
+                        <td v-if="statusnya==='Draft' && (ambiluser.purch===1 || ambiluser.superadmin===1)" style="text-align:center">
                             <button @click="deletelist(index)" class="btn btn-danger">Hapus</button>
                         </td>
                     </tr>
@@ -81,8 +83,17 @@
         <button @click="kembali()" class="btn-primary btn ml-4">
             Kembali
         </button>
-        <button v-if="statusnya==='Draft'" @click="submitPo()" class="btn-success btn ml-1">
-            Simpan PO
+        <button v-if="(ambiluser.purch===1 || ambiluser.superadmin===1) && (statusnya!=='Selesai' &&  statusnya!=='Di Selesaikan'&&  statusnya!=='Draft')" @click="reqedit()" class="btn-orange btn ml-1">
+            Request Edit
+        </button>
+        <button @click="formtolak()" v-if="(ambiluser.suppurch===1 || ambiluser.superadmin===1) && statusnya==='Request'" class="btn-danger btn ml-1">
+            Tolak PO
+        </button>
+        <button v-if="(ambiluser.suppurch===1 || ambiluser.superadmin===1) && statusnya==='Request'" @click="terimapo()" class="btn-success btn ml-1">
+            Terima PO
+        </button>
+        <button v-if="(ambiluser.purch===1 || ambiluser.superadmin===1) && statusnya==='Draft'" @click="kirimulang()" class="btn-success btn ml-1">
+            Kirim
         </button>
     </div>
     <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -136,15 +147,15 @@
                         <textarea v-model="up.alastolak" class="form-control"></textarea>
                     </div>
                 </div>
-                <div v-for="(lpo,index) in po" :key="index" class="modal-footer">
+                <div class="modal-footer">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="tolakPo(lpo)" class="btn btn-orange">Konfirmasi Tolak</button>
+                    <button type="button" @click="tolakpo()" class="btn btn-orange">Konfirmasi Tolak</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row mt-2" v-for="(lpo,index) in po" :key="index">
-        <div v-if="lpo.status=='Tolak'" id="alastolak">
+    <div class="row mt-2">
+        <div v-if="statusnya=='Tolak'" id="alastolak">
             <div>
                 <b>{{lpo.alastolak}}</b>
             </div>
@@ -205,6 +216,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -264,7 +276,13 @@ export default {
             po: {},
             sisalain: [],
             qtysisa: 0,
-            statusnya: ''
+            statusnya: '',
+            listponya: {},
+            bbmnya: 0,
+            disedit: true,
+            listdatabase: {},
+            llisthapus: {},
+            listpodel: {}
         }
     },
     created() {
@@ -295,11 +313,17 @@ export default {
                     this.lpo.nip_purchasing = this.po[0].nip_purchasing;
                     this.lpo.tanggal_datang = this.po[0].tanggal_datang;
                     this.lpo.keterangan = this.po[0].keterangan;
+                    this.lpo.alastolak = this.po[0].alastolak;
                     this.statusnya = this.po[0].status;
+                    if (this.po[0].status === "Draft" && this.ambiluser.purch === 1) {
+                        this.disedit = false;
+                    } else {
+                        this.disedit = true;
+                    }
 
                     axios.get('/api/listpo/' + this.$route.params.nomor)
                         .then(res => {
-                            this.listfix = res.data.data
+                            this.listfix = res.data.data;
                             for (let i = 0; i < this.listfix.length; i++) {
                                 this.qtysisa = 0;
                                 axios.get("/api/listso/data/group/" + this.listfix[i].kode_barang)
@@ -379,6 +403,10 @@ export default {
         showmodal() {
             this.errors = [];
             $("#modal-form").modal("show");
+        },
+        formtolak() {
+            this.up.alastolak = '';
+            $("#modal-tolak").modal("show");
         },
         resetForm() {
             this.aktif = false;
@@ -692,6 +720,353 @@ export default {
             this.$router.push({
                 name: 'po'
             })
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
+        },
+        terimapo() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menerima PO ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.put("/api/po/" + this.$route.params.nomor, {
+                        status: "Acc"
+                    }).then(res => {
+                        axios.post("/api/history", {
+                            nomor_dok: this.$route.params.nomor,
+                            id_user: this.ambiluser.id,
+                            notif: "PO " + this.$route.params.nomor + " Di terima Purch SPV",
+                            keterangan: "PO di terima Purch SPV",
+                            jenis: "Po",
+                            tanggal: this.DateTime(),
+                        })
+                        swalWithBootstrapButtons.fire(
+                            'Sukses!',
+                            'Po selesai di terima.',
+                            'success'
+                        )
+                        this.$router.push({
+                            name: 'po'
+                        })
+                    })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menerima PO :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        tolakpo() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menolak PO ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (this.up.alastolak === '') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Alasan tolak harus di isi!',
+                        })
+                    } else {
+                        axios.put("/api/po/" + this.$route.params.nomor, {
+                            alastolak: this.up.alastolak,
+                            status: 'Tolak'
+                        }).then(res => {
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.nomor,
+                                id_user: this.ambiluser.id,
+                                notif: "PO " + this.$route.params.nomor + " Di tolak Purch SPV",
+                                keterangan: "PO di tolak Purch SPV",
+                                jenis: "Po",
+                                tanggal: this.DateTime(),
+                            })
+                            swalWithBootstrapButtons.fire(
+                                'Sukses!',
+                                'Berhasil mengirim penolakan PO.',
+                                'success'
+                            )
+                            $("#modal-tolak").modal("hide");
+                            this.getall();
+                        })
+                    }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal tolak PO :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        reqedit() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin mengedit PO ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.get("/api/listpo/" + this.$route.params.nomor)
+                        .then(res => {
+                            this.listponya = res.data.data;
+                            this.bbmnya = 0;
+                            for (let i = 0; i < this.listponya.length; i++) {
+                                this.bbmnya += parseInt(this.listponya[i].bbm);
+                            }
+                            if (this.bbmnya < 1) {
+                                axios.put("/api/po/" + this.$route.params.nomor, {
+                                    status: 'Draft',
+                                }).then(res => {
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.$route.params.nomor,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Purchasing menarik kembali PO " + this.$route.params.nomor,
+                                        keterangan: "PO di tarik kembali oleh Purchasing (Edit PO)",
+                                        jenis: "Po",
+                                        tanggal: this.DateTime(),
+                                    })
+                                    swalWithBootstrapButtons.fire(
+                                        'Berhasil!',
+                                        'Silahkan edit PO anda di List Draft PO.',
+                                        'success'
+                                    )
+                                    this.$router.push({
+                                        name: 'po'
+                                    })
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Tidak dapat mengedit PO ini',
+                                    text: 'Sudah ada barang masuk dari PO ini!',
+                                })
+                            }
+                        });
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal mengedit PO :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        kirimulang() {
+            if (this.$route.params.nomor === this.lpo.nomor_po) {
+                if (this.listfix.length < 1) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Anda belum menginput data barang!',
+                    })
+                } else {
+                    this.hitunginv();
+                    this.lengkap = "";
+                    this.subl = '';
+                    this.subban = '';
+                    for (let i = 0; i < this.listfix.length; i++) {
+                        if (this.hitung.sub[i] > 0 && this.hitung.subqty[i] > 0) {
+                            this.lengkap = "Y";
+                        } else {
+                            this.lengkap = "N";
+                        }
+                        this.subl += this.lengkap;
+                        this.subban += "Y";
+                    }
+                    if (this.subl === this.subban) {
+                        axios.post("/api/po/" + this.$route.params.nomor, this.lpo)
+                            .then(res => {
+                                axios.get('/api/listpo/' + this.$route.params.nomor)
+                                    .then(res => {
+                                        this.listdatabase = res.data.data;
+                                        this.sisapo = 0;
+                                        this.openpo = 0;
+                                        this.statuspo = "";
+                                        for (let i = 0; i < this.listdatabase.length; i++) {
+                                            axios.get("/api/listso/data/kembalikanpo/" + this.listdatabase[i].kode_barang)
+                                                .then(res => {
+                                                    this.listhapus = res.data.data;
+                                                    for (let k = 0; k < this.listhapus.length; k++) {
+                                                        if (this.listdatabase[i].qty >= this.listhapus[k].openpo) {
+                                                            this.sisapo = this.listhapus[k].openpo + this.listhapus[k].sisapo;
+                                                            this.openpo = 0;
+                                                            this.statuspo = "N";
+                                                            this.listdatabase[i].qty = parseInt(this.listdatabase[i].qty) - parseInt(this.listhapus[k].openpo);
+                                                        } else {
+                                                            this.openpo = parseInt(this.listhapus[k].openpo) - parseInt(this.listdatabase[i].qty);
+                                                            if (this.listdatabase[i].qty > this.listhapus[k].qty) {
+                                                                this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listhapus[k].open);
+                                                            } else {
+                                                                this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listdatabase[i].qty);
+                                                            }
+                                                            if (this.sisapo < 1) {
+                                                                this.statuspo = "Y";
+                                                            } else {
+                                                                this.statuspo = "N";
+                                                            }
+                                                            this.listdatabase[i].qty = parseInt(this.listdatabase[i].qty) - parseInt(this.listhapus[k].openpo);
+                                                            if (this.listdatabase[i].qty < 1) {
+                                                                this.listdatabase[i].qty = 0;
+                                                            }
+                                                        }
+                                                        axios.put("/api/listso/" + this.listhapus[k].id, {
+                                                            sisapo: this.sisapo,
+                                                            openpo: this.openpo,
+                                                            statuspo: this.statuspo
+                                                        })
+                                                    }
+                                                })
+                                        }
+                                    });
+                                for (let h = 0; h < this.listfix.length; h++) {
+                                    this.uplistpo = {
+                                        nomor_po: this.lpo.nomor_po,
+                                        kode_barang: this.listfix[h].kode_barang,
+                                        harga: this.hitung.harga[h],
+                                        qty: this.hitung.qty[h],
+                                        sisapo: this.hitung.qty[h]
+                                    }
+                                    axios.post("/api/listpo/", this.uplistpo)
+                                }
+                                console.log(this.uplistpo);
+                                this.kasihso = 0;
+                                this.sisapembagi = 0;
+                                this.masihsisa = 0;
+                                this.sisapo = 0;
+                                this.openpo = 0;
+                                for (let i = 0; i < this.listfix.length; i++) {
+                                    axios.get("/api/listso/data/antrianpo/" + this.listfix[i].kode_barang)
+                                        .then(res => {
+                                            this.listbagi = res.data.data;
+                                            this.kasihso = 0;
+                                            this.sisapembagi = 0;
+                                            this.masihsisa = 0;
+                                            this.sisapo = 0;
+                                            this.tutupso = '';
+                                            this.bandingtutup = '';
+                                            this.openpo = 0;
+                                            for (let k = 0; k < this.listbagi.length; k++) {
+                                                /* ini sisa sonya */
+                                                this.sisapembagi = parseInt(this.listbagi[k].qty) - parseInt(this.listbagi[k].openpo);
+                                                /* end */
+                                                if (this.hitung.qty[i] < this.sisapembagi) {
+                                                    this.kasihso = this.hitung.qty[i];
+                                                    this.hitung.qty[i] = 0;
+                                                } else {
+                                                    this.kasihso = this.sisapembagi;
+                                                    this.hitung.qty[i] = parseInt(this.hitung.qty[i]) - parseInt(this.sisapembagi);
+                                                }
+
+                                                this.sisapo = parseInt(this.listbagi[k].sisapo) - parseInt(this.kasihso);
+                                                this.openpo = parseInt(this.listbagi[k].openpo) + parseInt(this.kasihso);
+
+                                                if (this.sisapo === 0) {
+                                                    this.ubah = "Y";
+                                                } else {
+                                                    this.ubah = "N";
+                                                }
+                                                axios.put("/api/listso/" + this.listbagi[k].id, {
+                                                    sisapo: this.sisapo,
+                                                    openpo: this.openpo,
+                                                    statuspo: this.ubah,
+                                                })
+                                            }
+                                        })
+                                }
+                                /* end input listpo */
+                                axios.post("/api/history", {
+                                    nomor_dok: this.lpo.nomor_po,
+                                    id_user: this.ambiluser.id,
+                                    notif: "Terdapat permintaan PO baru",
+                                    keterangan: "Mengirim PO ke Purch Supervisor",
+                                    jenis: "Po",
+                                    tanggal: this.DateTime(),
+                                })
+                                this.$router.push({
+                                    name: 'po'
+                                })
+
+                            }).catch(error => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Cek kembali data PO anda!',
+                                })
+                            })
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Qty & Harga barang tidak boleh kosong!',
+                        })
+                    }
+                }
+            } else {
+                alert("ubah")
+            }
         }
     },
 }

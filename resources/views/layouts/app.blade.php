@@ -176,8 +176,8 @@
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <router-link to="/purchase/po/" class="dropdown-item" >Purchasing Order</router-link>
-                                    <router-link to="/purchase/po/acc" class="dropdown-item" >Request Acc PO</router-link>
+                                    <router-link to="/purchase/po/" class="dropdown-item" >Request Acc PO</router-link>
+                                  <!--   <router-link to="/purchase/po/acc" class="dropdown-item" >Request Acc PO</router-link> -->
                                     <router-link to="/purchase/po/selesai" class="dropdown-item" >Request Selesai PO</router-link>
                                 </div>
                             </li>

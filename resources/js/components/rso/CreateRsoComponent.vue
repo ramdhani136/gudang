@@ -45,6 +45,7 @@
                         <th>Nama Barang</th>
                         <th>Satuan</th>
                         <th>Harga</th>
+                        <th>Diskon Harga</th>
                         <th>Qty</th>
                         <th>Sub Total</th>
                         <th>Catatan</th>
@@ -58,6 +59,9 @@
                         <td>{{lp.nama}}</td>
                         <td style="text-align:center">{{lp.satuan}}</td>
                         <td style="text-align:center">{{lp.harga | currency}}</td>
+                        <td style="text-align:center">
+                            <input @input="hitunginvoice()" v-model="diskon[index]" type="number" class="form-control">
+                        </td>
                         <td style="text-align:center">
                             <input @input="hitunginvoice()" v-model="hitung.qty[index]" type="number" class="form-control">
                         </td>
@@ -223,11 +227,13 @@ export default {
             invoice: 0,
             subtotal: 0,
             inhitung: {
-                qty: []
+                qty: [],
+                diskon: []
             },
             cek: '',
             init: '',
-            banding: ''
+            banding: '',
+            diskon: [],
         }
     },
     created() {
@@ -441,6 +447,7 @@ export default {
                                             qty: this.hitung.qty[i],
                                             qty: this.hitung.qty[i],
                                             catatan: this.hitung.keterangan[i],
+                                            diskon: this.diskon[i],
                                         }
                                         axios.post("/api/listrso", this.uplist)
                                             .then(res => {
@@ -544,6 +551,7 @@ export default {
                                             qty: this.hitung.qty[i],
                                             qty: this.hitung.qty[i],
                                             catatan: this.hitung.keterangan[i],
+                                            diskon: this.diskon[i],
                                         }
                                         axios.post("/api/listrso", this.uplist)
                                             .then(res => {
@@ -591,9 +599,10 @@ export default {
             })
         },
         hapus(index) {
-            this.listpr.splice(index, 1)
-            this.hitung.qty.splice(index, 1)
-            this.hitung.keterangan.splice(index, 1)
+            this.listpr.splice(index, 1);
+            this.hitung.qty.splice(index, 1);
+            this.diskon.splice(index, 1);
+            this.hitung.keterangan.splice(index, 1);
         },
         DateTime() {
             this.date = new Date();
@@ -660,6 +669,11 @@ export default {
             this.subtotal = 0;
             this.invoice = 0;
             for (let i = 0; i < this.listpr.length; i++) {
+
+                if (this.diskon[i] > this.listpr[i].harga) {
+                    this.diskon[i] = this.listpr[i].harga;
+                }
+
                 if (this.hitung.qty[i] === "") {
                     this.inhitung.qty[i] = 0;
                 } else if (this.hitung.qty[i] === undefined) {
@@ -667,7 +681,16 @@ export default {
                 } else {
                     this.inhitung.qty[i] = this.hitung.qty[i];
                 }
-                this.subtotal = parseInt(this.listpr[i].harga) * parseInt(this.inhitung.qty[i])
+
+                if (this.diskon[i] === "") {
+                    this.inhitung.diskon[i] = 0;
+                } else if (this.diskon[i] === undefined) {
+                    this.inhitung.diskon[i] = 0;
+                } else {
+                    this.inhitung.diskon[i] = this.diskon[i];
+                }
+
+                this.subtotal = (parseInt(this.listpr[i].harga) - parseInt(this.inhitung.diskon[i])) * parseInt(this.inhitung.qty[i])
                 this.invoice += this.subtotal;
             }
         }

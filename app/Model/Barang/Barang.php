@@ -2,16 +2,17 @@
 
 namespace App\Model\Barang;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Model\Rso\Listrso;
-use App\Model\Sales\Custprice;
-use App\Model\Barang\Listbcm;
-use App\Model\Bbm\Listbbm;
-use App\Model\Bck\Listbck;
-use App\Model\Bck\Listbbk;
 use App\Model\Po\Listpo;
-use App\Model\Retur\Listretur;
 use App\Model\So\Listso;
+use App\Model\Bbm\Listbbm;
+use App\Model\Bck\Listbbk;
+use App\Model\Bck\Listbck;
+use App\Model\Rso\Listrso;
+use App\Model\Barang\Listbcm;
+use App\Model\Retur\Listretur;
+use App\Model\Sales\Custprice;
+use App\Model\Barang\Kategoribarang;
+use Illuminate\Database\Eloquent\Model;
 
 class Barang extends Model
 {
@@ -52,5 +53,9 @@ class Barang extends Model
 
     public function listpo(){
         return $this->hasMany(Listpo::class,'kode_barang','kode');
+    }
+
+    public function kategoribarang(){
+        return $this->belongsTo(Kategoribarang::class,'id_kategori','id');
     }
 }

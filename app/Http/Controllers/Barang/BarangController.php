@@ -17,13 +17,13 @@ class BarangController extends Controller
      */
     public function index()
     {
-        return BarangResource::collection(Barang::where('aktif','Y')->latest()->get());
+        return BarangResource::collection(Barang::where('aktif','Y')->orderBy('nama','ASC')->get());
     }
 
 
     public function all()
     {
-        return BarangResource::collection(Barang::latest()->get());
+        return BarangResource::collection(Barang::orderBy('nama','ASC')->get());
     }
 
     /**

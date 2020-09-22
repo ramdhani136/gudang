@@ -27,19 +27,61 @@
             <tbody>
                 <tr v-for="(lp,index) in FilteredPr" :key="index">
                     <td style="text-align:center">{{index+1}}</td>
-                    <td style="text-align:center">{{lp.nomor_rso}}</td>
+                    <td style="text-align:center">
+                        <router-link :to="{name:'ViewPrcomponent',params:{nomor:lp.nomor_rso}}" class="btn btn-none">
+                            {{lp.nomor_rso}}
+                        </router-link>
+                    </td>
                     <td style="text-align:center">{{lp.tanggal_rso}}</td>
                     <td style="text-align:center">{{lp.customer}}</td>
                     <td style="text-align:center">
-                        <router-link :to="{name:'ViewPrcomponent',params:{nomor:lp.nomor_rso}}" class="btn btn-primary">
-                            Lihat Data
-                        </router-link>
+                        <button @click="showhistory(lp)" class="btn btn-primary">
+                            Lihat Rincian
+                        </button>
+                        <button @click="batalkan(lp)" class="btn btn-danger">
+                            Batalkan
+                        </button>
                         <button v-if="lp.status==='Tolak'||lp.status==='Draft'" class="btn btn-danger">Hapus</button>
                     </td>
                 </tr>
             </tbody>
         </table>
         <Circle5 id="load" v-if="load"></Circle5>
+    </div>
+    <div class="modal fade" id="modal-history" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Rincian History PR</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="thead" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>tanggal</th>
+                                <th>Nomor PR</th>
+                                <th>keterangan</th>
+                                <th>Oleh</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(hs,index) in historyview" :key="index">
+                                <td>{{hs.tanggal}}</td>
+                                <td>{{hs.nomor_dok}}</td>
+                                <td>{{hs.keterangan}}</td>
+                                <td>{{hs.user}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </template>
@@ -58,6 +100,11 @@ export default {
             load: false,
             status: 'Confirmed',
             pr: [],
+            historyview: {},
+            statusnya: '',
+            listso: {},
+            openpo: 0,
+            history: {}
         }
     },
     created() {
@@ -89,6 +136,96 @@ export default {
                     this.pr = res.data.data;
                 })
         },
+        showhistory(lp) {
+            $("#modal-history").modal("show");
+            axios.get("/api/history/data/" + lp.nomor_rso + "/RSO")
+                .then(res => {
+                    this.historyview = res.data.data;
+                })
+        },
+        batalkan(lp) {
+
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menghapus PR ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (lp.status === "Purch") {
+                        axios.delete("/api/rso/" + lp.nomor_rso)
+                            .then(res => {
+                                axios.get("/api/history/" + lp.nomor_rso)
+                                    .then(res => {
+                                        this.history = res.data.data;
+                                        for (let j = 0; j < this.history.length; j++) {
+                                            axios.delete("/api/history/" + this.history[j].id)
+                                        }
+                                    })
+                                swalWithBootstrapButtons.fire(
+                                    'Deleted!',
+                                    'PR berhasil di hapus.',
+                                    'success'
+                                )
+                                this.getPr();
+                            })
+                    } else {
+                        axios.get("/api/listso/" + lp.nomor_rso)
+                            .then(res => {
+                                this.listso = res.data.data;
+                                this.openpo = 0;
+                                for (let i = 0; i < this.listso.length; i++) {
+                                    this.openpo += this.listso[i].openpo;
+                                }
+                                if (this.openpo < 1) {
+                                    axios.delete("/api/rso/" + lp.nomor_rso)
+                                        .then(res => {
+                                            axios.get("/api/history/" + lp.nomor_rso)
+                                                .then(res => {
+                                                    this.history = res.data.data;
+                                                    for (let j = 0; j < this.history.length; j++) {
+                                                        axios.delete("/api/history/" + this.history[j].id)
+                                                    }
+                                                })
+                                            swalWithBootstrapButtons.fire(
+                                                'Deleted!',
+                                                'PR berhasil di batakan.',
+                                                'success'
+                                            )
+                                            this.getPr();
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Tidak dapat membatalkan PR ini',
+                                        text: 'Item sudah di bukakan PO!, Silahkan konfirmasi Purchasing',
+                                    })
+                                }
+                            })
+                    }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menghapus PR :)',
+                        'error'
+                    )
+                }
+            })
+        }
     }
 }
 </script>

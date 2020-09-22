@@ -13,7 +13,7 @@
             <option value="Di Selesaikan">Di Selesaikan</option>
         </select>
     </div>
-    <div class="row">
+    <div class="row" v-if="ambiluser.purch===1 || ambiluser.superadmin===1">
         <router-link to="/purchase/po/create" class="btn btn-success my-3">+ Create PO</router-link>
     </div>
     <div id="overflow" class="border-top">
@@ -43,7 +43,7 @@
                         <button @click="showhistory(pl)" class="btn btn-primary">
                             Lihat Rincian
                         </button>
-                        <button @click="getHapus(pl)" v-if="ambiluser.superadmin===1 || ambiluser.purch===1" class="btn btn-danger">Batalkan</button>
+                        <button @click="getHapus(pl)" v-if="(pl.status=='Draft' || pl.status=='Request' || pl.status=='Tolak')  && (ambiluser.superadmin===1 || ambiluser.purch===1)" class="btn btn-danger">Batalkan</button>
                         <button @click="requestSelesai(pl)" v-if="pl.status=='Acc' && pl.rs==='N' && (ambiluser.superadmin===1 || ambiluser.purch===1)" class="btn btn-orange">Request Selesai</button>
                         <button @click="batalselesai(pl)" v-if="pl.status=='Acc' && pl.rs==='Y' &&  (ambiluser.superadmin===1 || ambiluser.purch===1)" class="btn btn-none">Batal Selesai</button>
                         <button @click="infoTolak(pl)" v-if="pl.status=='Acc' && pl.rs==='T' &&  (ambiluser.superadmin===1 || ambiluser.purch===1)" class="btn btn-none">R. Selesai di tolak</button>
@@ -111,7 +111,7 @@
                         <thead>
                             <tr>
                                 <th>tanggal</th>
-                                <th>Nomor RSO</th>
+                                <th>Nomor PO</th>
                                 <th>keterangan</th>
                                 <th>Oleh</th>
                             </tr>
@@ -166,7 +166,8 @@ export default {
             sisapo: 0,
             openpo: 0,
             statuspo: '',
-            historyview: {}
+            historyview: {},
+            history: {},
         }
     },
     created() {
@@ -327,6 +328,13 @@ export default {
                             }
                             axios.delete("/api/po/" + pl.nomor_po)
                                 .then(res => {
+                                    axios.get("/api/history/" + pl.nomor_po)
+                                        .then(res => {
+                                            this.history = res.data.data;
+                                            for (let o = 0; 0 < this.history.length; o++) {
+                                                axios.delete("/api/history/" + this.history[o].id)
+                                            }
+                                        })
                                     swalWithBootstrapButtons.fire(
                                         'Deleted!',
                                         'PO berhasil di hapus.',
