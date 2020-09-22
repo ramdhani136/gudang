@@ -6,6 +6,7 @@
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select @change="pilihstatus()" name="status" v-model="status" class="form-control">
             <option value="Draft">Draft SO</option>
+            <option value="Kordinator">Kordinator Sales</option>
             <option value="Sent">Sales SPV</option>
             <option value="Dic">Request DIC</option>
             <option value="Acc">Open</option>
@@ -193,6 +194,8 @@ export default {
                     return this.so.filter(elem => elem.status === "Di Selesaikan")
                 } else if (this.status === "Dic") {
                     return this.so.filter(elem => elem.status === "Dic")
+                } else if (this.status === "Kordinator") {
+                    return this.so.filter(elem => elem.status === "Kordinator")
                 }
             } else {
                 return this.so.filter(elem => {

@@ -5,7 +5,8 @@
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select name="status" v-model="status" class="form-control">
-            <option value="Sent">Request SO</option>
+            <option value="Kordinator">Request Kordinator</option>
+            <option value="Sent">Request SPV</option>
             <option value="Dic">Request DIC</option>
             <option value="Acc">Open</option>
             <option value="Tolak">Rejected</option>
@@ -89,13 +90,14 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
     data() {
         return {
             search: '',
-            status: 'Sent',
+            status: '',
             so: [],
             load: true,
             historyview: {}
@@ -119,6 +121,8 @@ export default {
                     return this.so.filter(elem => elem.status === "Di Selesaikan")
                 } else if (this.status === "Dic") {
                     return this.so.filter(elem => elem.status === "Dic")
+                } else if (this.status === "Kordinator") {
+                    return this.so.filter(elem => elem.status === "Kordinator")
                 }
             } else {
                 return this.so.filter(elem => {
@@ -129,9 +133,15 @@ export default {
     },
     methods: {
         getSo() {
-            axios.get("/api/so/data/realso")
+            axios.get("/api/so")
                 .then(res => {
                     this.so = res.data.data
+                    if (this.ambiluser.susales === 1) {
+                        this.status = "Sent"
+                    } else {
+                        this.status = "Kordinator"
+                    }
+                    console.log(this.status);
                     this.load = false;
                 });
         },

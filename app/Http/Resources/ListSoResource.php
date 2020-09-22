@@ -39,6 +39,7 @@ class ListSoResource extends JsonResource
             'sisapo'=>$this->sisapo,
             'pr'=>$this->pr,
             'accdate'=>$this->accdate,
+            'diskon'=>$this->diskon,
         ];
     }
 }

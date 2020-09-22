@@ -530,6 +530,7 @@ export default {
                                                     id_custprice: this.listpr[i].id_custprice,
                                                     qty: this.hitung.qty[i],
                                                     catatan: this.hitung.keterangan[i],
+                                                    diskon: this.diskon[i],
                                                 }
                                                 axios.post("/api/listrso", this.uplist)
                                             }
@@ -667,6 +668,7 @@ export default {
                                                     id_custprice: this.listpr[i].id_custprice,
                                                     qty: this.hitung.qty[i],
                                                     catatan: this.hitung.keterangan[i],
+                                                    diskon: this.diskon[i],
                                                 }
                                                 axios.post("/api/listrso", this.uplist)
                                             }

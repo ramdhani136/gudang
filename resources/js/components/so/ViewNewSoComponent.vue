@@ -63,6 +63,7 @@
                         <th>Qty</th>
                         <th>Satuan</th>
                         <th>Harga</th>
+                        <th>Diskon</th>
                         <th>Status</th>
                         <th v-if="ket.status==='Tidak Tersedia'">Estimasi</th>
                         <th v-if="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">Sudah Kirim</th>
@@ -79,6 +80,7 @@
                         </td>
                         <td style="text-align:center">{{ch.satuan}}</td>
                         <td style="text-align:center">{{ch.harga |currency}}</td>
+                        <td style="text-align:center">{{ch.diskon |currency}}</td>
                         <td style="text-align:center">{{ket.status}}</td>
                         <td v-if="ket.status==='Tidak Tersedia'" style="text-align:center">{{ch.tgl_datang}}</td>
                         <td v-if="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'" style="text-align:center">{{ch.bbk}}</td>
@@ -271,7 +273,7 @@ export default {
             distribusi: 'default',
             lokasi: 'default',
             dataekspedisi: {},
-            visible: false,
+            visible: true,
             visiblecust: false,
             query: '',
             selected: 0,
@@ -339,7 +341,8 @@ export default {
                                     this.sub = this.hitung.qty[i];
                                 }
 
-                                this.invoice += parseInt(this.sub) * parseInt(this.listnewso[i].harga);
+                                this.invoice += parseInt(this.sub) * (parseInt(this.listnewso[i].harga) - parseInt(this.listnewso[i].diskon));
+                                console.log(this.invoice)
                             }
                             this.load = false;
                         })
@@ -419,7 +422,7 @@ export default {
                                 distribusi: vso.distribusi,
                                 alamat: vso.alamat,
                                 lokasi: vso.lokasi,
-                                status: 'Sent',
+                                status: 'Kordinator',
                                 alastolak: '',
                                 id_ekspedisi: vso.id_ekspedisi
                             };
@@ -448,7 +451,8 @@ export default {
                                                     qty: this.hitung.qty[i],
                                                     qtyrso: 0,
                                                     tersedia: this.ada,
-                                                    statusso: this.ket.status
+                                                    statusso: this.ket.status,
+                                                    diskon: this.listnewso[i].diskon,
                                                 }
                                                 axios.post("/api/listso", this.uplist)
                                             }
@@ -457,7 +461,7 @@ export default {
                                         nomor_dok: vso.nomor_so,
                                         id_user: this.ambiluser.id,
                                         notif: "Anda mendapatkan permintaan SO baru",
-                                        keterangan: "So di kirim ke Sales Supervisor",
+                                        keterangan: "So di kirim ke Sales Kordinator",
                                         jenis: "So",
                                         tanggal: this.DateTime(),
                                     })
@@ -502,7 +506,8 @@ export default {
                                                     id_custprice: this.listnewso[i].id_custprice,
                                                     qty: this.hitung.qty[i],
                                                     qtyrso: 0,
-                                                    tersedia: this.ada
+                                                    tersedia: this.ada,
+                                                    diskon: this.listnewso[i].diskon,
                                                 }
                                                 axios.post("/api/listso", this.uplist)
                                             }
@@ -741,7 +746,7 @@ export default {
                     this.sub = this.hitung.qty[i];
                 }
 
-                this.invoice += parseInt(this.sub) * parseInt(this.listnewso[i].harga);
+                this.invoice += parseInt(this.sub) * (parseInt(this.listnewso[i].harga) - parseInt(this.listnewso[i].diskon));
             }
         },
         hapuslistSo(index) {

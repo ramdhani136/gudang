@@ -65,6 +65,7 @@
                         <th>Qty</th>
                         <th>Satuan</th>
                         <th>Harga</th>
+                        <th>Diskon</th>
                         <th>Status</th>
                         <th>Sub Total</th>
                         <th v-if="tampil">Estimasi</th>
@@ -81,6 +82,7 @@
                         </td>
                         <td style="text-align:center">{{ch.satuan}}</td>
                         <td style="text-align:center">{{ch.harga |currency}}</td>
+                        <td style="text-align:center">{{ch.diskon |currency}}</td>
                         <td style="text-align:center">{{lstatus}}</td>
                         <td>{{ch.harga * hitung.qty[index] | currency}}</td>
                         <td v-if="tampil" style="text-align:center">{{ch.tgl_datang}}</td>
@@ -497,7 +499,7 @@ export default {
                         } else {
                             this.up.statusso = "tidaktersedia";
                         }
-                        this.up.status = "Sent";
+                        this.up.status = "Kordinator";
                         axios.post("/api/so", this.up)
                             .then(res => {
                                 this.ada = 0;
@@ -526,6 +528,7 @@ export default {
                                         statuspo: this.statpo,
                                         statusso: this.statusso,
                                         sisapo: this.sisapo,
+                                        diskon: this.checkrso[i].diskon,
                                     }
                                     axios.post("/api/listso", this.upload)
                                         .then(res => {
@@ -562,7 +565,7 @@ export default {
                                     nomor_ref: this.up.nomor_rso,
                                     id_user: this.ambiluser.id,
                                     notif: "Anda mendapatkan permintaan SO baru",
-                                    keterangan: "SO di kirim ke Sales Supervisor",
+                                    keterangan: "SO di kirim ke Sales Kordinator",
                                     jenis: "So",
                                     tanggal: this.DateTime(),
                                 })
@@ -624,7 +627,7 @@ export default {
                     this.sub = this.hitung.qty[i];
                 }
 
-                this.invoice += parseInt(this.sub) * parseInt(this.checkrso[i].harga);
+                this.invoice += parseInt(this.sub) * (parseInt(this.checkrso[i].harga) - parseInt(this.checkrso[i].diskon));
             }
         },
         draftSo() {
@@ -692,6 +695,7 @@ export default {
                                         statuspo: this.statpo,
                                         statusso: this.statusso,
                                         sisapo: this.sisapo,
+                                        diskon: this.checkrso[i].diskon,
                                     }
                                     axios.post("/api/listso", this.upload)
                                         .then(res => {

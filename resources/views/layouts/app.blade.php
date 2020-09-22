@@ -86,6 +86,20 @@
                             </li>
                             @endif
 
+                             <!-- Halaman Sales Kordinator -->
+                             @if(Auth::user()->kordisales == 1 || Auth::user()->superadmin == 1 )
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Sales <span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <router-link to="/confirmso" class="dropdown-item" >SO Confirmation</router-link>
+                                </div>
+                            </li>
+                            @endif
+                            
+
                             <!-- Halaman Sales SPV -->
                             @if(Auth::user()->susales == 1 || Auth::user()->superadmin == 1 )
                             <li class="nav-item dropdown">

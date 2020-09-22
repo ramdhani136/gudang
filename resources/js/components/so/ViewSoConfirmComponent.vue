@@ -89,12 +89,21 @@
         </div>
     </div>
     <div class="row mt-2" v-for="(lso,index) in so" :key="index">
-        <button v-if="lso.status=='Sent'" @click="confirmSO(lso)" class="btn-orange btn ml-3">
+        <button v-if="(lso.status=='Sent' && ambiluser.susales===1)" @click="confirmSO(lso)" class="btn-orange btn ml-3">
             Terima SO
         </button>
-        <button @click="showModal()" v-if="lso.status=='Sent'" class="btn-danger btn ml-1">
+        <button @click="showModal()" v-if="(lso.status=='Sent' && ambiluser.susales===1)" class="btn-danger btn ml-1">
             Tolak SO
         </button>
+
+        <button v-if="(lso.status=='Kordinator' && ambiluser.kordisales===1)" @click="kordinconfirm(lso)" class="btn-orange btn ml-3">
+            Terima SO
+        </button>
+
+        <button v-if="(lso.status=='Kordinator' && ambiluser.kordisales===1)" @click="showModal()" class="btn-danger btn ml-1">
+            Tolak SO
+        </button>
+
     </div>
     <div v-if="vso.status=='Tolak'" v-for="vso in so" :key="vso.nomor_so" id="alastolak">
         <div v-for="(lso,index) in so" :key="index">
@@ -118,7 +127,8 @@
                 </div>
                 <div v-for="(lso,index) in so" :key="index" class="modal-footer">
                     <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" @click="tolakSo(lso)" class="btn btn-primary">Konfirmasi Tolak</button>
+                    <button v-if="ambiluser.susales===1" type="button" @click="tolakSo(lso)" class="btn btn-primary">Konfirmasi Tolak</button>
+                    <button v-if="ambiluser.kordisales===1" type="button" @click="tolakkordinatorSo(lso)" class="btn btn-primary">Konfirmasi Tolak</button>
                 </div>
             </div>
         </div>
@@ -276,6 +286,70 @@ export default {
                 }
             })
         },
+        kordinconfirm(lso) {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menerima SO ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    this.up.nomor_so = lso.nomor_so;
+                    this.up.tanggal_so = lso.tanggal_so;
+                    this.up.tanggal_kirim = lso.tanggal_kirim;
+                    this.up.nomor_rso = lso.nomor_rso;
+                    this.up.keterangan = lso.keterangan;
+                    this.up.status = "Sent";
+                    axios.put("/api/so/" + this.up.nomor_so, this.up)
+                        .then((response) => {
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.id,
+                                id_user: this.ambiluser.id,
+                                notif: "So nomor : " + this.$route.params.id + " DI konfirmasi Kordinator Sales",
+                                keterangan: "SO di terima Sales Kordinator",
+                                jenis: "So",
+                                tanggal: this.DateTime(),
+                            })
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.id,
+                                id_user: this.ambiluser.id,
+                                notif: "So nomor : " + this.$route.params.id + " DI konfirmasi kordinator",
+                                keterangan: "Menunggu konfirmasi Sales SPV",
+                                jenis: "So",
+                                tanggal: this.DateTime(),
+                            })
+                            this.$router.push({
+                                name: 'soconfirm'
+                            })
+                            swalWithBootstrapButtons.fire(
+                                'Selesai!',
+                                'SO Berhasil di terima !',
+                                'success'
+                            )
+                        })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Batal',
+                        'SO Batal diterima :)',
+                        'error'
+                    )
+                }
+            })
+        },
         tolakSo(lso) {
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
@@ -332,6 +406,64 @@ export default {
                     )
                 }
             })
+        },
+        tolakkordinatorSo(lso) {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menolak SO ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    this.up.nomor_so = lso.nomor_so;
+                    this.up.tanggal_so = lso.tanggal_so;
+                    this.up.tanggal_kirim = lso.tanggal_kirim;
+                    this.up.nomor_rso = lso.nomor_rso;
+                    this.up.keterangan = lso.keterangan;
+                    this.up.status = "Tolak";
+                    axios.put("/api/so/" + this.up.nomor_so, this.up)
+                        .then((response) => {
+                            $("#modal-form").modal("hide");
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.id,
+                                id_user: this.ambiluser.id,
+                                notif: "So nomor : " + this.$route.params.id + " Di tolak Kordinator Sales",
+                                keterangan: "SO di tolak Sales Kordinator",
+                                jenis: "So",
+                                tanggal: this.DateTime(),
+                            })
+                            swalWithBootstrapButtons.fire(
+                                'Sukses!',
+                                'SO berhasil di tolak !',
+                                'success'
+                            )
+                            this.$router.push({
+                                name: 'soconfirm'
+                            })
+                        })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal melakukan penolakan :)',
+                        'error'
+                    )
+                }
+            })
+
         },
         DateTime() {
             this.date = new Date();
