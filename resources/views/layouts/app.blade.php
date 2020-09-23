@@ -139,7 +139,8 @@
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link>
+                                <!--     <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link> -->
+                                    <router-link to="/purchase/po/" class="dropdown-item" >Purchasing Order</router-link>
                                     <router-link to="/dic/bcm" class="dropdown-item" >Bukti Checker</router-link>
                                     <router-link to="/dic/rbcm" class="dropdown-item" >Request Bukti Checker</router-link>
                                     <router-link to="/dic/incoming" class="dropdown-item" >Bukti Barang Masuk</router-link>
@@ -147,6 +148,26 @@
                                 </div>
                             </li>
                             @endif
+
+                            <!-- halaman Incoming spv -->
+                            @if(Auth::user()->incoming == 1 || Auth::user()->superadmin == 1 )
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Incoming Goods<span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <!--     <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link> -->
+                                    <router-link to="/purchase/po/" class="dropdown-item" >Purchasing Order</router-link>
+                                    <router-link to="/dic/bcm" class="dropdown-item" >Bukti Checker</router-link>
+                                    <router-link to="/dic/rbcm" class="dropdown-item" >Request Bukti Checker</router-link>
+                                    <router-link to="/dic/incoming" class="dropdown-item" >Bukti Barang Masuk</router-link>
+                                    <!-- <router-link to="/dic/incoming/confirm" class="dropdown-item" >Incoming Goods</router-link> -->
+                                </div>
+                            </li>
+                            @endif
+
+                            
 
 
                             <!-- Halaman Distribusi -->
@@ -209,7 +230,23 @@
                                     <router-link to="/warehouse/bongkar" class="dropdown-item" >List Bongkar Barang</router-link>
                                 </div>
                             </li>
-                            @endif   
+                            @endif
+                            
+
+                          <!-- halaman Incoming spv -->
+                          @if(Auth::user()->incomingspv == 1 || Auth::user()->superadmin == 1 )
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Incoming Goods<span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <!--     <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link> -->
+                                    <router-link to="/dic/bcm" class="dropdown-item" >Request BCM</router-link>
+                                    <!-- <router-link to="/dic/incoming/confirm" class="dropdown-item" >Incoming Goods</router-link> -->
+                                </div>
+                            </li>
+                            @endif
 
 
                             <li class="nav-item dropdown">

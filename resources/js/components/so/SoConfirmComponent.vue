@@ -141,7 +141,6 @@ export default {
                     } else {
                         this.status = "Kordinator"
                     }
-                    console.log(this.status);
                     this.load = false;
                 });
         },

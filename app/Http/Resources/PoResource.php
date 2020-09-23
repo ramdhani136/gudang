@@ -29,6 +29,7 @@ class PoResource extends JsonResource
             'rs'=>$this->rs,
             'alasselesai'=>$this->alasselesai,
             'alastolakrequest'=>$this->alastolakrequest,
+            'poselesai'=>$this->poselesai,
         ];
     }
 }

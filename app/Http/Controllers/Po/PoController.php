@@ -90,7 +90,7 @@ class PoController extends Controller
 
     public function aktif()
     {
-        return PoResource::collection(Po::orderBy('updated_at','ASC')->where('status','Acc')->get());
+        return PoResource::collection(Po::orderBy('nomor_po','ASC')->where('status','Acc')->where('poselesai','N')->get());
     }
 
     public function rselesai()

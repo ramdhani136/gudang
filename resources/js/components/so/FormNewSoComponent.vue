@@ -594,7 +594,13 @@ export default {
                                     'SO berhasil di kirim.',
                                     'success'
                                 )
-                            });
+                            }).catch(error => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Cek kembali rincian SO anda!',
+                                })
+                            })
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -625,6 +631,10 @@ export default {
                     this.sub = 0;
                 } else {
                     this.sub = this.hitung.qty[i];
+                }
+
+                if (this.checkrso[i].diskon === null) {
+                    this.checkrso[i].diskon = 0;
                 }
 
                 this.invoice += parseInt(this.sub) * (parseInt(this.checkrso[i].harga) - parseInt(this.checkrso[i].diskon));
@@ -741,7 +751,13 @@ export default {
                                     'Draft SO berhasil di Di simpan.',
                                     'success'
                                 )
-                            });
+                            }).catch(error => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Cek kembali rincian SO anda!',
+                                })
+                            })
                     } else {
                         Swal.fire({
                             icon: 'error',

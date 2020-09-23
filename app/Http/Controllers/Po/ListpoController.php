@@ -74,7 +74,7 @@ class ListpoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Listpo::where('nomor_po',$id)->update($request->all());
+        Listpo::where('id',$id)->update($request->all());
         return response('updated',response::HTTP_CREATED);
     }
 
@@ -89,8 +89,17 @@ class ListpoController extends Controller
         Listpo::where('id',$id)->delete();
     }
 
-    public function sisalist(){
-        return ListPoResource::collection(Listpo::where("closepo","N")->get());
+    public function sisalist($nomor){
+        return ListPoResource::collection(Listpo::where('nomor_po',$nomor)->where("closepo","N")->get());
+    }
+
+    public function bcm($id)
+    {
+        return ListPoResource::collection(Listpo::where("id",$id)->get());
+    }
+
+    public function hapusbck($po,$barang){
+        return ListPoResource::collection(Listpo::where("nomor_po",$po)->where("kode_barang",$barang)->get());
     }
 
 

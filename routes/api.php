@@ -118,7 +118,9 @@ Route::get('listso/data/kembalikanpo/{barang}','So\ListSoController@kembalikanpo
 Route::resource('pr','Pr\PrController');
 
 Route::resource('listpo','Po\ListpoController');
-Route::get('listpo/data/aktif','Po\ListpoController@sisalist');
+Route::get('listpo/data/aktif/{nomor}','Po\ListpoController@sisalist');
+Route::get('listpo/data/bcm/{id}','Po\ListpoController@bcm');
+Route::get('listpo/data/{po}/{barang}','Po\ListpoController@hapusbck');
 
 Route::resource('history','History\HistoryController');
 Route::get('history/data/{nomorso}/{jenis}','History\HistoryController@historyview');

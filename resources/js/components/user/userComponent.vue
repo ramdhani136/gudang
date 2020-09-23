@@ -92,6 +92,13 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label>Menu Incoming SPV</label>
+                        <select v-model="form.incomingspv" class="form-control">
+                            <option value="0">Tidak Aktif</option>
+                            <option value="1">Aktif</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Menu Purchasing</label>
                         <select v-model="form.purch" class="form-control">
                             <option value="0">Tidak Aktif</option>
@@ -168,6 +175,7 @@ export default {
                 warehouse: 0,
                 distribusi: 0,
                 kordisales: 0,
+                incomingspv: 0,
                 password: '',
             },
             edit: false,
@@ -229,6 +237,7 @@ export default {
                 password: '',
                 warehouse: 0,
                 kordisales: 0,
+                incomingspv: 0,
             };
         }
         /*  

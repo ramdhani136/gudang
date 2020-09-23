@@ -5,10 +5,10 @@
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select name="status" v-model="status" class="form-control">
-            <option value="Draft">Draft</option>
-            <option value="Request">Request</option>
+            <option v-if="ambiluser.purch===1 || ambiluser.suppurch===1" value=" Draft">Draft</option>
+            <option v-if="ambiluser.purch===1 || ambiluser.suppurch===1" value="Request">Request</option>
             <option value="Acc">Open</option>
-            <option value="Tolak">Rejected</option>
+            <option v-if="ambiluser.purch===1 || ambiluser.suppurch===1" value="Tolak">Rejected</option>
             <option value="Selesai">Selesai</option>
             <option value="Di Selesaikan">Di Selesaikan</option>
         </select>
@@ -147,7 +147,7 @@ export default {
     data() {
         return {
             search: '',
-            status: 'Request',
+            status: '',
             po: [],
             load: true,
             supplier: [],
@@ -209,6 +209,11 @@ export default {
             axios.get("/api/po")
                 .then(res => {
                     this.po = res.data.data
+                    if (this.ambiluser.incoming === 1) {
+                        this.status = "Acc";
+                    } else {
+                        this.status = "Request";
+                    }
                     this.load = false;
                 });
         },

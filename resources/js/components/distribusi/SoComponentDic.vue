@@ -25,19 +25,56 @@
             <tbody>
                 <tr v-for="(rs , index) in FilterKategori" :key="rs.nomor_so">
                     <td style="text-align:center">{{index+1}}</td>
-                    <td style="text-align:center">{{rs.nomor_so}}</td>
+                    <td style="text-align:center">
+                        <router-link :to="{name:'viewnewso',params:{id:rs.nomor_so}}" class="btn btn-none ">
+                            {{rs.nomor_so}}
+                        </router-link>
+                    </td>
                     <td style="text-align:center">{{rs.tanggal_so}}</td>
                     <td>{{rs.customer}}</td>
                     <td style="text-align:center">{{rs.tanggal_kirim}}</td>
                     <td style="text-align:center">
-                        <router-link :to="{name:'viewnewso',params:{id:rs.nomor_so}}" class="btn btn-primary">
-                            Lihat Detail
-                        </router-link>
+                        <button v-if="rs.status!=='Draft'" @click="showhistory(rs)" class="btn btn-primary">Lihat History</button>
                     </td>
                 </tr>
             </tbody>
         </table>
         <Circle5 id="load" v-if="load"></Circle5>
+    </div>
+    <div class="modal fade" id="modal-history" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Rincian History SO</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="thead" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>tanggal</th>
+                                <th>Nomor SO</th>
+                                <th>keterangan</th>
+                                <th>Oleh</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(hs,index) in historyview" :key="index">
+                                <td>{{hs.tanggal}}</td>
+                                <td>{{hs.nomor_dok}}</td>
+                                <td>{{hs.keterangan}}</td>
+                                <td>{{hs.user}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </template>
@@ -47,6 +84,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -57,6 +95,8 @@ export default {
             so: [],
             load: true,
             listrso: {},
+            history: {},
+            historyview: {}
         }
     },
     created() {
@@ -86,6 +126,13 @@ export default {
                     this.so = res.data.data
                     this.load = false;
                 });
+        },
+        showhistory(rs) {
+            $("#modal-history").modal("show");
+            axios.get("/api/history/data/" + rs.nomor_so + "/So")
+                .then(res => {
+                    this.historyview = res.data.data;
+                })
         },
     }
 }
