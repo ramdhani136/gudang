@@ -84,7 +84,7 @@
                         <td style="text-align:center">{{ch.harga |currency}}</td>
                         <td style="text-align:center">{{ch.diskon |currency}}</td>
                         <td style="text-align:center">{{lstatus}}</td>
-                        <td>{{ch.harga * hitung.qty[index] | currency}}</td>
+                        <td>{{(ch.harga-ch.diskon) * hitung.qty[index] | currency}}</td>
                         <td v-if="tampil" style="text-align:center">{{ch.tgl_datang}}</td>
                         <td style="text-align:center">
                             <button @click="hapuslistSo(index)" class="btn btn-danger">Hapus</button>

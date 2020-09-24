@@ -48,7 +48,7 @@
                         <th>Satuan</th>
                         <th>Sisa PO</th>
                         <th>Qty SJ</th>
-                        <th>Diterima</th>
+                        <th>Rencana Bongkar</th>
                         <th>Keterangan</th>
                     </tr>
                 </thead>
@@ -60,11 +60,11 @@
                         <td style="text-align:center">{{list.satuan}}</td>
                         <td style="text-align:center">{{arr[indexlist].qty}}</td>
                         <td style="text-align:center" v-for="(bc,index) in bcm" :key="index">
-                            <input v-if="bc.status==='sent' || bc.status==='open' || bc.status==='close'" v-model="list.qty" type="number" class="form-control" disabled>
+                            <input v-if="bc.status==='sent' || bc.status==='open' || bc.status==='close'" v-model="list.sj" type="number" class="form-control" disabled>
                             <input v-if="bc.status==='draft' || bc.status==='tolak'" @input="validqty(indexlist)" v-model="hitung.qty[indexlist]" type="number" class="form-control">
                         </td>
                         <td style="text-align:center" v-for="(bc,index) in bcm" :key="index">
-                            <input v-if="bc.status==='sent' && ambiluser.incomingspv===1" v-model="hitung.diterima[indexlist]" type="number" class="form-control">
+                            <input @input="validditerima()" v-model="hitung.diterima[indexlist]" type="number" class="form-control" :disabled="(ambiluser.incomingspv===0 || status!=='sent')">
                         </td>
                         <td style="text-align:center" v-for="(bc,index) in bcm" :key="index">
                             <textarea v-if="bc.status==='sent' || bc.status==='open' || bc.status==='close'" v-model="hitung.keterangan[indexlist]" class="form-control" disabled></textarea>
@@ -76,16 +76,13 @@
         </div>
     </div>
     <div class="row mt-2" v-for="(bc,index) in bcm" :key="index">
-        <button v-if="bc.status==='draft'" @click="draftBcm()" class="btn-orange btn ml-4">
-            Simpan Draft
-        </button>
         <button v-if="jenbutton && bc.status==='draft' || bc.status==='tolak'" @click="submitBCM()" class="btn-success btn ml-2">
             Kirim Warehouse
         </button>
         <button v-if="!jenbutton && bc.status==='draft' || bc.status==='tolak'" @click="requestBcm()" class="btn-primary btn ml-2">
             Request Acc
         </button>
-        <button @click="kembali()" class="btn-primary btn ml-3">
+        <button v-if="status!=='draft'" @click="kembali()" class="btn-primary btn ml-3">
             Kembali
         </button>
         <button v-if="bc.status==='sent' && ambiluser.incomingspv===1" @click="konfirmasi()" class="btn-success btn ml-1">
@@ -156,7 +153,9 @@ export default {
             listrso: {},
             totalmasuk: {},
             masuk: {},
-            arr: []
+            arr: [],
+            status: '',
+            nomorbcm: ''
         }
     },
     created() {
@@ -170,7 +169,9 @@ export default {
         getBcm() {
             axios.get("/api/bcm/" + this.$route.params.nomor)
                 .then(res => {
-                    this.bcm = res.data.data
+                    this.bcm = res.data.data;
+                    this.status = this.bcm[0].status;
+                    this.nomorbcm = this.bcm[0].bcm;
                     this.uploood.keterangan = this.bcm[0].keterangan;
                 });
         },
@@ -181,6 +182,8 @@ export default {
                     for (let i = 0; i < this.listbcm.length; i++) {
                         this.hitung.qty[i] = this.listbcm[i].masuk;
                         this.hitung.keterangan[i] = this.listbcm[i].keterangan;
+                        this.hitung.diterima[i] = this.listbcm[i].bongkar;
+                        this.hitung.qty[i] = this.listbcm[i].sj;
                         axios.get("/api/listbcm/data/" + this.$route.params.nomor + "/" + this.listbcm[i].kode_barang)
                             .then(res => {
                                 this.totalmasuk = res.data.data;
@@ -251,74 +254,176 @@ export default {
                 name: 'bcmcomponent'
             });
         },
-        draftBcm() {
-            /* let jawab=confirm("Simpan Draft?");
-            if(jawab===true){
-                this.up.status="Draft";
-                axios.put("/api/bcm/"+this.$route.params.nomor,this.uploood)
-                .then(res=>{
-                    axios.get("/api/listbcm/"+this.$route.params.nomor)
-                    .then(res=>{
-                        this.listbcm=res.data.data;
-                        for(let i=0;i<this.listbcm.length;i++){
-                            this.uplistbcm={
-                                qty:this.hitung.qty[i],
-                                keterangan:this.hitung.keterangan[i]
-                            };
-                            console.log(this.uplistbcm);
-                            axios.put("/api/listbcm/"+this.listbcm[i].id,this.uplistbcm)
-                            .then(res=>{
-                                this.uploadlist={
-                                qty_masuk:parseInt((this.listbcm[i].masuk-this.listbcm[i].qty)+this.hitung.qty[i])
-                                };
-                                axios.get("/api/view/detailpo/"+this.listbcm[i].nomor_po+"/"+this.listbcm[i].kode_barang)
-                                .then(res=>{
-                                this.listrso=res.data.data;
-                                    axios.put("/api/listrso/"+this.listrso[0].id,this.uploadlist)
-                                    .then(res=>{
-                                        axios.get("/api/listrso/data/listpo/"+this.aktif.nomor_po)
-                                        .then(res=>{
-                                            this.listsisa=res.data.data;
-                                            for(let i=0;i<this.listsisa.length;i++){
-                                                if(this.listsisa[i].sisapo<1){
-                                                    this.uplist.po_close="Y";
-                                                    axios.put("/api/listrso/data/"+this.listsisa[i].nomor_po+"/"+this.listsisa[i].kode_barang,this.uplist)
-                                                    .then(res=>{
-                                                    });
-                                                }
-                                            }
-                                        })
-                                        this.sipo=0;
-                                        axios.get("/api/listrso/data/listall/"+this.aktif.nomor_po)
-                                        .then(res=>{
-                                            this.sisasemua=0;
-                                            this.listsisa=res.data.data;
-                                            for(let i=0;i<this.listsisa.length;i++){
-                                                this.sipo+=parseInt(this.listsisa[i].sisapo);  
-                                            }
-                                            if(this.sipo>1){
-                                                this.uppo.status="Selesai";
-                                                axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
-                                                .then(res=>{
-                                                    this.$router.push({name:'bcmcomponent'});
-                                                });
-                                            }else{
-                                                this.uppo.status="Acc";
-                                                axios.put("/api/po/"+this.aktif.nomor_po,this.uppo)
-                                                .then(res=>{
-                                                    this.$router.push({name:'bcmcomponent'});
-                                                });
-                                            }
-                                        });
-                                    })
-                                });
-                            });
-                        }
-                    });
-                })
+        validditerima() {
+            for (let i = 0; i < this.listbcm.length; i++) {
+                if (this.hitung.diterima[i] > this.listbcm[i].qty) {
+                    this.hitung.diterima[i] = this.listbcm[i].qty;
+                }
+            }
+        },
+        konfirmasi() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
 
-            } */
-        }
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin mengkonfirmasi BCM ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.a = '';
+                    this.aplus = '';
+                    this.abanding = '';
+                    for (let i = 0; i < this.listbcm.length; i++) {
+                        if (this.hitung.diterima[i] === undefined || this.hitung.diterima[i] < 1 || this.hitung.diterima[i] === '') {
+                            this.a = "N";
+                        } else {
+                            this.a = "Y";
+                        }
+
+                        this.aplus += this.a;
+                        this.abanding += "Y";
+                    }
+                    if (this.aplus === this.abanding) {
+                        axios.put("/api/bcm/" + this.nomorbcm, {
+                                status: 'open'
+                            })
+                            .then(res => {
+                                for (let i = 0; i < this.listbcm.length; i++) {
+                                    axios.put("/api/listbcm/" + this.listbcm[i].id, {
+                                        bongkar: this.hitung.diterima[i]
+                                    })
+                                }
+                                axios.post("/api/history", {
+                                    nomor_dok: this.nomorbcm,
+                                    nomor_ref: '0',
+                                    id_user: this.ambiluser.id,
+                                    notif: "BCM Nomor di konfirmasi",
+                                    keterangan: "BCM Di konfirmasi",
+                                    jenis: "Bcm",
+                                    tanggal: this.DateTime(),
+                                }).then(
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.nomorbcm,
+                                        nomor_ref: '0',
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan BCM baru",
+                                        keterangan: "Mengirim form checker ke gudang bongkar",
+                                        jenis: "Bcm",
+                                        tanggal: this.DateTime(),
+                                    })
+                                )
+                                swalWithBootstrapButtons.fire(
+                                    'Sukses!',
+                                    'Berhasil mengkonfirmasi BCM.',
+                                    'success'
+                                )
+                                this.$router.push({
+                                    name: 'bcmcomponent'
+                                });
+                            }).catch(error => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Cek kembali rincian form BCM anda!',
+                                })
+                            })
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Cek kembali Qty, tidak boleh di kosongkan!',
+                        })
+                    }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal mengkofirmasi BCM :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
+        },
+        reqedit() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin merubah bcm ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.put("/api/bcm/" + this.nomorbcm, {
+                        status: 'draft'
+                    }).then(res => {
+                        axios.post("/api/history", {
+                            nomor_dok: this.nomorbcm,
+                            nomor_ref: '0',
+                            id_user: this.ambiluser.id,
+                            notif: "BCM ditarik kembali",
+                            keterangan: "Menarik kembali BCM (Edit BCM)",
+                            jenis: "Bcm",
+                            tanggal: this.DateTime(),
+                        })
+                        swalWithBootstrapButtons.fire(
+                            'Sukses!',
+                            'Silahkan edit form BCM anda di Draft list BCM.',
+                            'success'
+                        )
+                        this.$router.push({
+                            name: 'bcmcomponent'
+                        });
+                    })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal melakukan perubahan BCM :)',
+                        'error'
+                    )
+                }
+            })
+        },
     },
 }
 </script>

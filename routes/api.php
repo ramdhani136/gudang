@@ -114,6 +114,7 @@ Route::get('listso/data/group','So\ListSoController@group');
 Route::get('listso/data/group/{barang}','So\ListSoController@grouplist');
 Route::get('listso/data/antrianpo/{barang}','So\ListSoController@antrianpo');
 Route::get('listso/data/kembalikanpo/{barang}','So\ListSoController@kembalikanpo');
+Route::get('listso/data/bbmbagi/{barang}','So\ListSoController@bbmbagi');
 
 Route::resource('pr','Pr\PrController');
 

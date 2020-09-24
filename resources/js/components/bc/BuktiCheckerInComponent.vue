@@ -12,7 +12,7 @@
         </select>
     </div>
     <div class="row" v-if="ambiluser.incoming===1 || ambiluser.superadmin===1">
-        <router-link to=" /dic/bcm/view" class="btn btn-success my-3">+ Create Bukti Checker</router-link>
+        <router-link to="/dic/bcm/view" class="btn btn-success my-3">+ Create Bukti Checker</router-link>
     </div>
     <div id="overflow" class="border-top">
         <table id="thead" class="table table-striped table-bordered" style="width:100%">
@@ -39,7 +39,7 @@
                     <td>{{bm.supplier}}</td>
                     <td style="text-align:center">
                         <button @click="showhistory(bm)" class="btn btn-primary">Lihat History</button>
-                        <button v-if="ambiluser.incoming===1 || ambiluser.superadmin===1" @click="batal(bm)" class="btn btn-danger">Batalkan</button>
+                        <button v-if="bm.status!=='close' && (ambiluser.incoming===1 || ambiluser.superadmin===1)" @click="batal(bm)" class="btn btn-danger">Batalkan</button>
                     </td>
                 </tr>
             </tbody>
@@ -182,7 +182,7 @@ export default {
                                         axios.get("/api/listpo/data/" + bm.nomor_po + "/" + this.listbcm[i].kode_barang)
                                             .then(res => {
                                                 this.listpo = res.data.data;
-                                                this.sisapo = parseInt(this.listpo[0].sisapo) + parseInt(this.listbcm[i].qty);
+                                                this.sisapo = parseInt(this.listpo[0].sisapo) + parseInt(this.listbcm[i].sj);
                                                 axios.put("/api/listpo/" + this.listpo[0].id, {
                                                     sisapo: this.sisapo,
                                                     closepo: "N"

@@ -110,4 +110,8 @@ class ListSoController extends Controller
         return ListSoResource::collection(Listso::where('openpo','>',0)->where("openso","Y")->where('kode_barang',$barang)->where('statusso','Tidak Tersedia')->orderBy('pr','DESC')->orderBy('accdate','DESC')->get());
     }
 
+    public function  bbmbagi($barang){
+        return  ListSoResource::collection(Listso::where('openso','Y')->where('statusso','Tidak Tersedia')->where('kode_barang',$barang)->orderBy('pr','ASC')->orderBy('accdate','ASC')->get());
+    }
+
 }

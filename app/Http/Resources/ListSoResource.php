@@ -40,6 +40,7 @@ class ListSoResource extends JsonResource
             'pr'=>$this->pr,
             'accdate'=>$this->accdate,
             'diskon'=>$this->diskon,
+            'blmdatang'=>$this->qty-$this->tersedia,
         ];
     }
 }

@@ -133,7 +133,7 @@ export default {
     },
     methods: {
         getSo() {
-            axios.get("/api/so")
+            axios.get("/api/so/data/realso")
                 .then(res => {
                     this.so = res.data.data
                     if (this.ambiluser.susales === 1) {

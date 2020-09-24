@@ -65,7 +65,7 @@
                         <td style="text-align:center">
                             <input @input="hitunginvoice()" v-model="hitung.qty[index]" type="number" class="form-control">
                         </td>
-                        <td style="text-align:center">{{lp.harga * hitung.qty[index] | currency}}</td>
+                        <td style="text-align:center">{{(lp.harga-diskon[index]) * hitung.qty[index] | currency}}</td>
                         <td style="text-align:center">
                             <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
                         </td>

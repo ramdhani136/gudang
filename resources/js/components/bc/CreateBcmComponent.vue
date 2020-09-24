@@ -429,7 +429,8 @@ export default {
                                         this.uploood = {
                                             kode_barang: this.uploadlist.kode_barang,
                                             nomor_bcm: this.uploadlist.nomor_bcm,
-                                            qty: this.uploadlist.qty,
+                                            sj: this.uploadlist.qty,
+                                            bongkar: this.uploadlist.qty,
                                             keterangan: this.uploadlist.keterangan,
                                             nomor_po: this.up.nomor_po,
                                             sisapo: this.checker[i].sisapo,
@@ -489,7 +490,7 @@ export default {
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Oops...',
-                                        text: 'Cek kembali rincian BCK anda!',
+                                        text: 'Cek kembali rincian BCM anda!',
                                     })
                                 })
                         } else {
@@ -523,7 +524,7 @@ export default {
 
             swalWithBootstrapButtons.fire({
                 title: 'Apakah anda yakin?',
-                text: "Ingin meminta konfirmasi BCK ini!",
+                text: "Ingin meminta konfirmasi BCM ini!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Iya, Yakin!',
@@ -562,7 +563,8 @@ export default {
                                         this.uploood = {
                                             kode_barang: this.uploadlist.kode_barang,
                                             nomor_bcm: this.uploadlist.nomor_bcm,
-                                            qty: this.uploadlist.qty,
+                                            sj: this.uploadlist.qty,
+                                            bongkar: this.uploadlist.qty,
                                             keterangan: this.uploadlist.keterangan,
                                             nomor_po: this.up.nomor_po,
                                             sisapo: this.checker[i].sisapo,
@@ -606,7 +608,7 @@ export default {
                                         nomor_ref: this.up.nomor_po,
                                         id_user: this.ambiluser.id,
                                         notif: "Anda mendapatkan permintaan BCM baru",
-                                        keterangan: "Meminta konfirmasi Form BCK",
+                                        keterangan: "Meminta konfirmasi Form BCM",
                                         jenis: "Bcm",
                                         tanggal: this.DateTime(),
                                     })
@@ -622,7 +624,7 @@ export default {
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Oops...',
-                                        text: 'Cek kembali rincian BCK anda!',
+                                        text: 'Cek kembali rincian BCM anda!',
                                     })
                                 })
                         } else {

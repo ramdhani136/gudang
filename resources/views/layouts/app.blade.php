@@ -111,6 +111,7 @@
                                     <router-link to="/confirmso" class="dropdown-item" >SO Confirmation</router-link>
                                     <router-link to="/so/data/selesai" class="dropdown-item" >Request SO Selesai</router-link>
                                     <router-link to="/data/price/request" class="dropdown-item" >Request Special Price</router-link>
+                                    <router-link to="/price/customer" class="dropdown-item" >Data Special Price</router-link>
                                 </div>
                             </li>
                             @endif
@@ -148,26 +149,6 @@
                                 </div>
                             </li>
                             @endif
-
-                            <!-- halaman Incoming spv -->
-                            @if(Auth::user()->incoming == 1 || Auth::user()->superadmin == 1 )
-                            <li class="nav-item dropdown">
-                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    Incoming Goods<span class="caret"></span>
-                                </router-link>
-
-                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <!--     <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link> -->
-                                    <router-link to="/purchase/po/" class="dropdown-item" >Purchasing Order</router-link>
-                                    <router-link to="/dic/bcm" class="dropdown-item" >Bukti Checker</router-link>
-                                    <router-link to="/dic/rbcm" class="dropdown-item" >Request Bukti Checker</router-link>
-                                    <router-link to="/dic/incoming" class="dropdown-item" >Bukti Barang Masuk</router-link>
-                                    <!-- <router-link to="/dic/incoming/confirm" class="dropdown-item" >Incoming Goods</router-link> -->
-                                </div>
-                            </li>
-                            @endif
-
-                            
 
 
                             <!-- Halaman Distribusi -->

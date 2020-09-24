@@ -17,13 +17,13 @@ class BcmController extends Controller
      */
     public function index()
     {
-        return BcmResource::collection(Bcm::orderBy('updated_at','ASC')->get());
+        return BcmResource::collection(Bcm::orderBy('bcm','ASC')->get());
     }
 
 
     public function open()
     {
-        return BcmResource::collection(Bcm::where('status',"open")->orderBy('updated_at','ASC')->get());
+        return BcmResource::collection(Bcm::where('status',"open")->orderBy('bcm','ASC')->get());
     }
     /**
      * Show the form for creating a new resource.
