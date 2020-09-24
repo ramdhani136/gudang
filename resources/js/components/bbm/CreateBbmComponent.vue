@@ -20,7 +20,7 @@
             </div>
             <div class="form-group">
                 <label>Nomor Bukti Checker</label>
-                <input v-model="up.nomor_bcm" @click="showBcm()" type="text" class="form-control" placeholder="Pilih Purchase Order" autocomplete="disabled">
+                <input v-model="up.nomor_bcm" @click="showBcm()" type="text" class="form-control" placeholder="Pilih Nomor BCM" autocomplete="disabled">
             </div>
         </div>
         <div class="col-4">
@@ -176,6 +176,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -284,98 +285,146 @@ export default {
             $("#modal-po").modal("hide");
         },
         submitBBM() {
-            for (let i = 0; i < this.checker.length; i++) {
-                axios.get("/api/listso/data/bbmbagi/" + this.checker[i].kode_barang)
-                    .then(res => {
-                        if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 1 || this.hitung.qty[i] === '') {
-                            this.hitung.qty[i] = 0;
-                        }
-                        this.listso = res.data.data;
-                        this.diterima = 0;
-                        this.statusso = '';
-                        for (let j = 0; j < this.listso.length; j++) {
-                            if (this.hitung.qty[i] <= this.listso[j].blmdatang) {
-                                this.diterima = parseInt(this.listso[j].tersedia + parseInt(this.hitung.qty[i]));
-                                if (this.diterima < this.listso[j].blmdatang) {
-                                    this.statusso = "Y";
-                                } else {
-                                    this.statusso = "N";
-                                }
-                                this.hitung.qty[i] = 0;
-                            } else {
-                                this.statusso = "N";
-                                this.diterima = parseInt(this.listso[j].blmdatang + parseInt(this.listso[j].tersedia));
-                                this.hitung.qty[i] = parseInt(this.hitung.qty[i]) - parseInt(this.listso[j].blmdatang);
-                            }
-                            console.log(this.listso[j].id)
-                            console.log(this.diterima);
-                            console.log(this.statusso);
-                        }
-                    })
-            }
-            // const swalWithBootstrapButtons = Swal.mixin({
-            //     customClass: {
-            //         confirmButton: 'btn btn-success ml-2',
-            //         cancelButton: 'btn btn-danger'
-            //     },
-            //     buttonsStyling: false
-            // })
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
 
-            // swalWithBootstrapButtons.fire({
-            //     title: 'Apakah anda yakin?',
-            //     text: "Ingin mengirim BBM ini!",
-            //     icon: 'warning',
-            //     showCancelButton: true,
-            //     confirmButtonText: 'Iya, Yakin!',
-            //     cancelButtonText: 'Tidak!',
-            //     reverseButtons: true
-            // }).then((result) => {
-            //     if (result.isConfirmed) {
-            //         if (this.checker.length > 0) {
-            //             this.a = '';
-            //             this.b = '';
-            //             this.banding = '';
-            //             for (let i = 0; i < this.checker.length; i++) {
-            //                 if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === '' || this.hitung.qty[i] < 1) {
-            //                     this.a = "N";
-            //                 } else {
-            //                     this.a = "Y";
-            //                 }
-            //                 this.b += this.a;
-            //                 this.banding += "Y";
-            //                 if (this.b === this.banding) {
-            //                     /* jika oke */
-            //                 } else {
-            //                     Swal.fire({
-            //                         icon: 'error',
-            //                         title: 'Oops...',
-            //                         text: 'Cek kembali qty barang anda, tidak boleh kosong!',
-            //                     })
-            //                 }
-            //             }
-            //         } else {
-            //             Swal.fire({
-            //                 icon: 'error',
-            //                 title: 'Oops...',
-            //                 text: 'And belum menginput item apapun!',
-            //             })
-            //         }
-            //         // swalWithBootstrapButtons.fire(
-            //         //     'Sukses!',
-            //         //     'Berhasil mengirim BBM.',
-            //         //     'success'
-            //         // )
-            //     } else if (
-            //         /* Read more about handling dismissals below */
-            //         result.dismiss === Swal.DismissReason.cancel
-            //     ) {
-            //         swalWithBootstrapButtons.fire(
-            //             'Cancelled',
-            //             'Batal mengirim bbm :)',
-            //             'error'
-            //         )
-            //     }
-            // })
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin mengirim BBM ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (this.checker.length > 0) {
+                        this.a = '';
+                        this.b = '';
+                        this.banding = '';
+                        for (let i = 0; i < this.checker.length; i++) {
+                            if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === '' || this.hitung.qty[i] < 1) {
+                                this.a = "N";
+                            } else {
+                                this.a = "Y";
+                            }
+                            this.b += this.a;
+                            this.banding += "Y";
+                            if (this.b === this.banding) {
+                                axios.post("/api/bbm", this.up)
+                                    .then(res => {
+                                        for (let i = 0; i < this.checker.length; i++) {
+                                            /* input list bbm */
+                                            axios.post("/api/listbbm", {
+                                                nomor_bbm: this.up.bbm,
+                                                kode_barang: this.checker[i].kode_barang,
+                                                qty: this.hitung.qty[i],
+                                                keterangan: this.hitung.keterangan[i]
+                                            })
+                                            /* end */
+
+                                            /* update listso */
+                                            axios.get("/api/listso/data/bbmbagi/" + this.checker[i].kode_barang)
+                                                .then(res => {
+                                                    if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 1 || this.hitung.qty[i] === '') {
+                                                        this.hitung.qty[i] = 0;
+                                                    }
+                                                    this.listso = res.data.data;
+                                                    this.diterima = 0;
+                                                    this.statusso = '';
+                                                    for (let j = 0; j < this.listso.length; j++) {
+                                                        if (this.hitung.qty[i] <= this.listso[j].blmdatang) {
+                                                            this.diterima = parseInt(this.listso[j].tersedia + parseInt(this.hitung.qty[i]));
+                                                            if (this.diterima < this.listso[j].blmdatang) {
+                                                                this.statusso = "Y";
+                                                            } else {
+                                                                this.statusso = "N";
+                                                            }
+                                                            this.hitung.qty[i] = 0;
+                                                        } else {
+                                                            this.statusso = "N";
+                                                            this.diterima = parseInt(this.listso[j].blmdatang + parseInt(this.listso[j].tersedia));
+                                                            this.hitung.qty[i] = parseInt(this.hitung.qty[i]) - parseInt(this.listso[j].blmdatang);
+                                                        }
+                                                        axios.put("/api/listso/" + this.listso[j].id, {
+                                                            tersedia: this.diterima,
+                                                            openso: this.statusso,
+                                                        })
+                                                    }
+                                                })
+
+                                        }
+                                        /* tutup bcm */
+                                        axios.put("/api/bcm/" + this.up.nomor_bcm, {
+                                            status: 'close'
+                                        }).then(res => {
+                                            axios.post("/api/history", {
+                                                nomor_dok: this.up.nomor_bcm,
+                                                nomor_ref: this.up.bbm,
+                                                id_user: this.ambiluser.id,
+                                                notif: "Anda mendapatkan permintaan BBM baru",
+                                                keterangan: "Membuka form BBM nomor : " + this.up.bbm,
+                                                jenis: "Bcm",
+                                                tanggal: this.DateTime(),
+                                            }).then(res => {
+                                                axios.post("/api/history", {
+                                                    nomor_dok: this.up.bbm,
+                                                    nomor_ref: this.up.nomor_bcm,
+                                                    id_user: this.ambiluser.id,
+                                                    notif: "Anda mendapatkan permintaan BBM baru",
+                                                    keterangan: "Membuat BBM nomor : " + this.up.bbm,
+                                                    jenis: "Bbm",
+                                                    tanggal: this.DateTime(),
+                                                })
+                                            })
+                                            swalWithBootstrapButtons.fire(
+                                                'Sukses!',
+                                                'Berhasil mengirim BBM.',
+                                                'success'
+                                            )
+                                            this.$router.push({
+                                                name: 'ingoods'
+                                            });
+                                        })
+                                        /* end */
+                                    }).catch(error => {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Oops...',
+                                            text: 'Cek kembali rincian BBM anda!',
+                                        })
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Cek kembali qty barang anda, tidak boleh kosong!',
+                                })
+                            }
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'And belum menginput item apapun!',
+                        })
+                    }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal mengirim bbm :)',
+                        'error'
+                    )
+                }
+            })
         },
         validasiqty() {
             for (let i = 0; i < this.checker.length; i++) {

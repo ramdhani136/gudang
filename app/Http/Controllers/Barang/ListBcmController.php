@@ -90,7 +90,7 @@ class ListBcmController extends Controller
      */
     public function destroy($listbcm)
     {
-        Barang::where('id',$listbcm)->delete();
+        Listbcm::where('id',$listbcm)->delete();
         return response('deleted',response::HTTP_OK);
     }
 

@@ -7,7 +7,6 @@
         <select name="status" v-model="status" class="form-control">
             <option value="sent">Menunggu Acc</option>
             <option value="open">Open</option>
-            <option value="tolak">Tolak</option>
             <option value="close">Close</option>
         </select>
     </div>
@@ -60,7 +59,7 @@
                         <thead>
                             <tr>
                                 <th>tanggal</th>
-                                <th>Nomor RSO</th>
+                                <th>Nomor BCM</th>
                                 <th>keterangan</th>
                                 <th>Oleh</th>
                             </tr>
@@ -146,7 +145,6 @@ export default {
             axios.get("/api/history/data/" + bm.bcm + "/Bcm")
                 .then(res => {
                     this.historyview = res.data.data;
-                    console.log(this.historyview);
                 })
         },
         batal(bm) {
