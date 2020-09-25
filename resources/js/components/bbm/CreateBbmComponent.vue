@@ -197,6 +197,7 @@ export default {
             hitung: {
                 qty: [],
                 keterangan: [],
+                bagi: []
             },
             uploood: {},
             dtime: this.DateTime(),
@@ -217,7 +218,11 @@ export default {
             input: {},
             listso: {},
             diterima: 0,
-            statusso: ''
+            statusso: '',
+            nomorpo: '',
+            listtutuppo: {},
+            bbm: 0,
+            listbagi: {}
         }
     },
     created() {
@@ -273,6 +278,7 @@ export default {
             this.ket.supplier = aktif.supplier;
             this.up.nomor_bcm = aktif.bcm;
             this.ket.nopol = aktif.nopol;
+            this.nomorpo = aktif.nomor_po;
             axios.get("/api/listbcm/data/" + aktif.bcm)
                 .then(res => {
                     this.listsisa = res.data.data;
@@ -315,73 +321,119 @@ export default {
                             }
                             this.b += this.a;
                             this.banding += "Y";
-                            if (this.b === this.banding) {
-                                axios.post("/api/bbm", this.up)
-                                    .then(res => {
-                                        for (let i = 0; i < this.checker.length; i++) {
-                                            /* input list bbm */
-                                            axios.post("/api/listbbm", {
-                                                nomor_bbm: this.up.bbm,
-                                                kode_barang: this.checker[i].kode_barang,
-                                                qty: this.hitung.qty[i],
-                                                keterangan: this.hitung.keterangan[i]
-                                            })
-                                            /* end */
+                        }
+                        if (this.b === this.banding) {
+                            axios.post("/api/bbm", this.up)
+                                .then(res => {
+                                    for (let i = 0; i < this.checker.length; i++) {
+                                        /* input list bbm */
+                                        axios.post("/api/listbbm", {
+                                            nomor_bbm: this.up.bbm,
+                                            kode_barang: this.checker[i].kode_barang,
+                                            qty: this.hitung.qty[i],
+                                            keterangan: this.hitung.keterangan[i]
+                                        })
+                                        /* end */
 
-                                            /* update listso */
-                                            axios.get("/api/listso/data/bbmbagi/" + this.checker[i].kode_barang)
-                                                .then(res => {
-                                                    if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 1 || this.hitung.qty[i] === '') {
-                                                        this.hitung.qty[i] = 0;
-                                                    }
-                                                    this.listso = res.data.data;
-                                                    this.diterima = 0;
-                                                    this.statusso = '';
-                                                    for (let j = 0; j < this.listso.length; j++) {
-                                                        if (this.hitung.qty[i] <= this.listso[j].blmdatang) {
-                                                            this.diterima = parseInt(this.listso[j].tersedia + parseInt(this.hitung.qty[i]));
-                                                            if (this.diterima < this.listso[j].blmdatang) {
-                                                                this.statusso = "Y";
-                                                            } else {
-                                                                this.statusso = "N";
-                                                            }
-                                                            this.hitung.qty[i] = 0;
+                                        /* update listso */
+                                        axios.get("/api/listso/data/bbmbagi/" + this.checker[i].kode_barang)
+                                            .then(res => {
+                                                if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 1 || this.hitung.qty[i] === '') {
+                                                    this.hitung.bagi[i] = 0;
+                                                } else {
+                                                    this.hitung.bagi[i] = this.hitung.qty[i];
+                                                }
+                                                this.listso = res.data.data;
+                                                this.diterima = 0;
+                                                this.statusso = '';
+                                                for (let j = 0; j < this.listso.length; j++) {
+                                                    if (this.hitung.bagi[i] <= this.listso[j].blmdatang) {
+                                                        this.diterima = parseInt(this.listso[j].tersedia + parseInt(this.hitung.bagi[i]));
+                                                        if (this.diterima < this.listso[j].blmdatang) {
+                                                            this.statusso = "Y";
                                                         } else {
                                                             this.statusso = "N";
-                                                            this.diterima = parseInt(this.listso[j].blmdatang + parseInt(this.listso[j].tersedia));
-                                                            this.hitung.qty[i] = parseInt(this.hitung.qty[i]) - parseInt(this.listso[j].blmdatang);
                                                         }
-                                                        axios.put("/api/listso/" + this.listso[j].id, {
-                                                            tersedia: this.diterima,
-                                                            openso: this.statusso,
-                                                        })
+                                                        this.hitung.bagi[i] = 0;
+                                                    } else {
+                                                        this.statusso = "N";
+                                                        this.diterima = parseInt(this.listso[j].blmdatang + parseInt(this.listso[j].tersedia));
+                                                        this.hitung.bagi[i] = parseInt(this.hitung.bagi[i]) - parseInt(this.listso[j].blmdatang);
                                                     }
-                                                })
-
-                                        }
-                                        /* tutup bcm */
-                                        axios.put("/api/bcm/" + this.up.nomor_bcm, {
-                                            status: 'close'
+                                                    axios.put("/api/listso/" + this.listso[j].id, {
+                                                        tersedia: this.diterima,
+                                                        openso: this.statusso,
+                                                    })
+                                                }
+                                                axios.get("/api/listpo/data/" + this.nomorpo + "/" + this.checker[i].kode_barang)
+                                                    .then(res => {
+                                                        this.listbagi = res.data.data;
+                                                        this.sisapo = 0;
+                                                        this.bbm = 0;
+                                                        for (let l = 0; l < this.listbagi.length; l++) {
+                                                            if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 1 || this.hitung.qty[i] === '') {
+                                                                this.hitung.qty[i] = 0;
+                                                            }
+                                                            this.sisapo = (parseInt(this.checker[i].sj + this.listbagi[l].sisapo)) - parseInt(this.hitung.qty[i]);
+                                                            this.bbm = parseInt(this.listbagi[l].bbm) + parseInt(this.hitung.qty[i]);
+                                                            if (this.sisapo > 0) {
+                                                                this.closepo = "N";
+                                                            } else {
+                                                                this.closepo = "Y";
+                                                            }
+                                                            axios.put("/api/listpo/" + this.listbagi[l].id, {
+                                                                bbm: this.bbm,
+                                                                sisapo: this.sisapo,
+                                                                closepo: this.closepo
+                                                            })
+                                                        }
+                                                    })
+                                                axios.get("/api/listpo/" + this.nomorpo)
+                                                    .then(res => {
+                                                        this.listtutuppo = res.data.data;
+                                                        this.aplus = '';
+                                                        this.banding = '';
+                                                        for (let y = 0; y < this.listtutuppo.length; y++) {
+                                                            this.aplus += this.listtutuppo[y].closepo;
+                                                            this.banding += "Y";
+                                                        }
+                                                        if (this.aplus === this.banding) {
+                                                            axios.put("/api/po/" + this.nomorpo, {
+                                                                poselesai: "Y",
+                                                                status: "Selesai",
+                                                            })
+                                                        } else {
+                                                            axios.put("/api/po/" + this.nomorpo, {
+                                                                poselesai: "N",
+                                                                status: "Acc",
+                                                            })
+                                                        }
+                                                    })
+                                            })
+                                    }
+                                    /* tutup bcm */
+                                    axios.put("/api/bcm/" + this.up.nomor_bcm, {
+                                        status: 'close'
+                                    }).then(res => {
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.up.nomor_bcm,
+                                            nomor_ref: this.up.bbm,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Anda mendapatkan permintaan BBM baru",
+                                            keterangan: "Membuka form BBM nomor : " + this.up.bbm,
+                                            jenis: "Bcm",
+                                            tanggal: this.DateTime(),
                                         }).then(res => {
                                             axios.post("/api/history", {
-                                                nomor_dok: this.up.nomor_bcm,
-                                                nomor_ref: this.up.bbm,
+                                                nomor_dok: this.up.bbm,
+                                                nomor_ref: this.up.nomor_bcm,
                                                 id_user: this.ambiluser.id,
                                                 notif: "Anda mendapatkan permintaan BBM baru",
-                                                keterangan: "Membuka form BBM nomor : " + this.up.bbm,
-                                                jenis: "Bcm",
+                                                keterangan: "Membuat BBM nomor : " + this.up.bbm,
+                                                jenis: "Bbm",
                                                 tanggal: this.DateTime(),
-                                            }).then(res => {
-                                                axios.post("/api/history", {
-                                                    nomor_dok: this.up.bbm,
-                                                    nomor_ref: this.up.nomor_bcm,
-                                                    id_user: this.ambiluser.id,
-                                                    notif: "Anda mendapatkan permintaan BBM baru",
-                                                    keterangan: "Membuat BBM nomor : " + this.up.bbm,
-                                                    jenis: "Bbm",
-                                                    tanggal: this.DateTime(),
-                                                })
                                             })
+                                        }).then(res => {
                                             swalWithBootstrapButtons.fire(
                                                 'Sukses!',
                                                 'Berhasil mengirim BBM.',
@@ -391,21 +443,21 @@ export default {
                                                 name: 'ingoods'
                                             });
                                         })
-                                        /* end */
-                                    }).catch(error => {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Oops...',
-                                            text: 'Cek kembali rincian BBM anda!',
-                                        })
                                     })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: 'Cek kembali qty barang anda, tidak boleh kosong!',
+                                    /* end */
+                                }).catch(error => {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Cek kembali rincian BBM anda!',
+                                    })
                                 })
-                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Cek kembali qty barang anda, tidak boleh kosong!',
+                            })
                         }
                     } else {
                         Swal.fire({

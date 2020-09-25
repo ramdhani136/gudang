@@ -180,7 +180,7 @@ export default {
                                     qty: this.daftarbbm[0].qty
                                 };
                                 this.listqty.push(this.masukan);
-                                this.hitung.qty[i] = this.daftarbbm[i].bongkar;
+                                this.hitung.qty[i] = this.daftarbbm[0].bongkar;
                                 this.checker.push([{
                                     qty: this.hitung.qty[i]
                                 }])

@@ -66,6 +66,7 @@
                         <th>Diskon</th>
                         <th>Status</th>
                         <th v-if="ket.status==='Tidak Tersedia'">Estimasi</th>
+                        <th>Sudah Tersedia</th>
                         <th v-if="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">Sudah Kirim</th>
                         <th v-if="ket.statusnya==='Draft' || ket.statusnya==='Tolak'">Aksi</th>
                     </tr>
@@ -83,6 +84,7 @@
                         <td style="text-align:center">{{ch.diskon |currency}}</td>
                         <td style="text-align:center">{{ket.status}}</td>
                         <td v-if="ket.status==='Tidak Tersedia'" style="text-align:center">{{ch.tgl_datang}}</td>
+                        <td style="text-align:center">{{ch.tersedia}}</td>
                         <td v-if="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'" style="text-align:center">{{ch.bbk}}</td>
                         <td v-if="ket.statusnya==='Draft' || ket.statusnya==='Tolak'" style="text-align:center">
                             <button @click="hapuslistSo(index)" class="btn btn-danger">Hapus</button>
