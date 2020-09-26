@@ -362,7 +362,7 @@ export default {
                                                     }
                                                     axios.put("/api/listso/" + this.listso[j].id, {
                                                         tersedia: this.diterima,
-                                                        openso: this.statusso,
+                                                        statuspo: this.statusso,
                                                     })
                                                 }
                                                 axios.get("/api/listpo/data/" + this.nomorpo + "/" + this.checker[i].kode_barang)
@@ -387,27 +387,28 @@ export default {
                                                                 closepo: this.closepo
                                                             })
                                                         }
-                                                    })
-                                                axios.get("/api/listpo/" + this.nomorpo)
-                                                    .then(res => {
-                                                        this.listtutuppo = res.data.data;
-                                                        this.aplus = '';
-                                                        this.banding = '';
-                                                        for (let y = 0; y < this.listtutuppo.length; y++) {
-                                                            this.aplus += this.listtutuppo[y].closepo;
-                                                            this.banding += "Y";
-                                                        }
-                                                        if (this.aplus === this.banding) {
-                                                            axios.put("/api/po/" + this.nomorpo, {
-                                                                poselesai: "Y",
-                                                                status: "Selesai",
+                                                    }).then(res => {
+                                                        axios.get("/api/listpo/" + this.nomorpo)
+                                                            .then(res => {
+                                                                this.listtutuppo = res.data.data;
+                                                                this.aplus = '';
+                                                                this.banding = '';
+                                                                for (let y = 0; y < this.listtutuppo.length; y++) {
+                                                                    this.aplus += this.listtutuppo[y].closepo;
+                                                                    this.banding += "Y";
+                                                                }
+                                                                if (this.aplus === this.banding) {
+                                                                    axios.put("/api/po/" + this.nomorpo, {
+                                                                        poselesai: "Y",
+                                                                        status: "Selesai",
+                                                                    })
+                                                                } else {
+                                                                    axios.put("/api/po/" + this.nomorpo, {
+                                                                        poselesai: "N",
+                                                                        status: "Acc",
+                                                                    })
+                                                                }
                                                             })
-                                                        } else {
-                                                            axios.put("/api/po/" + this.nomorpo, {
-                                                                poselesai: "N",
-                                                                status: "Acc",
-                                                            })
-                                                        }
                                                     })
                                             })
                                     }
@@ -420,7 +421,7 @@ export default {
                                             nomor_ref: this.up.bbm,
                                             id_user: this.ambiluser.id,
                                             notif: "Anda mendapatkan permintaan BBM baru",
-                                            keterangan: "Membuka form BBM nomor : " + this.up.bbm,
+                                            keterangan: "BBM di buat dan BCM selesai nomor : " + this.up.bbm,
                                             jenis: "Bcm",
                                             tanggal: this.DateTime(),
                                         }).then(res => {

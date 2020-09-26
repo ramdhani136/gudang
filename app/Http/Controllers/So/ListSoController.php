@@ -114,4 +114,12 @@ class ListSoController extends Controller
         return  ListSoResource::collection(Listso::where('openso','Y')->where('statusso','Tidak Tersedia')->where('kode_barang',$barang)->orderBy('pr','ASC')->orderBy('accdate','ASC')->get());
     }
 
+    public function  listbck($so){
+        return ListSoResource::collection(Listso::where('nomor_so',$so)->where('openso','Y')->where('closeso','N')->get());
+    }
+
+    public function  listsobck($so,$barang){
+        return ListSoResource::collection(Listso::where('nomor_so',$so)->where('kode_barang',$barang)->get());
+    }
+
 }

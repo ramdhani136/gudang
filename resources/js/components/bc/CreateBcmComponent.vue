@@ -652,25 +652,35 @@ export default {
             this.aksicek = "";
             this.sisanya = 0;
             this.jumlahnya = 0;
+            this.a = '';
+            this.aplus = '';
+            this.bandingnya = '';
             for (let i = 0; i < this.checker.length; i++) {
                 if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === '') {
                     this.hitung.jumlahnya[i] = 0;
                 } else {
                     this.hitung.jumlahnya[i] = this.hitung.qty[i];
                 }
-                this.jumlahnya += parseInt(this.hitung.jumlahnya[i]);
-                this.sisanya += parseInt(this.checker[i].sisapo);
+
+                if (this.hitung.jumlahnya[i] > this.checker[i].sisapo) {
+                    this.a = "N";
+                } else {
+                    this.a = "Y";
+                }
+                this.aplus += this.a;
+                this.bandingnya += "Y";
             }
-            if (this.jumlahnya > this.sisanya) {
-                this.jenbutton = false;
-            } else {
+            if (this.aplus === this.bandingnya) {
                 this.jenbutton = true;
+            } else {
+                this.jenbutton = false;
             }
         },
         hapuslist(index) {
             this.checker.splice(index, 1);
             this.hitung.qty.splice(index, 1);
             this.hitung.keterangan.splice(index, 1);
+            this.validqty();
         },
         DateTime() {
             this.date = new Date();

@@ -38,6 +38,7 @@ class SoResource extends JsonResource
             'alasselesai'=>$this->alasselesai,
             'alastolakselesai'=>$this->alastolakselesai,
             'openpo'=>$this->openpo,
+            'openpo'=>$this->closebck,
         ];
     }
 }

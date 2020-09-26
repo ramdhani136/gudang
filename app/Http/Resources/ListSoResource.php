@@ -37,6 +37,7 @@ class ListSoResource extends JsonResource
             'tgl_datang'=>$this->tanggal_datang,
             'openpo'=>$this->openpo,
             'sisapo'=>$this->sisapo,
+            'closeso'=>$this->closeso,
             'pr'=>$this->pr,
             'accdate'=>$this->accdate,
             'diskon'=>$this->diskon,

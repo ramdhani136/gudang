@@ -20,7 +20,6 @@ class ListBckResource extends JsonResource
             'nomor_bck'=>$this->nomor_bck,
             'kode_barang'=>$this->kode_barang,
             'qty'=>$this->qty,
-            'sisaso'=>$this->sisaso,
             'keterangan'=>$this->keterangan,
             'close_bck'=>$this->close_bck,
             'bck'=>$this->bck->nomor_so,
@@ -28,7 +27,6 @@ class ListBckResource extends JsonResource
             'statusso'=>$this->bck->so->statusso,
             'nama_barang'=>$this->barang->nama,
             'satuan'=>$this->barang->satuan,
-            'tersedia'=>$this->tersedia,
             'harga'=>$this->harga,
             'nomor_so'=>$this->bck->nomor_so,
         ];

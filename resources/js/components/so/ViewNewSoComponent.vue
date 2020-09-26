@@ -101,7 +101,7 @@
         <button v-if="ket.statusnya==='Draft'" @click="submitSo(vso)" class="btn-success btn ml-4 mt-2">
             Kirim SO
         </button>
-        <button v-if="(ket.statusnya==='Dic' || ket.statusnya==='Sent' || ket.statusnya==='Acc'  || ket.statusnya==='Tolak') && (ambiluser.sales===1 || ambiluser.superadmin===1)" @click="reqedit(vso)" class="btn-orange btn ml-4 mt-2">
+        <button v-if="(ket.statusnya==='Dic' || ket.statusnya==='Kordinator' || ket.statusnya==='Sent' || ket.statusnya==='Acc'  || ket.statusnya==='Tolak') && (ambiluser.sales===1 || ambiluser.superadmin===1)" @click="reqedit(vso)" class="btn-orange btn ml-4 mt-2">
             Request Edit SO
         </button>
         <button v-if="ket.statusnya==='Tolak'" @click="submitSo(vso)" class="btn-success btn ml-2 mt-2">
