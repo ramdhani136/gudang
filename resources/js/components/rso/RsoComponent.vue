@@ -241,7 +241,6 @@ export default {
             axios.get("/api/history/data/" + rs.nomor_rso + "/RSO")
                 .then(res => {
                     this.historyview = res.data.data;
-                    console.log(this.historyview);
                 })
         },
         getCustomer() {

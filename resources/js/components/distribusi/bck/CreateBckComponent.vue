@@ -415,55 +415,56 @@ export default {
                                                         axios.put("/api/listso/" + this.listso[0].id, {
                                                             bck: this.qtymasuk,
                                                             closeso: this.closepo
+                                                        }).then(res => {
+                                                            axios.get("/api/listso/" + this.up.nomor_so)
+                                                                .then(res => {
+                                                                    this.listsoall = res.data.data;
+                                                                    console.log(this.listsoall)
+                                                                    this.bplus = '';
+                                                                    this.bban = '';
+                                                                    for (let i = 0; i < this.listsoall.length; i++) {
+                                                                        this.bplus += this.listsoall[i].closeso;
+                                                                        this.bban += "Y";
+                                                                    }
+                                                                    console.log(this.bplus);
+                                                                    console.log(this.bban);
+                                                                    if (this.bplus === this.bban) {
+                                                                        axios.put("/api/so/" + this.up.nomor_so, {
+                                                                            closebck: "Y"
+                                                                        })
+                                                                    }
+                                                                })
                                                         })
                                                     })
                                             })
                                     }
-                                    axios.get("/api/listso/" + this.up.nomor_so)
-                                        .then(res => {
-                                            this.listsoall = res.data.data;
-                                            console.log(this.listsoall)
-                                            this.bplus = '';
-                                            this.bban = '';
-                                            for (let i = 0; i < this.listsoall.length; i++) {
-                                                this.bplus += this.listsoall[i].closeso;
-                                                this.bban += "Y";
-                                            }
-                                            console.log(this.bplus);
-                                            console.log(this.bban);
-                                            if (this.bplus === this.bban) {
-                                                axios.get("/api/so/" + this.up.nomor_so, {
-                                                    closebck: "Y"
-                                                })
-                                            }
+                                    this.$nextTick(() => {
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.up.nomor_so,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Anda mendapatkan BCK baru!",
+                                            keterangan: "Membuka BCK nomor : " + this.up.bck,
+                                            jenis: "So",
+                                            tanggal: this.DateTime(),
+                                        })
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.up.bck,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Anda mendapatkan BCK baru!",
+                                            keterangan: "Mengirim form bck ke warehouse",
+                                            jenis: "Bck",
+                                            tanggal: this.DateTime(),
                                         }).then(res => {
-                                            axios.post("/api/history", {
-                                                nomor_dok: this.up.nomor_so,
-                                                id_user: this.ambiluser.id,
-                                                notif: "Anda mendapatkan BCK baru!",
-                                                keterangan: "Membuka BCK nomor : " + this.up.bck,
-                                                jenis: "So",
-                                                tanggal: this.DateTime(),
-                                            })
-                                            axios.post("/api/history", {
-                                                nomor_dok: this.up.bck,
-                                                id_user: this.ambiluser.id,
-                                                notif: "Anda mendapatkan BCK baru!",
-                                                keterangan: "Mengirim form bck ke warehouse",
-                                                jenis: "Bck",
-                                                tanggal: this.DateTime(),
-                                            }).then(res => {
-                                                swalWithBootstrapButtons.fire(
-                                                    'Sukses!',
-                                                    'BCK berhasil di kirim.',
-                                                    'success'
-                                                )
-                                                this.$router.push({
-                                                    name: 'bck'
-                                                })
+                                            swalWithBootstrapButtons.fire(
+                                                'Sukses!',
+                                                'BCK berhasil di kirim.',
+                                                'success'
+                                            )
+                                            this.$router.push({
+                                                name: 'bck'
                                             })
                                         })
-
+                                    })
                                 }).catch(error => {
                                     Swal.fire({
                                         icon: 'error',
