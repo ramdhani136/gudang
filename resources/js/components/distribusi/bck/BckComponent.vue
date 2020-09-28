@@ -39,7 +39,7 @@
                         <button @click="showhistory(bk)" class="btn btn-primary">
                             Lihat History
                         </button>
-                        <button @click="batalkan(bk)" v-if="statusbck!=='close'" class="btn btn-danger">Batalkan</button>
+                        <button @click="batalkan(bk)" class="btn btn-danger">Batalkan</button>
                     </td>
                 </tr>
             </tbody>
@@ -101,6 +101,10 @@ export default {
             bck: [],
             historyview: {},
             history: {},
+            listbck: {},
+            listso: {},
+            statusbck: '',
+            qtybck: 0,
         }
     },
     created() {
@@ -152,6 +156,90 @@ export default {
                     this.historyview = res.data.data;
                 })
         },
+        batalkan(bk) {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin membatalkan form checker ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                this.load = true;
+                if (result.isConfirmed) {
+                    /* edit status bck so */
+                    axios.put("/api/so/" + bk.nomor_so, {
+                            closebck: "N"
+                        })
+                        .then(res => {
+                            /* edit listso */
+                            axios.get("/api/listbck/" + bk.bck)
+                                .then(res => {
+                                    this.listbck = res.data.data;
+                                    for (let i = 0; i < this.listbck.length; i++) {
+                                        this.qtybck = 0;
+                                        axios.get("/api/listso/data/" + bk.nomor_so + "/" + this.listbck[i].kode_barang)
+                                            .then(res => {
+                                                this.listso = res.data.data;
+                                                this.qtybck = parseInt(this.listso[0].bck) - parseInt(this.listbck[i].qty);
+                                                axios.put("/api/listso/" + this.listso[0].id, {
+                                                    bck: this.qtybck,
+                                                    closeso: "N"
+                                                })
+                                            })
+                                    }
+                                })
+                        }).then(res => {
+                            axios.delete("/api/bck/" + bk.bck)
+                                .then(res => {
+                                    axios.get("/api/history/" + bk.bck)
+                                        .then(res => {
+                                            this.history = res.data.data;
+                                            for (let i = 0; i < this.history.length; i++) {
+                                                axios.delete("/api/history/" + this.history[i].id);
+                                            }
+                                        }).then(res => {
+                                            axios.post("/api/history", {
+                                                nomor_dok: bk.nomor_so,
+                                                id_user: this.ambiluser.id,
+                                                notif: "BCK " + bk.bck + " di batalkan",
+                                                keterangan: "Membatalkan BCK nomor : " + bk.bck,
+                                                jenis: "So",
+                                                tanggal: this.DateTime(),
+                                            }).then(res => {
+                                                this.load = false;
+                                                swalWithBootstrapButtons.fire(
+                                                    'Deleted!',
+                                                    'Bukti Checker Keluar di batalkan.',
+                                                    'success'
+                                                )
+                                                this.getBck();
+                                            })
+                                        })
+
+                                });
+                        })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menghapus BCK :)',
+                        'error'
+                    )
+                }
+            })
+        }
     }
 }
 </script>

@@ -94,8 +94,8 @@
         <!-- <button @click="draftBcm()" class="btn-orange btn ml-4" >
                     Simpan Draft
                 </button> -->
-        <button class="btn btn-primary ml-3">Kembali</button>
-        <button class="btn btn-danger ml-1">Batalkan BCK</button>
+        <button @click="kembali()" class="btn btn-primary ml-3">Kembali</button>
+        <button @click="batalkan()" class="btn btn-danger ml-1">Batalkan BCK</button>
     </div>
     <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -256,14 +256,16 @@ export default {
             subtotal: 0,
             total: 0,
             kendaraan: {},
-            listso: {},
             qtymasuk: 0,
             sisanya: 0,
             listsoall: {},
             bck: {},
             statusbck: '',
             listbck: {},
-            listsonya: {}
+            listsonya: {},
+            listbckhps: {},
+            listsohps: {},
+            qtybck: 0
         }
     },
     created() {
@@ -573,6 +575,97 @@ export default {
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
         },
+        batalkan() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin membatalkan form checker ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    /* edit status bck so */
+                    this.load = true;
+                    axios.put("/api/so/" + this.up.nomor_so, {
+                            closebck: "N"
+                        })
+                        .then(res => {
+                            /* edit listso */
+                            axios.get("/api/listbck/" + this.$route.params.bck)
+                                .then(res => {
+                                    this.listbckhps = res.data.data;
+                                    for (let i = 0; i < this.listbckhps.length; i++) {
+                                        this.qtybck = 0;
+                                        axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.listbckhps[i].kode_barang)
+                                            .then(res => {
+                                                this.listsohps = res.data.data;
+                                                this.qtybck = parseInt(this.listsohps[0].bck) - parseInt(this.listbckhps[i].qty);
+                                                axios.put("/api/listso/" + this.listsohps[0].id, {
+                                                    bck: this.qtybck,
+                                                    closeso: "N"
+                                                })
+                                            })
+                                    }
+                                })
+                        }).then(res => {
+                            axios.delete("/api/bck/" + this.$route.params.bck)
+                                .then(res => {
+                                    axios.get("/api/history/" + this.$route.params.bck)
+                                        .then(res => {
+                                            this.history = res.data.data;
+                                            for (let i = 0; i < this.history.length; i++) {
+                                                axios.delete("/api/history/" + this.history[i].id);
+                                            }
+                                        }).then(res => {
+                                            axios.post("/api/history", {
+                                                nomor_dok: this.$route.params.bck,
+                                                id_user: this.ambiluser.id,
+                                                notif: "BCK " + this.$route.params.bck + " di batalkan",
+                                                keterangan: "Membatalkan BCK nomor : " + this.$route.params.bck,
+                                                jenis: "So",
+                                                tanggal: this.DateTime(),
+                                            }).then(res => {
+                                                this.load = false;
+                                                swalWithBootstrapButtons.fire(
+                                                    'Deleted!',
+                                                    'Bukti Checker Keluar di batalkan.',
+                                                    'success'
+                                                )
+                                                this.$router.push({
+                                                    name: 'bck'
+                                                })
+                                            })
+                                        })
+
+                                });
+                        })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menghapus BCK :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        kembali() {
+            this.$router.push({
+                name: 'bck'
+            })
+        }
     },
 }
 </script>

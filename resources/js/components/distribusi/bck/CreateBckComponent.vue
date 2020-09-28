@@ -370,6 +370,7 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
+                    this.load = true;
                     if (this.checker.length > 0) {
                         this.a = '';
                         this.aplus = '';
@@ -419,15 +420,12 @@ export default {
                                                             axios.get("/api/listso/" + this.up.nomor_so)
                                                                 .then(res => {
                                                                     this.listsoall = res.data.data;
-                                                                    console.log(this.listsoall)
                                                                     this.bplus = '';
                                                                     this.bban = '';
                                                                     for (let i = 0; i < this.listsoall.length; i++) {
                                                                         this.bplus += this.listsoall[i].closeso;
                                                                         this.bban += "Y";
                                                                     }
-                                                                    console.log(this.bplus);
-                                                                    console.log(this.bban);
                                                                     if (this.bplus === this.bban) {
                                                                         axios.put("/api/so/" + this.up.nomor_so, {
                                                                             closebck: "Y"
@@ -455,6 +453,7 @@ export default {
                                             jenis: "Bck",
                                             tanggal: this.DateTime(),
                                         }).then(res => {
+                                            this.load = false;
                                             swalWithBootstrapButtons.fire(
                                                 'Sukses!',
                                                 'BCK berhasil di kirim.',
