@@ -61,8 +61,7 @@ class ListBbkController extends Controller
      */
     public function edit($id)
     {
-        Listbbk::where('id',$id)->update($request->all());
-        return response('update',response::HTTP_CREATED);
+        
     }
 
     /**
@@ -74,7 +73,8 @@ class ListBbkController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        Listbbk::where('id',$id)->update($request->all());
+        return response('update',response::HTTP_CREATED);
     }
 
     /**

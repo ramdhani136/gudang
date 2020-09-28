@@ -39,7 +39,7 @@
                         <button @click="showhistory(bk)" class="btn btn-primary">
                             Lihat History
                         </button>
-                        <button @click="batalkan(bk)" class="btn btn-danger">Batalkan</button>
+                        <button v-if="status==='open'" @click="batalkan(bk)" class="btn btn-danger">Batalkan</button>
                     </td>
                 </tr>
             </tbody>

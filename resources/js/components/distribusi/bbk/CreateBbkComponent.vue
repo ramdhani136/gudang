@@ -1,105 +1,109 @@
 <template>
-    <div class="container">
-        <div class="row row-cols-2">
-            <div class="col-4">
-                <div class="form-group">
-                    <label>Nomor BBK :</label>
-                    <input v-model="up.bbk" type="text" class="form-control col-12" >
-                </div>
-                <div class="form-group">
-                    <label>Tanggal :</label>
-                    <input v-model="up.tanggal" type="date" @change="validate()" :min="now()" class="form-control col-12" >
-                </div>
-                <div class="form-group">
-                    <label>Nomor BCK</label>
-                    <input v-model="up.nomor_bck" @click="showSo()" type="text" class="form-control" placeholder="Pilih BCK">
-                </div>
+<div class="container">
+    <div class="row row-cols-2">
+        <div class="col-4">
+            <div class="form-group">
+                <label>Nomor BBK :</label>
+                <input v-model="up.bbk" type="text" class="form-control col-12" autocomplete="disabled">
             </div>
-            <div class="col-4">
-                <div class="form-group">
-                    <label>Nomor SO</label>
-                    <input v-model="ket.nomor_so" type="text" class="form-control" disabled>
-                </div>
-                <div class="form-group">
-                    <label>Customer</label>
-                    <select v-model="ket.customer" name="customer" class="col-12 form-control" disabled>
-                        <option :value="ket.customer">{{ket.customer}}</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Distribusi</label>
-                    <input v-model="ket.distribusi" type="text" class="form-control" disabled>
-                </div>
+            <div class="form-group">
+                <label>Tanggal :</label>
+                <input v-model="up.tanggal" type="date" @change="validate()" :min="now()" class="form-control col-12">
             </div>
-            <div class="col-4">
-                <div class="form-group">
-                    <label>Lokasi</label>
-                    <input v-model="ket.lokasi" type="text" class="form-control" disabled>
-                </div>
-                <div class="form-group">
-                    <label>Alamat</label>
-                    <textarea v-model="ket.alamat" name="keterangan" class="form-control col-12" disabled></textarea>
-                </div>
-                <div class="form-group">
-                    <label>keterangan</label>
-                    <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
-                </div>
+            <div class="form-group">
+                <label>Nomor BCK</label>
+                <input v-model="up.nomor_bck" @click="showSo()" type="text" class="form-control" placeholder="Pilih BCK" autocomplete="disabled">
             </div>
         </div>
-        <div id="rsoverflowso" class="row mt-2 mx-auto">
-            <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{total | currency}}</div>
-            <div class="row mt-1 mx-auto col-12" >
-                <Circle5 id="load3" v-if="load"></Circle5>
-                <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Kode Barang</th>
-                            <th>Nama Barang</th>
-                            <th>Satuan</th>
-                            <th>Harga</th>
-                            <th>Qty BCK</th>
-                            <th>Qty termuat</th>
-                            <th>Keterangan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(listbcm,index) in checker" :key="index">
-                            <td style="text-align:center">{{index+1}}</td>
-                            <td>{{listbcm.kode_barang}}</td>
-                            <td>{{listbcm.nama_barang}}</td>
-                            <td style="text-align:center">{{listbcm.satuan}}</td>
-                            <td style="text-align:center">{{listbcm.harga | currency}}</td>
-                            <td style="text-align:center">{{listbcm.qty}}</td>
-                            <td  style="text-align:center">
-                                <input @input="validqty(index)"  v-model="hitung.qty[index]" type="number" class="form-control">
-                            </td>
-                            <td style="text-align:center">
-                                <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="col-4">
+            <div class="form-group">
+                <label>Nomor SO</label>
+                <input v-model="ket.nomor_so" type="text" class="form-control" disabled>
             </div>
-        </div>   
-        <div class="row mt-2">
-                <!-- <button @click="draftBcm()" class="btn-orange btn ml-4" >
+            <div class="form-group">
+                <label>Customer</label>
+                <select v-model="ket.customer" name="customer" class="col-12 form-control" disabled>
+                    <option :value="ket.customer">{{ket.customer}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Distribusi</label>
+                <input v-model="ket.distribusi" type="text" class="form-control" disabled>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                <label>Lokasi</label>
+                <input v-model="ket.lokasi" type="text" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label>Alamat</label>
+                <textarea v-model="ket.alamat" name="keterangan" class="form-control col-12" disabled></textarea>
+            </div>
+            <div class="form-group">
+                <label>keterangan</label>
+                <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12" autocomplete="disabled"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{total | currency}}</div>
+    </div>
+    <div id="rsoverflowso" class="row mt-2 mx-auto">
+        <div class="row mt-1 mx-auto col-12">
+            <Circle5 id="load3" v-if="load"></Circle5>
+            <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode Barang</th>
+                        <th>Nama Barang</th>
+                        <th>Satuan</th>
+                        <th>Harga</th>
+                        <th>Diskon</th>
+                        <th>Qty BCK</th>
+                        <th>Qty termuat</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(listbcm,index) in checker" :key="index">
+                        <td style="text-align:center">{{index+1}}</td>
+                        <td>{{listbcm.kode_barang}}</td>
+                        <td>{{listbcm.nama_barang}}</td>
+                        <td style="text-align:center">{{listbcm.satuan}}</td>
+                        <td style="text-align:center">{{listbcm.harga | currency}}</td>
+                        <td style="text-align:center">{{listbcm.diskon | currency}}</td>
+                        <td style="text-align:center">{{listbcm.qty}}</td>
+                        <td style="text-align:center">
+                            <input @input="validqty(index)" v-model="hitung.qty[index]" type="number" class="form-control">
+                        </td>
+                        <td style="text-align:center">
+                            <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <!-- <button @click="draftBcm()" class="btn-orange btn ml-4" >
                     Simpan Draft
                 </button> -->
-                <button @click="submitBck()" class="btn-success btn ml-2" >
-                    Simpan  
-                </button>
-                <button @click="batal()" class="btn-orange btn ml-2" >
-                    Batal
-                </button>
-        </div>
-        <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div id="modal-width" class="modal-content">
+        <button @click="batal()" class="btn-orange btn ml-2">
+            Batal
+        </button>
+        <button @click="submitBbk()" class="btn-success btn ml-1">
+            Simpan
+        </button>
+    </div>
+    <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Form List Bukti Checker</h5>
                     <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -114,51 +118,51 @@
                         <input v-model="ket.customer" type="text" class="form-control" disabled>
                     </div>
                     <div id="overflowBody">
-                    <table class="table mt-2 table-striped table-bordered" style="width:100%">
-                        <thead  id="rsthead">
-                            <tr>
-                                <th style="text-align:center">No</th>
-                                <th style="text-align:center">Kode</th>
-                                <th style="text-align:center">Item</th>
-                                <th style="text-align:center">Satuan</th>
-                                <th style="text-align:center">jumlah BCK</th>
-                                <th style="text-align:center">Pilih</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(ls,index) in listbck" :key="index">
-                                <td style="text-align:center">{{index+1}}</td>
-                                <td>{{ls.kode_barang}}</td>
-                                <td>{{ls.nama_barang}}</td>
-                                <td style="text-align:center">{{ls.satuan}}</td>
-                                <td style="text-align:center">{{ls.qty}}</td>
-                                <td style="text-align:center">
-                                    <input @change="pilihlistchecker()" v-model="checker" type="checkbox" :value="ls" disabled>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <table class="table mt-2 table-striped table-bordered" style="width:100%">
+                            <thead id="rsthead">
+                                <tr>
+                                    <th style="text-align:center">No</th>
+                                    <th style="text-align:center">Kode</th>
+                                    <th style="text-align:center">Item</th>
+                                    <th style="text-align:center">Satuan</th>
+                                    <th style="text-align:center">jumlah BCK</th>
+                                    <th style="text-align:center">Pilih</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(ls,index) in listbck" :key="index">
+                                    <td style="text-align:center">{{index+1}}</td>
+                                    <td>{{ls.kode_barang}}</td>
+                                    <td>{{ls.nama_barang}}</td>
+                                    <td style="text-align:center">{{ls.satuan}}</td>
+                                    <td style="text-align:center">{{ls.qty}}</td>
+                                    <td style="text-align:center">
+                                        <input @change="pilihlistchecker()" v-model="checker" type="checkbox" :value="ls" disabled>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button @click="resetForm()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" @click="checklist()" class="btn btn-primary">Save changes</button>
                 </div>
-                </div>
             </div>
         </div>
-            <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div  class="modal-dialog" role="document">
-                <div id="modal-width" class="modal-content">
+    </div>
+    <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div id="scrollList">
-                        <table  id="thead" class="table table-striped table-bordered" style="width:100%">
+                        <table id="thead" class="table table-striped table-bordered" style="width:100%">
                             <thead>
                                 <tr>
                                     <th style="text-align:center">No</th>
@@ -188,234 +192,344 @@
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
                 <div class="error-actions">
-                        <router-link to="/so"  class="btn btn-primary btn-lg">
-                                Lihat Data SO
-                        </router-link>
+                    <router-link to="/so" class="btn btn-primary btn-lg">
+                        Lihat Data SO
+                    </router-link>
                 </div>
-                </div>
-            </div>
-        </div>
-        <div v-if="gagal" class="row mt-2">
-            <div id="alastolak">
-                <div>
-                    <b>Belum ada list Request Sales Order Yang di pilih! </b> 
-                </div>                
             </div>
         </div>
     </div>
+    <div v-if="gagal" class="row mt-2">
+        <div id="alastolak">
+            <div>
+                <b>Belum ada list Request Sales Order Yang di pilih! </b>
+            </div>
+        </div>
+    </div>
+</div>
 </template>
 
 <script>
-import {Circle5} from 'vue-loading-spinner'
+import {
+    Circle5
+} from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
-    data(){
+    data() {
         return {
-            load:false,
-            up:{
-                bbk:this.bbk_nomor(),
-                tanggal:this.now(),
+            load: false,
+            up: {
+                bbk: this.bbk_nomor(),
+                tanggal: this.now(),
             },
-            ket:{
-                sisaso:[],
-                sisasopilih:[],
-                tersedia:[],
-                ltersedia:[]
+            ket: {},
+            aktif: {},
+            checker: [],
+            listbcm: {},
+            hitung: {
+                qty: [],
+                keterangan: [],
+                jumlah: []
             },
-            aktif:{},
-            listsisa:{},
-            checker:[],
-            listbcm:{},
-            uploadlist:[],
-            hitung:{
-                qty:[],
-                keterangan:[],
-                jumlah:[]
-            },
-            uplistsisa:{
-                qty_masuk:0,
-            },
-            bckaktif:{},
-            listso:{},
-            gagal:false,
-            uplist:{},
-            qty:0,
-            listrso:{},
-            nilai:null,
-            harga:0,
-            subtotal:0,
-            total:0,
-            listbck:{},
-            uplistrso:{},
-            qtyupdate:0,
-            upso:{}
+            bckaktif: {},
+            gagal: false,
+            qty: 0,
+            nilai: null,
+            harga: 0,
+            subtotal: 0,
+            total: 0,
+            listbck: {},
+            uplistbbk: {},
+            listso: {},
+            qtybbk: 0,
+            qtybck: 0,
+            selesai: ''
         }
     },
-    created(){
+    created() {
         this.getBckAktif();
         this.resetForm();
         this.timer();
-    },  
-    computed:{  
+    },
+    computed: {
 
     },
-    methods:{
-        getBckAktif(){
+    methods: {
+        getBckAktif() {
             axios.get("/api/bck/data/aktif")
-            .then(res=>{
-                this.bckaktif=res.data.data;
-            });
+                .then(res => {
+                    this.bckaktif = res.data.data;
+                });
         },
-        now(){
+        now() {
             var d = new Date();
-            var month = d.getMonth()+1;
+            var month = d.getMonth() + 1;
             var day = d.getDate();
 
-            var output = d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" + (day<10 ? '0' : '') + day;
+            var output = d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-" + (day < 10 ? '0' : '') + day;
             return output
-            },
-        validate(){
-            if(this.so.tanggal_so < this.now()){
-                this.so.tanggal_so=this.now();
+        },
+        validate() {
+            if (this.so.tanggal_so < this.now()) {
+                this.so.tanggal_so = this.now();
             }
         },
-        bbk_nomor(){
+        bbk_nomor() {
             var d = new Date();
-            var month = d.getMonth()+1;
+            var month = d.getMonth() + 1;
 
-            var output = "BBK-" + d.getFullYear() + "-" + (month<10 ? '0' : '') + month + "-" ;
+            var output = "BBK-" + d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-";
             return output
         },
-        showSo(){
+        showSo() {
             $("#modal-po").modal("show");
         },
-        resetForm(){
-            this.checker=[];
+        resetForm() {
+            this.checker = [];
         },
-        pilihBck(aktif){
-            this.hitung.qty=[];
-            this.checker=[];
-            this.ket.customer=aktif.customer;
-            this.ket.nomor_so=aktif.nomor_so;
-            this.ket.lokasi=aktif.lokasi;
-            this.ket.alamat=aktif.alamat;
-            this.ket.distribusi=aktif.distribusi;
-            this.up.nomor_bck=aktif.bck;
+        pilihBck(aktif) {
+            this.hitung.qty = [];
+            this.checker = [];
+            this.ket.customer = aktif.customer;
+            this.ket.nomor_so = aktif.nomor_so;
+            this.ket.lokasi = aktif.lokasi;
+            this.ket.alamat = aktif.alamat;
+            this.ket.distribusi = aktif.distribusi;
+            this.up.nomor_bck = aktif.bck;
 
-            axios.get("/api/listbck/data/aktif/"+this.up.nomor_bck)
-            .then(res=>{
-                this.listbck=res.data.data;  
-                for (let i in this.listbck) {
-					this.checker.push(this.listbck[i]);
-				}   
-            });
-        },
-        checklist(){ 
-            $("#modal-po").modal("hide");
-        },
-        submitBck(){
-            let yakin=confirm("Yakin ingin membuat Bukti Checker ini?");
-            if(yakin===true){
-                if(this.checker.length>0){
-                axios.post("/api/bbk",this.up)
-                .then(res=>{
-                    for(let i=0;i<this.checker.length;i++){
-                        this.nomor_bbk=this.up.bbk;
-                        this.kode_barang=this.checker[i].kode_barang;
-                        this.qty=0;
-                        this.qty=parseInt(this.hitung.qty[i]);
-                        this.harga=this.checker[i].harga;
-                        this.qtybck=this.checker[i].qty;    
-                        this.keterangan=this.hitung.keterangan[i];
-                        this.uplist={nomor_bbk:this.nomor_bbk,kode_barang:this.kode_barang,qty:this.qty,qty_bck:this.qtybck,keterangan:this.keterangan,harga:this.harga};
-                        axios.post("/api/listbbk",this.uplist)
-                        .then(res=>{
-                            axios.put("/api/bck/"+this.up.nomor_bck,{status:'close'})
-                            .then(res=>{
-                                axios.get("/api/listrso/data/"+this.checker[i].nomor_rso+"/"+this.checker[i].kode_barang)
-                                .then(res=>{
-                                    this.listrso=res.data.data;
-                                    for(let o=0;o<this.listrso.length;o++){
-                                        if(parseInt(this.hitung.qty[i])<this.checker[i].qty){     
-                                            if(this.checker[i].statusso==='tersedia'){
-                                                this.qtyupdate=(parseInt(this.listrso[o].keluar_tersedia)-parseInt(this.checker[i].qty))+parseInt(this.hitung.qty[i]);
-                                                this.uplistrso={out_yes:this.qtyupdate,sotersedia_close:'N',bbk_tersedia:this.hitung.qty[i]};
-                                                axios.put("/api/listrso/"+this.listrso[o].id,this.uplistrso)
-                                                .then(res=>{
-                                                    this.upso={status:'Acc'};
-                                                    axios.put("/api/so/"+this.listbck[i].nomor_so,this.upso)
-                                                    .then(res=>{
-                                                        this.$router.push({name:'distribusibbk'});
-                                                    })
-                                                })
-                                            }else{
-                                                this.qtyupdate=(parseInt(this.listrso[o].keluar_tdktersedia)-parseInt(this.checker[i].qty))+parseInt(this.hitung.qty[i]);
-                                                this.uplistrso={out_no:this.qtyupdate,sotdk_close:'N',bbk_tdktersedia:this.hitung.qty[i]};
-                                                axios.put("/api/listrso/"+this.listrso[o].id,this.uplistrso)
-                                                .then(res=>{
-                                                    this.upso={status:'Acc'};
-                                                    axios.put("/api/so/"+this.listbck[i].nomor_so,this.upso)
-                                                    .then(res=>{
-                                                        this.$router.push({name:'distribusibbk'});
-                                                    })
-                                                })
-                                            }
-                                        }else{
-                                            if(this.checker[i].statusso==='tersedia'){
-                                                this.qtyupdate=parseInt(this.listrso[o].bbk_tersedia)+parseInt(this.hitung.qty[i]);
-                                                this.uplistrso={bbk_tersedia:this.qtyupdate};
-                                                axios.put("/api/listrso/"+this.listrso[o].id,this.uplistrso)
-                                                .then(res=>{ 
-                                                        this.$router.push({name:'distribusibbk'});  
-                                                })
-                                            }else{
-                                                this.qtyupdate=parseInt(this.listrso[o].bbk_tdktersedia)+parseInt(this.hitung.qty[i]);
-                                                this.uplistrso={bbk_tdktersedia:this.qtyupdate};
-                                                axios.put("/api/listrso/"+this.listrso[o].id,this.uplistrso)
-                                                .then(res=>{
-                                                        this.$router.push({name:'distribusibbk'});
-                                                })
-                                            }
-                                        }
-                                    }
-                                    
-                                });
-                            });
-                        })
+            axios.get("/api/listbck/data/aktif/" + this.up.nomor_bck)
+                .then(res => {
+                    this.listbck = res.data.data;
+                    for (let i in this.listbck) {
+                        this.checker.push(this.listbck[i]);
                     }
                 });
-                }else{
-                    this.gagal=true;
+        },
+        checklist() {
+            $("#modal-po").modal("hide");
+        },
+        submitBbk() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menyimpan BBK ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.load = true;
+                    if (this.checker.length > 0) {
+                        this.a = '';
+                        this.aplus = '';
+                        this.banding = '';
+                        for (let i = 0; i < this.checker.length; i++) {
+                            if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 1 || this.hitung.qty[i] === '') {
+                                this.a = "N";
+                            } else {
+                                this.a = "Y";
+                            }
+                            this.aplus += this.a;
+                            this.banding += "Y";
+                        }
+                        if (this.aplus === this.banding) {
+                            axios.post("/api/bbk", this.up)
+                                .then(res => {
+                                    /* input listbbk */
+                                    this.qtybck = 0;
+                                    this.qtybck = 0;
+                                    for (let i = 0; i < this.checker.length; i++) {
+                                        this.uplistbbk = {
+                                            nomor_bbk: this.up.bbk,
+                                            kode_barang: this.checker[i].kode_barang,
+                                            qty: this.hitung.qty[i],
+                                            harga: this.checker[i].harga,
+                                            diskon: this.checker[i].diskon,
+                                            keterangan: this.checker[i].keterangan
+                                        }
+                                        axios.post("/api/listbbk", this.uplistbbk)
+                                            .then(res => {
+                                                /* edit listsi */
+                                                axios.get("/api/listso/data/" + this.checker[i].nomor_so + "/" + this.checker[i].kode_barang)
+                                                    .then(res => {
+                                                        this.listso = res.data.data;
+                                                        this.qtybbk = parseInt(this.listso[0].bbk) + parseInt(this.hitung.qty[i]);
+                                                        this.qtybck = (parseInt(this.listso[0].bck) - parseInt(this.checker[i].qty)) + parseInt(this.hitung.qty[i]);
+                                                        if (this.qtybck >= this.listso[0].qty) {
+                                                            this.a = "Y";
+                                                        } else {
+                                                            this.a = "N"
+                                                        }
+                                                        axios.put("/api/listso/" + this.listso[0].id, {
+                                                            bbk: this.qtybbk,
+                                                            bck: this.qtybck,
+                                                            closeso: this.a
+                                                        }).then(res => {
+                                                            axios.get("/api/listso/" + this.checker[0].nomor_so)
+                                                                .then(res => {
+                                                                    this.listso = res.data.data;
+                                                                    this.aplus = '';
+                                                                    this.banding = '';
+                                                                    this.selesai = '';
+                                                                    for (let i = 0; i < this.listso.length; i++) {
+                                                                        if (this.listso[0].bbk < this.listso[0].qty) {
+                                                                            this.b = "N";
+                                                                        } else {
+                                                                            this.b = "Y";
+                                                                        }
+                                                                        this.aplus += this.listso[i].closeso;
+                                                                        this.banding += "Y";
+                                                                        this.selesai += this.b;
+                                                                    }
+                                                                    if (this.aplus === this.banding && this.selesai === this.banding) {
+                                                                        axios.put("/api/so/" + this.checker[0].nomor_so, {
+                                                                            closebck: "Y",
+                                                                            status: "Selesai",
+                                                                        })
+                                                                    } else if (this.aplus === this.banding && this.selesai !== this.banding) {
+                                                                        axios.put("/api/so/" + this.checker[0].nomor_so, {
+                                                                            closebck: "Y",
+                                                                            status: "Acc",
+                                                                        })
+                                                                    } else if (this.aplus !== this.banding && this.selesai === this.banding) {
+                                                                        axios.put("/api/so/" + this.checker[0].nomor_so, {
+                                                                            closebck: "N",
+                                                                            status: "Selesai",
+                                                                        })
+                                                                    } else if (this.aplus !== this.banding && this.selesai !== this.banding) {
+                                                                        axios.put("/api/so/" + this.checker[0].nomor_so, {
+                                                                            closebck: "N",
+                                                                            status: "Acc",
+                                                                        })
+                                                                    }
+                                                                    /* end */
+                                                                })
+                                                        })
+                                                    })
+                                                /* end */
+                                            })
+                                    }
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.ket.nomor_so,
+                                        id_user: this.ambiluser.id,
+                                        notif: "BBK dibuka!",
+                                        keterangan: "membuat BBK nomor : " + this.up.bbk,
+                                        jenis: "So",
+                                        tanggal: this.DateTime(),
+                                    }).then(res => {
+                                        axios.put("/api/bck/" + this.up.nomor_bck, {
+                                                status: "close"
+                                            })
+                                            .then(res => {
+                                                axios.post("/api/history", {
+                                                    nomor_dok: this.up.bbk,
+                                                    id_user: this.ambiluser.id,
+                                                    notif: "BBK dibuka!",
+                                                    keterangan: "Mmebuat BBK nomor : " + this.up.bbk,
+                                                    jenis: "Bbk",
+                                                    tanggal: this.DateTime(),
+                                                }).then(res => {
+                                                    this.load = false;
+                                                    swalWithBootstrapButtons.fire(
+                                                        'Sukss!',
+                                                        'Berhasil meyimpan BCK.',
+                                                        'success'
+                                                    )
+                                                    this.$router.push({
+                                                        name: 'distribusibbk'
+                                                    })
+                                                })
+                                            })
+                                    })
+
+                                }).catch(error => {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Cek kembali rincian BBK anda!',
+                                    })
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Periksa kembali qty barang, tidak boleh kosong!',
+                            })
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Anda belum menginput item apapun!',
+                        })
+                    }
+
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menyimpan BCK :)',
+                        'error'
+                    )
                 }
+            })
+        },
+        validqty(index) {
+            // if (parseInt(this.hitung.qty[index]) > (parseInt(this.checker[index].qty) + (parseInt(this.checker[index].qty) / 100 * 10))) {
+            //     this.hitung.qty[index] = this.checker[index].qty;
+            // }
+            this.total = 0;
+            for (let i = 0; i < this.checker.length; i++) {
+                if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === "" || this.hitung.qty[i] < 0) {
+                    this.hitung.jumlah[i] = 0;
+                } else {
+                    this.hitung.jumlah[i] = this.hitung.qty[i];
+                }
+                this.subtotal = (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) * parseInt(this.hitung.jumlah[i]);
+                this.total += parseInt(this.subtotal);
             }
         },
-        validqty(index){
-                if(parseInt(this.hitung.qty[index])>(parseInt(this.checker[index].qty)+(parseInt(this.checker[index].qty)/100*10))){
-                    this.hitung.qty[index]=this.checker[index].qty;
-                }
-                this.total=0;
-                for(let i=0;i<this.checker.length;i++){
-                    if(this.hitung.qty[i]===undefined || this.hitung.qty[i]===""){
-                        this.hitung.jumlah[i]=0;
-                    }else{
-                        this.hitung.jumlah[i]=this.hitung.qty[i];
-                    }
-                    this.subtotal=parseInt(this.checker[i].harga)*parseInt(this.hitung.jumlah[i]);
-                    this.total+=parseInt(this.subtotal);
-                }
-        },
-        batal(){
-            this.$router.push({name:'distribusibbk'});
+        batal() {
+            this.$router.push({
+                name: 'distribusibbk'
+            });
         },
         timer() {
-                setInterval(() => {
-                    this.gagal=false;
-                }, 5000);
-            },
+            setInterval(() => {
+                this.gagal = false;
+            }, 5000);
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
+        },
     },
-} 
+}
 </script>
 
 <style>

@@ -100,7 +100,7 @@ Route::get('listrso/data/pilihsotersedia/view/{rso}','Rso\ListRsoController@pili
 Route::get('listrso/data/pilihsotidak/view/{rso}','Rso\ListRsoController@pilihsotidak');
 
 Route::resource('bbk','Bbk\BbkController');
-Route::resource('listbbk','Bbk\ListbbkController');
+Route::resource('listbbk','Bbk\ListBbkController');
 
 Route::resource('listmasuk','Bbm\barangMasukController');
 

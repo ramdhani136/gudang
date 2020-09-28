@@ -48,8 +48,10 @@
             </div>
         </div>
     </div>
-    <div id="rsoverflowso" class="row mt-2 mx-auto">
+    <div class="row">
         <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{total | currency}}</div>
+    </div>
+    <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
             <Circle5 id="load3" v-if="load"></Circle5>
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -60,6 +62,7 @@
                         <th>Nama Barang</th>
                         <th>Satuan</th>
                         <th>Harga</th>
+                        <th>Diskon</th>
                         <th>Sisa SO</th>
                         <th>Qty Tersedia</th>
                         <th>Rencana Kirim</th>
@@ -74,6 +77,7 @@
                         <td>{{listbcm.nama_barang}}</td>
                         <td style="text-align:center">{{listbcm.satuan}}</td>
                         <td style="text-align:center">{{listbcm.harga | currency}}</td>
+                        <td style="text-align:center">{{listbcm.diskon | currency}}</td>
                         <td style="text-align:center">{{hitung.sisaso[index]}}</td>
                         <td style="text-align:center">{{hitung.tersedia[index]}}</td>
                         <td style="text-align:center">
@@ -95,7 +99,7 @@
                     Simpan Draft
                 </button> -->
         <button @click="kembali()" class="btn btn-primary ml-3">Kembali</button>
-        <button @click="batalkan()" class="btn btn-danger ml-1">Batalkan BCK</button>
+        <button v-if="statusbck==='open'" @click="batalkan()" class="btn btn-danger ml-1">Batalkan BCK</button>
     </div>
     <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -293,6 +297,7 @@ export default {
                                     nama_barang: this.listbck[i].nama_barang,
                                     satuan: this.listbck[i].satuan,
                                     harga: this.listbck[i].harga,
+                                    diskon: this.listbck[i].diskon,
                                 })
                                 this.hitung.qty[i] = this.listbck[i].qty;
                                 axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.listbck[i].kode_barang)
@@ -539,7 +544,7 @@ export default {
                 } else {
                     this.hitung.jumlah[i] = this.hitung.qty[i];
                 }
-                this.subtotal = parseInt(this.checker[i].harga) * parseInt(this.hitung.jumlah[i]);
+                this.subtotal = (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) * parseInt(this.hitung.jumlah[i]);
                 this.total += parseInt(this.subtotal);
             }
         },

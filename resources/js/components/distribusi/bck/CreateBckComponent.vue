@@ -48,8 +48,10 @@
             </div>
         </div>
     </div>
-    <div id="rsoverflowso" class="row mt-2 mx-auto">
+    <div class="row">
         <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{total | currency}}</div>
+    </div>
+    <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
             <Circle5 id="load3" v-if="load"></Circle5>
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -60,6 +62,7 @@
                         <th>Nama Barang</th>
                         <th>Satuan</th>
                         <th>Harga</th>
+                        <th>Diskon</th>
                         <th>Sisa SO</th>
                         <th>Qty Tersedia</th>
                         <th>Rencana Kirim</th>
@@ -74,6 +77,7 @@
                         <td>{{listbcm.nama_barang}}</td>
                         <td style="text-align:center">{{listbcm.satuan}}</td>
                         <td style="text-align:center">{{listbcm.harga | currency}}</td>
+                        <td style="text-align:center">{{listbcm.diskon | currency}}</td>
                         <td style="text-align:center">{{ket.sisasopilih[index]}}</td>
                         <td style="text-align:center">{{ket.tersedia[index]}}</td>
                         <td style="text-align:center">
@@ -399,6 +403,7 @@ export default {
                                             kode_barang: this.checker[i].kode_barang,
                                             qty: this.hitung.qty[i],
                                             harga: this.checker[i].harga,
+                                            diskon: this.checker[i].diskon,
                                             keterangan: this.hitung.keterangan[i],
                                         }
                                         axios.post("/api/listbck", this.uploadlist)
@@ -508,7 +513,7 @@ export default {
                 } else {
                     this.hitung.jumlah[i] = this.hitung.qty[i];
                 }
-                this.subtotal = parseInt(this.checker[i].harga) * parseInt(this.hitung.jumlah[i]);
+                this.subtotal = (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) * parseInt(this.hitung.jumlah[i]);
                 this.total += parseInt(this.subtotal);
             }
         },
