@@ -91,6 +91,7 @@ Route::get('bck/data/aktif','Bck\BckController@aktif');
 
 Route::resource('listbck','Bck\ListBckController');
 Route::get('listbck/data/aktif/{bck}','Bck\ListBckController@aktif');
+Route::get('listbck/view/{bck}/{barang}','Bck\ListBckController@viewbbk');
 
 Route::get('bcm/{barang}/{bcm}','Barang\ListBcmController@getbbm');
 

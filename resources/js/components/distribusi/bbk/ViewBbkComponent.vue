@@ -46,8 +46,10 @@
             </div>
         </div>
     </div>
-    <div id="rsoverflowso" class="row mt-2 mx-auto">
+    <div class="row">
         <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{total | currency}}</div>
+    </div>
+    <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
             <Circle5 id="load3" v-if="load"></Circle5>
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -58,6 +60,7 @@
                         <th>Nama Barang</th>
                         <th>Satuan</th>
                         <th>Harga</th>
+                        <th>Diskon</th>
                         <th>Qty BCK</th>
                         <th>Qty termuat</th>
                         <th>Keterangan</th>
@@ -70,7 +73,8 @@
                         <td>{{list.nama_barang}}</td>
                         <td style="text-align:center">{{list.satuan}}</td>
                         <td style="text-align:center">{{list.harga | currency}}</td>
-                        <td style="text-align:center">{{list.qty_bck}}</td>
+                        <td style="text-align:center">{{list.diskon | currency}}</td>
+                        <td style="text-align:center">{{hitung.qtynya[index]}}</td>
                         <td style="text-align:center">
                             <input @input="validqty(index)" v-model="inputin.qty[index]" type="number" class="form-control" disabled>
                         </td>
@@ -221,7 +225,6 @@ export default {
                 sisaso: [],
                 sisasopilih: [],
                 tersedia: [],
-                ltersedia: []
             },
             aktif: {},
             listsisa: {},
@@ -231,7 +234,8 @@ export default {
             hitung: {
                 qty: [],
                 keterangan: [],
-                jumlah: []
+                jumlah: [],
+                qtynya: []
             },
             inputin: {
                 qty: [],
@@ -254,7 +258,8 @@ export default {
             qtyupdate: 0,
             upso: {},
             listbbk: {},
-            bbk: {}
+            bbk: {},
+            viewqtybck: {}
         }
     },
     created() {
@@ -287,9 +292,17 @@ export default {
                     axios.get("/api/listbbk/" + this.bbk[0].bbk)
                         .then(res => {
                             this.listbbk = res.data.data;
+                            this.ket.qtybck = [];
                             for (let k = 0; k < this.listbbk.length; k++) {
                                 this.total += parseInt(this.listbbk[k].qty) * parseInt(this.listbbk[k].harga);
                                 this.inputin.qty[k] = this.listbbk[k].qty;
+                                axios.get("/api/listbck/view/" + this.up.nomor_bck + "/" + this.listbbk[k].kode_barang)
+                                    .then(res => {
+                                        this.viewqtybck = res.data.data;
+                                        this.hitung.qtynya.push(900);
+                                        this.hitung.qtynya.splice(this.listbbk.length, 1)
+                                        this.hitung.qtynya[k] = this.viewqtybck[0].qty;
+                                    })
                             }
                             this.load = false;
                         })
@@ -445,7 +458,7 @@ export default {
                 } else {
                     this.hitung.jumlah[i] = this.hitung.qty[i];
                 }
-                this.subtotal = parseInt(this.checker[i].harga) * parseInt(this.hitung.jumlah[i]);
+                this.subtotal = (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) * parseInt(this.hitung.jumlah[i]);
                 this.total += parseInt(this.subtotal);
             }
         },

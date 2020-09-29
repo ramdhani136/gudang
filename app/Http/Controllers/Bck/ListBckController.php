@@ -92,4 +92,8 @@ class ListBckController extends Controller
     public function aktif($bck){
         return ListBckResource::collection(Listbck::where('close_bck','N')->where('nomor_bck',$bck)->get());
     }
+
+    public function viewbbk($bck,$barang){
+        return ListBckResource::collection(Listbck::where('nomor_bck',$bck)->where('kode_barang',$barang)->get());
+    }
 }

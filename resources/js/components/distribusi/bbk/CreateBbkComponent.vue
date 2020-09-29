@@ -368,6 +368,7 @@ export default {
                                                         this.qtybck = (parseInt(this.listso[0].bck) - parseInt(this.checker[i].qty)) + parseInt(this.hitung.qty[i]);
                                                         if (this.qtybck >= this.listso[0].qty) {
                                                             this.a = "Y";
+                                                            this.qtybck = this.listso[0].qty;
                                                         } else {
                                                             this.a = "N"
                                                         }
@@ -382,16 +383,14 @@ export default {
                                                                     this.aplus = '';
                                                                     this.banding = '';
                                                                     this.selesai = '';
-                                                                    for (let i = 0; i < this.listso.length; i++) {
-                                                                        if (this.listso[0].bbk < this.listso[0].qty) {
-                                                                            this.b = "N";
-                                                                        } else {
-                                                                            this.b = "Y";
-                                                                        }
-                                                                        this.aplus += this.listso[i].closeso;
-                                                                        this.banding += "Y";
-                                                                        this.selesai += this.b;
+                                                                    if (this.listso[0].bbk < this.listso[0].qty) {
+                                                                        this.b = "N";
+                                                                    } else {
+                                                                        this.b = "Y";
                                                                     }
+                                                                    this.aplus += this.listso[i].closeso;
+                                                                    this.banding += "Y";
+                                                                    this.selesai += this.b;
                                                                     if (this.aplus === this.banding && this.selesai === this.banding) {
                                                                         axios.put("/api/so/" + this.checker[0].nomor_so, {
                                                                             closebck: "Y",
@@ -436,7 +435,7 @@ export default {
                                                     nomor_dok: this.up.bbk,
                                                     id_user: this.ambiluser.id,
                                                     notif: "BBK dibuka!",
-                                                    keterangan: "Mmebuat BBK nomor : " + this.up.bbk,
+                                                    keterangan: "Membuat BBK nomor : " + this.up.bbk,
                                                     jenis: "Bbk",
                                                     tanggal: this.DateTime(),
                                                 }).then(res => {
