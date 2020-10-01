@@ -5,6 +5,7 @@ namespace App\Model\Rso;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Sales\Sales;
 use App\Model\Customer\Customer;
+use App\Model\Groupso\Groupso;
 use App\Model\Rso\Listrso;
 use App\Model\So\So;
 
@@ -29,4 +30,8 @@ class Rso extends Model
         return $this->hasMany(So::class,'nomor_rso','nomor_rso');
     }
 
+
+    public function groupso(){
+        return $this->belongsTo(Groupso::class,'kode_groupso','kode');
+    }
 }

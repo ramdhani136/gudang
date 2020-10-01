@@ -4,26 +4,33 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor RSO :</label>
-                <input v-model="upload.nomor_rso" type="text" class="form-control col-12">
+                <input @input="cekinputrso()" v-model="upload.nomor_rso" type="text" maxlength="18" class="form-control col-12" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
             </div>
             <div class="form-group">
-                <label>Tanggal :</label>
-                <input v-model="upload.tanggal_rso" type="date" :min="now()" class="form-control col-12">
+                <label>Pilih Area :</label>
+                <select v-model="upload.kode_groupso" class="form-control">
+                    <option :value="gr.kode" v-for="(gr,index) in groupso" :key="index">{{gr.area}}</option>
+                </select>
             </div>
         </div>
         <div class="col-4">
             <div class="form-group">
+                <label>Tanggal :</label>
+                <input v-model="upload.tanggal_rso" type="date" :min="now()" class="form-control col-12">
+            </div>
+            <div class="form-group">
                 <label>Customer</label>
                 <input @click="showcustomer()" v-model="namacustomer" type="text" class="form-control" placeholder="Pilih Customer" :disabled="listpr.length > 0">
             </div>
+
+        </div>
+        <div class="col-4">
             <div class="form-group">
                 <label>Sales</label>
                 <select class="form-control" v-model="upload.nip_sales">
                     <option v-for="(sl,index) in sales" :key="index" :value="sl.nip">{{sl.nama}}</option>
                 </select>
             </div>
-        </div>
-        <div class="col-4">
             <div class="form-group">
                 <label>keterangan</label>
                 <textarea v-model="upload.keterangan" name="keterangan" class="form-control col-12"></textarea>
@@ -234,6 +241,9 @@ export default {
             init: '',
             banding: '',
             diskon: [],
+            groupso: {},
+            aktif: false,
+            adarso: {}
         }
     },
     created() {
@@ -269,7 +279,11 @@ export default {
                             axios.get("/api/customer")
                                 .then(res => {
                                     this.customer = res.data.data;
-                                    this.load = false;
+                                    axios.get("/api/groupso/data/aktif")
+                                        .then(res => {
+                                            this.groupso = res.data.data;
+                                            this.load = false;
+                                        });
                                 })
                         })
                 })
@@ -355,23 +369,20 @@ export default {
         },
         tambahList() {
             if (this.listpr.length == 0) {
-                this.barangs = {
-                    id_custprice: this.ket.id_custprice,
-                    harga: this.ket.harga,
-                    kode: this.ket.kode,
-                    nama: this.ket.nama,
-                    satuan: this.ket.satuan
-                };
-                this.listpr.push(this.barangs);
-            } else {
-                if (this.Filteredlist.length > 0) {
+                if (this.ket.kode === undefined) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text: 'Item sudah diinput sebelumnya, hapus terlebih dahulu untuk memperbarui item!',
+                        text: 'Anda belum memilih tem !',
                     })
                 } else {
-                    if (this.listpr.length <= 5) {
+                    if (this.ket.harga < 1) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Item ini belum ada harganya !',
+                        })
+                    } else {
                         this.barangs = {
                             id_custprice: this.ket.id_custprice,
                             harga: this.ket.harga,
@@ -380,12 +391,47 @@ export default {
                             satuan: this.ket.satuan
                         };
                         this.listpr.push(this.barangs);
-                    } else {
+                    }
+                }
+            } else {
+                if (this.Filteredlist.length > 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Item sudah diinput sebelumnya, hapus terlebih dahulu untuk memperbarui item!',
+                    })
+                } else {
+                    if (this.ket.kode === undefined) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
-                            text: 'Maksimal input 6 item!',
+                            text: 'Anda belum memilih tem !',
                         })
+                    } else {
+                        if (this.ket.harga < 1) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Item ini belum ada harganya !',
+                            })
+                        } else {
+                            if (this.listpr.length <= 5) {
+                                this.barangs = {
+                                    id_custprice: this.ket.id_custprice,
+                                    harga: this.ket.harga,
+                                    kode: this.ket.kode,
+                                    nama: this.ket.nama,
+                                    satuan: this.ket.satuan
+                                };
+                                this.listpr.push(this.barangs);
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Maksimal input 6 item!',
+                                })
+                            }
+                        }
                     }
                 }
             }
@@ -450,11 +496,6 @@ export default {
                                             diskon: this.diskon[i],
                                         }
                                         axios.post("/api/listrso", this.uplist)
-                                            .then(res => {
-                                                this.$router.push({
-                                                    name: 'rso'
-                                                })
-                                            })
                                     }
                                     axios.post("/api/history", {
                                         nomor_dok: this.upload.nomor_rso,
@@ -469,6 +510,9 @@ export default {
                                         'Berhasil mengirimkan RSO.',
                                         'success'
                                     )
+                                    this.$router.push({
+                                        name: 'rso'
+                                    })
                                 }).catch(error => {
                                     Swal.fire({
                                         icon: 'error',
@@ -693,6 +737,17 @@ export default {
                 this.subtotal = (parseInt(this.listpr[i].harga) - parseInt(this.inhitung.diskon[i])) * parseInt(this.inhitung.qty[i])
                 this.invoice += this.subtotal;
             }
+        },
+        cekinputrso() {
+            axios.get("/api/rso/" + this.upload.nomor_rso)
+                .then(res => {
+                    this.adarso = res.data.data;
+                    if (this.upload.nomor_rso.length === 18 && this.adarso.length === 0) {
+                        this.aktif = true;
+                    } else {
+                        this.aktif = false;
+                    };
+                })
         }
     },
 }
