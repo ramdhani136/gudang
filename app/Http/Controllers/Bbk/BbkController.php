@@ -17,7 +17,7 @@ class BbkController extends Controller
      */
     public function index()
     {
-        return BbkResource::collection(Bbk::orderBy('updated_at','ASC')->get());
+        return BbkResource::collection(Bbk::orderBy('bbk','ASC')->get());
     }
 
     /**

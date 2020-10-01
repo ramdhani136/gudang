@@ -244,6 +244,7 @@ export default {
             listbck: {},
             uplistbbk: {},
             listso: {},
+            listsonya: {},
             qtybbk: 0,
             qtybck: 0,
             selesai: ''
@@ -379,46 +380,33 @@ export default {
                                                         }).then(res => {
                                                             axios.get("/api/listso/" + this.checker[0].nomor_so)
                                                                 .then(res => {
-                                                                    this.listso = res.data.data;
-                                                                    this.aplus = '';
-                                                                    this.banding = '';
+                                                                    this.listsonya = res.data.data;
                                                                     this.selesai = '';
-                                                                    if (this.listso[0].bbk < this.listso[0].qty) {
-                                                                        this.b = "N";
-                                                                    } else {
-                                                                        this.b = "Y";
+                                                                    this.banding = '';
+                                                                    for (let y = 0; y < this.listsonya.length; y++) {
+                                                                        this.banding += "Y";
+                                                                        this.selesai += this.listsonya[y].closeso;
                                                                     }
-                                                                    this.aplus += this.listso[i].closeso;
-                                                                    this.banding += "Y";
-                                                                    this.selesai += this.b;
-                                                                    if (this.aplus === this.banding && this.selesai === this.banding) {
+                                                                    if (this.selesai === this.banding) {
                                                                         axios.put("/api/so/" + this.checker[0].nomor_so, {
-                                                                            closebck: "Y",
                                                                             status: "Selesai",
+                                                                            closebck: 'Y',
                                                                         })
-                                                                    } else if (this.aplus === this.banding && this.selesai !== this.banding) {
+                                                                    } else if (this.selesai !== this.banding) {
                                                                         axios.put("/api/so/" + this.checker[0].nomor_so, {
-                                                                            closebck: "Y",
                                                                             status: "Acc",
-                                                                        })
-                                                                    } else if (this.aplus !== this.banding && this.selesai === this.banding) {
-                                                                        axios.put("/api/so/" + this.checker[0].nomor_so, {
-                                                                            closebck: "N",
-                                                                            status: "Selesai",
-                                                                        })
-                                                                    } else if (this.aplus !== this.banding && this.selesai !== this.banding) {
-                                                                        axios.put("/api/so/" + this.checker[0].nomor_so, {
-                                                                            closebck: "N",
-                                                                            status: "Acc",
+                                                                            closebck: 'N',
                                                                         })
                                                                     }
-                                                                    /* end */
+
                                                                 })
                                                         })
                                                     })
                                                 /* end */
                                             })
                                     }
+
+                                }).then(res => {
                                     axios.post("/api/history", {
                                         nomor_dok: this.ket.nomor_so,
                                         id_user: this.ambiluser.id,
@@ -439,20 +427,29 @@ export default {
                                                     jenis: "Bbk",
                                                     tanggal: this.DateTime(),
                                                 }).then(res => {
-                                                    this.load = false;
-                                                    swalWithBootstrapButtons.fire(
-                                                        'Sukss!',
-                                                        'Berhasil meyimpan BCK.',
-                                                        'success'
-                                                    )
-                                                    this.$router.push({
-                                                        name: 'distribusibbk'
+                                                    axios.post("/api/history", {
+                                                        nomor_dok: this.up.nomor_bck,
+                                                        id_user: this.ambiluser.id,
+                                                        notif: "BBK dibuka!",
+                                                        keterangan: "Bck selesai, membuka BBK nomor : " + this.up.bbk,
+                                                        jenis: "Bck",
+                                                        tanggal: this.DateTime(),
+                                                    }).then(res => {
+                                                        this.load = false;
+                                                        swalWithBootstrapButtons.fire(
+                                                            'Sukss!',
+                                                            'Berhasil meyimpan BBK.',
+                                                            'success'
+                                                        )
+                                                        this.$router.push({
+                                                            name: 'distribusibbk'
+                                                        })
                                                     })
                                                 })
                                             })
                                     })
-
                                 }).catch(error => {
+                                    this.load = false;
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Oops...',

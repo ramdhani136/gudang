@@ -92,6 +92,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -111,7 +112,12 @@ export default {
             tclose: '',
             tband: '',
             listsofix: {},
-            listbck: {}
+            listbck: {},
+            history: {},
+            listsonya: {},
+            qtybck: 0,
+            listmu: [],
+            lebih: 0
         }
     },
     created() {
@@ -148,83 +154,171 @@ export default {
                 })
         },
         batalkan(bk) {
-            /* Ubah status so */
-            axios.put("/api/so/" + bk.nomor_so, {
-                status: 'Acc',
-                closebck: 'N'
-                /* end */
-            }).then(res => {
-                /* status open bck */
-                axios.put("/api/bck/" + bk.nomor_bck, {
-                    status: 'open'
-                    /* end */
-                }).then(res => {
-                    this.closesoplus = [];
-                    this.banding = []
-                    axios.get("/api/listbbk/" + bk.bbk)
-                        .then(res => {
-                            this.listbbk = res.data.data;
-                            this.qtybbk = 0;
-                            this.closeso = '';
-                            for (let i = 0; i < this.listbbk.length; i++) {
-                                this.a = '';
-                                axios.get("/api/listso/data/" + bk.nomor_so + "/" + this.listbbk[i].kode_barang)
-                                    .then(res => {
-                                        this.listso = res.data.data;
-                                        this.qtybbk = parseInt(this.listso[0].bbk) - parseInt(this.listbbk[i].qty);
-                                        if (this.listso[0].bck >= this.listso[0].qty) {
-                                            this.closeso = "Y";
-                                        } else {
-                                            this.closeso = "N";
-                                        }
-                                        axios.put("/api/listso/" + this.listso[0].id, {
-                                            bbk: this.qtybbk,
-                                            closeso: this.closeso
-                                        }).then(res => {
-                                            axios.get("/api/listbck/" + bk.nomor_bck + "/" + this.listbbk[i].kode_barang)
-                                                .then(res => {
-                                                    this.listbck = res.data.data;
-                                                    axios.put("/api/listbck/" + this.listbck[0].id, {
-                                                        qty: (parseInt(this.listso[0].qty) - parseInt(this.listso[0].bbk)) + parseInt(this.listbbk[i].qty),
-                                                    })
-                                                })
-                                        })
-                                    })
-                            };
-                        }).then(res => {
-                            axios.get("/api/listso/" + bk.nomor_so)
-                                .then(res => {
-                                    this.listsofix = res.data.data;
-                                    this.a = "";
-                                    this.aplus = "";
-                                    this.aband = "";
-                                    for (let i = 0; i < this.listsofix.length; i++) {
-                                        if (this.listsofix[i].bck >= this.listsofix[i].qty) {
-                                            this.a = "Y";
-                                        } else {
-                                            this.a = "N";
-                                        }
-                                        this.aplus += this.a;
-                                        this.aband += "Y";
-                                    }
-                                    if (this.aplus === this.aband) {
-                                        axios.put("/api/so/" + bk.nomor_so, {
-                                            closebck: "Y"
-                                        });
-                                    } else {
-                                        axios.put("/api/so/" + bk.nomor_so, {
-                                            closebck: "N"
-                                        });
-                                    }
-                                }).then(res => {
-                                    axios.delete("/api/bbk/" + bk.bbk).then(res => {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
 
-                                    })
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "ingin membatalkan form BBK ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.load = true;
+                    /* Ubah status so */
+                    axios.put("/api/so/" + bk.nomor_so, {
+                        status: 'Acc',
+                        closebck: 'N'
+                        /* end */
+                    }).then(res => {
+                        /* status open bck */
+                        axios.put("/api/bck/" + bk.nomor_bck, {
+                            status: 'draft'
+                            /* end */
+                        }).then(res => {
+                            this.closesoplus = [];
+                            this.banding = []
+                            axios.get("/api/listbbk/" + bk.bbk)
+                                .then(res => {
+                                    this.listbbk = res.data.data;
+                                    this.qtybbk = 0;
+                                    this.closeso = '';
+                                    this.qtybck = 0;
+                                    this.lebih = 0;
+                                    for (let i = 0; i < this.listbbk.length; i++) {
+                                        axios.get("/api/listbck/view/" + bk.nomor_bck + "/" + this.listbbk[i].kode_barang)
+                                            .then(res => {
+                                                this.listbck = res.data.data;
+                                                axios.get("/api/listso/data/" + bk.nomor_so + "/" + this.listbbk[i].kode_barang)
+                                                    .then(res => {
+                                                        this.listsonya = res.data.data;
+                                                        this.listmu.push(this.listsonya[0]);
+                                                        axios.get("/api/listbck/view/" + bk.nomor_bck + "/" + this.listbbk[i].kode_barang)
+                                                            .then(res => {
+                                                                this.listbck = res.data.data;
+                                                                if ((parseInt(this.listmu[i].bbk) - parseInt(this.listmu[i].qty)) > 0) {
+                                                                    this.lebih = parseInt(this.listmu[i].bbk) - parseInt(this.listmu[i].qty)
+                                                                } else {
+                                                                    this.lebih = 0;
+                                                                }
+                                                                this.qtybck = parseInt(this.listbbk[i].qty) - parseInt(this.lebih);
+                                                                console.log(this.qtybck);
+                                                                axios.put("/api/listbck/" + this.listbck[0].id, {
+                                                                    qty: this.qtybck,
+                                                                })
+                                                            })
+                                                    })
+                                            }).then(res => {
+                                                this.a = '';
+                                                axios.get("/api/listso/data/" + bk.nomor_so + "/" + this.listbbk[i].kode_barang)
+                                                    .then(res => {
+                                                        this.listso = res.data.data;
+                                                        this.qtybbk = parseInt(this.listso[0].bbk) - parseInt(this.listbbk[i].qty);
+                                                        if (this.listso[0].bck >= this.listso[0].qty) {
+                                                            this.closeso = "Y";
+                                                        } else {
+                                                            this.closeso = "N";
+                                                        }
+                                                        axios.put("/api/listso/" + this.listso[0].id, {
+                                                            bbk: this.qtybbk,
+                                                            closeso: this.closeso
+                                                        })
+                                                    })
+                                            })
+                                    };
+                                }).then(res => {
+                                    axios.get("/api/listso/" + bk.nomor_so)
+                                        .then(res => {
+                                            this.listsofix = res.data.data;
+                                            this.a = "";
+                                            this.aplus = "";
+                                            this.aband = "";
+                                            for (let i = 0; i < this.listsofix.length; i++) {
+                                                if (this.listsofix[i].bck >= this.listsofix[i].qty) {
+                                                    this.a = "Y";
+                                                } else {
+                                                    this.a = "N";
+                                                }
+                                                this.aplus += this.a;
+                                                this.aband += "Y";
+                                            }
+                                            if (this.aplus === this.aband) {
+                                                axios.put("/api/so/" + bk.nomor_so, {
+                                                    closebck: "Y"
+                                                });
+                                            } else {
+                                                axios.put("/api/so/" + bk.nomor_so, {
+                                                    closebck: "N"
+                                                });
+                                            }
+                                        }).then(res => {
+                                            axios.delete("/api/bbk/" + bk.bbk).then(res => {
+                                                axios.post("/api/history", {
+                                                    nomor_dok: bk.nomor_bck,
+                                                    id_user: this.ambiluser.id,
+                                                    notif: "Membatalkan BBK!",
+                                                    keterangan: "form BBK nomor : " + bk.bbk + " di batalkan",
+                                                    jenis: "Bck",
+                                                    tanggal: this.DateTime(),
+                                                }).then(res => {
+                                                    axios.get("/api/history/" + bk.bbk)
+                                                        .then(res => {
+                                                            this.history = res.data.data
+                                                            for (let l = 0; l < this.history.length; l++) {
+                                                                axios.delete("/api/history/" + this.history[l].id)
+                                                            }
+                                                        }).then(res => {
+                                                            this.load = false;
+                                                            swalWithBootstrapButtons.fire(
+                                                                'Deleted!',
+                                                                'Berhasil menghasil form BBK.',
+                                                                'success'
+                                                            )
+                                                            this.getBbk();
+                                                        })
+                                                })
+
+                                            })
+                                        })
                                 })
                         })
-                })
+                    })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menghapus form bbk :)',
+                        'error'
+                    )
+                }
             })
-        }
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
+        },
     }
 }
 </script>

@@ -5,6 +5,7 @@
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select name="status" v-model="status" class="form-control">
+            <option value="draft">Draft</option>
             <option value="open">Open</option>
             <option value="close">Close</option>
         </select>
@@ -39,7 +40,7 @@
                         <button @click="showhistory(bk)" class="btn btn-primary">
                             Lihat History
                         </button>
-                        <button v-if="status==='open'" @click="batalkan(bk)" class="btn btn-danger">Batalkan</button>
+                        <button v-if="status==='open' || status==='draft' " @click="batalkan(bk)" class="btn btn-danger">Batalkan</button>
                     </td>
                 </tr>
             </tbody>
@@ -117,6 +118,8 @@ export default {
                     return this.bck.filter(elem => elem.status === "open")
                 } else if (this.status === "close") {
                     return this.bck.filter(elem => elem.status === "close")
+                } else if (this.status === "draft") {
+                    return this.bck.filter(elem => elem.status === "draft")
                 }
             } else {
                 return this.bck.filter(elem => {
@@ -232,6 +235,7 @@ export default {
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal menghapus BCK :)',

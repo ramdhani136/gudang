@@ -470,6 +470,7 @@ export default {
                                         })
                                     })
                                 }).catch(error => {
+                                    this.load = false;
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Oops...',
@@ -482,6 +483,7 @@ export default {
                                 title: 'Oops...',
                                 text: 'Periksa kembali qty item, pastikan sudah terisi!',
                             })
+                            this.load = false;
                         }
                     } else {
                         Swal.fire({
@@ -489,6 +491,7 @@ export default {
                             title: 'Oops...',
                             text: 'Anda belum memasukkan item apapun!',
                         })
+                        this.load = false;
                     }
                 } else if (
                     /* Read more about handling dismissals below */
