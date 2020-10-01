@@ -112,6 +112,7 @@
                                     <router-link to="/so/data/selesai" class="dropdown-item" >Request SO Selesai</router-link>
                                     <router-link to="/data/price/request" class="dropdown-item" >Request Special Price</router-link>
                                     <router-link to="/price/customer" class="dropdown-item" >Data Special Price</router-link>
+                                    <router-link to="/groupso" class="dropdown-item" >Input Group Customer </router-link>
                                 </div>
                             </li>
                             @endif

@@ -87,6 +87,10 @@ import homeComponent from '../components/home/homeComponent.vue'
 import muatBarangComponent from '../components/warehouse/muatBarangComponent.vue'
 import bongkarBarangComponent from '../components/warehouse/bongkarBarangComponent.vue'
 
+import GroupSoComponent from '../components/groupso/GroupSoComponent.vue'
+
+
+
 
 const routes=[
     {name:'barang', path:'/barang', component:BarangComponent},
@@ -176,6 +180,8 @@ const routes=[
 
     {name:'muatan', path:'/warehouse/muatan', component:muatBarangComponent},
     {name:'bongkaran', path:'/warehouse/bongkar', component:bongkarBarangComponent},
+
+    {name:'groupso', path:'/groupso', component:GroupSoComponent},
     
 ]
 

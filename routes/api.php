@@ -133,3 +133,6 @@ Route::get('history/data/{nomorso}/{jenis}','History\HistoryController@historyvi
 Route::resource('kategoribarang','Barang\KategoriBarangController');
 
 Route::resource('satuan','Barang\SatuanController');
+
+Route::resource('groupso','Groupso\GroupSoController');
+Route::get('groupso/data/aktif','Groupso\GroupSoController@aktif');
