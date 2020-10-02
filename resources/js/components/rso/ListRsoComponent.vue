@@ -2,13 +2,17 @@
 <div class="container">
     <div class="row row-cols-2">
         <div class="col-4">
-            <div class="form-group">
+            <div v-if="status==='Draft' || status==='Confirmed'" class="form-group">
                 <label>Nomor RSO :</label>
-                <input @input="cekinputrso()" v-model="upload.nomor_rso" type="text" maxlength="18" class="form-control col-12" :disabled="status!=='Draft' && status!=='Confirmed'" :class=" { 'is-valid' : aktif}">
+                <input @input="cekinputrso()" v-model="upload.nomor_rso" type="text" maxlength="16" class="form-control col-12" :disabled="status!=='Draft' && status!=='Confirmed'" :class=" { 'is-valid' : aktif}">
+            </div>
+            <div v-if="status!=='Draft' && status!=='Confirmed'" class="form-group">
+                <label>Nomor RSO :</label>
+                <input @input="cekinputrso()" v-model="ket.nomor_rsofull" type="text" maxlength="16" class="form-control col-12" :disabled="status!=='Draft' && status!=='Confirmed'" :class=" { 'is-valid' : aktif}">
             </div>
             <div class="form-group">
-                <label>Pilih Area :</label>
-                <select v-model="upload.kode_groupso" class="form-control" :disabled="status!=='Draft' && status!=='Confirmed'">
+                <label>Sales Area :</label>
+                <select v-model="upload.kode_groupso" class="form-control" disabled>
                     <option :value="gr.kode" v-for="(gr,index) in groupso" :key="index">{{gr.area}}</option>
                 </select>
             </div>
@@ -26,8 +30,8 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Sales</label>
-                <select class="form-control" v-model="upload.nip_sales" :disabled="status!=='Draft' && status!=='Confirmed' ">
-                    <option v-for="(sl,index) in sales" :key="index" :value="sl.nip">{{sl.nama}}</option>
+                <select class="form-control" v-model="upload.id_user" disabled>
+                    <option v-for="(sl,index) in sales" :key="index" :value="sl.id">{{sl.name}}</option>
                 </select>
             </div>
             <div class="form-group">
@@ -326,7 +330,7 @@ export default {
             axios.get("/api/barang/")
                 .then(res => {
                     this.barang = res.data.data
-                    axios.get("/api/sales")
+                    axios.get("/api/user")
                         .then(res => {
                             this.sales = res.data.data;
                             axios.get("/api/customer")
@@ -346,13 +350,14 @@ export default {
             axios.get("/api/rso/" + this.$route.params.id)
                 .then(res => {
                     this.rso = res.data.data;
-                    this.upload.nomor_rso = this.rso[0].nomor_rso;
+                    this.upload.nomor_rso = this.rso[0].nomor_rso.slice(0, 16);
                     this.upload.tanggal_rso = this.rso[0].tanggal_rso;
-                    this.upload.nip_sales = this.rso[0].nip_sales;
+                    this.upload.id_user = this.rso[0].id_user;
                     this.upload.kode_groupso = this.rso[0].kode_groupso;
                     this.namacustomer = this.rso[0].customer;
                     this.kodecustomer = this.rso[0].kode_customer;
                     this.upload.keterangan = this.rso[0].keterangan;
+                    this.ket.nomor_rsofull = this.rso[0].nomor_rso;
                     this.status = this.rso[0].status;
                     axios.get("/api/listrso/" + this.$route.params.id)
                         .then(res => {
@@ -600,6 +605,7 @@ export default {
                         }
                         if (this.cek === this.banding) {
                             this.upload.status = "Sent";
+                            this.upload.nomor_rso = this.upload.nomor_rso + this.upload.kode_groupso;
                             axios.put("/api/rso/" + this.$route.params.id, this.upload)
                                 .then(res => {
                                     axios.get("/api/listrso/" + this.upload.nomor_rso)
@@ -857,6 +863,7 @@ export default {
                                     if (this.openso === false) {
                                         this.upload.status = "Sent";
                                         this.upload.kode_customer = this.kodecustomer;
+                                        this.upload.nomor_rso = this.upload.nomor_rso + this.upload.kode_groupso;
                                         axios.put("/api/rso/" + this.$route.params.id, this.upload)
                                             .then(res => {
                                                 axios.get("/api/listrso/" + this.upload.nomor_rso)
@@ -1003,6 +1010,7 @@ export default {
                         if (this.cek === this.banding) {
                             this.upload.status = "Draft";
                             this.upload.kode_customer = this.kodecustomer;
+                            this.upload.nomor_rso = this.upload.nomor_rso + this.upload.kode_groupso;
                             axios.put("/api/rso/" + this.$route.params.id, this.upload)
                                 .then(res => {
                                     axios.get("/api/listrso/" + this.upload.nomor_rso)
@@ -1191,10 +1199,10 @@ export default {
             }
         },
         cekinputrso() {
-            axios.get("/api/rso/" + this.upload.nomor_rso)
+            axios.get("/api/rso/" + this.upload.nomor_rso + this.upload.kode_groupso)
                 .then(res => {
                     this.adarso = res.data.data;
-                    if (this.upload.nomor_rso.length === 18 && this.adarso.length === 0) {
+                    if (this.upload.nomor_rso.length === 16 && this.adarso.length === 0) {
                         this.aktif = true;
                     } else {
                         this.aktif = false;

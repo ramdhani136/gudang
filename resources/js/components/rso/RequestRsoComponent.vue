@@ -19,13 +19,13 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Marketing</label>
-                <select v-model="rlist.nip_sales" name="marketing" class="col-12 form-control" disabled>
-                    <option :value="rlist.nip_sales">{{rlist.sales}}</option>
+                <label>Sales</label>
+                <select v-model="rlist.id_user" name="sales" class="col-12 form-control" disabled>
+                    <option :value="sl.id" v-for="(sl,index) in sales" :key="index">{{sl.name}}</option>
                 </select>
             </div>
         </div>
-        <div class="col-4">
+        <div class=" col-4">
             <div class="form-group">
                 <label>keterangan</label>
                 <textarea v-model="rlist.keterangan" name="keterangan" class="form-control col-12" disabled></textarea>
@@ -170,11 +170,11 @@ export default {
             up: {},
             load: true,
             selesaikah: false,
+            sales: {}
         }
     },
     created() {
         this.getRso();
-        this.getlistRso();
         this.tujuanConfirm();
     },
     mounted() {
@@ -184,20 +184,24 @@ export default {
     methods: {
         getRso() {
             axios.get(`/api/rso/${this.$route.params.id}`)
-                .then(res => this.form = res.data.data)
+                .then(res => {
+                    this.form = res.data.data
+                    axios.get(`/api/listrso/${this.$route.params.id}`)
+                        .then(res => {
+                            this.listrso = res.data.data
+                            axios.get("/api/user")
+                                .then(res => {
+                                    this.sales = res.data.data;
+                                    this.load = false;
+                                })
+                        });
+                });
         },
         showModal() {
             $("#modal-form").modal("show");
         },
-        getlistRso() {
-            axios.get(`/api/listrso/${this.$route.params.id}`)
-                .then(res => {
-                    this.listrso = res.data.data
-                    this.load = false;
-                });
-        },
         showModal(list) {
-            this.getlistRso()
+            this.getRso()
             this.dic.kode = list.lkode_barang
             this.dic.catatan = list.catatan
             this.dic.id = list.id
@@ -212,7 +216,7 @@ export default {
             this.selesaikah = false;
             axios.put(`/api/listrso/` + this.dic.id, this.update)
                 .then((response) => {
-                    this.getlistRso()
+                    this.getRso()
                     if (this.update.status === "Tidak Tersedia") {
                         this.update.qty_tersedia = "";
                         this.update.so_tersedia = "Y";
@@ -222,7 +226,7 @@ export default {
                         this.tujuanConfirm()
                         this.selesaikah = true;
                     } else if (this.update.status === "Tersedia") {
-                        this.getlistRso()
+                        this.getRso()
                         this.update.so_tdktersedia = "Y";
                         this.update.so_tersedia = "N";
                         this.update.qty_tersedia = this.dic.jumlahrso
@@ -233,7 +237,7 @@ export default {
                                 this.selesaikah = true;
                             })
                     } else if (this.update.status === "Tersedia Sebagian") {
-                        this.getlistRso()
+                        this.getRso()
                         this.update.so_tdktersedia = "N";
                         this.update.so_tersedia = "N";
                         axios.put(`/api/listrso/` + this.dic.id, this.update)
@@ -246,7 +250,7 @@ export default {
         },
         updateStatusklik(list) {
             if (this.update.status === "Tersedia Sebagian") {
-                this.getlistRso()
+                this.getRso()
                 this.update.qty_tdktersedia = this.dic.jumlahrso - this.update.qty_tersedia;
                 axios.put(`/api/listrso/` + this.dic.id, this.update)
                     .then((response) => {
@@ -267,7 +271,7 @@ export default {
             }
         },
         resetForm() {
-            this.getlistRso();
+            this.getRso();
             this.dic.catatan = "";
             this.dic.id = "";
             this.dic.nama_barang = "";

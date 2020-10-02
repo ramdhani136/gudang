@@ -18,8 +18,8 @@ class RsoResource extends JsonResource
         [
             'nomor_rso'=>$this->nomor_rso,
             'tanggal_rso'=>$this->tanggal_rso,
-            'sales'=>$this->sales->nama,
-            'nip_sales'=>$this->nip_sales,
+            'id_user'=>$this->id_user,
+            'namauser'=>$this->user->name,
             'customer'=>$this->customer->nama,
             'alamat'=>$this->customer->alamat,
             'kontak'=>$this->customer->kontak,

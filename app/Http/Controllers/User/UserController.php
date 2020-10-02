@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::all();
+        return UserResource::collection(User::orderBy('name','ASC')->get());
     }
 
     /**
@@ -54,6 +54,7 @@ class UserController extends Controller
             'acc' => $request->acc,
             'warehouse' => $request->warehouse,
             'superadmin' => $request->superadmin,
+            'kode_groupso' => $request->kode_groupso,
         ]);
     }
 

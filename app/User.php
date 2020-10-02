@@ -5,7 +5,9 @@ namespace App;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Message;
+use App\Model\Groupso\Groupso;
 use App\Model\History\History;
+use App\Model\Rso\Rso;
 
 class User extends Authenticatable
 {
@@ -18,7 +20,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name', 'email', 'password','username','sales','susales','inventory','incoming','distribusi','purch','suppurch',
-        'acc','superadmin','warehouse',
+        'acc','superadmin','warehouse','kode_groupso',
     ];
 
     /**
@@ -45,6 +47,14 @@ class User extends Authenticatable
 
     public function history(){
         return $this->hasMany(History::class,'id_user','id');
+    }
+
+    public function rso(){
+        return $this->hasMany(Rso::class,'id_user','id');
+    }
+
+    public function groupso(){
+        return $this->belongsTo(Groupso::class,'kode_groupso','kode');
     }
 
 

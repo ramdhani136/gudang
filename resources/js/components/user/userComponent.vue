@@ -34,7 +34,7 @@
         <div class="modal-dialog" role="document">
             <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Form divisi</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Form User</h5>
                     <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -57,84 +57,101 @@
                         <input v-model="form.password" type="password" class="form-control" autocomplete="new-password">
                     </div>
                     <div class="form-group">
+                        <label>Pilih Bagian</label>
+                        <select v-model="bagian" class="form-control">
+                            <option value="1">Accounting</option>
+                            <option value="2">DIC</option>
+                            <option value="3">Purchasing</option>
+                            <option value="4">Sales</option>
+                            <option value="5">Superadmin</option>
+                            <option value="6">Warehouse</option>
+                        </select>
+                    </div>
+                    <div v-if="bagian==='4'" class="form-group">
                         <label>Menu Sales</label>
                         <select v-model="form.sales" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Kordinator Sales</label>
+                    <div v-if="bagian==='4'" class="form-group">
+                        <label>Kordinator</label>
                         <select v-model="form.kordisales" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Menu Sales SPV</label>
+                    <div v-if="bagian==='4'" class="form-group">
+                        <label>Supervisor</label>
                         <select v-model="form.susales" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Menu inventory</label>
+                    <div v-if="bagian==='4'" class="form-group">
+                        <label>Group</label>
+                        <select v-model="form.kode_groupso" class="form-control">
+                            <option :value="gs.kode" v-for="(gs,index) in groupso" :key="index">{{gs.area}}</option>
+                        </select>
+                    </div>
+                    <div v-if="bagian==='2'" class="form-group">
+                        <label>Inventory Control</label>
                         <select v-model="form.inventory" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Menu Incoming</label>
+                    <div v-if="bagian==='2'" class="form-group">
+                        <label>Incoming Goods</label>
                         <select v-model="form.incoming" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Menu Incoming SPV</label>
+                    <div v-if="bagian==='2'" class="form-group">
+                        <label>Incoming ACC</label>
                         <select v-model="form.incomingspv" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Menu Purchasing</label>
+                    <div v-if="bagian==='3'" class="form-group">
+                        <label>Staff</label>
                         <select v-model="form.purch" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Menu Purch SPV</label>
+                    <div v-if="bagian==='3'" class="form-group">
+                        <label>Supervisor</label>
                         <select v-model="form.suppurch" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Menu Distribusi</label>
+                    <div v-if="bagian==='2'" class="form-group">
+                        <label>Distribusi Staff</label>
                         <select v-model="form.distribusi" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Accounting</label>
+                    <div v-if="bagian==='1'" class="form-group">
+                        <label>Staff</label>
                         <select v-model="form.acc" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div v-if="bagian==='6'" class="form-group">
                         <label>Warehouse</label>
                         <select v-model="form.warehouse" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Super Admin</label>
+                    <div v-if="bagian==='5'" class="form-group">
+                        <label>Status</label>
                         <select v-model="form.superadmin" class="form-control">
                             <option value="0">Tidak Aktif</option>
                             <option value="1">Aktif</option>
@@ -177,9 +194,12 @@ export default {
                 kordisales: 0,
                 incomingspv: 0,
                 password: '',
+                kode_groupso: 'A1',
             },
             edit: false,
             load: true,
+            groupso: {},
+            bagian: null
         }
     },
     created() {
@@ -196,8 +216,12 @@ export default {
         getuser() {
             axios.get("/api/user")
                 .then(res => {
-                    this.user = res.data;
-                    this.load = false;
+                    this.user = res.data.data;
+                    axios.get("/api/groupso")
+                        .then(res => {
+                            this.groupso = res.data.data;
+                            this.load = false;
+                        })
                 })
         },
         deleteUser(usr) {

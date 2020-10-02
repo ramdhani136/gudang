@@ -8,6 +8,7 @@ use App\Model\Customer\Customer;
 use App\Model\Groupso\Groupso;
 use App\Model\Rso\Listrso;
 use App\Model\So\So;
+use App\User;
 
 class Rso extends Model
 {
@@ -33,5 +34,9 @@ class Rso extends Model
 
     public function groupso(){
         return $this->belongsTo(Groupso::class,'kode_groupso','kode');
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class,'id_user','id');
     }
 }

@@ -20,9 +20,9 @@
                 <input v-if="apapr==='Y'" value="Gudang Stok" type="text" class="form-control" disabled>
             </div>
             <div class="form-group">
-                <label>Marketing</label>
-                <select v-model="rlist.nip_sales" name="marketing" class="col-12 form-control" disabled>
-                    <option :value="rlist.nip_sales">{{rlist.sales}}</option>
+                <label>Sales</label>
+                <select v-model="rlist.id_user" name="marketing" class="col-12 form-control" disabled>
+                    <option v-for="(sl,index) in sales" :key="index" :value="sl.id">{{sl.name}}</option>
                 </select>
             </div>
         </div>
@@ -153,6 +153,7 @@ export default {
             value: '',
             uplist: {},
             apapr: '',
+            sales: {}
         }
     },
     created() {
@@ -177,6 +178,11 @@ export default {
                     this.listrso = res.data.data
                     this.load = false;
                     this.banding = this.listrso;
+                    axios.get("/api/user")
+                        .then(res => {
+                            this.sales = res.data.data;
+                            this.load = false;
+                        })
                 });
         },
         showModal(list) {
@@ -242,7 +248,7 @@ export default {
                         if (rs.pr === "N") {
                             this.konfirm.status = 'Confirmed';
                             this.konfirm.tanggal_rso = rs.tanggal_rso;
-                            this.konfirm.nip_sales = rs.nip_sales;
+                            this.konfirm.id_user = rs.id_user;
                             this.konfirm.kode_customer = rs.kode_customer;
                             this.konfirm.keterangan = rs.keterangan;
                             axios.put(`/api/rso/` + rs.nomor_rso, this.konfirm)
@@ -274,7 +280,7 @@ export default {
                             if (this.upso === this.value) {
                                 this.konfirm.status = 'So';
                                 this.konfirm.tanggal_rso = rs.tanggal_rso;
-                                this.konfirm.nip_sales = rs.nip_sales;
+                                this.konfirm.id_user = rs.id_user;
                                 this.konfirm.kode_customer = rs.kode_customer;
                                 this.konfirm.keterangan = rs.keterangan;
                                 axios.put(`/api/rso/` + rs.nomor_rso, this.konfirm)
@@ -331,7 +337,7 @@ export default {
                             } else {
                                 this.konfirm.status = 'Confirmed';
                                 this.konfirm.tanggal_rso = rs.tanggal_rso;
-                                this.konfirm.nip_sales = rs.nip_sales;
+                                this.konfirm.id_user = rs.id_user;
                                 this.konfirm.kode_customer = rs.kode_customer;
                                 this.konfirm.keterangan = rs.keterangan;
                                 axios.put(`/api/rso/` + rs.nomor_rso, this.konfirm)

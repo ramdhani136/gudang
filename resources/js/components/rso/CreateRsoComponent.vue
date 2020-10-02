@@ -4,11 +4,11 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor RSO :</label>
-                <input @input="cekinputrso()" v-model="upload.nomor_rso" type="text" maxlength="18" class="form-control col-12" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
+                <input @input="cekinputrso()" v-model="upload.nomor_rso" type="text" maxlength="16" class="form-control col-12" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
             </div>
             <div class="form-group">
-                <label>Pilih Area :</label>
-                <select v-model="upload.kode_groupso" class="form-control">
+                <label>Sales Area :</label>
+                <select v-model="upload.kode_groupso" class="form-control" disabled>
                     <option :value="gr.kode" v-for="(gr,index) in groupso" :key="index">{{gr.area}}</option>
                 </select>
             </div>
@@ -27,8 +27,8 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Sales</label>
-                <select class="form-control" v-model="upload.nip_sales">
-                    <option v-for="(sl,index) in sales" :key="index" :value="sl.nip">{{sl.nama}}</option>
+                <select class="form-control" v-model="upload.id_user" disabled>
+                    <option v-for="(sl,index) in sales" :key="index" :value="sl.id">{{sl.name}}</option>
                 </select>
             </div>
             <div class="form-group">
@@ -197,6 +197,8 @@ export default {
             upload: {
                 nomor_rso: this.rso_nomor(),
                 tanggal_rso: this.now(),
+                kode_groupso: this.ambiluser.kode_groupso,
+                id_user: this.ambiluser.id,
             },
             listpr: [],
             hitung: {
@@ -273,7 +275,7 @@ export default {
             axios.get("/api/barang/")
                 .then(res => {
                     this.barang = res.data.data
-                    axios.get("/api/sales")
+                    axios.get("/api/user")
                         .then(res => {
                             this.sales = res.data.data;
                             axios.get("/api/customer")
@@ -478,6 +480,7 @@ export default {
                         }
                         if (this.cek === this.banding) {
                             this.upload.status = "Sent";
+                            this.upload.nomor_rso = this.upload.nomor_rso + this.upload.kode_groupso;
                             axios.post("/api/rso", this.upload)
                                 .then(res => {
                                     for (let i = 0; i < this.listpr.length; i++) {
@@ -580,6 +583,7 @@ export default {
                         }
                         if (this.cek === this.banding) {
                             this.upload.status = "Draft";
+                            this.upload.nomor_rso = this.upload.nomor_rso + this.upload.kode_groupso;
                             axios.post("/api/rso", this.upload)
                                 .then(res => {
                                     for (let i = 0; i < this.listpr.length; i++) {
@@ -739,10 +743,10 @@ export default {
             }
         },
         cekinputrso() {
-            axios.get("/api/rso/" + this.upload.nomor_rso)
+            axios.get("/api/rso/" + this.upload.nomor_rso + this.upload.kode_groupso)
                 .then(res => {
                     this.adarso = res.data.data;
-                    if (this.upload.nomor_rso.length === 18 && this.adarso.length === 0) {
+                    if (this.upload.nomor_rso.length === 16 && this.adarso.length === 0) {
                         this.aktif = true;
                     } else {
                         this.aktif = false;
