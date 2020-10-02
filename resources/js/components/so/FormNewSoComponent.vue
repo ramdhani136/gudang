@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor SO :</label>
-                <input v-model="up.nomor_so" type="text" class="form-control col-12">
+                <input @input="ceknomorso()" v-model="up.nomor_so" type="text" maxlength="15" class="form-control col-12" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -98,7 +98,7 @@
         <button @click="draftSo()" class="btn-orange btn ml-4">
             Simpan
         </button>
-        <button @click="submitSo()" class="btn-success btn ml-2">
+        <button @click="submitSo()" class="btn-success btn ml-1">
             Kirim SO
         </button>
     </div>
@@ -333,7 +333,11 @@ export default {
             lisallrso: {},
             statpo: 'Y',
             statusso: '',
-            statusnya: ''
+            statusnya: '',
+            aktif: null,
+            adaso: {},
+            tampil: null,
+            defaultal: ''
         }
     },
     created() {
@@ -500,6 +504,8 @@ export default {
                             this.up.statusso = "tidaktersedia";
                         }
                         this.up.status = "Kordinator";
+                        this.up.id_user = this.ambiluser.id;
+                        this.up.nomor_so = this.up.nomor_so + this.ambiluser.kode_groupso;
                         axios.post("/api/so", this.up)
                             .then(res => {
                                 this.ada = 0;
@@ -678,6 +684,8 @@ export default {
                             this.up.statusso = "tidaktersedia";
                         }
                         this.up.status = "Draft";
+                        this.up.id_user = this.ambiluser.id;
+                        this.up.nomor_so = this.up.nomor_so + this.ambiluser.kode_groupso;
                         axios.post("/api/so", this.up)
                             .then(res => {
                                 this.ada = 0;
@@ -831,7 +839,7 @@ export default {
             this.up.id_ekspedisi = this.eks.id;
             this.visible = false;
         },
-        up() {
+        upin() {
             if (this.selected == 0) {
                 return;
             }
@@ -864,10 +872,68 @@ export default {
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
         },
+        ceknomorso() {
+            axios.get("/api/so/" + this.up.nomor_so + this.ambiluser.kode_groupso)
+                .then(res => {
+                    this.adaso = res.data.data;
+                    if (this.up.nomor_so.length === 15 && this.adaso.length === 0) {
+                        this.aktif = true;
+                    } else {
+                        this.aktif = false;
+                    };
+                })
+        }
     }
 }
 </script>
 
 <style>
+#rsoverflowso {
+    width: 100%;
+    max-height: 275px;
+    overflow-y: scroll;
+    border-top: solid 1px #dee2e6;
+}
 
+#load3 {
+    position: relative;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
+.label {
+    border: solid 1px rgb(42, 199, 42);
+    background-color: rgb(104, 226, 104);
+    font-size: 16px;
+    border-radius: 3px;
+    padding: 5px;
+    padding-left: 1%;
+    padding-right: 1%;
+    color: #fff;
+}
+
+.labelt {
+    border: solid 1px rgb(40, 131, 206);
+    background-color: rgb(75, 161, 231);
+    font-size: 16px;
+    border-radius: 3px;
+    padding: 5px;
+    padding-left: 1%;
+    padding-right: 1%;
+    color: #fff;
+}
+
+.error-template {
+    padding: 40px 15px;
+    text-align: center;
+}
+
+.error-actions {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.error-actions .btn {
+    margin-right: 10px;
+}
 </style>

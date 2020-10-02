@@ -17,7 +17,7 @@ import RequestRsoComponent from '../components/rso/RequestRsoComponent.vue'
 import PurchaseComponent from '../components/purchase/PurchaseComponent.vue'
 import ListPurchaseComponent from '../components/purchase/ListPurchaseComponent.vue'
 
-import CreateSoComponent from '../components/so/CreateSoComponent.vue'
+// import CreateSoComponent from '../components/so/CreateSoComponent.vue'
 import FormCreateSoComponent from '../components/so/FormCreateSoComponent.vue'
 
 /* SO baru */
@@ -110,7 +110,7 @@ const routes=[
     {name:'purchase', path:'/purchase', component:PurchaseComponent},
     {name:'listpurchase', path:'/purchase/view/:id', component:ListPurchaseComponent},
 
-    {name:'createso', path:'/so/create/:id', component:CreateSoComponent},
+    // {name:'createso', path:'/so/create/:id', component:CreateSoComponent},
     {name:'formcreateso', path:'/so/create/', component:FormCreateSoComponent},
     {name:'soconfirm', path:'/confirmso', component:SoConfirmComponent},
     {name:'viewso', path:'/so/confirm/:id', component:ViewSoConfirmComponent},

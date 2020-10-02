@@ -26,8 +26,6 @@ class SoResource extends JsonResource
             'customer'=>$this->rso->customer->nama,
             'alamatcustomer'=>$this->rso->customer->alamat,
             'kode_customer'=>$this->rso->customer->kode,
-            'nip_sales'=>$this->rso->sales->nip,
-            'sales'=>$this->rso->sales->nama,
             'alastolak'=>$this->alastolak,
             'statusso'=>$this->statusso,
             'id_ekspedisi'=>$this->id_ekspedisi,
@@ -39,6 +37,8 @@ class SoResource extends JsonResource
             'alastolakselesai'=>$this->alastolakselesai,
             'openpo'=>$this->openpo,
             'openpo'=>$this->closebck,
+            'id_user'=>$this->id_user,
+            'sales'=>$this->user->name,
         ];
     }
 }

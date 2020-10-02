@@ -8,6 +8,7 @@ use App\Message;
 use App\Model\Groupso\Groupso;
 use App\Model\History\History;
 use App\Model\Rso\Rso;
+use App\Model\So\So;
 
 class User extends Authenticatable
 {
@@ -51,6 +52,10 @@ class User extends Authenticatable
 
     public function rso(){
         return $this->hasMany(Rso::class,'id_user','id');
+    }
+
+    public function so(){
+        return $this->hasMany(So::class,'id_user','id');
     }
 
     public function groupso(){

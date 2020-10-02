@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor SO :</label>
-                <input v-model="vso.nomor_so" type="text" class="form-control col-12" :disabled="ket.statusnya!=='Draft'">
+                <input @input="ceknomorso(vso)" v-model="vso.nomor_so" type="text" class="form-control col-12" :disabled="ket.statusnya!=='Draft'" maxlength="15" :class="{ 'is-valid': aktif }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -302,7 +302,11 @@ export default {
             up: {},
             listsoup: {},
             history: {},
-            nomorso: ''
+            nomorso: '',
+            aktif: null,
+            defaultal: '',
+            tampil: '',
+            adaso: {}
         }
     },
     created() {
@@ -426,7 +430,8 @@ export default {
                                 lokasi: vso.lokasi,
                                 status: 'Kordinator',
                                 alastolak: '',
-                                id_ekspedisi: vso.id_ekspedisi
+                                id_ekspedisi: vso.id_ekspedisi,
+                                id_user: this.ambiluser.id
                             };
                             axios.put("/api/so/" + this.listnewso[0].nomor_so, this.uploadso)
                                 .then(res => {
@@ -480,17 +485,18 @@ export default {
                             axios.delete("/api/so/" + this.$route.params.id)
                                 .then(res => {
                                     this.uploadso = {
-                                        nomor_so: vso.nomor_so,
+                                        nomor_so: vso.nomor_so + this.ambiluser.kode_groupso,
                                         tanggal_kirim: vso.tanggal_kirim,
                                         keterangan: vso.keterangan,
                                         distribusi: vso.distribusi,
                                         alamat: vso.alamat,
                                         lokasi: vso.lokasi,
-                                        status: 'Sent',
+                                        status: 'Kordinator',
                                         id_ekspedisi: vso.id_ekspedisi,
                                         statusso: vso.statusso,
                                         tanggal_so: vso.tanggal_so,
                                         nomor_rso: vso.nomor_rso,
+                                        id_user: this.ambiluser.id
                                     };
                                     axios.post("/api/so", this.uploadso)
                                         .then(res => {
@@ -502,7 +508,7 @@ export default {
                                                     this.ada = 0;
                                                 }
                                                 this.uplist = {
-                                                    nomor_so: vso.nomor_so,
+                                                    nomor_so: vso.nomor_so + this.ambiluser.kode_groupso,
                                                     kode_barang: this.listnewso[i].kode_barang,
                                                     harga: this.listnewso[i].harga,
                                                     id_custprice: this.listnewso[i].id_custprice,
@@ -520,21 +526,21 @@ export default {
                                             this.history = res.data.data;
                                             for (let j = 0; j < this.history.length; j++) {
                                                 axios.put("/api/history/" + this.history[j].id, {
-                                                    nomor_dok: vso.nomor_so
+                                                    nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso
                                                 })
                                             }
                                         })
                                     axios.post("/api/history", {
-                                        nomor_dok: vso.nomor_so,
+                                        nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
                                         nomor_ref: vso.nomor_rso,
                                         id_user: this.ambiluser.id,
                                         notif: "Anda mendapatkan permintaan SO baru",
-                                        keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso.nomor_so,
+                                        keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso.nomor_so.slice(0, 15) + this.ambiluser.kode_groupso,
                                         jenis: "So",
                                         tanggal: this.DateTime(),
                                     })
                                     axios.post("/api/history", {
-                                        nomor_dok: vso.nomor_so,
+                                        nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
                                         nomor_ref: vso.nomor_rso,
                                         id_user: this.ambiluser.id,
                                         notif: "Anda mendapatkan permintaan SO baru",
@@ -544,10 +550,10 @@ export default {
                                     })
                                     axios.post("/api/history", {
                                         nomor_dok: vso.nomor_rso,
-                                        nomor_ref: vso.nomor_so,
+                                        nomor_ref: vso.nomor_so + this.ambiluser.kode_groupso,
                                         id_user: this.ambiluser.id,
                                         notif: "Anda mendapatkan permintaan SO baru",
-                                        keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso.nomor_so,
+                                        keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso.nomor_so.slice(0, 15) + this.ambiluser.kode_groupso,
                                         jenis: "RSO",
                                         tanggal: this.DateTime(),
                                         aktif: "N",
@@ -851,7 +857,7 @@ export default {
             this.eksid = this.eks.id;
             this.visible = false;
         },
-        up() {
+        upin() {
             if (this.selected == 0) {
                 return;
             }
@@ -1008,6 +1014,17 @@ export default {
             this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
+        },
+        ceknomorso(vso) {
+            axios.get("/api/so/" + vso.nomor_so + this.ambiluser.kode_groupso)
+                .then(res => {
+                    this.adaso = res.data.data;
+                    if (vso.nomor_so.length === 15 && this.adaso.length === 0) {
+                        this.aktif = true;
+                    } else {
+                        this.aktif = false;
+                    };
+                })
         }
     }
 }
