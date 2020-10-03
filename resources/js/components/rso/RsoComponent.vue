@@ -162,12 +162,21 @@ export default {
     },
     methods: {
         getRso() {
-            axios.get("/api/rso/data/realrso/")
-                .then(res => {
-                    this.rso = res.data.data
-                    this.statusData();
-                    this.load = false;
-                });
+            if (this.ambiluser.sales === 1) {
+                axios.get("/api/rso/data/view/" + this.ambiluser.kode_groupso)
+                    .then(res => {
+                        this.rso = res.data.data
+                        this.statusData();
+                        this.load = false;
+                    });
+            } else {
+                axios.get("/api/rso/data/realrso/")
+                    .then(res => {
+                        this.rso = res.data.data
+                        this.statusData();
+                        this.load = false;
+                    });
+            }
         },
         deleteRso(rso) {
             const swalWithBootstrapButtons = Swal.mixin({

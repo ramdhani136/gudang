@@ -355,7 +355,7 @@ export default {
     },
     methods: {
         getRso() {
-            axios.get("/api/rso/data/confirm/")
+            axios.get("/api/rso/data/confirm/" + this.ambiluser.kode_groupso)
                 .then(res => {
                     this.rso = res.data.data;
                     axios.get("/api/ekspedisi")
@@ -506,6 +506,7 @@ export default {
                         this.up.status = "Kordinator";
                         this.up.id_user = this.ambiluser.id;
                         this.up.nomor_so = this.up.nomor_so + this.ambiluser.kode_groupso;
+                        this.up.kode_groupso = this.ambiluser.kode_groupso;
                         axios.post("/api/so", this.up)
                             .then(res => {
                                 this.ada = 0;
@@ -685,6 +686,7 @@ export default {
                         }
                         this.up.status = "Draft";
                         this.up.id_user = this.ambiluser.id;
+                        this.up.kode_groupso = this.ambiluser.kode_groupso;
                         this.up.nomor_so = this.up.nomor_so + this.ambiluser.kode_groupso;
                         axios.post("/api/so", this.up)
                             .then(res => {

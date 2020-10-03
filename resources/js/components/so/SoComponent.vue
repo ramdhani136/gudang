@@ -206,13 +206,24 @@ export default {
     },
     methods: {
         getSo() {
-            axios.get("/api/so/data/realso")
-                .then(res => {
-                    this.so = res.data.data
-                    this.status = "Draft";
-                    this.status = "Acc";
-                    this.load = false;
-                });
+            if (this.ambiluser.susales === 1) {
+                axios.get("/api/so/data/realso")
+                    .then(res => {
+                        this.so = res.data.data
+                        this.status = "Draft";
+                        this.status = "Acc";
+                        this.load = false;
+                    });
+            } else {
+                axios.get("/api/so/data/view/" + this.ambiluser.kode_groupso)
+                    .then(res => {
+                        this.so = res.data.data
+                        this.status = "Draft";
+                        this.status = "Acc";
+                        this.load = false;
+                    });
+            }
+
         },
         pilihstatus() {
             for (let i = 0; i < this.FilterKategori.length; i++) {
@@ -235,31 +246,59 @@ export default {
             }
         },
         filter() {
-            axios.get("/api/so/data/realso")
-                .then(res => {
-                    this.so = res.data.data;
-                    this.hh = this.so.filter(elem => elem.status === "Acc")
-                    this.FilterKategori.push(this.hh);
-                    this.FilterKategori.splice(this.FilterKategori.length - 1, 1)
-                    for (let i = 0; i < this.FilterKategori.length; i++) {
-                        axios.get("/api/listso/" + this.FilterKategori[i].nomor_so)
-                            .then(res => {
-                                this.listso = res.data.data;
-                                this.bbk = 0;
-                                for (let n = 0; n < this.listso.length; n++) {
-                                    this.bbk += parseInt(this.listso[n].bbk);
-                                }
-                                if (this.bbk < 1) {
-                                    this.aktifin = true;
-                                } else {
-                                    this.aktifin = false;
-                                }
-                                this.ket.aktif[i] = this.aktifin;
-                                this.load = true;
-                                this.load = false;
-                            })
-                    }
-                });
+            if (this.ambiluser.susales === 1) {
+                axios.get("/api/so/data/realso")
+                    .then(res => {
+                        this.so = res.data.data;
+                        this.hh = this.so.filter(elem => elem.status === "Acc")
+                        this.FilterKategori.push(this.hh);
+                        this.FilterKategori.splice(this.FilterKategori.length - 1, 1)
+                        for (let i = 0; i < this.FilterKategori.length; i++) {
+                            axios.get("/api/listso/" + this.FilterKategori[i].nomor_so)
+                                .then(res => {
+                                    this.listso = res.data.data;
+                                    this.bbk = 0;
+                                    for (let n = 0; n < this.listso.length; n++) {
+                                        this.bbk += parseInt(this.listso[n].bbk);
+                                    }
+                                    if (this.bbk < 1) {
+                                        this.aktifin = true;
+                                    } else {
+                                        this.aktifin = false;
+                                    }
+                                    this.ket.aktif[i] = this.aktifin;
+                                    this.load = true;
+                                    this.load = false;
+                                })
+                        }
+                    });
+            } else {
+                axios.get("/api/so/data/view/" + this.ambiluser.kode_groupso)
+                    .then(res => {
+                        this.so = res.data.data;
+                        this.hh = this.so.filter(elem => elem.status === "Acc")
+                        this.FilterKategori.push(this.hh);
+                        this.FilterKategori.splice(this.FilterKategori.length - 1, 1)
+                        for (let i = 0; i < this.FilterKategori.length; i++) {
+                            axios.get("/api/listso/" + this.FilterKategori[i].nomor_so)
+                                .then(res => {
+                                    this.listso = res.data.data;
+                                    this.bbk = 0;
+                                    for (let n = 0; n < this.listso.length; n++) {
+                                        this.bbk += parseInt(this.listso[n].bbk);
+                                    }
+                                    if (this.bbk < 1) {
+                                        this.aktifin = true;
+                                    } else {
+                                        this.aktifin = false;
+                                    }
+                                    this.ket.aktif[i] = this.aktifin;
+                                    this.load = true;
+                                    this.load = false;
+                                })
+                        }
+                    });
+            }
         },
         showhistory(rs) {
             $("#modal-history").modal("show");

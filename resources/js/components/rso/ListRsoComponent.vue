@@ -744,6 +744,7 @@ export default {
                         if (this.cek === this.banding) {
                             this.upload.status = "Draft";
                             this.upload.kode_customer = this.kodecustomer;
+                            this.upload.nomor_rso = this.upload.nomor_rso + this.upload.kode_groupso;
                             axios.put("/api/rso/" + this.$route.params.id, this.upload)
                                 .then(res => {
                                     axios.get("/api/listrso/" + this.upload.nomor_rso)

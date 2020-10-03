@@ -21,6 +21,11 @@ class RsoController extends Controller
         return RsoResource::collection(Rso::orderBy('updated_at','ASC')->get());
     }
 
+    public function groupso($groupso)
+    {
+        return RsoResource::collection(Rso::where('kode_groupso',$groupso)->where('pr','N')->orderBy('nomor_rso','ASC')->get());
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -95,6 +100,10 @@ class RsoController extends Controller
 
     public function confirm(){
         return RsoResource::collection(Rso::where('pr','N')->where('status','Confirmed')->orderBy('updated_at','ASC')->get());
+    }
+
+    public function confirmgroup($groupso){
+        return RsoResource::collection(Rso::where('kode_groupso',$groupso)->where('pr','N')->where('status','Confirmed')->orderBy('updated_at','ASC')->get());
     }
 
     public function pr()

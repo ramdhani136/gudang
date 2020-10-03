@@ -28,9 +28,11 @@ Route::resource('rso','Rso\RsoController');
 Route::get('rso/data/pr','Rso\RsoController@pr');
 Route::get('rso/data/pr/{rso}','Rso\RsoController@viewpr');
 Route::get('rso/data/realrso/','Rso\RsoController@realrso');
+Route::get('rso/data/view/{groupso}','Rso\RsoController@groupso');
 
 Route::get('rso/data/purch/','Rso\RsoController@purch');
 Route::get('rso/data/confirm/','Rso\RsoController@confirm');
+Route::get('rso/data/confirm/{groupso}','Rso\RsoController@confirmgroup');
 Route::get('listrso/data/purch/{id}','Rso\ListRsoController@purch');
 Route::get('listrso/data/pr/{rso}','Rso\ListRsoController@pr');
 Route::get('listrso/data/acc/{no}','Rso\ListRsoController@purchacc');
@@ -59,6 +61,7 @@ Route::get('so/data/realso','So\SoController@realso');
 Route::get('so/data/aktif','So\SoController@aktif');
 Route::get('so/selesai/view','So\SoController@sselesai');
 Route::get('so/rso/{rso}','So\SoController@statusopen');
+Route::get('so/data/view/{groupso}','So\SoController@groupso');
 
 Route::resource('bcm','Barang\BcmController');
 Route::get('bcm/data/open','Barang\BcmController@open');

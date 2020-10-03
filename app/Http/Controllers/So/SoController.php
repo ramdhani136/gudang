@@ -111,4 +111,10 @@ class SoController extends Controller
     {
         return SoResource::collection(So::Where('nomor_rso',$rso)->get()); 
     }
+
+    public function groupso($groupso)
+    {
+        return SoResource::collection(So::where('kode_groupso',$groupso)->where('pr','N')->orderBy('nomor_so','ASC')->get());
+    }
+    
 }

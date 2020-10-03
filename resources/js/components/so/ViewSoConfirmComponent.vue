@@ -104,6 +104,14 @@
             Tolak SO
         </button>
 
+        <button v-if="(lso.status=='Kordinator' && ambiluser.susales===1 && ambiluser.kode_groupso==='GR' && groupso==='GR')" @click="kordinconfirm(lso)" class="btn-orange btn ml-3">
+            Terima SO
+        </button>
+
+        <button v-if="(lso.status=='Kordinator' && ambiluser.susales===1 && ambiluser.kode_groupso==='GR' && groupso==='GR')" @click="showModal()" class="btn-danger btn ml-1">
+            Tolak SO
+        </button>
+
     </div>
     <div v-if="vso.status=='Tolak'" v-for="vso in so" :key="vso.nomor_so" id="alastolak">
         <div v-for="(lso,index) in so" :key="index">
@@ -166,6 +174,7 @@ export default {
                 qty: [],
             },
             lstatus: '',
+            groupso: ''
         }
     },
     created() {
@@ -185,6 +194,7 @@ export default {
                     } else {
                         this.lstatus = "Tidak Tersedia";
                     }
+                    this.groupso = this.so[0].kode_groupso;
                     axios.get("/api/listso/" + this.$route.params.id)
                         .then(res => {
                             this.listso = res.data.data;

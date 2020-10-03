@@ -39,6 +39,8 @@ class SoResource extends JsonResource
             'openpo'=>$this->closebck,
             'id_user'=>$this->id_user,
             'sales'=>$this->user->name,
+            'kode_groupso'=>$this->user->kode_groupso,
+            'areagroup'=>$this->groupso->area
         ];
     }
 }

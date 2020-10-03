@@ -133,16 +133,29 @@ export default {
     },
     methods: {
         getSo() {
-            axios.get("/api/so/data/realso")
-                .then(res => {
-                    this.so = res.data.data
-                    if (this.ambiluser.susales === 1) {
-                        this.status = "Sent"
-                    } else {
-                        this.status = "Kordinator"
-                    }
-                    this.load = false;
-                });
+            if (this.ambiluser.susales === 1) {
+                axios.get("/api/so/data/realso")
+                    .then(res => {
+                        this.so = res.data.data
+                        if (this.ambiluser.susales === 1) {
+                            this.status = "Sent"
+                        } else {
+                            this.status = "Kordinator"
+                        }
+                        this.load = false;
+                    });
+            } else {
+                axios.get("/api/so/data/view/" + this.ambiluser.kode_groupso)
+                    .then(res => {
+                        this.so = res.data.data
+                        if (this.ambiluser.susales === 1) {
+                            this.status = "Sent"
+                        } else {
+                            this.status = "Kordinator"
+                        }
+                        this.load = false;
+                    });
+            }
         },
         showhistory(rs) {
             $("#modal-history").modal("show");
