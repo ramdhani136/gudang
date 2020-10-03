@@ -56,7 +56,7 @@
                         <td style="text-align:center">{{lp.satuan}}</td>
                         <td style="text-align:center">{{lp.harga | currency}}</td>
                         <td style="text-align:center">
-                            <input type="number" class="form-control">
+                            <input type="number" class="form-control" v-model="hitung.harga[index]">
                         </td>
                         <td style="text-align:center">
                             <button @click="hapus(index)" style="text-align:center" class="btn btn-danger">Hapus</button>
@@ -207,7 +207,11 @@ export default {
             banding: '',
             groupso: {},
             aktif: false,
-            adaprice: {}
+            adaprice: {},
+            hitung: {
+                harga: []
+            },
+            uplist: {}
         }
     },
     created() {
@@ -388,20 +392,211 @@ export default {
                 $("#modal-form").modal("hide");
         },
         submit() {
-            console.log(this.listpr);
-            // axios.post("/api/formprice", this.upload)
-            //     .then(res => {
-            //         /* lanjut */
-            //     }).catch(error => {
-            //         Swal.fire({
-            //             icon: 'error',
-            //             title: 'Oops...',
-            //             text: 'Cek kembali rincian form anda!',
-            //         })
-            //     })
+            this.load = true;
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin mengirim permintaan harga ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (this.listpr.length > 0) {
+                        this.aplus = '';
+                        this.aband = '';
+                        for (let i = 0; i < this.listpr.length; i++) {
+                            if (this.hitung.harga[i] === undefined || this.hitung.harga[i] < 1 || this.hitung.harga[i] === '') {
+                                this.a = "N";
+                            } else {
+                                this.a = "Y";
+                            }
+                            this.aplus += this.a;
+                            this.aband += "Y";
+                        }
+                        if (this.aplus === this.aband) {
+                            this.upload.nomor_price = this.upload.nomor_price + this.ambiluser.kode_groupso;
+                            axios.post("/api/formprice", this.upload)
+                                .then(res => {
+                                    for (let i = 0; i < this.listpr.length; i++) {
+                                        this.uplist = {
+                                            nomor_price: this.upload.nomor_price,
+                                            id_user: this.ambiluser.id,
+                                            tanggal: this.DateTime(),
+                                            kode_customer: this.ket2.kode,
+                                            harga: this.hitung.harga[i],
+                                            kode_barang: this.listpr[i].kode,
+                                            keterangan: this.upload.keterangan
+                                        }
+                                        axios.post("/api/custprice", this.uplist)
+                                    };
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.upload.nomor_price,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan  harga baru!",
+                                        keterangan: "Form permintan di kirim ke kordinator Sales",
+                                        jenis: "Cp",
+                                        tanggal: this.DateTime(),
+                                    }).then(res => {
+                                        this.load = false;
+                                        swalWithBootstrapButtons.fire(
+                                            'Sukses!',
+                                            'Berhasil mengirim permintaan harga.',
+                                            'success'
+                                        )
+                                        this.$router.push({
+                                            name: 'formprice'
+                                        });
+                                    });
+                                }).catch(error => {
+                                    this.load = false;
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Cek kembali rincian form anda!',
+                                    })
+                                })
+                        } else {
+                            this.load = false;
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Periksa kembali harga item, tidak boleh kosong!',
+                            })
+                        }
+                    } else {
+                        this.load = false;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Anda belum menginput item apapun!',
+                        })
+                    }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    this.load = false;
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal mengirim form permintaan harga :)',
+                        'error'
+                    )
+                }
+            })
         },
         createDraft() {
+            this.load = true;
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
 
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menyimpan form permintaan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (this.listpr.length > 0) {
+                        this.aplus = '';
+                        this.aband = '';
+                        for (let i = 0; i < this.listpr.length; i++) {
+                            if (this.hitung.harga[i] === undefined || this.hitung.harga[i] < 1 || this.hitung.harga[i] === '') {
+                                this.a = "N";
+                            } else {
+                                this.a = "Y";
+                            }
+                            this.aplus += this.a;
+                            this.aband += "Y";
+                        }
+                        if (this.aplus === this.aband) {
+                            this.upload.nomor_price = this.upload.nomor_price + this.ambiluser.kode_groupso;
+                            this.upload.status = "Draft";
+                            axios.post("/api/formprice", this.upload)
+                                .then(res => {
+                                    for (let i = 0; i < this.listpr.length; i++) {
+                                        this.uplist = {
+                                            nomor_price: this.upload.nomor_price,
+                                            id_user: this.ambiluser.id,
+                                            tanggal: this.DateTime(),
+                                            kode_customer: this.ket2.kode,
+                                            harga: this.hitung.harga[i],
+                                            kode_barang: this.listpr[i].kode,
+                                            keterangan: this.upload.keterangan
+                                        }
+                                        axios.post("/api/custprice", this.uplist)
+                                    };
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.upload.nomor_price,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan  harga baru!",
+                                        keterangan: "Membuat draft permintaan harga",
+                                        jenis: "Cp",
+                                        tanggal: this.DateTime(),
+                                    }).then(res => {
+                                        this.load = false;
+                                        swalWithBootstrapButtons.fire(
+                                            'Sukses!',
+                                            'Berhasil menyimpan form permintaan harga.',
+                                            'success'
+                                        )
+                                        this.$router.push({
+                                            name: 'formprice'
+                                        });
+                                    });
+                                }).catch(error => {
+                                    this.load = false;
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Cek kembali rincian form anda!',
+                                    })
+                                })
+                        } else {
+                            this.load = false;
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Periksa kembali harga item, tidak boleh kosong!',
+                            })
+                        }
+                    } else {
+                        this.load = false;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Anda belum menginput item apapun!',
+                        })
+                    }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    this.load = false;
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menyimpan :)',
+                        'error'
+                    )
+                }
+            })
         },
         hapus(index) {
             this.listpr.splice(index, 1);

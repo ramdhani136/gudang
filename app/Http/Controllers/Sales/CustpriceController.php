@@ -114,4 +114,9 @@ class CustpriceController extends Controller
         return CustpriceResource::collection(Custprice::where('status','Non Aktif')->orderBy('tanggal','ASC')->get());
     }
 
+    public function view($nomor)
+    {
+        return CustpriceResource::collection(Custprice::where('nomor_price',$nomor)->orderBy('tanggal','ASC')->get());
+    }
+
 }

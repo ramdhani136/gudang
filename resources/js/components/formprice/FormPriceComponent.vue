@@ -35,7 +35,7 @@
                     </td>
                     <td style="text-align:center">{{fp.tanggal}}</td>
                     <td>{{fp.customer}}</td>
-                    <td>{{fp.user}}</td>
+                    <td style="text-align:center">{{fp.user}}</td>
                     <td style="text-align:center">
                         <button @click="showhistory(fp)" class="btn btn-primary">Lihat History</button>
                         <button @click="deleteFrom(fp)" class="btn btn-danger">Batalkan</button>
@@ -131,7 +131,7 @@ export default {
     },
     methods: {
         getform() {
-            if (this.ambiluser.sales === 1) {
+            if (this.ambiluser.susales === 1) {
                 axios.get("/api/formprice/")
                     .then(res => {
                         this.formprice = res.data.data;
@@ -190,6 +190,13 @@ export default {
                 if (result.isConfirmed) {
                     axios.delete("/api/formprice/" + fp.nomor_price)
                         .then(res => {
+                            axios.get("/api/history/" + fp.nomor_price)
+                                .then(res => {
+                                    this.history = res.data.data;
+                                    for (let k = 0; k < this.history.length; k++) {
+                                        axios.delete("/api/history/" + this.history[k].id);
+                                    }
+                                });
                             this.load = false;
                             this.getform();
                             swalWithBootstrapButtons.fire(
