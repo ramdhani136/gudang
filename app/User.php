@@ -8,7 +8,9 @@ use App\Message;
 use App\Model\Groupso\Groupso;
 use App\Model\History\History;
 use App\Model\Rso\Rso;
+use App\Model\Sales\Custprice;
 use App\Model\So\So;
+use App\Sales\Formprice;
 
 class User extends Authenticatable
 {
@@ -56,6 +58,13 @@ class User extends Authenticatable
 
     public function so(){
         return $this->hasMany(So::class,'id_user','id');
+    }
+
+    public function custprice(){
+        return $this->hasMany(Custprice::class,'id_user','id');
+    }
+    public function formprice(){
+        return $this->hasMany(Formprice::class,'id_user','id');
     }
 
     public function groupso(){

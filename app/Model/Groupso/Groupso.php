@@ -4,6 +4,7 @@ namespace App\Model\Groupso;
 
 use App\Model\Rso\Rso;
 use App\Model\So\So;
+use App\Sales\Formprice;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,5 +23,9 @@ class Groupso extends Model
 
     public function so(){
         return $this->hasMany(So::class,'kode_groupso','kode');
+    }
+
+    public function formprice(){
+        return $this->hasMany(Formprice::class,'kode_groupso','kode');
     }
 }

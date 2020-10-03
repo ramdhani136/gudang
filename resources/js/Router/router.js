@@ -89,6 +89,12 @@ import bongkarBarangComponent from '../components/warehouse/bongkarBarangCompone
 
 import GroupSoComponent from '../components/groupso/GroupSoComponent.vue'
 
+import FormPriceComponent from '../components/formprice/FormPriceComponent.vue'
+import ViewPriceComponent from '../components/formprice/ViewPriceComponent.vue'
+import CreateFormPriceComponent from '../components/formprice/CreateFormPriceComponent.vue'
+
+
+
 
 
 
@@ -182,6 +188,10 @@ const routes=[
     {name:'bongkaran', path:'/warehouse/bongkar', component:bongkarBarangComponent},
 
     {name:'groupso', path:'/groupso', component:GroupSoComponent},
+
+    {name:'createformprice', path:'/formprice/create', component:CreateFormPriceComponent},
+    {name:'formprice', path:'/formprice', component:FormPriceComponent},
+    {name:'viewformprice', path:'/formprice/view/:nomor', component:ViewPriceComponent},
     
 ]
 

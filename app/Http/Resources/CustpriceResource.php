@@ -17,9 +17,9 @@ class CustpriceResource extends JsonResource
         return 
         [
             'id'=>$this->id,
-            'no_reg'=>$this->no_reg,
-            'nip_sales'=>$this->nip_sales,
-            'sales'=>$this->sales->nama,
+            'nomor_price'=>$this->nomor_price,
+            'id_user'=>$this->id_user,
+            'sales'=>$this->user->name,
             'kode_customer'=>$this->kode_customer,
             'customer'=>$this->customer->nama,
             'kode_barang'=>$this->kode_barang,

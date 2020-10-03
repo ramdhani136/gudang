@@ -79,7 +79,8 @@
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/rso" class="dropdown-item" >Request Sales Order</router-link>
                                     <router-link to="/so" class="dropdown-item" >Sales Order</router-link>
-                                    <router-link to="/price/customer" class="dropdown-item" >Special Price</router-link>
+                                    <router-link to="/formprice" class="dropdown-item" >Customer Price</router-link>
+                                    <router-link to="/price/customer" class="dropdown-item" >History Price</router-link>
                                     <router-link to="/ekspedisi" class="dropdown-item" >Data Ekspedisi</router-link>
                                    <!--  <router-link to="/retur" class="dropdown-item" >Data Retur Barang</router-link> -->
                                 </div>

@@ -139,3 +139,6 @@ Route::resource('satuan','Barang\SatuanController');
 
 Route::resource('groupso','Groupso\GroupSoController');
 Route::get('groupso/data/aktif','Groupso\GroupSoController@aktif');
+
+Route::resource('formprice','Sales\FormpriceController');
+Route::get('formprice/data/{groupso}','Sales\FormpriceController@groupso');

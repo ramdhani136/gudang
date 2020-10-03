@@ -19,8 +19,5 @@ class Sales extends Model
         public function rso(){
             return $this->hasMany(Rso::class,'nip_sales','nip');
     }
-    
-    public function custprice(){
-        return $this->hasMany(Custprice::class,'nip_sales','nip');
-    }
+
 }

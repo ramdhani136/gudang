@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Model\Rso\Rso;
 use App\Model\Sales\Sales;
 use App\Model\Sales\Custprice;
+use App\Sales\Formprice;
 
 class Customer extends Model
 {
@@ -26,6 +27,10 @@ class Customer extends Model
 
     public function pr(){
         return $this->hasMany(Pr::class,'kode_customer','kode');
+    }
+
+    public function formprice(){
+        return $this->hasMany(Formprice::class,'kode_customer','kode');
     }
 }
 

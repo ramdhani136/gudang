@@ -3,17 +3,17 @@
 namespace App\Model\Sales;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Model\Sales\Sales;
 use App\Model\Barang\Barang;
 use App\Model\customer\Customer;
+use App\User;
 
 class Custprice extends Model
 {
     protected $table="custprice";
     protected $guarded=[];
 
-    public function Sales(){
-        return $this->belongsTo(Sales::class,'nip_sales','nip');
+    public function user(){
+        return $this->belongsTo(User::class,'id_user','id');
     }
 
     public function barang(){
