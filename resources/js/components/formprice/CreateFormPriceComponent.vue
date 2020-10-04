@@ -600,6 +600,7 @@ export default {
         },
         hapus(index) {
             this.listpr.splice(index, 1);
+            this.hitung.harga.splice(index, 1)
         },
         DateTime() {
             this.date = new Date();

@@ -14,7 +14,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Customer</label>
-                <input @click="showcustomer()" v-model="namacustomer" type="text" class="form-control" placeholder="Pilih Customer" :disabled="status!=='Draft'">
+                <input @click="showcustomer()" v-model="namacustomer" type="text" class="form-control" placeholder="Pilih Customer" :disabled="status!=='Draft' || listpr.length>0">
             </div>
             <div class="form-group">
                 <label>Sales</label>
@@ -215,12 +215,15 @@ export default {
             aktif: false,
             adaprice: {},
             hitung: {
-                harga: []
+                harga: [],
+                hargaakhir: []
             },
             uplist: {},
             formprice: {},
             status: '',
-            listprice: {}
+            listprice: {},
+            hargaakhir: {},
+            history: {}
         }
     },
     created() {
@@ -261,13 +264,21 @@ export default {
                     axios.get("/api/view/data/view/" + this.$route.params.nomor)
                         .then(res => {
                             this.listprice = res.data.data;
-                            console.log(this.listprice);
                             for (let t = 0; t < this.listprice.length; t++) {
+                                axios.get("/api/view/price/" + this.ket2.kode + "/" + this.listprice[t].kode_barang)
+                                    .then(res => {
+                                        this.hargaakhir = res.data.data;
+                                        if (this.hargaakhir.length < 1) {
+                                            this.hitung.hargaakhir[t] = 0;
+                                        } else {
+                                            this.hitung.hargaakhir[t] = this.hargaakhir[0].harga;
+                                        }
+                                    })
                                 this.listpr.push({
                                     kode: this.listprice[t].kode_barang,
                                     nama: this.listprice[t].nama_barang,
                                     satuan: this.listprice[t].satuan,
-                                    harga: this.listprice[t].harga,
+                                    harga: this.hitung.hargaakhir[t],
                                 })
                                 this.hitung.harga[t] = this.listprice[t].harga;
                             }
@@ -634,6 +645,8 @@ export default {
         },
         hapus(index) {
             this.listpr.splice(index, 1);
+            this.hitung.harga.splice(index, 1);
+            this.hitung.hargaakhir.splice(index, 1);
         },
         DateTime() {
             this.date = new Date();
@@ -693,9 +706,6 @@ export default {
             this.upload.kode_customer = this.ket2.kode;
             $("#modal-customer").modal("hide");
         },
-        pilihjenisharga() {
-            console.log(this.ket.harga);
-        },
         cekinputrso() {
             axios.get("/api/formprice/" + this.upload.nomor_price + this.upload.kode_groupso)
                 .then(res => {
@@ -706,6 +716,109 @@ export default {
                         this.aktif = false;
                     };
                 })
+        },
+        batalkan() {
+            this.load = true;
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menghapus permintaan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.delete("/api/formprice/" + this.$route.params.nomor)
+                        .then(res => {
+                            axios.get("/api/history/" + this.$route.params.nomor)
+                                .then(res => {
+                                    this.history = res.data.data;
+                                    for (let k = 0; k < this.history.length; k++) {
+                                        axios.delete("/api/history/" + this.history[k].id);
+                                    }
+                                });
+                            this.load = false;
+                            this.$router.push({
+                                name: 'formprice'
+                            });
+                            swalWithBootstrapButtons.fire(
+                                'Deleted!',
+                                'Berhasil menghapus permintaan.',
+                                'success'
+                            )
+                        })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    this.load = false;
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menghapus permintaan :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        reqedit() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin merubah data form ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.put("/api/formprice/" + this.$route.params.nomor, {
+                        status: 'Draft'
+                    }).then(res => {
+                        axios.post("/api/history", {
+                            nomor_dok: this.$route.params.nomor,
+                            id_user: this.ambiluser.id,
+                            notif: "Permintaan ditarik!",
+                            keterangan: "Permintaan di tarik kembali (Request edit)",
+                            jenis: "Cp",
+                            tanggal: this.DateTime(),
+                        }).then(res => {
+                            swalWithBootstrapButtons.fire(
+                                'Sukses!',
+                                'Silahkan edit permintaan anda di list Draft.',
+                                'success'
+                            )
+                            this.$router.push({
+                                name: 'formprice'
+                            });
+                        })
+                    })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal melakukan permintaan :)',
+                        'error'
+                    )
+                }
+            })
         }
     },
 }

@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-    <router-link to="/formprice/create" class="btn btn-success my-3">+ Input Harga</router-link>
+    <router-link to="/formprice/create" class="btn btn-success my-3">+ Request Harga</router-link>
     <div class="form-group col-3 my-3 float-right">
         <input v-model="search" type="text" class="form-control" placeholder="Search">
     </div>
@@ -10,7 +10,6 @@
             <option value="Kordinator">Request Kordinator</option>
             <option value="Supervisor">Request SPV</option>
             <option value="Confirm">Confirmed</option>
-            <option value="Tolak">Di tolak</option>
         </select>
     </div>
     <div id="overflow" class="border-top">
@@ -49,7 +48,7 @@
         <div class="modal-dialog" role="document">
             <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Rincian History RSO</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Rincian History Permintaan</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
