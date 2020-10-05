@@ -304,7 +304,9 @@ export default {
                                     pr: 'Y',
                                     distribusi: 'ambil',
                                     lokasi: 'PT.Ekatunggal Tunas Mandiri',
-                                    alamat: 'Bogor'
+                                    alamat: 'Bogor',
+                                    kode_groupso: 'GR',
+                                    id_user: this.ambiluser.id
                                 }
                                 axios.post("/api/so", this.cso)
                                     .then(res => {

@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor PR :</label>
-                <input v-model="upload.nomor_rso" type="text" class="form-control col-12">
+                <input @input="cekpr()" v-model="upload.nomor_rso" type="text" maxlength="15" class="form-control col-12" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -145,7 +145,9 @@ export default {
             ket: {
                 nama: "Pilih Barang"
             },
-            barangs: {}
+            barangs: {},
+            aktif: false,
+            rso: {}
         }
     },
     created() {
@@ -251,6 +253,7 @@ export default {
                 $("#modal-form").modal("hide");
         },
         kirimpr() {
+            this.load = true;
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success ml-2',
@@ -269,46 +272,69 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     if (this.listpr.length > 0) {
-                        this.upload.status = "Purch";
-                        this.upload.pr = "Y";
-                        this.upload.nip_sales = "default";
-                        console.log(this.upload);
-                        axios.post("/api/rso", this.upload)
-                            .then(res => {
-                                for (let i = 0; i < this.listpr.length; i++) {
-                                    this.uplist = {
-                                        nomor_rso: this.upload.nomor_rso,
-                                        tanggal_rso: this.upload.tanggal_rso,
-                                        kode_barang: this.listpr[i].kode,
-                                        harga: 0,
-                                        qty: this.hitung.qty[i],
-                                        qty_tdktersedia: this.hitung.qty[i],
-                                        status: 'Tidak Tersedia',
-                                        catatan: this.hitung.keterangan[i],
-                                        pr: 'Y',
-                                        dateaccso: this.DateTime()
+                        this.aplus = '';
+                        this.aband = '';
+                        for (let i = 0; i < this.listpr.length; i++) {
+                            if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === undefined < 1 || this.hitung.qty[i] === '') {
+                                this.a = "N";
+                            } else {
+                                this.a = "Y";
+                            }
+                            this.aplus += this.a;
+                            this.aband += "Y";
+                        }
+                        if (this.aplus === this.aband) {
+                            this.upload.status = "Purch";
+                            this.upload.pr = "Y";
+                            this.upload.id_user = this.ambiluser.id;
+                            this.upload.kode_groupso = "GR";
+                            console.log(this.upload);
+                            axios.post("/api/rso", this.upload)
+                                .then(res => {
+                                    for (let i = 0; i < this.listpr.length; i++) {
+                                        this.uplist = {
+                                            nomor_rso: this.upload.nomor_rso,
+                                            tanggal_rso: this.upload.tanggal_rso,
+                                            kode_barang: this.listpr[i].kode,
+                                            harga: 0,
+                                            qty: this.hitung.qty[i],
+                                            qty_tdktersedia: this.hitung.qty[i],
+                                            status: 'Tidak Tersedia',
+                                            catatan: this.hitung.keterangan[i],
+                                            pr: 'Y',
+                                            dateaccso: this.DateTime()
+                                        }
+                                        axios.post("/api/listrso", this.uplist)
+                                            .then(res => {})
                                     }
-                                    axios.post("/api/listrso", this.uplist)
-                                        .then(res => {})
-                                }
-                                axios.post("/api/history", {
-                                    nomor_dok: this.upload.nomor_rso,
-                                    id_user: this.ambiluser.id,
-                                    notif: "Anda mendapatkan permintaan PR baru!",
-                                    keterangan: "Mengirim permintaan ke purchasing",
-                                    jenis: "RSO",
-                                    tanggal: this.DateTime(),
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.upload.nomor_rso,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan PR baru!",
+                                        keterangan: "Mengirim permintaan ke purchasing",
+                                        jenis: "RSO",
+                                        tanggal: this.DateTime(),
+                                    })
+                                    this.load = false;
+                                    swalWithBootstrapButtons.fire(
+                                        'Terkirim!',
+                                        'PR Berhasil di kirim.',
+                                        'success'
+                                    )
+                                    this.$router.push({
+                                        name: 'Prcomponent'
+                                    });
                                 })
-                                swalWithBootstrapButtons.fire(
-                                    'Terkirim!',
-                                    'PR Berhasil di kirim.',
-                                    'success'
-                                )
-                                this.$router.push({
-                                    name: 'Prcomponent'
-                                });
+                        } else {
+                            this.load = false;
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Periksa kembali list item barang, qty tidak boleh kosong!',
                             })
+                        }
                     } else {
+                        this.load = false;
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
@@ -319,6 +345,7 @@ export default {
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Batal',
                         'Permintaan ini di batalkan :)',
@@ -347,6 +374,17 @@ export default {
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
         },
+        cekpr() {
+            axios.get("/api/rso/" + this.upload.nomor_rso)
+                .then(res => {
+                    this.rso = res.data.data;
+                    if (this.upload.nomor_rso.length === 15 && this.rso.length === 0) {
+                        this.aktif = true;
+                    } else {
+                        this.aktif = false;
+                    }
+                })
+        }
     },
 }
 </script>

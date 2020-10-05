@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor BBK :</label>
-                <input v-model="up.bbk" type="text" class="form-control col-12" autocomplete="disabled">
+                <input @input="cekbbk()" v-model="up.bbk" type="text" class="form-control col-12" autocomplete="disabled" maxlength="16" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -247,7 +247,9 @@ export default {
             listsonya: {},
             qtybbk: 0,
             qtybck: 0,
-            selesai: ''
+            selesai: '',
+            aktif: false,
+            adabbk: {}
         }
     },
     created() {
@@ -524,6 +526,17 @@ export default {
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
         },
+        cekbbk() {
+            axios.get("/api/bbk/" + this.up.bbk)
+                .then(res => {
+                    this.adabbk = res.data.data;
+                    if (this.adabbk.length < 1 && this.up.bbk.length === 16) {
+                        this.aktif = true;
+                    } else {
+                        this.aktif = false;
+                    }
+                })
+        }
     },
 }
 </script>

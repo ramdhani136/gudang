@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor Checker :</label>
-                <input v-model="up.bck" type="text" class="form-control col-12">
+                <input @input="cekbck()" v-model="up.bck" type="text" class="form-control col-12" maxlength="16" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -268,7 +268,9 @@ export default {
             listso: {},
             qtymasuk: 0,
             sisanya: 0,
-            listsoall: {}
+            listsoall: {},
+            aktif: false,
+            adabck: {}
         }
     },
     created() {
@@ -356,6 +358,7 @@ export default {
             }
         },
         submitBck() {
+            this.load = true;
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success ml-2',
@@ -374,7 +377,6 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.load = true;
                     if (this.checker.length > 0) {
                         this.a = '';
                         this.aplus = '';
@@ -552,6 +554,17 @@ export default {
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
         },
+        cekbck() {
+            axios.get("/api/bck/" + this.up.bck)
+                .then(res => {
+                    this.adabck = res.data.data;
+                    if (this.adabck.length < 1 && this.up.bck.length === 16) {
+                        this.aktif = true;
+                    } else {
+                        this.aktif = false;
+                    }
+                })
+        }
     },
 }
 </script>

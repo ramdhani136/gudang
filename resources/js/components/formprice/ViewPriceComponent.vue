@@ -293,22 +293,23 @@ export default {
                                 axios.get("/api/view/price/" + this.ket2.kode + "/" + this.listprice[t].kode_barang)
                                     .then(res => {
                                         this.hargaakhir = res.data.data;
+
                                         if (this.hargaakhir.length < 1) {
                                             this.hitung.hargaakhir[t] = 0;
                                         } else {
                                             this.hitung.hargaakhir[t] = this.hargaakhir[0].harga;
                                         }
-                                    })
-                                this.listpr.push({
-                                    id: this.listprice[t].id,
-                                    kode: this.listprice[t].kode_barang,
-                                    nama: this.listprice[t].nama_barang,
-                                    satuan: this.listprice[t].satuan,
-                                    harga: this.hitung.hargaakhir[t],
-                                    status: this.listprice[t].status,
-                                    alastolak: this.listprice[t].alastolak,
-                                })
-                                this.hitung.harga[t] = this.listprice[t].harga;
+                                        this.listpr.push({
+                                            id: this.listprice[t].id,
+                                            kode: this.listprice[t].kode_barang,
+                                            nama: this.listprice[t].nama_barang,
+                                            satuan: this.listprice[t].satuan,
+                                            harga: this.hitung.hargaakhir[t],
+                                            status: this.listprice[t].status,
+                                            alastolak: this.listprice[t].alastolak,
+                                        })
+                                        this.hitung.harga[t] = this.listprice[t].harga;
+                                    });
                             }
                             for (let o = 0; o < this.listpr.length; o++) {
                                 this.statusminta[o] = this.listpr[o].status;
@@ -539,7 +540,7 @@ export default {
                                                         kode_customer: this.ket2.kode,
                                                         harga: this.hitung.harga[i],
                                                         kode_barang: this.listpr[i].kode,
-                                                        keterangan: this.upload.keterangan
+                                                        keterangan: this.upload.keterangan,
                                                     }
                                                     axios.post("/api/custprice", this.uplist)
                                                 };

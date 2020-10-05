@@ -44,8 +44,9 @@
                         </div>
                     </td>
                     <td style="text-align:center">
-                        <div v-if="it.status=='Aktif'" class="btn btn-orange">Di terima</div>
-                        <div v-if="it.status=='Non Aktif'" class="btn btn-none">Non Aktif</div>
+                        <div v-if="it.status=='Aktif' && it.open==='Y'" class="btn btn-orange">Di terima</div>
+                        <div v-if="it.status=='Non Aktif'  && it.open==='Y'" class="btn btn-none">Non Aktif</div>
+                        <div v-if="it.open==='N'" class="btn btn-none">Menunggu konfirmasi</div>
                         <div @click="viewalastolak(it)" v-if="it.status=='Di Tolak'" class="btn btn-danger">Di tolak</div>
                     </td>
                 </tr>
