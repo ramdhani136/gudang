@@ -32,6 +32,7 @@ class CustpriceResource extends JsonResource
             'keterangan'=>$this->keterangan,
             'tanggal'=>$this->tanggal,
             'alastolak'=>$this->alastolak,
+            'open'=>$this->open,
         ];
     }
 }

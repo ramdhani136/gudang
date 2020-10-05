@@ -72,7 +72,7 @@ Route::get('view/price/aktif/{customer}/{barang}','Sales\CustpriceController@akt
 Route::get('view/price/tolak/{customer}/{barang}','Sales\CustpriceController@tolak');
 Route::get('view/price/tdkaktif/{customer}/{barang}','Sales\CustpriceController@tdkaktif');
 Route::get('view/data/price/tdkaktif','Sales\CustpriceController@request');
-Route::get('view/data/view/{nomor}','Sales\CustpriceController@view');
+Route::get('view/data/{nomor}','Sales\CustpriceController@view');
 Route::resource('purchasing','Purchase\PurchasingController');
 Route::resource('po','Po\PoController');
 Route::get('poaktif/','Po\PoController@aktif');

@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor Permintaan :</label>
-                <input @input="cekinputrso()" v-model="upload.nomor_price" type="text" maxlength="15" class="form-control col-12" :class="{ 'is-valid': aktif}" :disabled="status!=='Draft'">
+                <input @input="cekinputrso()" v-model="upload.nomor_price" type="text" maxlength="15" class="form-control col-12" :class="{ 'is-valid': aktif}" :disabled="status!=='Draft' || ambiluser.sales===0">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -26,12 +26,12 @@
         <div class="col-4">
             <div class="form-group">
                 <label>keterangan</label>
-                <textarea v-model="upload.keterangan" name="keterangan" class="form-control col-12" :disabled="status!=='Draft'"></textarea>
+                <textarea v-model="upload.keterangan" name="keterangan" class="form-control col-12" :disabled="status!=='Draft' || ambiluser.sales===0"></textarea>
             </div>
         </div>
     </div>
     <div class="row">
-        <button v-if="status==='Draft'" @click="showmodal()" class="btn btn-orange mt-4 ml-3" style="height:40px;">+ Tambah Item</button>
+        <button v-if="status==='Draft' && ambiluser.sales===1" @click="showmodal()" class="btn btn-orange mt-4 ml-3" style="height:40px;">+ Tambah Item</button>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
@@ -45,7 +45,9 @@
                         <th>Satuan</th>
                         <th>Harga Terakhir</th>
                         <th>Request Harga</th>
-                        <th v-if="status==='Draft'">Aksi</th>
+                        <th v-if="status==='Draft' && ambiluser.sales===1">Aksi</th>
+                        <th v-if="(ambiluser.sales===1 && status !=='Draft') || (ambiluser.susales===1 || ambiluser.kordisales===1)">Aksi</th>
+                        <th v-if="(ambiluser.sales===1 && status !=='Draft') || (ambiluser.susales===1 || ambiluser.kordisales===1)">Alasan Tolak</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,10 +58,19 @@
                         <td style="text-align:center">{{lp.satuan}}</td>
                         <td style="text-align:center">{{lp.harga | currency}}</td>
                         <td style="text-align:center">
-                            <input type="number" class="form-control" v-model="hitung.harga[index]" :disabled="status!=='Draft'">
+                            <input type="number" class="form-control" v-model="hitung.harga[index]" :disabled="status!=='Draft' || ambiluser.sales===0">
                         </td>
-                        <td v-if="status==='Draft'" style="text-align:center">
+                        <td v-if="status==='Draft' && ambiluser.sales===1" style="text-align:center">
                             <button @click="hapus(index)" style="text-align:center" class="btn btn-danger">Hapus</button>
+                        </td>
+                        <td v-if="(ambiluser.sales===1 && status !=='Draft') || (ambiluser.susales===1 || ambiluser.kordisales===1)" style="text-align:center">
+                            <select @change="ubahaksi(index)" v-model="statusminta[index]" name="aksi" class="form-control" :disabled="tutup">
+                                <option value="Aktif">Terima</option>
+                                <option value="Di Tolak">Tolak</option>
+                            </select>
+                        </td>
+                        <td v-if="(ambiluser.sales===1 && status !=='Draft') || (ambiluser.susales===1 || ambiluser.kordisales===1)">
+                            <textarea v-model="alastolak[index]" name="alasan" class="form-control" :disabled="statusminta[index]!=='Di Tolak' || tutup"></textarea>
                         </td>
                     </tr>
                 </tbody>
@@ -67,17 +78,23 @@
         </div>
     </div>
     <div class="row mt-2">
-        <button v-if="status!=='Confirm'" class="btn btn-none ml-3" @click="batalkan()">
+        <button v-if="status!=='Confirm' && ambiluser.sales===1" class="btn btn-none ml-3" @click="batalkan()">
             Batalkan
         </button>
-        <button v-if="status!=='Draft' && status!=='Confirm'" class="btn btn-orange ml-1" @click="reqedit()">
+        <button v-if="(status!=='Draft' && status!=='Confirm') &&  ambiluser.sales===1" class="btn btn-orange ml-1" @click="reqedit()">
             Request Edit
         </button>
-        <button v-if="status==='Draft'" class="btn btn-primary ml-1" @click="createDraft()">
+        <button v-if="status==='Draft' && ambiluser.sales===1" class="btn btn-primary ml-1" @click="createDraft()">
             Simpan Draft
         </button>
-        <button v-if="status==='Draft'" @click="submit()" class="btn-success btn ml-1">
+        <button v-if="status==='Draft' && ambiluser.sales===1" @click="submit()" class="btn-success btn ml-1">
             Kirim Permintaan
+        </button>
+        <button v-if="status==='Kordinator' && ambiluser.kordisales===1" @click="konfirmharga()" class="btn-success btn ml-3">
+            Kirim Konfirmasi
+        </button>
+        <button v-if="buttonkonfirm" @click="spvkonfirmasi()" class="btn-success btn ml-3">
+            Konfirmasi
         </button>
     </div>
     <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -223,7 +240,14 @@ export default {
             status: '',
             listprice: {},
             hargaakhir: {},
-            history: {}
+            history: {},
+            listcust: {},
+            historyview: {},
+            statusminta: [],
+            alastolak: [],
+            tutup: true,
+            groupnya: null,
+            buttonkonfirm: false,
         }
     },
     created() {
@@ -261,7 +285,8 @@ export default {
                     this.ket2.kode = this.formprice[0].kode_customer;
                     this.namacustomer = this.formprice[0].customer;
                     this.status = this.formprice[0].status;
-                    axios.get("/api/view/data/view/" + this.$route.params.nomor)
+                    this.groupnya = this.formprice[0].kode_groupso;
+                    axios.get("/api/view/data/" + this.$route.params.nomor)
                         .then(res => {
                             this.listprice = res.data.data;
                             for (let t = 0; t < this.listprice.length; t++) {
@@ -275,13 +300,21 @@ export default {
                                         }
                                     })
                                 this.listpr.push({
+                                    id: this.listprice[t].id,
                                     kode: this.listprice[t].kode_barang,
                                     nama: this.listprice[t].nama_barang,
                                     satuan: this.listprice[t].satuan,
                                     harga: this.hitung.hargaakhir[t],
+                                    status: this.listprice[t].status,
+                                    alastolak: this.listprice[t].alastolak,
                                 })
                                 this.hitung.harga[t] = this.listprice[t].harga;
                             }
+                            for (let o = 0; o < this.listpr.length; o++) {
+                                this.statusminta[o] = this.listpr[o].status;
+                                this.alastolak[o] = this.listpr[o].alastolak;
+                            }
+
                             axios.get("/api/barang/")
                                 .then(res => {
                                     this.barang = res.data.data
@@ -294,6 +327,23 @@ export default {
                                                     axios.get("/api/groupso/data/aktif")
                                                         .then(res => {
                                                             this.groupso = res.data.data;
+                                                            if (this.ambiluser.kordisales === 1 && this.status === "Kordinator") {
+                                                                this.tutup = false;
+                                                            } else if (this.ambiluser.susales === 1 && this.status === "Supervisor") {
+                                                                this.tutup = false;
+                                                            } else if (this.ambiluser.susales === 1 && this.groupnya === "GR" && this.status !== "Confirm") {
+                                                                this.tutup = false;
+                                                            } else {
+                                                                this.tutup = true;
+                                                            }
+
+                                                            if (this.ambiluser.susales === 1 && this.groupnya === "GR" && this.status !== "Confirm") {
+                                                                this.buttonkonfirm = true;
+                                                            } else if (this.ambiluser.susales === 1 && this.status === "Supervisor") {
+                                                                this.buttonkonfirm = true;
+                                                            } else {
+                                                                this.buttonkonfirm = false;
+                                                            }
                                                             this.load = false;
                                                         });
                                                 })
@@ -469,47 +519,128 @@ export default {
                             this.aband += "Y";
                         }
                         if (this.aplus === this.aband) {
-                            this.upload.nomor_price = this.upload.nomor_price + this.ambiluser.kode_groupso;
-                            axios.post("/api/formprice", this.upload)
-                                .then(res => {
-                                    for (let i = 0; i < this.listpr.length; i++) {
-                                        this.uplist = {
-                                            nomor_price: this.upload.nomor_price,
-                                            id_user: this.ambiluser.id,
-                                            tanggal: this.DateTime(),
-                                            kode_customer: this.ket2.kode,
-                                            harga: this.hitung.harga[i],
-                                            kode_barang: this.listpr[i].kode,
-                                            keterangan: this.upload.keterangan
-                                        }
-                                        axios.post("/api/custprice", this.uplist)
-                                    };
-                                    axios.post("/api/history", {
-                                        nomor_dok: this.upload.nomor_price,
-                                        id_user: this.ambiluser.id,
-                                        notif: "Anda mendapatkan permintaan  harga baru!",
-                                        keterangan: "Form permintan di kirim ke kordinator Sales",
-                                        jenis: "Cp",
-                                        tanggal: this.DateTime(),
-                                    }).then(res => {
+                            if (this.upload.nomor_price === this.$route.params.nomor.slice(0, 15)) {
+                                this.upload.nomor_price = this.upload.nomor_price + this.ambiluser.kode_groupso;
+                                this.upload.status = "Kordinator";
+                                axios.put("/api/formprice/" + this.$route.params.nomor, this.upload)
+                                    .then(res => {
+                                        axios.get("/api/view/data/" + this.$route.params.nomor)
+                                            .then(res => {
+                                                this.listcust = res.data.data;
+                                                for (let y = 0; y < this.listcust.length; y++) {
+                                                    axios.delete("/api/custprice/" + this.listcust[y].id)
+                                                }
+                                            }).then(res => {
+                                                for (let i = 0; i < this.listpr.length; i++) {
+                                                    this.uplist = {
+                                                        nomor_price: this.upload.nomor_price,
+                                                        id_user: this.ambiluser.id,
+                                                        tanggal: this.DateTime(),
+                                                        kode_customer: this.ket2.kode,
+                                                        harga: this.hitung.harga[i],
+                                                        kode_barang: this.listpr[i].kode,
+                                                        keterangan: this.upload.keterangan
+                                                    }
+                                                    axios.post("/api/custprice", this.uplist)
+                                                };
+                                                axios.post("/api/history", {
+                                                    nomor_dok: this.upload.nomor_price,
+                                                    id_user: this.ambiluser.id,
+                                                    notif: "Anda mendapatkan permintaan  harga baru!",
+                                                    keterangan: "Form permintan di kirim ke kordinator Sales",
+                                                    jenis: "Cp",
+                                                    tanggal: this.DateTime(),
+                                                }).then(res => {
+                                                    this.load = false;
+                                                    swalWithBootstrapButtons.fire(
+                                                        'Sukses!',
+                                                        'Berhasil mengirim permintaan harga.',
+                                                        'success'
+                                                    )
+                                                    this.$router.push({
+                                                        name: 'formprice'
+                                                    });
+                                                });
+                                            })
+                                    }).catch(error => {
                                         this.load = false;
-                                        swalWithBootstrapButtons.fire(
-                                            'Sukses!',
-                                            'Berhasil mengirim permintaan harga.',
-                                            'success'
-                                        )
-                                        this.$router.push({
-                                            name: 'formprice'
-                                        });
-                                    });
-                                }).catch(error => {
-                                    this.load = false;
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Cek kembali rincian form anda!',
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Oops...',
+                                            text: 'Cek kembali rincian form anda!',
+                                        })
                                     })
-                                })
+                            } else {
+                                this.upload.nomor_price = this.upload.nomor_price + this.ambiluser.kode_groupso;
+                                this.upload.status = "Kordinator";
+                                axios.put("/api/formprice/" + this.$route.params.nomor, this.upload)
+                                    .then(res => {
+                                        axios.get("/api/view/data/" + this.upload.nomor_price)
+                                            .then(res => {
+                                                this.listcust = res.data.data;
+                                                for (let y = 0; y < this.listcust.length; y++) {
+                                                    axios.delete("/api/custprice/" + this.listcust[y].id)
+                                                }
+                                            }).then(res => {
+                                                for (let i = 0; i < this.listpr.length; i++) {
+                                                    this.uplist = {
+                                                        nomor_price: this.upload.nomor_price,
+                                                        id_user: this.ambiluser.id,
+                                                        tanggal: this.DateTime(),
+                                                        kode_customer: this.ket2.kode,
+                                                        harga: this.hitung.harga[i],
+                                                        kode_barang: this.listpr[i].kode,
+                                                        keterangan: this.upload.keterangan
+                                                    }
+                                                    axios.post("/api/custprice", this.uplist)
+                                                };
+                                                axios.get("/api/history/" + this.$route.params.nomor)
+                                                    .then(res => {
+                                                        this.historyview = res.data.data;
+                                                        for (let u = 0; u < this.historyview.length; u++) {
+                                                            axios.put("/api/history/" + this.historyview[u].id, {
+                                                                nomor_dok: this.upload.nomor_price
+                                                            })
+                                                        }
+                                                    }).then(res => {
+                                                        axios.post("/api/history", {
+                                                            nomor_dok: this.upload.nomor_price,
+                                                            id_user: this.ambiluser.id,
+                                                            notif: "Anda mendapatkan permintaan  harga baru!",
+                                                            keterangan: "Merubah nomor permintaan : " + this.$route.params.nomor,
+                                                            jenis: "Cp",
+                                                            tanggal: this.DateTime(),
+                                                        }).then(res => {
+                                                            axios.post("/api/history", {
+                                                                nomor_dok: this.upload.nomor_price,
+                                                                id_user: this.ambiluser.id,
+                                                                notif: "Anda mendapatkan permintaan  harga baru!",
+                                                                keterangan: "Form permintan di kirim ke kordinator Sales",
+                                                                jenis: "Cp",
+                                                                tanggal: this.DateTime(),
+                                                            }).then(res => {
+                                                                this.load = false;
+                                                                swalWithBootstrapButtons.fire(
+                                                                    'Sukses!',
+                                                                    'Berhasil mengirim permintaan harga.',
+                                                                    'success'
+                                                                )
+                                                                this.$router.push({
+                                                                    name: 'formprice'
+                                                                });
+                                                            });
+                                                        })
+                                                    })
+                                            })
+                                    }).catch(error => {
+                                        this.load = false;
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Oops...',
+                                            text: 'Cek kembali rincian form anda!',
+                                        })
+                                    })
+                            }
                         } else {
                             this.load = false;
                             Swal.fire({
@@ -572,48 +703,110 @@ export default {
                             this.aband += "Y";
                         }
                         if (this.aplus === this.aband) {
-                            this.upload.nomor_price = this.upload.nomor_price + this.ambiluser.kode_groupso;
-                            this.upload.status = "Draft";
-                            axios.post("/api/formprice", this.upload)
-                                .then(res => {
-                                    for (let i = 0; i < this.listpr.length; i++) {
-                                        this.uplist = {
-                                            nomor_price: this.upload.nomor_price,
-                                            id_user: this.ambiluser.id,
-                                            tanggal: this.DateTime(),
-                                            kode_customer: this.ket2.kode,
-                                            harga: this.hitung.harga[i],
-                                            kode_barang: this.listpr[i].kode,
-                                            keterangan: this.upload.keterangan
-                                        }
-                                        axios.post("/api/custprice", this.uplist)
-                                    };
-                                    axios.post("/api/history", {
-                                        nomor_dok: this.upload.nomor_price,
-                                        id_user: this.ambiluser.id,
-                                        notif: "Anda mendapatkan permintaan  harga baru!",
-                                        keterangan: "Membuat draft permintaan harga",
-                                        jenis: "Cp",
-                                        tanggal: this.DateTime(),
-                                    }).then(res => {
+                            if (this.upload.nomor_price === this.$route.params.nomor.slice(0, 15)) {
+                                this.upload.nomor_price = this.upload.nomor_price + this.ambiluser.kode_groupso;
+                                this.upload.status = "Draft";
+                                axios.put("/api/formprice/" + this.$route.params.nomor, this.upload)
+                                    .then(res => {
+                                        axios.get("/api/view/data/" + this.$route.params.nomor)
+                                            .then(res => {
+                                                this.listcust = res.data.data;
+                                                for (let y = 0; y < this.listcust.length; y++) {
+                                                    axios.delete("/api/custprice/" + this.listcust[y].id)
+                                                }
+                                            }).then(res => {
+                                                for (let i = 0; i < this.listpr.length; i++) {
+                                                    this.uplist = {
+                                                        nomor_price: this.upload.nomor_price,
+                                                        id_user: this.ambiluser.id,
+                                                        tanggal: this.DateTime(),
+                                                        kode_customer: this.ket2.kode,
+                                                        harga: this.hitung.harga[i],
+                                                        kode_barang: this.listpr[i].kode,
+                                                        keterangan: this.upload.keterangan
+                                                    }
+                                                    axios.post("/api/custprice", this.uplist)
+                                                };
+                                                this.load = false;
+                                                swalWithBootstrapButtons.fire(
+                                                    'Sukses!',
+                                                    'Berhasil menyimpan permintan.',
+                                                    'success'
+                                                )
+                                                this.$router.push({
+                                                    name: 'formprice'
+                                                });
+                                            })
+                                    }).catch(error => {
                                         this.load = false;
-                                        swalWithBootstrapButtons.fire(
-                                            'Sukses!',
-                                            'Berhasil menyimpan form permintaan harga.',
-                                            'success'
-                                        )
-                                        this.$router.push({
-                                            name: 'formprice'
-                                        });
-                                    });
-                                }).catch(error => {
-                                    this.load = false;
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Cek kembali rincian form anda!',
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Oops...',
+                                            text: 'Cek kembali rincian form anda!',
+                                        })
                                     })
-                                })
+                            } else {
+                                this.upload.nomor_price = this.upload.nomor_price + this.ambiluser.kode_groupso;
+                                this.upload.status = "Draft";
+                                axios.put("/api/formprice/" + this.$route.params.nomor, this.upload)
+                                    .then(res => {
+                                        axios.get("/api/view/data/" + this.upload.nomor_price)
+                                            .then(res => {
+                                                this.listcust = res.data.data;
+                                                for (let y = 0; y < this.listcust.length; y++) {
+                                                    axios.delete("/api/custprice/" + this.listcust[y].id)
+                                                }
+                                            }).then(res => {
+                                                for (let i = 0; i < this.listpr.length; i++) {
+                                                    this.uplist = {
+                                                        nomor_price: this.upload.nomor_price,
+                                                        id_user: this.ambiluser.id,
+                                                        tanggal: this.DateTime(),
+                                                        kode_customer: this.ket2.kode,
+                                                        harga: this.hitung.harga[i],
+                                                        kode_barang: this.listpr[i].kode,
+                                                        keterangan: this.upload.keterangan
+                                                    }
+                                                    axios.post("/api/custprice", this.uplist)
+                                                };
+                                                axios.get("/api/history/" + this.$route.params.nomor)
+                                                    .then(res => {
+                                                        this.historyview = res.data.data;
+                                                        for (let u = 0; u < this.historyview.length; u++) {
+                                                            axios.put("/api/history/" + this.historyview[u].id, {
+                                                                nomor_dok: this.upload.nomor_price
+                                                            })
+                                                        }
+                                                    }).then(res => {
+                                                        axios.post("/api/history", {
+                                                            nomor_dok: this.upload.nomor_price,
+                                                            id_user: this.ambiluser.id,
+                                                            notif: "Anda mendapatkan permintaan  harga baru!",
+                                                            keterangan: "Merubah nomor permintaan : " + this.$route.params.nomor,
+                                                            jenis: "Cp",
+                                                            tanggal: this.DateTime(),
+                                                        }).then(res => {
+                                                            this.load = false;
+                                                            swalWithBootstrapButtons.fire(
+                                                                'Sukses!',
+                                                                'Berhasil menyimpan permintaan.',
+                                                                'success'
+                                                            )
+                                                            this.$router.push({
+                                                                name: 'formprice'
+                                                            });
+                                                        })
+                                                    })
+                                            })
+                                    }).catch(error => {
+                                        this.load = false;
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Oops...',
+                                            text: 'Cek kembali rincian form anda!',
+                                        })
+                                    })
+                            }
                         } else {
                             this.load = false;
                             Swal.fire({
@@ -770,6 +963,7 @@ export default {
             })
         },
         reqedit() {
+            this.load = true;
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success ml-2',
@@ -798,6 +992,7 @@ export default {
                             jenis: "Cp",
                             tanggal: this.DateTime(),
                         }).then(res => {
+                            this.load = false;
                             swalWithBootstrapButtons.fire(
                                 'Sukses!',
                                 'Silahkan edit permintaan anda di list Draft.',
@@ -812,6 +1007,7 @@ export default {
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal melakukan permintaan :)',
@@ -819,11 +1015,178 @@ export default {
                     )
                 }
             })
+        },
+        konfirmharga() {
+            this.load = true;
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin mengkonfirmasi permintaan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.lplus = "";
+                    this.lband = "";
+                    for (let i = 0; i < this.listpr.length; i++) {
+                        if (this.statusminta[i] === undefined || this.statusminta[i] === '' || this.statusminta[i] === 'Non Aktif') {
+                            this.l = "N";
+                        } else {
+                            this.l = "Y";
+                        }
+                        this.lplus += this.l;
+                        this.lband += "Y";
+                    }
+                    if (this.lplus === this.lband) {
+                        axios.put("/api/formprice/" + this.$route.params.nomor, {
+                            status: 'Supervisor'
+                        }).then(res => {
+                            for (let i = 0; i < this.listpr.length; i++) {
+                                axios.put("/api/custprice/" + this.listpr[i].id, {
+                                    status: this.statusminta[i],
+                                    alastolak: this.alastolak[i]
+                                })
+                            }
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.nomor,
+                                id_user: this.ambiluser.id,
+                                notif: "Permintaan di konfimasi!",
+                                keterangan: "Di konfirmasi Kordinator Sales",
+                                jenis: "Cp",
+                                tanggal: this.DateTime(),
+                            }).then(res => {
+                                this.load = false;
+                                swalWithBootstrapButtons.fire(
+                                    'Berhasil!',
+                                    'Permintaan telah di konfirmasi.',
+                                    'success'
+                                )
+                                this.$router.push({
+                                    name: 'formprice'
+                                });
+                            })
+                        })
+                    } else {
+                        this.load = false;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Periksa kembali form anda, pastikan semua item sudah di konfirmasi!',
+                        })
+                    }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    this.load = false;
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal melakukan konfirmasi permintaan :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        spvkonfirmasi() {
+            this.load = true;
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin mengkonfirmasi permintaan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.lplus = "";
+                    this.lband = "";
+                    for (let i = 0; i < this.listpr.length; i++) {
+                        if (this.statusminta[i] === undefined || this.statusminta[i] === '' || this.statusminta[i] === 'Non Aktif') {
+                            this.l = "N";
+                        } else {
+                            this.l = "Y";
+                        }
+                        this.lplus += this.l;
+                        this.lband += "Y";
+                    }
+                    if (this.lplus === this.lband) {
+                        axios.put("/api/formprice/" + this.$route.params.nomor, {
+                            status: 'Confirm',
+                        }).then(res => {
+                            for (let i = 0; i < this.listpr.length; i++) {
+                                axios.put("/api/custprice/" + this.listpr[i].id, {
+                                    status: this.statusminta[i],
+                                    alastolak: this.alastolak[i],
+                                    open: "Y",
+                                })
+                            }
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.nomor,
+                                id_user: this.ambiluser.id,
+                                notif: "Permintaan di konfimasi!",
+                                keterangan: "Di konfirmasi Supervisor",
+                                jenis: "Cp",
+                                tanggal: this.DateTime(),
+                            }).then(res => {
+                                this.load = false;
+                                swalWithBootstrapButtons.fire(
+                                    'Berhasil!',
+                                    'Permintaan telah di konfirmasi.',
+                                    'success'
+                                )
+                                this.$router.push({
+                                    name: 'formprice'
+                                });
+                            })
+                        })
+                    } else {
+                        this.load = false;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Periksa kembali form anda, pastikan semua item sudah di konfirmasi!',
+                        })
+                    }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    this.load = false;
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal melakukan konfirmasi permintaan :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        ubahaksi(index) {
+            if (this.statusminta[index] === "Aktif") {
+                this.alastolak[index] = '';
+            }
         }
     },
 }
 </script>
 
 <style>
-
 </style>

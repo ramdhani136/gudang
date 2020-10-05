@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-    <router-link to="/formprice/create" class="btn btn-success my-3">+ Request Harga</router-link>
+    <router-link v-if="ambiluser.sales===1" to="/formprice/create" class="btn btn-success my-3">+ Request Harga</router-link>
     <div class="form-group col-3 my-3 float-right">
         <input v-model="search" type="text" class="form-control" placeholder="Search">
     </div>
@@ -37,7 +37,7 @@
                     <td style="text-align:center">{{fp.user}}</td>
                     <td style="text-align:center">
                         <button @click="showhistory(fp)" class="btn btn-primary">Lihat History</button>
-                        <button @click="deleteFrom(fp)" class="btn btn-danger">Batalkan</button>
+                        <button v-if="ambiluser.sales===1 && fp.status!=='Confirm'" @click="deleteFrom(fp)" class="btn btn-danger">Batalkan</button>
                     </td>
                 </tr>
             </tbody>
@@ -142,6 +142,11 @@ export default {
                         this.formprice = res.data.data;
                         this.load = false;
                     })
+            }
+            if (this.ambiluser.susales) {
+                this.status = "Supervisor";
+            } else {
+                this.status = "Kordinator";
             }
         },
         showhistory(fr) {

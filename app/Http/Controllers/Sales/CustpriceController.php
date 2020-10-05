@@ -106,7 +106,7 @@ class CustpriceController extends Controller
     }
 
     public function ambilPrice($customer,$barang){
-        return CustpriceResource::collection(Custprice::where('status','Aktif')->where('kode_customer',$customer)->where('kode_barang',$barang)->orderBy('id','DESC')->limit(1)->get());
+        return CustpriceResource::collection(Custprice::where("open","Y")->where('status','Aktif')->where('kode_customer',$customer)->where('kode_barang',$barang)->orderBy('id','DESC')->limit(1)->get());
     }
 
     public function request()

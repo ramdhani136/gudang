@@ -673,7 +673,7 @@ export default {
                         this.aktif = false;
                     };
                 })
-        }
+        },
     },
 }
 </script>
