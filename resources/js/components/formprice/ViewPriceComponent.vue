@@ -309,13 +309,10 @@ export default {
                                             alastolak: this.listprice[t].alastolak,
                                         })
                                         this.hitung.harga[t] = this.listprice[t].harga;
+                                        this.statusminta[t] = this.listpr[t].status;
+                                        this.alastolak[t] = this.listpr[t].alastolak;
                                     });
                             }
-                            for (let o = 0; o < this.listpr.length; o++) {
-                                this.statusminta[o] = this.listpr[o].status;
-                                this.alastolak[o] = this.listpr[o].alastolak;
-                            }
-
                             axios.get("/api/barang/")
                                 .then(res => {
                                     this.barang = res.data.data

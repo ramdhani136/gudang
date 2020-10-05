@@ -50,8 +50,10 @@
             </div>
         </div>
     </div>
-    <div id="rsoverflowso" class="row mt-2 mx-auto">
+    <div class="row">
         <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{invoice | currency}}</div>
+    </div>
+    <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
             <Circle5 id="load3" v-if="load"></Circle5>
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
