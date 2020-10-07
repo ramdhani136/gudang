@@ -40,9 +40,9 @@
             </div>
         </div>
     </div>
+    <button v-if="status==='Draft' || status==='Confirmed'" @click="showmodal()" class="btn btn-orange float-left mt-4 ml-1">+ Tambah Item</button>
     <div id="total" class="mt-3 ml-auto mr-4">Total Invoice :&nbsp; {{invoice | currency}}</div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
-        <button v-if="status==='Draft' || status==='Confirmed'" @click="showmodal()" class="btn btn-orange mt-2">+ Tambah Item</button>
         <div class="row mt-1 mx-auto col-12">
             <Circle5 id="load3" v-if="load"></Circle5>
             <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width:100%">
@@ -98,7 +98,7 @@
         <button v-if="status==='Draft'" class="btn btn-primary ml-3" @click="createDraft()">
             Simpan Draft
         </button>
-        <button v-if="status==='Draft'" @click="kirimrso()" class="btn-success btn ml-2">
+        <button v-if="status==='Draft'" @click="kirimrso()" class="btn-success btn ml-1" :disabled="bolehkirim">
             Kirim Permintaan
         </button>
         <button v-if="status==='Confirmed'" @click="requlang()" class="btn-none btn ml-3">
@@ -140,13 +140,6 @@
                     <div class="form-group">
                         <label>Satuan</label>
                         <input v-model="ket.satuan" type="text" class="form-control" disabled>
-                    </div>
-                    <div class="form-group" v-if="hs">
-                        <label>Jenis Harga</label>
-                        <select @change="selectItem()" class="form-control" v-model="jenisharga">
-                            <option value="N">Default</option>
-                            <option value="Y">Harga Spesial</option>
-                        </select>
                     </div>
                     <div class="form-group">
                         <label>Harga</label>
@@ -277,8 +270,6 @@ export default {
             namacustomer: null,
             kodecustomer: null,
             item: false,
-            jenisharga: 'N',
-            hs: false,
             hargaSpecial: {},
             invoice: 0,
             subtotal: 0,
@@ -299,7 +290,8 @@ export default {
             diskon: [],
             groupso: {},
             aktif: false,
-            adarso: {}
+            adarso: {},
+            bolehkirim: true,
         }
     },
     created() {
@@ -366,6 +358,17 @@ export default {
                                 this.hitung.qty[i] = this.listpr[i].qty;
                                 this.diskon[i] = this.listpr[i].diskon;
                                 this.hitung.keterangan[i] = this.listpr[i].catatan;
+                                if (this.status === "Draft") {
+                                    axios.get("/api/view/price/" + this.listpr[i].kode_customer + "/" + this.listpr[i].lkode_barang)
+                                        .then(res => {
+                                            this.hargaSpecial = res.data.data;
+                                            if (this.hargaSpecial.length < 1) {
+                                                this.listpr[i].harga = 0;
+                                            } else {
+                                                this.listpr[i].harga = this.hargaSpecial[0].harga;
+                                            }
+                                        })
+                                }
                             }
                             this.hitunginvoice();
                         })
@@ -396,36 +399,19 @@ export default {
         selectItem() {
             this.custom = this.matches[this.selected];
             this.ket.kode = this.custom.kode;
-
             axios.get("/api/view/price/" + this.kodecustomer + "/" + this.custom.kode)
                 .then(res => {
                     this.hargaSpecial = res.data.data;
                     if (this.hargaSpecial.length < 1) {
-                        this.hs = false;
-                        this.ket.harga = this.custom.harga;
+                        this.ket.harga = 0;
                     } else {
-                        this.hs = true;
-                        if (this.jenisharga == 'N') {
-                            this.visible = true;
-                            this.visible = false;
-                            this.ket.harga = this.custom.harga;
-                            this.ket.id_custprice = "";
-                        } else {
-                            this.hs = true;
-                            this.visible = true;
-                            this.visible = false;
-                            this.ket.harga = this.hargaSpecial[0].harga;
-                            this.ket.id_custprice = this.hargaSpecial[0].id;
-                        }
-
+                        this.ket.harga = this.hargaSpecial[0].harga;
+                        this.ket.id_custprice = this.hargaSpecial[0].id;
                     }
+                    this.ket.satuan = this.custom.satuan;
+                    this.ket.nama = this.custom.nama;
+                    this.visible = false;
                 });
-            this.ket.satuan = this.custom.satuan;
-            this.ket.nama = this.custom.nama;
-            this.ket.harga = this.custom.harga;
-            this.hs = true;
-            this.visible = false;
-            this.ket.id_custprice = "";
         },
         up() {
             if (this.selected == 0) {
@@ -458,22 +444,14 @@ export default {
                         text: 'Anda belum memilih tem !',
                     })
                 } else {
-                    if (this.ket.harga < 1) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Item ini belum ada harganya !',
-                        })
-                    } else {
-                        this.barangs = {
-                            id_custprice: this.ket.id_custprice,
-                            harga: this.ket.harga,
-                            lkode_barang: this.ket.kode,
-                            nama_barang: this.ket.nama,
-                            satuan: this.ket.satuan
-                        };
-                        this.listpr.push(this.barangs);
-                    }
+                    this.barangs = {
+                        id_custprice: this.ket.id_custprice,
+                        harga: this.ket.harga,
+                        lkode_barang: this.ket.kode,
+                        nama_barang: this.ket.nama,
+                        satuan: this.ket.satuan
+                    };
+                    this.listpr.push(this.barangs);
                 }
             } else {
                 if (this.Filteredlist.length > 0) {
@@ -490,29 +468,21 @@ export default {
                             text: 'Anda belum memilih tem !',
                         })
                     } else {
-                        if (this.ket.harga < 1) {
+                        if (this.listpr.length <= 5) {
+                            this.barangs = {
+                                id_custprice: this.ket.id_custprice,
+                                harga: this.ket.harga,
+                                lkode_barang: this.ket.kode,
+                                nama_barang: this.ket.nama,
+                                satuan: this.ket.satuan
+                            };
+                            this.listpr.push(this.barangs);
+                        } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
-                                text: 'Item ini belum ada harganya !',
+                                text: 'Maksimal input 6 item!',
                             })
-                        } else {
-                            if (this.listpr.length <= 5) {
-                                this.barangs = {
-                                    id_custprice: this.ket.id_custprice,
-                                    harga: this.ket.harga,
-                                    lkode_barang: this.ket.kode,
-                                    nama_barang: this.ket.nama,
-                                    satuan: this.ket.satuan
-                                };
-                                this.listpr.push(this.barangs);
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: 'Maksimal input 6 item!',
-                                })
-                            }
                         }
                     }
                 }
@@ -524,53 +494,9 @@ export default {
                 this.ket = {
                     nama: "Pilih Barang"
                 },
-                $("#modal-form").modal("hide");
+                this.cekkirim();
+            $("#modal-form").modal("hide");
         },
-        // tambahList() {
-        //     if (this.listpr.length == 0) {
-        //         this.barangs = {
-        //             id_custprice: this.ket.id_custprice,
-        //             harga: this.ket.harga,
-        //             lkode_barang: this.ket.kode,
-        //             nama_barang: this.ket.nama,
-        //             satuan: this.ket.satuan
-        //         };
-        //         this.listpr.push(this.barangs);
-        //     } else {
-        //         if (this.Filteredlist.length > 0) {
-        //             Swal.fire({
-        //                 icon: 'error',
-        //                 title: 'Oops...',
-        //                 text: 'Item sudah diinput sebelumnya, hapus terlebih dahulu untuk memperbarui item!',
-        //             })
-        //         } else {
-        //             if (this.listpr.length <= 5) {
-        //                 this.barangs = {
-        //                     id_custprice: this.ket.id_custprice,
-        //                     harga: this.ket.harga,
-        //                     lkode_barang: this.ket.kode,
-        //                     nama_barang: this.ket.nama,
-        //                     satuan: this.ket.satuan
-        //                 };
-        //                 this.listpr.push(this.barangs);
-        //             } else {
-        //                 Swal.fire({
-        //                     icon: 'error',
-        //                     title: 'Oops...',
-        //                     text: 'Maksimal input 6 item!',
-        //                 })
-        //             }
-        //         }
-        //     }
-        //     this.visible = true,
-        //         this.query = '',
-        //         this.selected = 0,
-        //         this.custom = null,
-        //         this.ket = {
-        //             nama: "Pilih Barang"
-        //         },
-        //         $("#modal-form").modal("hide");
-        // },
         kirimrso() {
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
@@ -995,97 +921,72 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {
-                    if (this.listpr.length > 0) {
-                        this.init = "";
-                        this.cek = "";
-                        this.banding = "";
-                        for (let j = 0; j < this.listpr.length; j++) {
-                            if (this.hitung.qty[j] === undefined || this.hitung.qty[j] === "") {
-                                this.init = "N";
-                            } else {
-                                this.init = "Y";
-                            }
-                            this.cek += this.init;
-                            this.banding += "Y";
-                        }
-                        if (this.cek === this.banding) {
-                            this.upload.status = "Draft";
-                            this.upload.kode_customer = this.kodecustomer;
-                            this.upload.nomor_rso = this.upload.nomor_rso + this.upload.kode_groupso;
-                            axios.put("/api/rso/" + this.$route.params.id, this.upload)
+                    this.upload.status = "Draft";
+                    this.upload.kode_customer = this.kodecustomer;
+                    this.upload.nomor_rso = this.upload.nomor_rso + this.upload.kode_groupso;
+                    axios.put("/api/rso/" + this.$route.params.id, this.upload)
+                        .then(res => {
+                            axios.get("/api/listrso/" + this.upload.nomor_rso)
                                 .then(res => {
-                                    axios.get("/api/listrso/" + this.upload.nomor_rso)
-                                        .then(res => {
-                                            this.listrso = res.data.data;
-                                            for (let o = 0; o < this.listrso.length; o++) {
-                                                axios.delete("/api/listrso/" + this.listrso[o].id)
-                                            }
-                                            for (let i = 0; i < this.listpr.length; i++) {
-                                                if (this.hitung.keterangan[i] === undefined) {
-                                                    this.hitung.keterangan[i] = "";
-                                                }
-                                                this.uplist = {
-                                                    nomor_rso: this.upload.nomor_rso,
-                                                    tanggal_rso: this.upload.tanggal_rso,
-                                                    kode_barang: this.listpr[i].lkode_barang,
-                                                    harga: this.listpr[i].harga,
-                                                    id_custprice: this.listpr[i].id_custprice,
-                                                    qty: this.hitung.qty[i],
-                                                    catatan: this.hitung.keterangan[i],
-                                                    diskon: this.diskon[i],
-                                                }
-                                                axios.post("/api/listrso", this.uplist)
-                                            }
-                                        })
-                                    if (this.$route.params.id !== this.upload.nomor_rso) {
-                                        axios.get("/api/history/" + this.$route.params.id)
-                                            .then(res => {
-                                                this.history = res.data.data;
-                                                for (let i = 0; 1 < this.history.length; i++) {
-                                                    axios.put("/api/history/" + this.history[i].id, {
-                                                        nomor_dok: this.upload.nomor_rso
-                                                    })
-                                                }
-                                            })
-                                        axios.post("/api/history", {
-                                            nomor_dok: this.upload.nomor_rso,
-                                            id_user: this.ambiluser.id,
-                                            notif: "RSO " + this.$route.params.id + " di ganti dengan RSO " + this.upload.nomor_rs,
-                                            keterangan: "Mengubah nomor RSO lama : " + this.$route.params.id,
-                                            jenis: "RSO",
-                                            tanggal: this.DateTime(),
-                                            aktif: "N",
-                                        })
+                                    this.listrso = res.data.data;
+                                    for (let o = 0; o < this.listrso.length; o++) {
+                                        axios.delete("/api/listrso/" + this.listrso[o].id)
                                     }
-                                    this.$router.push({
-                                        name: 'rso'
-                                    })
-                                    swalWithBootstrapButtons.fire(
-                                        'Save!',
-                                        'Berhasil menyimpan RSO.',
-                                        'success'
-                                    )
-                                }).catch(error => {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Cek kembali rincian rso anda!',
-                                    })
+                                    if (this.listpr.length > 0) {
+                                        for (let i = 0; i < this.listpr.length; i++) {
+                                            if (this.hitung.keterangan[i] === undefined) {
+                                                this.hitung.keterangan[i] = "";
+                                            }
+                                            this.uplist = {
+                                                nomor_rso: this.upload.nomor_rso,
+                                                tanggal_rso: this.upload.tanggal_rso,
+                                                kode_barang: this.listpr[i].lkode_barang,
+                                                harga: this.listpr[i].harga,
+                                                id_custprice: this.listpr[i].id_custprice,
+                                                qty: this.hitung.qty[i],
+                                                catatan: this.hitung.keterangan[i],
+                                                diskon: this.diskon[i],
+                                            }
+                                            axios.post("/api/listrso", this.uplist)
+                                        }
+                                    }
                                 })
-                        } else {
+                            if (this.$route.params.id !== this.upload.nomor_rso) {
+                                axios.get("/api/history/" + this.$route.params.id)
+                                    .then(res => {
+                                        this.history = res.data.data;
+                                        for (let i = 0; 1 < this.history.length; i++) {
+                                            axios.put("/api/history/" + this.history[i].id, {
+                                                nomor_dok: this.upload.nomor_rso
+                                            })
+                                        }
+                                    })
+                                axios.post("/api/history", {
+                                    nomor_dok: this.upload.nomor_rso,
+                                    id_user: this.ambiluser.id,
+                                    notif: "RSO " + this.$route.params.id + " di ganti dengan RSO " + this.upload.nomor_rs,
+                                    keterangan: "Mengubah nomor RSO lama : " + this.$route.params.id,
+                                    jenis: "RSO",
+                                    tanggal: this.DateTime(),
+                                    aktif: "N",
+                                })
+                            }
+                            this.$router.push({
+                                name: 'rso'
+                            })
+                            swalWithBootstrapButtons.fire(
+                                'Save!',
+                                'Berhasil menyimpan RSO.',
+                                'success'
+                            )
+
+                        }).catch(error => {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
-                                text: 'Qty item tidak boleh kosong',
+                                text: 'Cek kembali rincian rso anda!',
                             })
-                        }
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Anda belum menginput item apapun!',
                         })
-                    }
                 } else if (
 
                     result.dismiss === Swal.DismissReason.cancel
@@ -1104,6 +1005,7 @@ export default {
             this.diskon.splice(index, 1);
             this.hitung.keterangan.splice(index, 1);
             this.hitunginvoice();
+            this.cekkirim();
         },
         aksiDetail(lp) {
             $("#modal-detail").modal("show");
@@ -1197,6 +1099,7 @@ export default {
 
                 this.subtotal = (parseInt(this.listpr[i].harga) - parseInt(this.inhitung.diskon[i])) * parseInt(this.inhitung.qty[i])
                 this.invoice += this.subtotal;
+                this.cekkirim();
             }
         },
         cekinputrso() {
@@ -1209,6 +1112,24 @@ export default {
                         this.aktif = false;
                     };
                 })
+        },
+        cekkirim() {
+            this.aband = '';
+            this.aplus = '';
+            for (let i = 0; i < this.listpr.length; i++) {
+                if (this.listpr[i].harga < 1 || this.hitung.qty[i] < 1 || this.hitung.qty[i] === '' || this.hitung.qty[i] === undefined) {
+                    this.a = "N";
+                } else {
+                    this.a = "Y";
+                }
+                this.aplus += this.a;
+                this.aband += "Y";
+            }
+            if (this.aplus === this.aband && this.listpr.length > 0) {
+                this.bolehkirim = false;
+            } else {
+                this.bolehkirim = true;
+            }
         }
     },
 }

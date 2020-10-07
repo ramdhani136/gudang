@@ -179,6 +179,7 @@ export default {
             }
         },
         deleteRso(rso) {
+            this.load = true;
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success ml-2',
@@ -216,6 +217,7 @@ export default {
                                                 }
                                                 this.getRso();
                                             })
+                                        this.load = false;
                                         swalWithBootstrapButtons.fire(
                                             'Deleted!',
                                             'Berhasil Menghapus RSO.',
@@ -226,6 +228,7 @@ export default {
                                         console.log(error)
                                     })
                             } else {
+                                this.load = false;
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Tidak dapat menghapus RSO ini.',
@@ -237,6 +240,7 @@ export default {
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal menghapus RSO ini :)',
