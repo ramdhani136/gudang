@@ -4,11 +4,11 @@
         <div class="col-4">
             <div v-if="status==='Draft' || status==='Confirmed'" class="form-group">
                 <label>Nomor RSO :</label>
-                <input @input="cekinputrso()" v-model="upload.nomor_rso" type="text" maxlength="16" class="form-control col-12" :disabled="status!=='Draft' && status!=='Confirmed'" :class=" { 'is-valid' : aktif}">
+                <input @input="cekinputrso()" v-model="upload.nomor_rso" type="text" maxlength="16" class="form-control col-12" :disabled="status!=='Draft'" :class=" { 'is-valid' : aktif}">
             </div>
             <div v-if="status!=='Draft' && status!=='Confirmed'" class="form-group">
                 <label>Nomor RSO :</label>
-                <input @input="cekinputrso()" v-model="ket.nomor_rsofull" type="text" maxlength="16" class="form-control col-12" :disabled="status!=='Draft' && status!=='Confirmed'" :class=" { 'is-valid' : aktif}">
+                <input @input="cekinputrso()" v-model="ket.nomor_rsofull" type="text" maxlength="16" class="form-control col-12" :disabled="status!=='Draft'" :class=" { 'is-valid' : aktif}">
             </div>
             <div class="form-group">
                 <label>Sales Area :</label>
@@ -24,7 +24,7 @@
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
-                <input v-model="upload.tanggal_rso" type="date" :min="now()" class="form-control col-12" :disabled="status!=='Draft' && status!=='Confirmed' ">
+                <input v-model="upload.tanggal_rso" type="date" :min="now()" class="form-control col-12" :disabled="status!=='Draft'">
             </div>
         </div>
         <div class="col-4">
@@ -36,11 +36,11 @@
             </div>
             <div class="form-group">
                 <label>keterangan</label>
-                <textarea v-model="upload.keterangan" name="keterangan" class="form-control col-12" :disabled="status!=='Draft' && status!=='Confirmed' "></textarea>
+                <textarea v-model="upload.keterangan" name="keterangan" class="form-control col-12" :disabled="status!=='Draft'"></textarea>
             </div>
         </div>
     </div>
-    <button v-if="status==='Draft' || status==='Confirmed'" @click="showmodal()" class="btn btn-orange float-left mt-4 ml-1">+ Tambah Item</button>
+    <button v-if="status==='Draft'" @click="showmodal()" class="btn btn-orange float-left mt-4 ml-1">+ Tambah Item</button>
     <div id="total" class="mt-3 ml-auto mr-4">Total Invoice :&nbsp; {{invoice | currency}}</div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
@@ -71,10 +71,10 @@
                         <td style="text-align:center">{{lp.satuan}}</td>
                         <td style="text-align:center">{{lp.harga | currency}}</td>
                         <td style="text-align:center">
-                            <input style="text-align:center" :disabled="status!=='Draft' && status!=='Confirmed'  " @input="hitunginvoice()" v-model="diskon[index]" type="number" class="form-control">
+                            <input style="text-align:center" :disabled="status!=='Draft'" @input="hitunginvoice()" v-model="diskon[index]" type="number" class="form-control">
                         </td>
                         <td style="text-align:center">
-                            <input style="text-align:center" :disabled="status!=='Draft' && status!=='Confirmed'  " @input="hitunginvoice()" v-model="hitung.qty[index]" type="number" class="form-control">
+                            <input style="text-align:center" :disabled="status!=='Draft'" @input="hitunginvoice()" v-model="hitung.qty[index]" type="number" class="form-control">
                         </td>
                         <td v-if="status==='Draft'" style="text-align:center">
                             <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
@@ -101,10 +101,10 @@
         <button v-if="status==='Draft'" @click="kirimrso()" class="btn-success btn ml-1" :disabled="bolehkirim">
             Kirim Permintaan
         </button>
-        <button v-if="status==='Confirmed'" @click="requlang()" class="btn-none btn ml-3">
+        <button v-if="status==='Confirmed'" @click="reqedit()" class="btn-none btn ml-3">
             Request Ulang
         </button>
-        <router-link v-if="status==='Confirmed'" to="/so/new" class="btn btn-success ml-2">+ Create SO</router-link>
+        <router-link v-if="status==='Confirmed'" to="/so/new" class="btn btn-success ml-1">+ Create SO</router-link>
         <button v-if="status==='Sent'" @click="reqedit()" class="btn-orange btn ml-3">
             Request Edit
         </button>

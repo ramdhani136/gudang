@@ -565,6 +565,7 @@ export default {
                                         catatan: this.hitung.keterangan[i],
                                         diskon: this.diskon[i],
                                     }
+                                    axios.post("/api/listrso", this.uplist)
                                 }
                                 this.load = false;
                                 swalWithBootstrapButtons.fire(
@@ -572,12 +573,10 @@ export default {
                                     'Berhasil menyimpan draft RSO.',
                                     'success'
                                 )
-                                axios.post("/api/listrso", this.uplist)
-                                    .then(res => {
-                                        this.$router.push({
-                                            name: 'rso'
-                                        })
-                                    })
+                                this.$router.push({
+                                    name: 'rso'
+                                })
+
                             } else {
                                 this.load = false;
                                 swalWithBootstrapButtons.fire(
