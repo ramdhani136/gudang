@@ -111,6 +111,7 @@ Route::resource('listmasuk','Bbm\barangMasukController');
 
 Route::resource('retur','Retur\ReturController');
 Route::resource('listretur','Retur\ListReturController');
+Route::get('listso/data/lretur/{so}','So\ListSoController@listretur');
 
 Route::resource('user','User\UserController');
 

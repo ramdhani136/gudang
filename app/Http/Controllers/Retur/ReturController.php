@@ -17,7 +17,7 @@ class ReturController extends Controller
      */
     public function index()
     {
-        return ReturResource::collection(Retur::orderBy('updated_at','ASC')->get());
+        return ReturResource::collection(Retur::orderBy('nomor_retur','ASC')->get());
     }
 
     /**

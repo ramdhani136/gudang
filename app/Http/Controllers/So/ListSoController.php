@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Model\So\Listso;
 use App\Http\Resources\ListSoResource;
 use App\Http\Resources\SoGroupResource;
+use App\Model\Retur\Listretur;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListSoController extends Controller
@@ -120,6 +121,10 @@ class ListSoController extends Controller
 
     public function  listsobck($so,$barang){
         return ListSoResource::collection(Listso::where('nomor_so',$so)->where('kode_barang',$barang)->get());
+    }
+
+    public function listretur($so){
+        return ListSoResource::collection(Listso::where('nomor_so',$so)->where('bbk','>',0)->get());
     }
 
 }
