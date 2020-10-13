@@ -88,4 +88,9 @@ class ReturController extends Controller
         Retur::where('nomor_retur',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
+
+    public function akses($groupso)
+    {
+        return ReturResource::collection(Retur::where('kode_groupso',$groupso)->orderBy('nomor_retur','ASC')->get());
+    }
 }

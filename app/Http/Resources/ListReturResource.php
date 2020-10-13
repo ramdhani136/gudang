@@ -21,9 +21,9 @@ class ListReturResource extends JsonResource
             'kode_barang'=>$this->kode_barang,
             'nama_barang'=>$this->barang->nama,
             'satuan'=>$this->barang->satuan,
-            'harga'=>$this->barang->harga,
             'qty'=>$this->qty,
             'catatan'=>$this->catatan,
+            'nomor_so'=>$this->nomor_so,
         ];
     }
 }

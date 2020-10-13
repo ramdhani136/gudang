@@ -112,6 +112,8 @@ Route::resource('listmasuk','Bbm\barangMasukController');
 Route::resource('retur','Retur\ReturController');
 Route::resource('listretur','Retur\ListReturController');
 Route::get('listso/data/lretur/{so}','So\ListSoController@listretur');
+Route::get('retur/akses/{groupso}','Retur\ReturController@akses');
+Route::get('listretur/bbk/{nomor}/{barang}','Retur\ListReturController@bbk');
 
 Route::resource('user','User\UserController');
 
@@ -141,6 +143,7 @@ Route::resource('satuan','Barang\SatuanController');
 
 Route::resource('groupso','Groupso\GroupSoController');
 Route::get('groupso/data/aktif','Groupso\GroupSoController@aktif');
+Route::get('groupso/retur/{groupso}','So\SoController@retur');
 
 Route::resource('formprice','Sales\FormpriceController');
 Route::get('formprice/data/{groupso}','Sales\FormpriceController@groupso');

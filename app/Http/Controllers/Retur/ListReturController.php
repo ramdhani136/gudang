@@ -50,7 +50,7 @@ class ListReturController extends Controller
      */
     public function show($id)
     {
-        return ListReturResource::collection(Listretur::where('id',$id)->get());
+        return ListReturResource::collection(Listretur::where('nomor_retur',$id)->get());
     }
 
     /**
@@ -87,5 +87,10 @@ class ListReturController extends Controller
     {
         Listretur::where('id',$id)->delete();
         return response('deleted',response::HTTP_OK);
+    }
+
+    public function bbk($nomor,$barang)
+    {
+        return ListReturResource::collection(Listretur::where('nomor_so',$nomor)->where('kode_barang',$barang)->get());
     }
 }

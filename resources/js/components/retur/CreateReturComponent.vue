@@ -218,6 +218,7 @@ import {
     Circle5
 } from 'vue-loading-spinner'
 export default {
+    props: ['ambiluser'],
     components: {
         Circle5
     },
@@ -252,7 +253,7 @@ export default {
             gagal: false,
             uplist: {},
             qty: 0,
-            listrso: {},
+            listsokurang: {},
             nilai: null,
             harga: 0,
             subtotal: 0,
@@ -261,7 +262,9 @@ export default {
             retur: {},
             listaktif: {},
             sopilih: {},
-            adagak: 0
+            adagak: 0,
+            listreturnya: {},
+            qty_retur: 0,
         }
     },
     created() {
@@ -274,22 +277,38 @@ export default {
     },
     methods: {
         getSoAktif() {
-            axios.get("/api/so/data/aktif")
+            axios.get("/api/groupso/retur/" + this.ambiluser.kode_groupso)
                 .then(res => {
                     this.sopilih = res.data.data;
                     for (let i = 0; i < this.sopilih.length; i++) {
                         axios.get("/api/listso/" + this.sopilih[i].nomor_so)
                             .then(res => {
                                 this.listaktif = res.data.data;
-                                this.adagak = 0;
-                                for (let o = 0; o < this.listaktif.length; o++) {
-                                    this.adagak += parseInt(this.listaktif[o].bbk);
+                                for (let u = 0; u < this.listaktif.length; u++) {
+                                    axios.get("/api/listretur/bbk/" + this.listaktif[0].nomor_so + "/" + this.listaktif[u].kode_barang)
+                                        .then(res => {
+                                            this.listreturnya = res.data.data;
+                                            this.qtyretur = 0;
+                                            for (let k = 0; k < this.listreturnya.length; k++) {
+                                                if (this.listreturnya[k].length < 1) {
+                                                    this.qtyretur = 0;
+                                                } else {
+                                                    this.qtyretur += parseInt(this.listreturnya[k].qty);
+                                                }
+                                            }
+                                            // console.log(this.qtyretur);
+                                            this.adagak = 0;
+                                            console.log(this.listaktif);
+                                        })
                                 }
-                                if (this.adagak > 0) {
-                                    this.soaktif.push(this.sopilih[i]);
-                                }
+
+                                // if (this.adagak > 0) {
+                                //     this.soaktif.push(this.sopilih[i]);
+                                // }
+
                             })
                     }
+
                     this.load = false;
                 });
         },
@@ -359,6 +378,7 @@ export default {
             }
         },
         submitretur() {
+            this.load = true;
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success ml-2',
@@ -389,10 +409,54 @@ export default {
                             this.aband += "Y";
                         }
                         if (this.aplus === this.aband) {
+                            this.up.nomor_retur = this.up.nomor_retur + this.ambiluser.kode_groupso;
+                            this.up.kode_groupso = this.ambiluser.kode_groupso;
                             axios.post("/api/retur", this.up)
                                 .then(res => {
-                                    /* lanjut */
+                                    for (let i = 0; i < this.checker.length; i++) {
+                                        this.uplist = {
+                                            nomor_retur: this.up.nomor_retur,
+                                            nomor_so: this.up.nomor_so,
+                                            kode_barang: this.checker[i].kode_barang,
+                                            qty: this.hitung.qty[i],
+                                            catatan: this.hitung.keterangan[i]
+                                        }
+                                        axios.post("/api/listretur", this.uplist);
+                                        // axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.checker[i].kode_barang)
+                                        //     .then(res => {
+                                        //         this.listsokurang = res.data.data;
+                                        //         axios.put("/api/listso/" + this.listsokurang[0].id, {
+                                        //             bbk: parseInt(this.listsokurang[0].bbk) - parseInt(this.hitung.qty[i]),
+                                        //             closeso: 'N',
+                                        //             bck: ((parseInt(this.listsokurang[0].bck)) + (parseInt(this.listsokurang[0].bbk) - parseInt(this.listsokurang[0].bck))) - parseInt(this.hitung.qty[i]),
+                                        //         })
+                                        //     })
+                                    }
+                                    // axios.put("/api/so/" + this.up.nomor_so, {
+                                    //     status: 'Acc',
+                                    //     closebck: 'N'
+                                    // }).then(res => {
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.up.nomor_retur,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan Retur baru!",
+                                        keterangan: "Mengirim permintaan ke Kordinator Sales",
+                                        jenis: "Rt",
+                                        tanggal: this.DateTime(),
+                                    }).then(res => {
+                                        this.load = false;
+                                        swalWithBootstrapButtons.fire(
+                                            'Sukses!',
+                                            'Permintaan retur berhasil di kirim.',
+                                            'success'
+                                        )
+                                        this.$router.push({
+                                            name: 'returcomponent'
+                                        })
+                                    })
+                                    // })
                                 }).catch(error => {
+                                    this.load = false;
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Oops...',
@@ -400,6 +464,7 @@ export default {
                                     })
                                 })
                         } else {
+                            this.load = false;
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
@@ -407,21 +472,18 @@ export default {
                             })
                         }
                     } else {
+                        this.load = false;
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
                             text: 'Anda belum menginput barang apapun!',
                         })
                     }
-                    // swalWithBootstrapButtons.fire(
-                    //     'Sukses!',
-                    //     'Permintaan retur berhasil di kirim.',
-                    //     'success'
-                    // )
                 } else if (
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal melakukan permintaan ini :)',
@@ -456,7 +518,7 @@ export default {
             }, 5000);
         },
         ceknomor() {
-            axios.get("/api/retur/" + this.up.nomor_retur)
+            axios.get("/api/retur/" + this.up.nomor_retur + this.ambiluser.kode_groupso)
                 .then(res => {
                     this.retur = res.data.data;
                     if (this.up.nomor_retur.length === 15 && this.retur.length < 1) {
@@ -480,7 +542,23 @@ export default {
                 this.subtotal = (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) * parseInt(this.hitung.jumlah[i]);
                 this.total += parseInt(this.subtotal);
             }
-        }
+        },
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
+        },
     },
 }
 </script>

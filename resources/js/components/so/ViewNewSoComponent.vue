@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-    <div class="row row-cols-2" v-for="(vso,index) in so" :key="index">
+    <div class="row" v-for="(vso,index) in so" :key="index">
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor SO :</label>
@@ -105,6 +105,9 @@
         </button>
         <button v-if="(ket.statusnya==='Dic' || ket.statusnya==='Kordinator' || ket.statusnya==='Sent' || ket.statusnya==='Acc'  || ket.statusnya==='Tolak') && (ambiluser.sales===1 || ambiluser.superadmin===1)" @click="reqedit(vso)" class="btn-orange btn ml-4 mt-2">
             Request Edit SO
+        </button>
+        <button @click="print()" class="btn-none btn ml-1 mt-2">
+            Print
         </button>
         <button v-if="ket.statusnya==='Tolak'" @click="submitSo(vso)" class="btn-success btn ml-2 mt-2">
             Kirim Ulang SO
@@ -260,7 +263,7 @@
 <script>
 import {
     Circle5
-} from 'vue-loading-spinner'
+} from 'vue-loading-spinner';
 export default {
     props: ['ambiluser'],
     components: {
@@ -350,7 +353,7 @@ export default {
                                 }
 
                                 this.invoice += parseInt(this.sub) * (parseInt(this.listnewso[i].harga) - parseInt(this.listnewso[i].diskon));
-                                console.log(this.invoice)
+
                             }
                             this.load = false;
                         })
@@ -1027,6 +1030,10 @@ export default {
                         this.aktif = false;
                     };
                 })
+        },
+        print() {
+            var x = window.open('/data/so/print/' + this.$route.params.id, '_blank');
+            x.focus();
         }
     }
 }

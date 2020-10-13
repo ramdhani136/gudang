@@ -1,0 +1,22 @@
+#baris{
+    width: 100%;
+    height: auto;
+    float: left;
+    border:solid 1px red;
+    margin-top: 10px;
+}
+
+.part{
+    width: 30%;
+    display: flex;
+}
+
+html{
+    margin: 0px;
+}
+
+.container{
+    display: block;
+}
+
+

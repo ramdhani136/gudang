@@ -25,6 +25,11 @@ class ReturResource extends JsonResource
             'sostatus'=>$this->so->status,
             'statusada'=>$this->so->statusso,
             'alastolak'=>$this->alastolak,
+            'kode_groupso'=>$this->kode_groupso,
+            'tanggal_so'=>$this->so->tanggal_so,
+            'lokasi'=>$this->so->lokasi,
+            'alamat'=>$this->so->alamat,
+            'distribusi'=>$this->so->distribusi
         ];
     }
 }

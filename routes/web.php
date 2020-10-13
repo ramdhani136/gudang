@@ -20,6 +20,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/data/so/print/{so}','So\SoController@print');
+
 
 Route::group(['middleware' => 'auth'], function() {
     Route::get('/chats','ChatsController@index');
