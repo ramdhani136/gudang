@@ -128,14 +128,11 @@ class SoController extends Controller
     }
 
     public function print($so){
-        $options = new \Dompdf\Options();
-        $getso=So::where('nomor_so',$so)->get();
-        $options->set('enable_css_float',true);
-        
+        $getso=So::where('nomor_so',$so)->get();    
         $getlistso=Listso::where('nomor_so',$so)->get();
         // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
         $pdf = PDF::loadview('print.so',['so'=>$getso,'listso'=>$getlistso])->setPaper('A4', 'potrait');
         // return $pdf;
-    	return $pdf->stream($so);
+        return   $pdf->stream("dompdf_out.pdf");
     }
 }

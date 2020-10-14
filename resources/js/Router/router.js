@@ -93,6 +93,11 @@ import FormPriceComponent from '../components/formprice/FormPriceComponent.vue'
 import ViewPriceComponent from '../components/formprice/ViewPriceComponent.vue'
 import CreateFormPriceComponent from '../components/formprice/CreateFormPriceComponent.vue'
 
+/* laporan */
+
+import lSalesOrder from '../components/laporan/sales/lSalesOrder.vue'
+import lPenjualan from '../components/laporan/sales/lPenjualan.vue'
+
 
 
 
@@ -192,6 +197,10 @@ const routes=[
     {name:'createformprice', path:'/formprice/create', component:CreateFormPriceComponent},
     {name:'formprice', path:'/formprice', component:FormPriceComponent},
     {name:'viewformprice', path:'/formprice/view/:nomor', component:ViewPriceComponent},
+
+    /* laporan */
+    {name:'sisaso', path:'/view/sisaso', component:lSalesOrder},
+    {name:'penjualan', path:'/view/penjualan', component:lPenjualan},
     
 ]
 

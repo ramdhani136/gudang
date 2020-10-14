@@ -240,7 +240,7 @@ return array(
          */
         "enable_html5_parser" => false,
 
-        "DOMPDF_ENABLE_CSS_FLOAT" => true,
+        "DOMPDF_ENABLE_CSS_FLOAT"=>true,
 
 
     ),

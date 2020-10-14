@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>Document</title>
+    <title>{{$so[0]->nomor_so}}</title>
 </head>
 <body>
     @php 
@@ -15,10 +15,10 @@
     } @endphp
 
     <div class="container-fluid" style="font-size: 7pt; color:black;display:inline-block;">
-    <div id="baris" class="flex">
+    <div id="row">
     @php $i=1 @endphp
     @foreach($so as $s)
-        <div class="part">
+        <div class="col-4">
             <div class="form-group">
                 <b>Nomor SO</b> : {{$s->nomor_so}}
             </div>
@@ -29,7 +29,7 @@
                 <b>Rencana Kirim</b> : {{$s->tanggal_kirim}}
             </div>
         </div>  
-        <div class="part">
+        <div class="col-4">
             <div class="form-group">
                 <b>Customer</b> : {{$s->rso->customer->nama}}
             </div>
@@ -40,7 +40,7 @@
                 <b>Distibusi</b> : {{$s->distribusi}}
             </div>
         </div>
-        <div class="part">  
+        <div class="col-4">  
             <div class="form-group">
                 <b>Lokasi</b> : {{$s->lokasi}}
             </div>
@@ -50,7 +50,7 @@
         </div>
     </div>    
     @endforeach
-    <div id="baris">  
+    <div id="row">  
         <table class='table mt-1 table-bordered' style="border:solid 1px #000;">
             <thead>
                 <tr style="text-align:center" style="font-size:7pt;">
@@ -79,7 +79,7 @@
             </tbody>
         </table>
     </div> 
-    <div id="baris">
+    <div id="row">
         <div class="col-12">
             <div class="form-group">
                 <label>Keterangan</label> 

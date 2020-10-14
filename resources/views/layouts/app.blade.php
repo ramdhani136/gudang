@@ -234,6 +234,22 @@
                             </li>
                             @endif
 
+                            <!-- halaman Laporan -->
+                           
+                            <li class="nav-item dropdown">
+                                <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Laporan<span class="caret"></span>
+                                </router-link>
+
+                                <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <!--     <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link> -->
+                                @if(Auth::user()->sales == 1 || Auth::user()->susales == 1 ) <router-link to="/view/sisaso" class="dropdown-item" >Sales Order</router-link> @endif
+                                @if(Auth::user()->sales == 1 || Auth::user()->susales == 1 ) <router-link to="/view/penjualan" class="dropdown-item" >Penjualan</router-link> @endif
+                                    <!-- <router-link to="/dic/incoming/confirm" class="dropdown-item" >Incoming Goods</router-link> -->
+                                </div>
+                            </li>
+                           
+
 
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

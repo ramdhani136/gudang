@@ -2,21 +2,19 @@
     width: 100%;
     height: auto;
     float: left;
-    border:solid 1px red;
-    margin-top: 10px;
 }
 
-.part{
+.col-4{
+    float: left;
     width: 30%;
-    display: flex;
+    float: left !important;
 }
 
 html{
     margin: 0px;
 }
 
-.container{
-    display: block;
-}
+
+
 
 
