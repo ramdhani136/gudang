@@ -4,11 +4,16 @@
         <div class="col-11 font-weight-bold title mt-4 mb-5">
             List Sales Order
         </div>
-        <div class="col-1 mt-4">
-            <button @click="showFillter()" class="btn btn-grey">Filter</button>
+        <div class="col-1 rig  mt-4">
+            <button @click="showFillter()" class="btn btn-orange">Filter</button>
         </div>
     </div>
-    <div v-for="(dso,index) in so" :key="index">
+    <div class="panelbawah">
+        <div class="col-2">
+            <button class="btn-sm btn-none">Cetak Laporan</button>
+        </div>
+    </div>
+    <div v-for=" (dso,index) in so" :key="index">
         <div class="row font-weight-bold bc align-items-center ">
             <div class="col-2">{{dso.nomor_so}}</div>
             <div class="col-5">{{dso.customer}}</div>
@@ -49,21 +54,35 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Status</label>
-                        <select class="form-control">
+                        <select v-model="filter.status" class="form-control">
                             <option value="all">Semua</option>
                             <option value="Acc">Open</option>
                             <option value="selesai">Selesai</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Sales</label>
-                        <select class="form-control" :disabled="ambiluser.susales===0">
-                            <option :value="ambiluser.id">{{ambiluser.name}}</option>
-                        </select>
+                        <label>Customer</label>
+                        <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisible2" v-text="custom2 ? custom2.nama:''"></div>
+                        <div class="placeholder" v-if="custom2==null" v-text="ket2.nama">Semua Customer</div>
+                        <div class="popover" v-show="visible2">
+                            <input type="text" @keydown.up="up2" @keydown.down="down2" @keydown.enter="selectItem2" v-model="query2" placeholder="Masukan nama customer ..">
+                            <div class="optionbr" ref="optionList">
+                                <ul>
+                                    <li v-for="(match2,index) in matches2" :key="match2.kode" v-text="match2.nama" :class="{'selected':(selected2==index)}" @click="itemClicked2(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
+                        <label>Sales</label>
+                        <select v-model="filter.sales" class="form-control" :disabled="ambiluser.susales===0">
+                            <option v-for="(sl,index) in sales" :key="index" :value="sl.id">{{sl.name}}</option>
+                        </select>
+                    </div>
+                    <div class=" form-group">
                         <label>Group Sales</label>
-                        <select class="form-control" :disabled="ambiluser.susales===0">
+                        <select v-model="filter.groupso" class="form-control" :disabled="ambiluser.susales===0">
                             <option :value="ambiluser.kode_groupso">{{ambiluser.kode_groupso}}</option>
                         </select>
                     </div>
@@ -76,15 +95,15 @@
                     </div>
                     <div v-if="jenistanggal==='Y'" class="form-group">
                         <label>Mulai Tanggal</label>
-                        <input type="date" class="form-control">
+                        <input v-model="filter.mulaitanggal" type="date" class="form-control">
                     </div>
-                    <div v-if="jenistanggal==='Y'" class="form-group">
+                    <div v-if="jenistanggal==='Y' && filter.mulaitanggal!==undifined" class="form-group">
                         <label>Sampai Tanggal</label>
-                        <input type="date" class="form-control">
+                        <input v-model="filter.akhirtanggal" type="date" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Save Change</button>
+                    <button @click="filterdata()" type="button" class="btn btn-primary" data-dismiss="modal">Fillter Data</button>
                 </div>
             </div>
         </div>
@@ -100,14 +119,35 @@ export default {
         return {
             listso: [],
             so: {},
-            sales: this.ambiluser.id,
-            groupso: this.ambiluser.kode_groupso,
             status: 'Acc',
             jenistanggal: 'N',
+            visible2: false,
+            query2: '',
+            selected2: 0,
+            itemHeight2: 39,
+            custom2: null,
+            ket2: {
+                nama: "Semua Customer"
+            },
+            customer: [],
+            filter: {
+                groupso: this.ambiluser.kode_groupso,
+                sales: this.ambiluser.id,
+                status: 'all',
+            },
+            sales: {}
         }
     },
     created() {
         this.getso();
+    },
+    computed: {
+        matches2() {
+            if (this.query2 == '') {
+                return [];
+            }
+            return this.customer.filter((item) => item.nama.toLowerCase().includes(this.query2.toLowerCase()))
+        },
     },
     methods: {
         getso() {
@@ -118,6 +158,14 @@ export default {
                         axios.get("/api/listso/" + this.so[i].nomor_so)
                             .then(res => {
                                 this.listso.push(res.data.data);
+                                axios.get("/api/customer")
+                                    .then(res => {
+                                        this.customer = res.data.data;
+                                        axios.get("/api/user")
+                                            .then(res => {
+                                                this.sales = res.data.data;
+                                            })
+                                    })
                             })
                     }
                 })
@@ -138,6 +186,41 @@ export default {
                 )
             }
             // return window.scrollY > 100
+        },
+        toggleVisible2() {
+            this.visible2 = !this.visible2;
+        },
+        itemClicked2(index) {
+            this.selected2 = index;
+            this.selectItem2();
+        },
+        selectItem2() {
+            this.custom2 = this.matches2[this.selected2];
+            this.ket2.kode = this.custom2.kode;
+            this.ket2.nama = this.custom2.nama;
+            this.item = true;
+            this.visible2 = false;
+        },
+        up2() {
+            if (this.selected2 == 0) {
+                return;
+            }
+            this.selected2 -= 1;
+            this.scrollToItem2();
+        },
+        down2() {
+            if (this.selected2 >= this.matches2.length - 1) {
+                return;
+            }
+            this.selected2 += 1;
+            this.scrollToItem2();
+        },
+        scrollToItem2() {
+            this.$refs.optionList.scrollTop = this.selected2 * this.itemHeight2;
+        },
+        filterdata() {
+            this.filter.kode_customer = this.ket2.kode;
+            console.log(this.filter)
         }
     }
 }
@@ -171,5 +254,18 @@ export default {
     background-color: #fff;
     z-index: 1000;
     height: auto;
+}
+
+.panelbawah {
+    border-top: solid 1px rgb(231, 229, 229);
+    width: 84%;
+    height: 50px;
+    background-color: #fff;
+    bottom: 0;
+    position: fixed;
+    z-index: 1001;
+    padding-top: 10px;
+    margin-left: -8%;
+    padding-left: 6%;
 }
 </style>
