@@ -133,13 +133,13 @@ class SoController extends Controller
         // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
         $pdf = PDF::loadview('print.so',['so'=>$getso,'listso'=>$getlistso])->setPaper('A4', 'potrait');
         // return $pdf;
-        return   $pdf->stream("dompdf_out.pdf");
+        return   $pdf->stream($so);
     }
 
-//     public function kordisales($groupso)
-//     {
-//         return SoResource::collection(So::where('pr','N')->where('kode_groupso',$groupso)->orderBy('nomor_so','ASC')->get());
-//     }
+    public function laporan()
+    {
+        return SoResource::collection(So::where('pr','N')->where('status','Acc')->orWhere('status','Selesai')->orWhere('status','Di Selesaikan')->orderBy('tanggal_so','ASC')->get());
+    }
 
 //     public function sales($groupso,$sales)
 //     {

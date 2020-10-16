@@ -1,8 +1,9 @@
 <template>
-<div class="wrapper">
+<div class="wrapper" @keyup.esc="getso()">
     <div class="row diam" v-scroll="handleScroll">
-        <div class="col-11 font-weight-bold title mt-4 mb-5">
-            List Sales Order
+        <div class="col-11 font-weight-bold title mt-4 mb-3">
+            List Sales Order<br>
+            <b class="ltanggal">{{filter.mulaitanggal}} - {{filter.akhirtanggal}} ({{" "+statusnya+" "}})</b>
         </div>
         <div class="col-1 rig  mt-4">
             <button @click="showFillter()" class="btn btn-orange">Filter</button>
@@ -14,8 +15,9 @@
         </div>
     </div>
     <div v-for=" (dso,index) in filterList" :key="index">
-        <div class="row font-weight-bold bc align-items-center ">
-            <div class="col-2">{{dso.nomor_so}}</div>
+        <div class="row font-weight-bold bc align-items-center py-1">
+            <div class="col-2">{{dso.tanggal_so}}
+            </div>
             <div class="col-5">{{dso.customer}}</div>
             <div class="col-3">{{dso.nomor_so}}</div>
             <div class="col-2">{{dso.sales}}</div>
@@ -47,7 +49,7 @@
             <div id="modal-width" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Fillter Pencarian</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" @click="getso()" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -90,7 +92,7 @@
                     </div>
                     <div class="form-group">
                         <label>Tanggal</label>
-                        <select v-model="jenistanggal" class="form-control">
+                        <select @change="cekjenistanggal()" v-model="jenistanggal" class="form-control">
                             <option value="N">Semua Tanggal</option>
                             <option value="Y">Filter Tanggal</option>
                         </select>
@@ -101,7 +103,7 @@
                     </div>
                     <div v-if="jenistanggal==='Y' && filter.mulaitanggal!==undifined" class="form-group">
                         <label>Sampai Tanggal</label>
-                        <input v-model="filter.akhirtanggal" type="date" class="form-control">
+                        <input v-model="filter.akhirtanggal" type="date" class="form-control" :min="filter.mulaitanggal">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -139,7 +141,9 @@ export default {
                 akhirtanggal: this.DateTime(),
             },
             sales: {},
-            groupnya: {}
+            groupnya: {},
+            statusnya: '',
+            load: true
         }
     },
     created() {
@@ -167,10 +171,11 @@ export default {
             })
         }
     },
+
     methods: {
         getso() {
             this.listso = [];
-            axios.get("/api/so/data/realso")
+            axios.get("/api/so/laporan/data")
                 .then(res => {
                     this.so = res.data.data;
                     for (let i = 0; i < this.filterList.length; i++) {
@@ -183,6 +188,13 @@ export default {
                                         axios.get("/api/groupso")
                                             .then(res => {
                                                 this.groupnya = res.data.data;
+                                                if (this.filter.status === "all") {
+                                                    this.statusnya = "Semua SO";
+                                                } else if (this.filter.status === "acc") {
+                                                    this.statusnya = "Open";
+                                                } else {
+                                                    this.statusnya = "Selesai";
+                                                }
                                             })
                                     })
                             })
@@ -250,7 +262,8 @@ export default {
             this.day = this.date.getDate();
             this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
             this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
-            this.datetimes = this.dates + " " + this.times;
+            this.datetimes = this.dates + " "
+            //  + this.times;
             return this.datetimes;
         },
         Datesebulan() {
@@ -266,7 +279,8 @@ export default {
             this.day = this.date.getDate();
             this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
             this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
-            this.datetimes = this.dates + " " + this.times;
+            this.datetimes = this.dates + " "
+            //  + this.times;
             return this.datetimes;
         },
         auth() {
@@ -291,6 +305,12 @@ export default {
                         this.filter.sales = "all";
                         this.filter.group = 'all';
                     })
+            }
+        },
+        cekjenistanggal() {
+            if (this.jenistanggal === 'N') {
+                this.filter.mulaitanggal = this.Datesebulan();
+                this.filter.akhirtanggal = this.DateTime();
             }
         }
     }
@@ -338,5 +358,10 @@ export default {
     padding-top: 10px;
     margin-left: -8%;
     padding-left: 6%;
+}
+
+.ltanggal {
+    font-size: 0.65em;
+    color: mediumseagreen;
 }
 </style>

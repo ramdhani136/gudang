@@ -58,6 +58,7 @@ Route::resource('sales','Sales\SalesController');
 
 Route::resource('so','So\SoController');
 Route::get('so/data/realso','So\SoController@realso');
+Route::get('so/laporan/data','So\SoController@laporan');
 Route::get('so/data/aktif','So\SoController@aktif');
 Route::get('so/selesai/view','So\SoController@sselesai');
 Route::get('so/rso/{rso}','So\SoController@statusopen');

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <title>{{$so[0]->nomor_so}}</title>
 </head>
 <body>
@@ -14,46 +13,36 @@
     return $hasil; 
     } @endphp
 
-    <div class="container-fluid" style="font-size: 7pt; color:black;display:inline-block;">
-    <div id="row">
+    <div class="wrapper" style="width: 100%;margin:0;padding:0">
+    <div style="font-size:12pt;text-align:center;margin-bottom:20px;margin-top:-20px">
+        <b >SALES ORDER</b>
+    </div>
+    <div class="row">
     @php $i=1 @endphp
     @foreach($so as $s)
-        <div class="col-4">
-            <div class="form-group">
-                <b>Nomor SO</b> : {{$s->nomor_so}}
-            </div>
-            <div class="form-group">
-                <b>Tanggal</b> : {{$s->tanggal_so}}
-            </div>
-            <div class="form-group">
-                <b>Rencana Kirim</b> : {{$s->tanggal_kirim}}
-            </div>
-        </div>  
-        <div class="col-4">
-            <div class="form-group">
-                <b>Customer</b> : {{$s->rso->customer->nama}}
-            </div>
-            <div class="form-group">
-                <b>Nomor RSO</b> : {{$s->nomor_rso}}
-            </div>
-            <div class="form-group">
-                <b>Distibusi</b> : {{$s->distribusi}}
-            </div>
-        </div>
-        <div class="col-4">  
-            <div class="form-group">
-                <b>Lokasi</b> : {{$s->lokasi}}
-            </div>
-            <div class="form-group">
-                <b>Alamat</b> : {{$s->alamat}}
-            </div>
-        </div>
-    </div>    
+    <table class="titlet" style="font-size: 9pt;">
+        <tbody>
+            <tr>
+                <td style="padding-left: 3%;"><b>Nomor SO</b> : {{$s->nomor_so}}</td>
+                <td style="padding-left: 3%;"><b>Customer</b> : {{$s->rso->customer->nama}}</td>
+                <td style="padding-left: 3%;"><b>Lokasi</b> : {{$s->lokasi}}</td>
+            </tr>
+            <tr>
+                <td style="padding-left: 3%;"><b>Tanggal</b> : {{$s->tanggal_so}}</td>
+                <td style="padding-left: 3%;"><b>Nomor RSO</b> : {{$s->nomor_rso}}</td>
+                <td style="padding-left: 3%;"> <b>Alamat</b> : {{$s->alamat}}</td>
+            </tr>
+            <tr>
+                <td style="padding-left: 3%;"><b>Rencana Kirim</b> : {{$s->tanggal_kirim}}</td>
+                <td style="padding-left: 3%;"><b>Distibusi</b> : {{$s->distribusi}}</td>
+            </tr>
+        </tbody>
+    </table>
     @endforeach
-    <div id="row">  
-        <table class='table mt-1 table-bordered' style="border:solid 1px #000;">
-            <thead>
-                <tr style="text-align:center" style="font-size:7pt;">
+    <div class="row">  
+        <table class="table" style="font-size: 8pt; width:100% ;margin-top:20px">
+            <thead style="border:solid 1px #000">
+                <tr>
                     <th>NO</th>
                     <th>KODE ITEM</th>
                     <th>ITEM</th>
@@ -63,7 +52,7 @@
                     <th>SUB TOTAL</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody  style="border:solid 1px #000">
                 @php $i=1 @endphp
                 @foreach($listso as $p)
                 <tr>
@@ -79,12 +68,25 @@
             </tbody>
         </table>
     </div> 
-    <div id="row">
-        <div class="col-12">
-            <div class="form-group">
-                <label>Keterangan</label> 
-            </div>
-        </div>
+    <div class="row">
+        <table class="ttd" style="width: 60%;margin-top: 10px;text-align: center;font-size:9pt;">
+            <thead>
+                <tr >
+                    <th style="border:solid 1px #000;width:25%">Di buat</th>
+                    <th style="border:solid 1px #000;width:25%">Kordinator</th>
+                    <th style="border:solid 1px #000;width:25%">Supervisor</th>
+                    <th style="border:solid 1px #000;width:25%">DIC</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="height: 75px;border:solid 1px #000;width:25%"></td>
+                    <td style="height: 75px;border:solid 1px #000;width:25%"></td>
+                    <td style="height: 75px;border:solid 1px #000;width:25%"></td>
+                    <td style="height: 75px;border:solid 1px #000;width:25%"></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     </div>
 </body>
