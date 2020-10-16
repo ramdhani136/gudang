@@ -135,4 +135,14 @@ class SoController extends Controller
         // return $pdf;
         return   $pdf->stream("dompdf_out.pdf");
     }
+
+//     public function kordisales($groupso)
+//     {
+//         return SoResource::collection(So::where('pr','N')->where('kode_groupso',$groupso)->orderBy('nomor_so','ASC')->get());
+//     }
+
+//     public function sales($groupso,$sales)
+//     {
+//         return SoResource::collection(So::where('pr','N')->where('kode_groupso',$groupso)->where('id_user',$sales)->orderBy('nomor_so','ASC')->get());
+//     }
 }

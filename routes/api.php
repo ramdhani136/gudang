@@ -63,6 +63,9 @@ Route::get('so/selesai/view','So\SoController@sselesai');
 Route::get('so/rso/{rso}','So\SoController@statusopen');
 Route::get('so/data/view/{groupso}','So\SoController@groupso');
 
+// Route::get('so/kordisales/{groupso}','So\SoController@kordisales');
+// Route::get('so/sales/{groupso}/{sales}','So\SoController@sales');
+
 Route::resource('bcm','Barang\BcmController');
 Route::get('bcm/data/open','Barang\BcmController@open');
 Route::resource('custprice','sales\CustpriceController');
@@ -116,6 +119,8 @@ Route::get('retur/akses/{groupso}','Retur\ReturController@akses');
 Route::get('listretur/bbk/{nomor}/{barang}','Retur\ListReturController@bbk');
 
 Route::resource('user','User\UserController');
+Route::get('user/data/all','User\UserController@sales');
+Route::get('user/view/{groupso}','User\UserController@groupsales');
 
 Route::resource('listso','So\ListSoController');
 Route::get('listso/data/group','So\ListSoController@group');

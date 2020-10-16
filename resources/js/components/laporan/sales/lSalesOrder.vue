@@ -13,7 +13,7 @@
             <button class="btn-sm btn-none">Cetak Laporan</button>
         </div>
     </div>
-    <div v-for=" (dso,index) in so" :key="index">
+    <div v-for=" (dso,index) in filterList" :key="index">
         <div class="row font-weight-bold bc align-items-center ">
             <div class="col-2">{{dso.nomor_so}}</div>
             <div class="col-5">{{dso.customer}}</div>
@@ -56,7 +56,7 @@
                         <label>Status</label>
                         <select v-model="filter.status" class="form-control">
                             <option value="all">Semua</option>
-                            <option value="Acc">Open</option>
+                            <option value="acc">Open</option>
                             <option value="selesai">Selesai</option>
                         </select>
                     </div>
@@ -76,14 +76,16 @@
                     </div>
                     <div class="form-group">
                         <label>Sales</label>
-                        <select v-model="filter.sales" class="form-control" :disabled="ambiluser.susales===0">
+                        <select v-model="filter.sales" class="form-control" :disabled="ambiluser.susales===0 && ambiluser.kordisales===0">
+                            <option value="all">Semua Sales</option>
                             <option v-for="(sl,index) in sales" :key="index" :value="sl.id">{{sl.name}}</option>
                         </select>
                     </div>
                     <div class=" form-group">
                         <label>Group Sales</label>
-                        <select v-model="filter.groupso" class="form-control" :disabled="ambiluser.susales===0">
-                            <option :value="ambiluser.kode_groupso">{{ambiluser.kode_groupso}}</option>
+                        <select v-model="filter.group" class="form-control" :disabled="ambiluser.susales===0">
+                            <option value="all">Pilih Semua</option>
+                            <option :value="gr.kode" v-for="(gr,index) in groupnya" :key="index">{{gr.area}}</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -103,7 +105,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button @click="filterdata()" type="button" class="btn btn-primary" data-dismiss="modal">Fillter Data</button>
+                    <button @click="getso()" type="button" class="btn btn-primary" data-dismiss="modal">Fillter Data</button>
                 </div>
             </div>
         </div>
@@ -113,13 +115,11 @@
 
 <script>
 export default {
-
     props: ['ambiluser'],
     data() {
         return {
             listso: [],
-            so: {},
-            status: 'Acc',
+            so: [],
             jenistanggal: 'N',
             visible2: false,
             query2: '',
@@ -127,18 +127,23 @@ export default {
             itemHeight2: 39,
             custom2: null,
             ket2: {
-                nama: "Semua Customer"
+                nama: "Semua Customer",
+                kode: ''
             },
             customer: [],
             filter: {
-                groupso: this.ambiluser.kode_groupso,
+                group: this.ambiluser.kode_groupso,
                 sales: this.ambiluser.id,
                 status: 'all',
+                mulaitanggal: this.Datesebulan(),
+                akhirtanggal: this.DateTime(),
             },
-            sales: {}
+            sales: {},
+            groupnya: {}
         }
     },
     created() {
+        this.auth();
         this.getso();
     },
     computed: {
@@ -148,22 +153,36 @@ export default {
             }
             return this.customer.filter((item) => item.nama.toLowerCase().includes(this.query2.toLowerCase()))
         },
+        filterList() {
+            var vm = this,
+                lists = vm.so
+            return _.filter(lists, function (query) {
+                var tanggal = query.tanggal_so >= vm.filter.mulaitanggal && query.tanggal_so <= vm.filter.akhirtanggal,
+                    // nomorso = vm.nomorso ? (query.nomor_so.toLowerCase().includes(vm.nomorso.toLowerCase())) : true,
+                    customer = vm.ket2.kode ? (query.kode_customer == vm.ket2.kode) : true,
+                    sales = vm.ambiluser.sales === 1 ? (query.id_user == vm.ambiluser.id) : vm.filter.sales !== 'all' ? (query.id_user == vm.filter.sales) : true,
+                    groupin = vm.ambiluser.sales === 1 || vm.ambiluser.kordisales === 1 ? (query.kode_groupso == vm.ambiluser.kode_groupso) : vm.filter.group !== 'all' ? (query.kode_groupso == vm.filter.group) : true,
+                    status = vm.filter.status === 'acc' ? (query.status == 'Acc') : vm.filter.status === 'selesai' ? (query.status == 'Selesai' || query.status == 'Di Selesaikan') : true;
+                return tanggal && customer && status && sales && groupin
+            })
+        }
     },
     methods: {
         getso() {
+            this.listso = [];
             axios.get("/api/so/data/realso")
                 .then(res => {
                     this.so = res.data.data;
-                    for (let i = 0; i < this.so.length; i++) {
-                        axios.get("/api/listso/" + this.so[i].nomor_so)
+                    for (let i = 0; i < this.filterList.length; i++) {
+                        axios.get("/api/listso/" + this.filterList[i].nomor_so)
                             .then(res => {
                                 this.listso.push(res.data.data);
                                 axios.get("/api/customer")
                                     .then(res => {
                                         this.customer = res.data.data;
-                                        axios.get("/api/user")
+                                        axios.get("/api/groupso")
                                             .then(res => {
-                                                this.sales = res.data.data;
+                                                this.groupnya = res.data.data;
                                             })
                                     })
                             })
@@ -218,9 +237,61 @@ export default {
         scrollToItem2() {
             this.$refs.optionList.scrollTop = this.selected2 * this.itemHeight2;
         },
-        filterdata() {
-            this.filter.kode_customer = this.ket2.kode;
-            console.log(this.filter)
+        DateTime() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
+        },
+        Datesebulan() {
+            this.date = new Date();
+            this.month = this.date.getMonth();
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates + " " + this.times;
+            return this.datetimes;
+        },
+        auth() {
+            if (this.ambiluser.sales === 1) {
+                axios.get("/api/user/view/" + this.ambiluser.kode_groupso)
+                    .then(res => {
+                        this.sales = res.data.data;
+                        this.filter.sales = this.ambiluser.id;
+                        this.filter.group = this.ambiluser.kode_groupso;
+                    })
+            } else if (this.ambiluser.kordisales === 1) {
+                axios.get("/api/user/view/" + this.ambiluser.kode_groupso)
+                    .then(res => {
+                        this.sales = res.data.data;
+                        this.filter.sales = "all";
+                        this.filter.group = this.ambiluser.kode_groupso;
+                    })
+            } else if (this.ambiluser.susales === 1) {
+                axios.get("/api/user/data/all")
+                    .then(res => {
+                        this.sales = res.data.data;
+                        this.filter.sales = "all";
+                        this.filter.group = 'all';
+                    })
+            }
         }
     }
 }

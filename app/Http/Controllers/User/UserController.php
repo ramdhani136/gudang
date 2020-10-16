@@ -104,4 +104,14 @@ class UserController extends Controller
         User::where('id',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
+
+    public function sales()
+    {
+        return UserResource::collection(User::where('sales',1)->orderBy('name','ASC')->get());
+    }
+
+    public function groupsales($groupso)
+    {
+        return UserResource::collection(User::where('sales',1)->where('kode_groupso',$groupso)->orderBy('name','ASC')->get());
+    }
 }
