@@ -206,4 +206,12 @@ class ListRsoController extends Controller
         return ListRsoResource::collection(Listrso::where('nomor_rso',$rso)->where('acc_purch','Y')->get());
     }
 
+    public function tersedia($rso){
+        return ListRsoResource::collection(Listrso::where('nomor_rso',$rso)->where('status','Tersedia')->orWhere('status','Tersedia Sebagian')->get());
+    }
+
+    public function tdktersedia($rso){
+        return ListRsoResource::collection(Listrso::where('nomor_rso',$rso)->where('status','Tidak Tersedia')->orWhere('status','Tersedia Sebagian')->get());
+    }
+
 }

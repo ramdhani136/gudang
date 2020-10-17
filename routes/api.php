@@ -87,6 +87,9 @@ Route::get('listbcm/data/{bcm}','Barang\ListBcmController@nnonaktif');
 Route::get('view/detailpo/{po}/{barang}','Rso\ListRsoController@detailpo');
 Route::get('view/accpo/{po}/{barang}','Rso\ListRsoController@accpo');
 
+Route::get('rso/tersedia/{rso}','Rso\ListRsoController@tersedia');
+Route::get('rso/tdktersedia/{rso}','Rso\ListRsoController@tdktersedia');
+
 Route::resource('ekspedisi','Ekspedisi\EkspedisiController');
 
 Route::resource('bbm','Bbm\BbmController');

@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use App\Model\Rso\Rso;
 use App\Http\Resources\RsoResource;
 use App\Http\Resources\PrResource;
+use App\Model\Rso\Listrso;
 use Symfony\Component\HttpFoundation\Response;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class RsoController extends Controller
 {
@@ -119,6 +121,24 @@ class RsoController extends Controller
     public function realrso()
     {
         return RsoResource::collection(Rso::where('pr','N')->orderBy('nomor_rso','ASC')->get());
+    }
+
+    public function printtersedia($rso){
+        $getrso=Rso::where('nomor_rso',$rso)->get();    
+        $getlist=Listrso::where('nomor_rso',$rso)->where('status','Tersedia')->get();
+        // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
+        $pdf = PDF::loadview('print.rsotersedia',['rso'=>$getrso,'list'=>$getlist])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        // return $pdf;
+        return   $pdf->stream($rso);
+    }
+
+    public function printtdk($rso){
+        $getrso=Rso::where('nomor_rso',$rso)->get();    
+        $getlist=Listrso::where('nomor_rso',$rso)->where('status','Tidak Tersedia')->get();
+        // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
+        $pdf = PDF::loadview('print.rsott',['rso'=>$getrso,'list'=>$getlist])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        // return $pdf;
+        return   $pdf->stream($rso);
     }
 
 }

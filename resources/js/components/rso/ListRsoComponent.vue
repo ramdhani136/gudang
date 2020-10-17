@@ -101,12 +101,15 @@
         <button v-if="status==='Draft'" @click="kirimrso()" class="btn-success btn ml-1" :disabled="bolehkirim">
             Kirim Permintaan
         </button>
-        <button v-if="status==='Confirmed'" @click="reqedit()" class="btn-none btn ml-3">
+        <button v-if="status==='Confirmed'" @click="reqedit()" class="btn-orange btn ml-3">
             Request Ulang
         </button>
         <router-link v-if="status==='Confirmed'" to="/so/new" class="btn btn-success ml-1">+ Create SO</router-link>
         <button v-if="status==='Sent'" @click="reqedit()" class="btn-orange btn ml-3">
             Request Edit
+        </button>
+        <button v-if="load===false && (status==='Confirmed'|| status==='So')" @click="showprint()" class="btn-none btn ml-1">
+            Print
         </button>
     </div>
     <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -224,6 +227,32 @@
             </div>
         </div>
     </div>
+    <div>
+        <div class="modal fade" id="modal-print" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div id="modal-width" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Form Cetak RSO</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Status RSO</label>
+                            <select class="form-control" v-model="pilihprint">
+                                <option value="Tersedia" :disabled="distersedia">Tersedia</option>
+                                <option value="Tidak Tersedia" :disabled="distt">Tidak Tersedia</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button @click="print()" type="button" class="btn btn-secondary" data-dismiss="modal">Print</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -238,6 +267,7 @@ export default {
     },
     data() {
         return {
+            pilihprint: '',
             load: true,
             upload: {},
             listpr: [],
@@ -292,6 +322,8 @@ export default {
             aktif: false,
             adarso: {},
             bolehkirim: true,
+            distersedia: false,
+            distt: false,
         }
     },
     created() {
@@ -332,6 +364,22 @@ export default {
                                         .then(res => {
                                             this.groupso = res.data.data;
                                             this.load = false;
+                                            axios.get("/api/rso/tersedia/" + this.$route.params.id)
+                                                .then(res => {
+                                                    if (res.data.data.length < 1) {
+                                                        this.distersedia = true;
+                                                    } else {
+                                                        this.distersedia = false;
+                                                    }
+                                                    axios.get("/api/rso/tdktersedia/" + this.$route.params.id)
+                                                        .then(res => {
+                                                            if (res.data.data.length < 1) {
+                                                                this.distt = true;
+                                                            } else {
+                                                                this.distt = false;
+                                                            }
+                                                        })
+                                                })
                                         });
                                 })
                         })
@@ -1130,7 +1178,28 @@ export default {
             } else {
                 this.bolehkirim = true;
             }
-        }
+        },
+        print() {
+            if (this.pilihprint === '' || this.pilihprint === undefined) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Anda belum memilih status RSO!',
+                })
+            } else {
+                if (this.pilihprint === 'Tersedia') {
+                    var x = window.open('/data/rso/print/' + this.$route.params.id, '_blank');
+                    x.focus();
+                } else {
+                    var x = window.open('/data/rsott/print/' + this.$route.params.id, '_blank');
+                    x.focus();
+                }
+            }
+
+        },
+        showprint() {
+            $("#modal-print").modal("show");
+        },
     },
 }
 </script>

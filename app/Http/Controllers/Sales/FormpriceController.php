@@ -99,23 +99,23 @@ class FormpriceController extends Controller
     public function print($nomor){
         $getform=Formprice::where('nomor_price',$nomor)->get();    
         $getcustprice=Custprice::where('nomor_price',$nomor)->get();
-        $count=0;
-        $harga=array();
-        foreach($getcustprice as $a){
-        $data= Custprice::where("open","Y")->where('status','Aktif')->where('kode_customer',$a->kode_customer)->where('kode_barang',$a->kode_barang)->orderBy('id','DESC')->limit(1)->get();
-        if($data[0]->harga<1){
-            $data[0]->harga=0;
-        }
-        $harga[$count++]=array(
-            'harga'=>$data[0]->harga,
-        );
-        $ambilharga=json_encode($harga);
-        }
+        // $count=0;
+        // $harga=array();
+        // foreach($getcustprice as $a){
+        // $data= Custprice::where("open","Y")->where('status','Aktif')->where('kode_customer',$a->kode_customer)->where('kode_barang',$a->kode_barang)->orderBy('id','DESC')->limit(1)->get();
+        // if($data[0]->harga<1){
+        //     $data[0]->harga=0;
+        // }
+        // $harga[$count++]=array(
+        //     'harga'=>$data[0]->harga,
+        // );
+        // $ambilharga=json_encode($harga);
+        // }
         // return $getform
    
 
         // $pdf = view('print.formprice',['form'=>$getform,'list'=>$getcustprice,'hargas'=>$ambilharga]);
-        $pdf = PDF::loadview('print.formprice',['form'=>$getform,'list'=>$getcustprice,'hargas'=>$ambilharga])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        $pdf = PDF::loadview('print.formprice',['form'=>$getform,'list'=>$getcustprice])->setPaper([0, 0, 396.8, 585.98], 'landscape');
         // return $pdf;
         return   $pdf->stream($nomor);
     }
