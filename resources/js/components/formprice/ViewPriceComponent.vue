@@ -78,12 +78,16 @@
         </div>
     </div>
     <div class="row mt-2">
-        <button v-if="status!=='Confirm' && ambiluser.sales===1" class="btn btn-none ml-3" @click="batalkan()">
+        <button v-if="status!=='Confirm' && ambiluser.sales===1" class="btn btn-danger ml-3" @click="batalkan()">
             Batalkan
         </button>
         <button v-if="(status!=='Draft' && status!=='Confirm') &&  ambiluser.sales===1" class="btn btn-orange ml-1" @click="reqedit()">
             Request Edit
         </button>
+        <button v-if="status!=='Draft'  &&  ambiluser.sales===1" class="btn btn-none ml-1" @click="print()">
+            Print
+        </button>
+
         <button v-if="status==='Draft' && ambiluser.sales===1" class="btn btn-primary ml-1" @click="createDraft()">
             Simpan Draft
         </button>
@@ -1181,6 +1185,10 @@ export default {
             if (this.statusminta[index] === "Aktif") {
                 this.alastolak[index] = '';
             }
+        },
+        print() {
+            var x = window.open('/data/formprice/print/' + this.$route.params.nomor, '_blank');
+            x.focus();
         }
     },
 }

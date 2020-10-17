@@ -6,7 +6,6 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="shortcut icon" href="{{ asset('img/logo.png') }}"">
 
     <title>ETM System - Ekatunggal Group</title>
 

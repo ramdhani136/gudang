@@ -131,7 +131,7 @@ class SoController extends Controller
         $getso=So::where('nomor_so',$so)->get();    
         $getlistso=Listso::where('nomor_so',$so)->get();
         // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
-        $pdf = PDF::loadview('print.so',['so'=>$getso,'listso'=>$getlistso])->setPaper('A4', 'potrait');
+        $pdf = PDF::loadview('print.so',['so'=>$getso,'listso'=>$getlistso])->setPaper([0, 0, 396.8, 585.98], 'landscape');
         // return $pdf;
         return   $pdf->stream($so);
     }

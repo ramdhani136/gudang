@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="shortcut icon" href="{{ asset('img/logo.png') }}">
     <title>{{$so[0]->nomor_so}}</title>
 </head>
 <body>
@@ -20,27 +21,28 @@
     <div class="row">
     @php $i=1 @endphp
     @foreach($so as $s)
-    <table class="titlet" style="font-size: 9pt;">
+    <table style="font-size: 9pt;width:100%">
         <tbody>
             <tr>
-                <td style="padding-left: 3%;"><b>Nomor SO</b> : {{$s->nomor_so}}</td>
-                <td style="padding-left: 3%;"><b>Customer</b> : {{$s->rso->customer->nama}}</td>
-                <td style="padding-left: 3%;"><b>Lokasi</b> : {{$s->lokasi}}</td>
+                <td style="width:25%;"><b>Nomor SO</b> : {{$s->nomor_so}}</td>
+                <td style="width:30%;margin-left: 5%;"><b>Customer</b> : {{$s->rso->customer->nama}}</td>
+                <td style="width:35%;margin-left: 5%;"><b>Lokasi</b> : {{$s->lokasi}}</td>
             </tr>
             <tr>
-                <td style="padding-left: 3%;"><b>Tanggal</b> : {{$s->tanggal_so}}</td>
-                <td style="padding-left: 3%;"><b>Nomor RSO</b> : {{$s->nomor_rso}}</td>
-                <td style="padding-left: 3%;"> <b>Alamat</b> : {{$s->alamat}}</td>
+                <td style="width:25%;"><b>Tanggal</b> : {{$s->tanggal_so}}</td>
+                <td style="width:30%;margin-left: 5%;"><b>Sales</b> : {{$s->user->name}}</td>
+                <td style="width:35%;margin-left: 5%;"> <b>Alamat</b> : {{$s->alamat}}</td>
             </tr>
             <tr>
-                <td style="padding-left: 3%;"><b>Rencana Kirim</b> : {{$s->tanggal_kirim}}</td>
-                <td style="padding-left: 3%;"><b>Distibusi</b> : {{$s->distribusi}}</td>
+                <td style="width:25%;"><b>Rencana Kirim</b> : {{$s->tanggal_kirim}}</td>
+                <td style="width:30%;margin-left: 5%;"><b>Distibusi</b> : {{$s->distribusi}}</td>
+                <td style="width:35%;margin-left: 5%;"><b>Keterangan</b> : {{$s->keterangan}}</td>
             </tr>
         </tbody>
     </table>
     @endforeach
     <div class="row">  
-        <table class="table" style="font-size: 8pt; width:100% ;margin-top:20px">
+        <table class="table" style="font-size: 8.5pt; width:100% ;margin-top:20px">
             <thead style="border:solid 1px #000">
                 <tr>
                     <th>NO</th>
@@ -48,12 +50,14 @@
                     <th>ITEM</th>
                     <th>JUMLAH</th>
                     <th>SATUAN</th>
-                    <th>HARGA</th> 
+                    <th>HARGA</th>
+                    <th>DISKON</th> 
                     <th>SUB TOTAL</th>
                 </tr>
             </thead>
             <tbody  style="border:solid 1px #000">
-                @php $i=1 @endphp
+                @php $i=1;
+                $total=0; @endphp
                 @foreach($listso as $p)
                 <tr>
                     <td style="text-align:center">{{ $i++ }}</td>
@@ -61,18 +65,31 @@
                     <td>{{$p->barang->nama}}</td>
                     <td style="text-align:center">{{format_uang($p->qty)}}</td>
                     <td style="text-align:center">{{$p->barang->satuan}}</td>
-                    <td style="text-align:center">Rp. {{format_uang($p->harga)}}</td>       
-                    <td style="text-align:center">Rp. {{format_uang($p->qty*$p->harga)}}</td>
-                </tr>
+                    <td style="text-align:center">Rp. {{format_uang($p->harga)}}</td>  
+                    <td style="text-align:center">Rp. {{format_uang($p->diskon)}}</td>      
+                    <td style="text-align:center">Rp. {{format_uang($p->qty*($p->harga-$p->diskon))}}</td>
+                </tr>  
+                {{$total+=$p->qty*($p->harga-$p->diskon)}};
                 @endforeach
             </tbody>
+        </table>
+        <table style="width:100.3%;font-size:10pt">
+            <thead>
+                    <th style="width:14.2%;"></th>
+                    <th style="width:14.2%;"></th>
+                    <th style="width:14.2%;"></th>
+                    <th style="width:14.2%;"></th>
+                    <th style="width:14.2%;"></th>
+                    <th style="width:15%;border:solid 1px #000;">Grand Total :</th> 
+                    <th style="width:15%;border:solid 1px #000;background-color:lightgrey">@php echo "Rp. ",format_uang($total) @endphp</th>
+            </thead>
         </table>
     </div> 
     <div class="row">
         <table class="ttd" style="width: 60%;margin-top: 10px;text-align: center;font-size:9pt;">
             <thead>
                 <tr >
-                    <th style="border:solid 1px #000;width:25%">Di buat</th>
+                    <th style="border:solid 1px #000;width:25%">Sales</th>
                     <th style="border:solid 1px #000;width:25%">Kordinator</th>
                     <th style="border:solid 1px #000;width:25%">Supervisor</th>
                     <th style="border:solid 1px #000;width:25%">DIC</th>

@@ -20,7 +20,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/data/so/print/{so}','So\SoController@print');
+Route::get('/data/so/print/{so}','So\SoController@print')->middleware('auth');
+Route::get('/data/formprice/print/{nomor}','Sales\FormpriceController@print')->middleware('auth');
 
 
 Route::group(['middleware' => 'auth'], function() {
