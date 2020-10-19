@@ -338,6 +338,7 @@ export default {
             this.up.nomor_so = aktif.nomor_so;
             this.ket.status = aktif.statusso;
             this.ket.nomor_rso = aktif.nomor_rso;
+            this.up.keterangan = aktif.keterangan;
             axios.get("/api/listso/data/listbck/" + aktif.nomor_so)
                 .then(res => {
                     this.listso = res.data.data;
