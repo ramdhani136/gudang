@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\Bck\Bck;
 use App\Http\Resources\BckResource;
+use App\Model\Bck\Listbck;
 use Symfony\Component\HttpFoundation\Response;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class BckController extends Controller
 {
@@ -94,4 +96,13 @@ class BckController extends Controller
         return BckResource::collection(Bck::where('status','open')->orderBy('bck','ASC')->get());
     }
 
+
+    public function print($bck){
+        $getbck=Bck::where('bck',$bck)->get();    
+        $getlist=Listbck::where('nomor_bck',$bck)->get();
+        // $pdf = view('print.bck',['bck'=>$getbck,'list'=>$getlist]);
+        $pdf = PDF::loadview('print.bck',['bck'=>$getbck,'list'=>$getlist])->setPaper('A4', 'landscape');
+        // return $pdf;
+        return   $pdf->stream($bck);
+    }
 }

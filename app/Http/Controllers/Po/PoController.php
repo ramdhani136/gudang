@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\Po\Po;
 use App\Http\Resources\PoResource;
+use App\Model\Po\Listpo;
 use Symfony\Component\HttpFoundation\Response;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class PoController extends Controller
 {
@@ -97,4 +99,14 @@ class PoController extends Controller
     {
         return PoResource::collection(Po::orderBy('updated_at','ASC')->where('status','Acc')->where('rs','Y')->get());
     }
+
+    public function print($po){
+        $getpo=Po::where('nomor_po',$po)->get();    
+        $getlist=Listpo::where('nomor_po',$po)->get();
+        // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
+        $pdf = PDF::loadview('print.po',['po'=>$getpo,'list'=>$getlist])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        // return $pdf;
+        return   $pdf->stream($po);
+    }
+
 }

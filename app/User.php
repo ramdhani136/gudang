@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use App\Message;
 use App\Model\Groupso\Groupso;
 use App\Model\History\History;
+use App\Model\Po\Po;
 use App\Model\Rso\Rso;
 use App\Model\Sales\Custprice;
 use App\Model\So\So;
@@ -69,6 +70,10 @@ class User extends Authenticatable
 
     public function groupso(){
         return $this->belongsTo(Groupso::class,'kode_groupso','kode');
+    }
+
+    public function po(){
+        return $this->hasMany(Po::class,'id_user','id');
     }
 
 

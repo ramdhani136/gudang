@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor PO :</label>
-                <input v-model="lpo.nomor_po" type="text" class="form-control col-12">
+                <input @input="cekinputrso()" v-model="lpo.nomor_po" type="text" class="form-control col-12" maxlength="15" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -18,8 +18,8 @@
             </div>
             <div class="form-group">
                 <label>Purchasing</label>
-                <select v-model="lpo.nip_purchasing" class="col-12 form-control">
-                    <option v-for="(purch,index) in purchasing" :key="index" :value="purch.nip">{{purch.nama}}</option>
+                <select v-model="lpo.id_user" class="col-12 form-control" disabled>
+                    <option v-for="(purch,index) in purchasing" :key="index" :value="purch.id">{{purch.name}}</option>
                 </select>
             </div>
         </div>
@@ -235,6 +235,7 @@ export default {
                 tanggal_po: this.now(),
                 nomor_po: this.po_nomor(),
                 tanggal_datang: this.tglKirim(),
+                id_user: this.ambiluser.id,
             },
             viewlist: [],
             urut: 0,
@@ -263,6 +264,8 @@ export default {
             masihsisa: 0,
             sisapo: 0,
             openpo: 0,
+            aktif: false,
+            adapo: {}
         }
     },
     created() {
@@ -289,7 +292,7 @@ export default {
                     axios.get("/api/supplier")
                         .then(res => {
                             this.supplier = res.data.data;
-                            axios.get("/api/purchasing")
+                            axios.get("/api/user")
                                 .then(res => {
                                     this.purchasing = res.data.data
                                     this.load = false;
@@ -392,23 +395,6 @@ export default {
 
             $("#modal-form").modal("hide");
             this.resetForm();
-
-            /*  var uniq = {}
-             this.arrFiltered = this.checked.filter(obj => !uniq[obj.kode] && (uniq[obj.kode] = true));
-             for (let i = 0; i < this.arrFiltered.length; i++) {
-                 var unik = {};
-                 this.barangFiltered = this.checked.filter(obj => obj.kode.includes(this.arrFiltered[i].kode));
-                 this.jumlah = 0;
-                 for (let u = 0; u < this.barangFiltered.length; u++) {
-                     this.jumlah += parseInt(this.barangFiltered[u].jumlah);
-                 }
-                 this.hitung.qty[i] = this.jumlah;
-                 this.hitung.harga[i] = "";
-                 this.hitunginv();
-             }
-
-             $("#modal-form").modal("hide");
-             this.resetForm(); */
         },
         deletelist(index) {
             /*    this.arrFiltered.splice(index, 1); */
@@ -675,6 +661,17 @@ export default {
             this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
+        },
+        cekinputrso() {
+            axios.get("/api/po/" + this.lpo.nomor_po)
+                .then(res => {
+                    this.adapo = res.data.data;
+                    if (this.lpo.nomor_po.length === 15 && this.adapo.length === 0) {
+                        this.aktif = true;
+                    } else {
+                        this.aktif = false;
+                    };
+                })
         }
     },
 }

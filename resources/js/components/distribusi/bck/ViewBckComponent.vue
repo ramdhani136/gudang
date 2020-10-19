@@ -100,6 +100,7 @@
                 </button> -->
         <button @click="kembali()" class="btn btn-primary ml-3">Kembali</button>
         <button v-if="statusbck==='open'" @click="batalkan()" class="btn btn-danger ml-1">Batalkan BCK</button>
+        <button v-if="statusbck==='open'" @click="print()" class="btn btn-none ml-1">Print</button>
     </div>
     <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -670,6 +671,10 @@ export default {
             this.$router.push({
                 name: 'bck'
             })
+        },
+        print() {
+            var x = window.open('/data/bck/print/' + this.$route.params.bck, '_blank');
+            x.focus();
         }
     },
 }

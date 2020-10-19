@@ -24,6 +24,8 @@ Route::get('/data/so/print/{so}','So\SoController@print')->middleware('auth');
 Route::get('/data/formprice/print/{nomor}','Sales\FormpriceController@print')->middleware('auth');
 Route::get('/data/rso/print/{rso}','Rso\RsoController@printtersedia')->middleware('auth');
 Route::get('/data/rsott/print/{rso}','Rso\RsoController@printtdk')->middleware('auth');
+Route::get('/data/po/print/{po}','Po\PoController@print')->middleware('auth');
+Route::get('/data/bck/print/{bck}','Bck\BckController@print')->middleware('auth');
 
 
 

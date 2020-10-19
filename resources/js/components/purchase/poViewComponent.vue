@@ -18,8 +18,8 @@
             </div>
             <div class="form-group">
                 <label>Purchasing</label>
-                <select v-model="lpo.nip_purchasing" class="col-12 form-control" :disabled="disedit">
-                    <option v-for="(purch,index) in purchasing" :key="index" :value="purch.nip">{{purch.nama}}</option>
+                <select v-model="lpo.id_user" class="col-12 form-control" :disabled="disedit">
+                    <option v-for="(purch,index) in purchasing" :key="index" :value="purch.id">{{purch.name}}</option>
                 </select>
             </div>
         </div>
@@ -85,6 +85,9 @@
         </button>
         <button v-if="(ambiluser.purch===1 || ambiluser.superadmin===1) && (statusnya!=='Selesai' &&  statusnya!=='Di Selesaikan'&&  statusnya!=='Draft')" @click="reqedit()" class="btn-orange btn ml-1">
             Request Edit
+        </button>
+        <button v-if="(ambiluser.purch===1 || ambiluser.superadmin===1) && (statusnya!=='Tolak'&&  statusnya!=='Draft')" @click="print()" class="btn-none btn ml-1">
+            Print
         </button>
         <button @click="formtolak()" v-if="(ambiluser.suppurch===1 || ambiluser.superadmin===1) && statusnya==='Request'" class="btn-danger btn ml-1">
             Tolak PO
@@ -310,7 +313,7 @@ export default {
                     this.lpo.tanggal_po = this.po[0].tanggal_po;
                     this.lpo.kode_supplier = this.po[0].kode_supplier;
                     this.ket.nama = this.po[0].supplier;
-                    this.lpo.nip_purchasing = this.po[0].nip_purchasing;
+                    this.lpo.id_user = this.po[0].id_user;
                     this.lpo.tanggal_datang = this.po[0].tanggal_datang;
                     this.lpo.keterangan = this.po[0].keterangan;
                     this.lpo.alastolak = this.po[0].alastolak;
@@ -347,7 +350,7 @@ export default {
                             axios.get("/api/supplier")
                                 .then(res => {
                                     this.supplier = res.data.data;
-                                    axios.get("/api/purchasing")
+                                    axios.get("/api/user")
                                         .then(res => {
                                             this.purchasing = res.data.data
                                             this.hitunginv();
@@ -1067,7 +1070,11 @@ export default {
             } else {
                 alert("ubah")
             }
-        }
+        },
+        print() {
+            var x = window.open('/data/po/print/' + this.$route.params.nomor, '_blank');
+            x.focus();
+        },
     },
 }
 </script>
