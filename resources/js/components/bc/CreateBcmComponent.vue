@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor Checker :</label>
-                <input v-model="up.bcm" type="text" class="form-control col-12" autocomplete="disabled">
+                <input @input="ceknomorbcm()" v-model="up.bcm" type="text" maxlength="16" class="form-control col-12" autocomplete="disabled" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -232,7 +232,9 @@ export default {
             sisapo: 0,
             poselesai: '',
             tutuppo: '',
-            bandingtutup: ''
+            bandingtutup: '',
+            aktif: false,
+            adabcm: {},
         }
     },
     created() {
@@ -698,6 +700,17 @@ export default {
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
         },
+        ceknomorbcm() {
+            axios.get("/api/bcm/" + this.up.bcm)
+                .then(res => {
+                    this.adabcm = res.data.data;
+                    if (this.up.bcm.length === 16 && this.adabcm.length === 0) {
+                        this.aktif = true;
+                    } else {
+                        this.aktif = false;
+                    };
+                })
+        }
     },
 }
 </script>

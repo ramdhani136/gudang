@@ -37,17 +37,17 @@
     </table>
     @endforeach
     <div class="row">  
-        <table class="table" style="font-size: 8.5pt; width:100% ;margin-top:20px">
-            <thead style="border:solid 1px #000">
+        <table cellspacing="0" class="table" style="font-size: 8.5pt; width:100% ;margin-top:20px">
+            <thead style="border:solid 1px #000;background-color:lightgrey;">
                 <tr>
-                    <th>NO</th>
-                    <th>KODE ITEM</th>
-                    <th>ITEM</th>
-                    <th>JUMLAH</th>
-                    <th>SATUAN</th>
-                    <th>HARGA</th>
-                    <th>DISKON</th> 
-                    <th>SUB TOTAL</th>
+                    <th style="height: 20px;border:solid 1px #000">NO</th>
+                    <th style="border:solid 1px #000;">KODE ITEM</th>
+                    <th style="border:solid 1px #000;">ITEM</th>
+                    <th style="border:solid 1px #000;">JUMLAH</th>
+                    <th style="border:solid 1px #000;">SATUAN</th>
+                    <th style="border:solid 1px #000;">HARGA</th>
+                    <th style="border:solid 1px #000;">DISKON</th> 
+                    <th style="border:solid 1px #000;">SUB TOTAL</th>
                 </tr>
             </thead>
             <tbody  style="border:solid 1px #000">
@@ -55,14 +55,14 @@
                 $total=0; @endphp
                 @foreach($list as $p)
                 <tr>
-                    <td style="text-align:center">{{ $i++ }}</td>
-                    <td>{{$p->kode_barang}}</td>
-                    <td>{{$p->barang->nama}}</td>
-                    <td style="text-align:center">{{format_uang($p->qty)}}</td>
-                    <td style="text-align:center">{{$p->barang->satuan}}</td>
-                    <td style="text-align:center">Rp. {{format_uang($p->harga)}}</td>  
-                    <td style="text-align:center">Rp. {{format_uang($p->diskon)}}</td>      
-                    <td style="text-align:center">Rp. {{format_uang($p->qty*($p->harga-$p->diskon))}}</td>
+                    <td style="text-align:center;border:solid 1px #000;">{{ $i++ }}</td>
+                    <td style="border:solid 1px #000;">{{$p->kode_barang}}</td>
+                    <td style="border:solid 1px #000;">{{$p->barang->nama}}</td>
+                    <td style="text-align:center;border:solid 1px #000;">{{format_uang($p->qty)}}</td>
+                    <td style="text-align:center;border:solid 1px #000;">{{$p->barang->satuan}}</td>
+                    <td style="text-align:center;border:solid 1px #000;">Rp. {{format_uang($p->harga)}}</td>  
+                    <td style="text-align:center;border:solid 1px #000;">Rp. {{format_uang($p->diskon)}}</td>      
+                    <td style="text-align:center;border:solid 1px #000;">Rp. {{format_uang($p->qty*($p->harga-$p->diskon))}}</td>
                 </tr>  
                 {{$total+=$p->qty*($p->harga-$p->diskon)}};
                 @endforeach
@@ -81,7 +81,7 @@
         </table>
     </div> 
     <div class="row">
-        <table class="ttd" style="width: 60%;margin-top: 10px;text-align: center;font-size:9pt;">
+        <table cellspacing="0" class="ttd" style="width: 60%;margin-top: 10px;text-align: center;font-size:9pt;">
             <thead>
                 <tr >
                     <th style="border:solid 1px #000;width:25%">Sales</th>

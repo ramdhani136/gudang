@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\Barang\Bcm;
 use App\Http\Resources\BcmResource;
+use App\Model\Barang\Listbcm;
 use Symfony\Component\HttpFoundation\Response;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class BcmController extends Controller
 {
@@ -92,5 +94,14 @@ class BcmController extends Controller
     {
         Bcm::where('bcm',$id)->delete();
         return response('deleted',response::HTTP_OK);
+    }
+
+    public function print($bcm){
+        $getbcm=Bcm::where('bcm',$bcm)->get();    
+        $getlist=Listbcm::where('nomor_bcm',$bcm)->get();
+        // $pdf = view('print.bcm',['bcm'=>$getbcm,'list'=>$getlist]);
+        $pdf = PDF::loadview('print.bcm',['bcm'=>$getbcm,'list'=>$getlist])->setPaper('A4', 'landscape');
+        // return $pdf;
+        return   $pdf->stream($bcm);
     }
 }

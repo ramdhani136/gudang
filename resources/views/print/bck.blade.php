@@ -40,7 +40,7 @@
                         <th style="border:solid 1px #000;">REAL</th>
                         <th style="border:solid 1px #000;">SATUAN</th>
                         <th style="border:solid 1px #000;">KETERANGAN HASIL CHECKER</th>
-                        <th style="border:solid 1px #000;">STOCKER</th>
+                        <!-- <th style="border:solid 1px #000;">STOCKER</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -53,8 +53,8 @@
                         <td style="width: 5%;text-align:center;border:solid 1px #000;">{{$p->qty}}</td>
                         <td style="width: 5%;text-align:center;border:solid 1px #000;"></td>
                         <td style="width: 5%;text-align:center;border:solid 1px #000;">{{$p->barang->satuan}}</td>
-                        <td style="width: 35%;border:solid 1px #000;"></td>
-                        <td style="width: 5%;border:solid 1px #000;"></td>
+                        <td style="width: 40%;border:solid 1px #000;"></td>
+                        <!-- <td style="width: 5%;border:solid 1px #000;"></td> -->
                     </tr>
                 @endforeach
                 </tbody>
@@ -63,7 +63,7 @@
         <table cellspacing="0" style="width:100%;">
         <thead>
             <tr>
-                <th style="width:100%;border:solid 1px #000;background-color:lightslategray;font-size:9pt"> Catatan</th>
+                <th style="width:100%;border:solid 1px #000;background-color:lightslategray;font-size:9pt;height:20px"> Catatan</th>
             </tr>
         </thead>
         <tbody>
@@ -77,9 +77,9 @@
         <table cellspacing="0" style="font-size: 9pt;width:50%;margin-top:10px">
             <thead>
                 <tr>
-                    <th style="border:solid 1px #000;height:20px">Checker</th>
-                    <th style="border:solid 1px #000;">Sales</th>
+                    <th style="border:solid 1px #000;height:20px">Admin</th>
                     <th style="border:solid 1px #000;">Kabag. Gudang</th>
+                    <th style="border:solid 1px #000;">Checker</th>
                     <th style="border:solid 1px #000;">Supir</th>
                     <th style="border:solid 1px #000;">Facturing</th>
                 </tr>

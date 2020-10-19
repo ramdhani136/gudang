@@ -85,6 +85,9 @@
         <button v-if="status!=='draft'" @click="kembali()" class="btn-primary btn ml-3">
             Kembali
         </button>
+        <button v-if="status==='open'" @click="print()" class="btn-none btn ml-1">
+            Print
+        </button>
         <button v-if="bc.status==='sent' && ambiluser.incomingspv===1" @click="konfirmasi()" class="btn-success btn ml-1">
             Konfirmasi
         </button>
@@ -424,6 +427,10 @@ export default {
                 }
             })
         },
+        print() {
+            var x = window.open('/data/bcm/print/' + this.$route.params.nomor, '_blank');
+            x.focus();
+        }
     },
 }
 </script>

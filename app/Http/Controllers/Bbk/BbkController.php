@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\Bbk\Bbk;
 use App\Http\Resources\BbkResource;
+use App\Model\Bbk\Listbbk;
 use Symfony\Component\HttpFoundation\Response;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class BbkController extends Controller
 {
@@ -87,6 +89,15 @@ class BbkController extends Controller
     {
         Bbk::where('bbk',$id)->delete();
         return response('deleted',response::HTTP_OK);
+    }
+
+    public function print($bbk){
+        $getbbk=Bbk::where('bbk',$bbk)->get();    
+        $getlist=Listbbk::where('nomor_bbk',$bbk)->get();
+        // $pdf = view('print.bbk',['bbk'=>$getbbk,'list'=>$getlist]);
+        $pdf = PDF::loadview('print.bbk',['bbk'=>$getbbk,'list'=>$getlist])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        // return $pdf;
+        return   $pdf->stream($bbk);
     }
 
 }
