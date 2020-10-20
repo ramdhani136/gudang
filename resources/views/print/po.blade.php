@@ -84,7 +84,7 @@
                 <tr >
                     <th style="border:solid 1px #000;width:25%">Dibuat oleh</th>
                     <th style="border:solid 1px #000;width:25%">Mengetahui</th>
-                    <th style="border:solid 1px #000;width:25%">Supplier</th>
+                    <th style="border:solid 1px #000;width:25%;font-size:8pt">{{$po[0]->supplier->nama}}</th>
                 </tr>
             </thead>
             <tbody>

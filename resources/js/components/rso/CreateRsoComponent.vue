@@ -472,7 +472,7 @@ export default {
                                             qty: this.hitung.qty[i],
                                             qty: this.hitung.qty[i],
                                             catatan: this.hitung.keterangan[i],
-                                            diskon: this.diskon[i],
+                                            diskon: this.inhitung.diskon[i],
                                         }
                                         axios.post("/api/listrso", this.uplist)
                                     }
@@ -563,7 +563,7 @@ export default {
                                         qty: this.hitung.qty[i],
                                         qty: this.hitung.qty[i],
                                         catatan: this.hitung.keterangan[i],
-                                        diskon: this.diskon[i],
+                                        diskon: this.inhitung.diskon[i],
                                     }
                                     axios.post("/api/listrso", this.uplist)
                                 }
