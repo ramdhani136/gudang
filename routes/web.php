@@ -29,6 +29,7 @@ Route::get('/data/po/print/{po}','Po\PoController@print')->middleware('auth');
 Route::get('/data/bck/print/{bck}','Bck\BckController@print')->middleware('auth');
 Route::get('/data/bbk/print/{bbk}','Bbk\BbkController@print')->middleware('auth');
 Route::get('/data/bcm/print/{bcm}','Barang\BcmController@print')->middleware('auth');
+Route::get('/data/bbm/print/{bbm}','Bbm\BbmController@print')->middleware('auth');
 /* End Print */
 
 

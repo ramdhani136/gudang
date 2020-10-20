@@ -71,6 +71,9 @@
         <button @click="kembali()" class="btn-primary btn ml-4">
             Kembali
         </button>
+        <button @click="print()" class="btn-none btn ml-1">
+            Print
+        </button>
     </div>
     <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -262,6 +265,10 @@ export default {
                 name: 'ingoods'
             });
         },
+        print() {
+            var x = window.open('/data/bbm/print/' + this.$route.params.nomor, '_blank');
+            x.focus();
+        }
     },
 }
 </script>

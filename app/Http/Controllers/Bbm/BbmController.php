@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\Bbm\Bbm;
 use App\Http\Resources\BbmResource;
+use App\Model\Bbm\Listbbm;
 use Symfony\Component\HttpFoundation\Response;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class BbmController extends Controller
 {
@@ -87,5 +89,14 @@ class BbmController extends Controller
     {
         Bbm::where('bbm',$id)->delete();
         return response('deleted',response::HTTP_OK);
+    }
+
+    public function print($bbm){
+        $getbbm=Bbm::where('bbm',$bbm)->get();    
+        $getlist=Listbbm::where('nomor_bbm',$bbm)->get();
+        // $pdf = view('print.bbm',['bbm'=>$getbbm,'list'=>$getlist]);
+        $pdf = PDF::loadview('print.bbm',['bbm'=>$getbbm,'list'=>$getlist])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        // return $pdf;
+        return   $pdf->stream($bbm);
     }
 }

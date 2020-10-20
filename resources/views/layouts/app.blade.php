@@ -242,8 +242,8 @@
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 <!--     <router-link to="/purchase/dpo" class="dropdown-item" >Purchase Order List</router-link> -->
-                                @if(Auth::user()->sales == 1 || Auth::user()->susales == 1 || Auth::user()->kordisales == 1) <router-link to="/view/sisaso" class="dropdown-item" >Sales Order</router-link> @endif
-                                @if(Auth::user()->sales == 1 || Auth::user()->susales == 1 || Auth::user()->kordisales == 1) <router-link to="/view/penjualan" class="dropdown-item" >Penjualan</router-link> @endif
+                                @if(Auth::user()->sales == 1 || Auth::user()->susales == 1 || Auth::user()->kordisales == 1 || Auth::user()->distribusi == 1 ) <router-link to="/view/sisaso" class="dropdown-item" >Sales Order</router-link> @endif
+                                @if(Auth::user()->sales == 1 || Auth::user()->susales == 1 || Auth::user()->kordisales == 1 ) <router-link to="/view/penjualan" class="dropdown-item" >Penjualan</router-link> @endif
                                     <!-- <router-link to="/dic/incoming/confirm" class="dropdown-item" >Incoming Goods</router-link> -->
                                 </div>
                             </li>

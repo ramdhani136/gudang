@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor BBM :</label>
-                <input v-model="up.bbm" type="text" class="form-control col-12" autocomplete="disabled">
+                <input @input="ceknomorbbm()" v-model="up.bbm" type="text" class="form-control col-12" maxlength="16" autocomplete="disabled" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -222,7 +222,9 @@ export default {
             nomorpo: '',
             listtutuppo: {},
             bbm: 0,
-            listbagi: {}
+            listbagi: {},
+            aktif: false,
+            adabbm: {}
         }
     },
     created() {
@@ -291,6 +293,7 @@ export default {
             $("#modal-po").modal("hide");
         },
         submitBBM() {
+            this.load = true;
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success ml-2',
@@ -435,6 +438,7 @@ export default {
                                                 tanggal: this.DateTime(),
                                             })
                                         }).then(res => {
+                                            this.load = false;
                                             swalWithBootstrapButtons.fire(
                                                 'Sukses!',
                                                 'Berhasil mengirim BBM.',
@@ -447,6 +451,7 @@ export default {
                                     })
                                     /* end */
                                 }).catch(error => {
+                                    this.load = false;
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Oops...',
@@ -454,6 +459,7 @@ export default {
                                     })
                                 })
                         } else {
+                            this.load = false;
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
@@ -461,6 +467,7 @@ export default {
                             })
                         }
                     } else {
+                        this.load = false;
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
@@ -471,6 +478,7 @@ export default {
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal mengirim bbm :)',
@@ -501,6 +509,17 @@ export default {
             this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
+        },
+        ceknomorbbm() {
+            axios.get("/api/bbm/" + this.up.bbm)
+                .then(res => {
+                    this.adabbm = res.data.data;
+                    if (this.up.bbm.length === 16 && this.adabbm.length === 0) {
+                        this.aktif = true;
+                    } else {
+                        this.aktif = false;
+                    };
+                })
         }
     },
 }

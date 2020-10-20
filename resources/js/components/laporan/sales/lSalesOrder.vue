@@ -298,7 +298,7 @@ export default {
                         this.filter.sales = "all";
                         this.filter.group = this.ambiluser.kode_groupso;
                     })
-            } else if (this.ambiluser.susales === 1) {
+            } else if (this.ambiluser.susales === 1 || this.ambiluser.distribusi === 1) {
                 axios.get("/api/user/data/all")
                     .then(res => {
                         this.sales = res.data.data;

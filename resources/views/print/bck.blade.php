@@ -63,7 +63,7 @@
         <table cellspacing="0" style="width:100%;">
         <thead>
             <tr>
-                <th style="width:100%;border:solid 1px #000;background-color:lightslategray;font-size:9pt;height:20px"> Catatan</th>
+                <th style="width:100%;border:solid 1px #000;background-color:lightgray;font-size:9pt;height:20px"> Catatan</th>
             </tr>
         </thead>
         <tbody>
