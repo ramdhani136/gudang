@@ -40,7 +40,7 @@
                         <button @click="showhistory(bk)" class="btn btn-primary">
                             Lihat History
                         </button>
-                        <button @click="batalkan(bk)" class="btn btn-danger mt-1">
+                        <button @click="batalkan(bk)" class="btn btn-danger">
                             Batalkan
                         </button>
                     </td>
