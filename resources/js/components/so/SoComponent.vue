@@ -1,10 +1,13 @@
 <template>
-<div class="container">
+<div class="container" @keyup.esc="defaultfilter">
+    <div class="form-group  ml-n4 col-1 my-3 float-right">
+        <button @click="showfilter()" class="btn btn-trans">Filter</button>
+    </div>
     <div class="form-group col-3 my-3 float-right">
-        <input @input="pilihstatus()" v-model="search" type="text" class="form-control" placeholder="Search">
+        <input @input="pilihstatus()" v-model="filter.nomorso" type="text" class="form-control" placeholder="Input Nomor SO">
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
-        <select @change="pilihstatus()" name="status" v-model="status" class="form-control">
+        <select @change="pilihstatus()" name="status" v-model="filter.status" class="form-control">
             <option value="Draft">Draft SO</option>
             <option value="Kordinator">Kordinator Sales</option>
             <option value="Sent">Sales SPV</option>
@@ -30,6 +33,7 @@
                     <th>Tanggal</th>
                     <th>Customer</th>
                     <th>Tanggal Kirim</th>
+                    <th>Sales</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -44,6 +48,7 @@
                     <td style="text-align:center">{{rs.tanggal_so}}</td>
                     <td>{{rs.customer}}</td>
                     <td style="text-align:center">{{rs.tanggal_kirim}}</td>
+                    <td style="text-align:center">{{rs.sales}}</td>
                     <td style="text-align:center">
                         <button v-if="rs.status!=='Draft'" @click="showhistory(rs)" class="btn btn-primary">Lihat History</button>
                         <button @click="deleteSo(rs)" v-if="rs.status!=='Selesai' && rs.status!=='Di Selesaikan'  && ket.aktif[index]==true" class="btn btn-danger">Batalkan</button>
@@ -136,6 +141,72 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-filter" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Filter Data</h5>
+                    <button @click="defaultfilter()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Customer</label>
+                        <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisible" v-text="custom ? custom.nama:''"></div>
+                        <div class="placeholder" v-if="custom==null" v-text="ket.nama">Pilih Customer</div>
+                        <div class="popover" v-show="visible">
+                            <input type="text" @keydown.up="up" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nama customer ..">
+                            <div class="optionbr" ref="optionList">
+                                <ul>
+                                    <li v-for="(match,index) in matches" :key="match.kode" v-text="match.nama" :class="{'selected':(selected==index)}" @click="itemClicked(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Sales</label>
+                        <select v-model="filter.id_user" class="form-control">
+                            <option value="">Semua Sales</option>
+                            <option :value="us.id" v-for="(us,index) in user" :key="index">{{us.name}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Group</label>
+                        <select v-model="filter.kode_groupso" class="form-control" :disabled="ambiluser.susales!==1">
+                            <option :value="gr.kode" v-for="(gr,index) in groupso" :key="index">{{gr.area}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Berdasarkan Tanggal</label>
+                        <select @change="cektanggal()" v-model="filter.listtanggal" class="form-control">
+                            <option value="so">Penerbitan SO</option>
+                            <option value="rk">Rencana Kirim</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Pilih Tanggal</label>
+                        <select @change="cekjenis()" v-model="filter.jenistanggal" class="form-control">
+                            <option value="Y">Bulan Berjalan</option>
+                            <option value="N">Filter Tanggal</option>
+                        </select>
+                    </div>
+                    <div v-if="filter.jenistanggal==='N'" class="form-group">
+                        <label>Mulai Tanggal</label>
+                        <input v-model="filter.mulaitanggal" type="date" class="form-control">
+                    </div>
+                    <div v-if="filter.jenistanggal==='N'&& filter.mulaitanggal!==undifined" class="form-group">
+                        <label>Sampai Tanggal</label>
+                        <input v-model="filter.sampaitanggal" type="date" class="form-control" :min="filter.mulaitanggal">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button @click="defaultfilter()" type="button" class="btn btn-success" data-dismiss="modal">Save Change</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -151,7 +222,6 @@ export default {
     data() {
         return {
             search: '',
-            status: 'Acc',
             so: [],
             load: true,
             update: {},
@@ -162,7 +232,8 @@ export default {
             input: {},
             alastolak: null,
             ket: {
-                aktif: []
+                aktif: [],
+                nama: "Pilih Customer"
             },
             listso: {},
             bbk: 0,
@@ -171,38 +242,76 @@ export default {
             history: {},
             historyview: {},
             nrso: null,
+            visible: false,
+            query: '',
+            selected: 0,
+            custom: null,
+            itemHeight: 39,
+            customer: [],
+            filter: {
+                kode_customer: '',
+                id_user: this.ambiluser.id,
+                kode_groupso: this.ambiluser.kode_groupso,
+                jenistanggal: 'Y',
+                mulaitanggal: this.FirstDate(),
+                sampaitanggal: this.today(),
+                status: 'Acc',
+                nomorso: '',
+                listtanggal: 'so',
+            },
+            groupso: {},
+            user: {},
         }
     },
     created() {
         this.getSo();
-        this.filter();
+        this.defaultfilter();
     },
     computed: {
         FilterKategori() {
-            if (this.search === "") {
-                if (this.status === "Draft") {
-                    return this.so.filter(elem => elem.status === "Draft")
-                } else if (this.status === "Acc") {
-                    return this.so.filter(elem => elem.status === "Acc")
-                } else if (this.status === "Sent") {
-                    return this.so.filter(elem => elem.status === "Sent")
-                } else if (this.status === "Tolak") {
-                    return this.so.filter(elem => elem.status === "Tolak")
-                } else if (this.status === "Selesai") {
-                    return this.so.filter(elem => elem.status === "Selesai")
-                } else if (this.status === "Di Selesaikan") {
-                    return this.so.filter(elem => elem.status === "Di Selesaikan")
-                } else if (this.status === "Dic") {
-                    return this.so.filter(elem => elem.status === "Dic")
-                } else if (this.status === "Kordinator") {
-                    return this.so.filter(elem => elem.status === "Kordinator")
-                }
-            } else {
-                return this.so.filter(elem => {
-                    return elem.nomor_so.toLowerCase().includes(this.search.toLowerCase());
-                });
-            }
+            var vm = this,
+                lists = vm.so
+            return _.filter(lists, function (query) {
+                // var tanggal = query.tanggal_so >= vm.filter.mulaitanggal && query.tanggal_so <= vm.filter.sampaitanggal,
+                var tanggal = vm.filter.listtanggal === 'so' ? query.tanggal_so >= vm.filter.mulaitanggal && query.tanggal_so <= vm.filter.sampaitanggal : query.tanggal_kirim >= vm.filter.mulaitanggal && query.tanggal_kirim <= vm.filter.sampaitanggal,
+                    customer = vm.filter.kode_customer ? (query.kode_customer == vm.filter.kode_customer) : true,
+                    sales = vm.filter.id_user ? (query.id_user == vm.filter.id_user) : true,
+                    groupin = vm.filter.kode_groupso ? (query.kode_groupso == vm.filter.kode_groupso) : true,
+                    nomorso = vm.filter.nomorso ? (query.nomor_so.toLowerCase().includes(vm.filter.nomorso.toLowerCase())) : true,
+                    status = vm.filter.status ? (query.status == vm.filter.status) : true;
+                return tanggal && customer && sales && groupin && nomorso && status;
+            })
+
+            // if (this.search === "") {
+            //     if (this.status === "Draft") {
+            //         return this.so.filter(elem => elem.status === "Draft")
+            //     } else if (this.status === "Acc") {
+            //         return this.so.filter(elem => elem.status === "Acc")
+            //     } else if (this.status === "Sent") {
+            //         return this.so.filter(elem => elem.status === "Sent")
+            //     } else if (this.status === "Tolak") {
+            //         return this.so.filter(elem => elem.status === "Tolak")
+            //     } else if (this.status === "Selesai") {
+            //         return this.so.filter(elem => elem.status === "Selesai")
+            //     } else if (this.status === "Di Selesaikan") {
+            //         return this.so.filter(elem => elem.status === "Di Selesaikan")
+            //     } else if (this.status === "Dic") {
+            //         return this.so.filter(elem => elem.status === "Dic")
+            //     } else if (this.status === "Kordinator") {
+            //         return this.so.filter(elem => elem.status === "Kordinator")
+            //     }
+            // } else {
+            //     return this.so.filter(elem => {
+            //         return elem.nomor_so.toLowerCase().includes(this.search.toLowerCase());
+            //     });
+            // }
         },
+        matches() {
+            if (this.query == '') {
+                return [];
+            }
+            return this.customer.filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()))
+        }
     },
     methods: {
         getSo() {
@@ -210,19 +319,38 @@ export default {
                 axios.get("/api/so/data/realso")
                     .then(res => {
                         this.so = res.data.data
-                        this.status = "Draft";
-                        this.status = "Acc";
-                        this.load = false;
+                        this.filter.status = "Draft";
+                        this.filter.status = "Acc";
                     });
             } else {
                 axios.get("/api/so/data/view/" + this.ambiluser.kode_groupso)
                     .then(res => {
                         this.so = res.data.data
-                        this.status = "Draft";
-                        this.status = "Acc";
-                        this.load = false;
+                        this.filter.status = "Draft";
+                        this.filter.status = "Acc";
                     });
             }
+            axios.get("/api/customer")
+                .then(res => {
+                    this.customer = res.data.data;
+                    axios.get("/api/groupso")
+                        .then(res => {
+                            this.groupso = res.data.data;
+                            if (this.ambiluser.susales === 1) {
+                                axios.get("/api/user/data/all")
+                                    .then(res => {
+                                        this.user = res.data.data;
+                                        this.load = false;
+                                    });
+                            } else {
+                                axios.get("/api/user/view/" + this.ambiluser.kode_groupso)
+                                    .then(res => {
+                                        this.user = res.data.data;
+                                        this.load = false;
+                                    });
+                            }
+                        })
+                })
 
         },
         pilihstatus() {
@@ -245,7 +373,7 @@ export default {
                     })
             }
         },
-        filter() {
+        defaultfilter() {
             if (this.ambiluser.susales === 1) {
                 axios.get("/api/so/data/realso")
                     .then(res => {
@@ -299,6 +427,35 @@ export default {
                         }
                     });
             }
+        },
+        toggleVisible() {
+            this.visible = !this.visible;
+        },
+        itemClicked(index) {
+            this.selected = index;
+            this.selectItem();
+        },
+        selectItem() {
+            this.custom = this.matches[this.selected];
+            this.filter.kode_customer = this.custom.kode
+            this.visible = false;
+        },
+        up() {
+            if (this.selected == 0) {
+                return;
+            }
+            this.selected -= 1;
+            this.scrollToItem();
+        },
+        down() {
+            if (this.selected >= this.matches.length - 1) {
+                return;
+            }
+            this.selected += 1;
+            this.scrollToItem();
+        },
+        scrollToItem() {
+            this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
         },
         showhistory(rs) {
             $("#modal-history").modal("show");
@@ -541,6 +698,45 @@ export default {
             this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
+        },
+        showfilter() {
+            $("#modal-filter").modal("show");
+        },
+        FirstDate() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + "01";
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates;
+            return this.datetimes;
+        },
+        today() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates;
+            return this.datetimes;
+        },
+        cekjenis() {
+            this.filter.mulaitanggal = this.FirstDate();
+            this.filter.sampaitanggal = this.today();
         }
     }
 }
