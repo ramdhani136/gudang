@@ -115,4 +115,9 @@ class UserController extends Controller
         return UserResource::collection(User::where('sales',1)->where('kode_groupso',$groupso)->orderBy('name','ASC')->get());
     }
 
+    public function purch()
+    {
+        return UserResource::collection(User::where('purch',1)->orderBy('name','ASC')->get());
+    }
+
 }

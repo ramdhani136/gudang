@@ -125,6 +125,7 @@ Route::get('listretur/bbk/{nomor}/{barang}','Retur\ListReturController@bbk');
 Route::resource('user','User\UserController');
 Route::get('user/data/all','User\UserController@sales');
 Route::get('user/view/{groupso}','User\UserController@groupsales');
+Route::get('user/data/purch','User\UserController@purch');
 
 Route::resource('listso','So\ListSoController');
 Route::get('listso/data/group','So\ListSoController@group');
