@@ -211,6 +211,12 @@ export default {
                 return tanggal && customer && sales && groupin && (nomorbck || nomorso) && status
             })
         },
+        matches() {
+            if (this.query == '') {
+                return [];
+            }
+            return this.customer.filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()))
+        }
     },
     methods: {
         getBck() {
