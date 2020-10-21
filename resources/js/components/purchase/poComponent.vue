@@ -234,7 +234,7 @@ export default {
             },
             filter: {
                 kode_supplier: '',
-                id_user: this.ambiluser.id,
+                id_user: "",
                 jenistanggal: 'Y',
                 mulaitanggal: this.FirstDate(),
                 sampaitanggal: this.today(),

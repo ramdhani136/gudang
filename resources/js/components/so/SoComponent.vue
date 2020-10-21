@@ -4,7 +4,7 @@
         <button @click="showfilter()" class="btn btn-trans">Filter</button>
     </div>
     <div class="form-group col-3 my-3 float-right">
-        <input @input="pilihstatus()" v-model="filter.nomorso" type="text" class="form-control" placeholder="Input Nomor SO">
+        <input @input="pilihstatus()" v-model="filter.nomorso" type="text" class="form-control" placeholder="Cari nomor SO">
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select @change="pilihstatus()" name="status" v-model="filter.status" class="form-control">
