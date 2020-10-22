@@ -277,37 +277,9 @@ export default {
     },
     methods: {
         getSoAktif() {
-            axios.get("/api/groupso/retur/" + this.ambiluser.kode_groupso)
+            axios.get("/api/so/data/view/" + this.ambiluser.kode_groupso)
                 .then(res => {
                     this.sopilih = res.data.data;
-                    for (let i = 0; i < this.sopilih.length; i++) {
-                        axios.get("/api/listso/" + this.sopilih[i].nomor_so)
-                            .then(res => {
-                                this.listaktif = res.data.data;
-                                for (let u = 0; u < this.listaktif.length; u++) {
-                                    axios.get("/api/listretur/bbk/" + this.listaktif[0].nomor_so + "/" + this.listaktif[u].kode_barang)
-                                        .then(res => {
-                                            this.listreturnya = res.data.data;
-                                            this.qtyretur = 0;
-                                            for (let k = 0; k < this.listreturnya.length; k++) {
-                                                if (this.listreturnya[k].length < 1) {
-                                                    this.qtyretur = 0;
-                                                } else {
-                                                    this.qtyretur += parseInt(this.listreturnya[k].qty);
-                                                }
-                                            }
-                                            // console.log(this.qtyretur);
-                                            this.adagak = 0;
-                                            console.log(this.listaktif);
-                                        })
-                                }
-
-                                // if (this.adagak > 0) {
-                                //     this.soaktif.push(this.sopilih[i]);
-                                // }
-
-                            })
-                    }
 
                     this.load = false;
                 });

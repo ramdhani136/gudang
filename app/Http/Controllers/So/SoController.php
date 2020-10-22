@@ -122,11 +122,6 @@ class SoController extends Controller
         return SoResource::collection(So::where('kode_groupso',$groupso)->where('pr','N')->orderBy('nomor_so','ASC')->get());
     }
 
-    public function retur($groupso)
-    {
-        return SoResource::collection(So::where('kode_groupso',$groupso)->where('status','Acc')->where('pr','N')->orderBy('nomor_so','ASC')->where('closebck','N')->get());
-    }
-
     public function print($so){
         $getso=So::where('nomor_so',$so)->get();    
         $getlistso=Listso::where('nomor_so',$so)->get();

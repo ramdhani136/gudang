@@ -98,6 +98,8 @@ import CreateFormPriceComponent from '../components/formprice/CreateFormPriceCom
 import lSalesOrder from '../components/laporan/sales/lSalesOrder.vue'
 import lPenjualan from '../components/laporan/sales/lPenjualan.vue'
 
+import lpurchaseorder from '../components/laporan/purch/lpurchaseorder.vue'
+
 
 
 
@@ -201,6 +203,7 @@ const routes=[
     /* laporan */
     {name:'sisaso', path:'/view/sisaso', component:lSalesOrder},
     {name:'penjualan', path:'/view/penjualan', component:lPenjualan},
+    {name:'laporpo', path:'/view/laporpo', component:lpurchaseorder},
     
 ]
 

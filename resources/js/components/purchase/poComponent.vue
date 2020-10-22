@@ -8,7 +8,7 @@
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select name="status" v-model="filter.status" class="form-control">
-            <option v-if="ambiluser.purch===1 || ambiluser.suppurch===1" value=" Draft">Draft</option>
+            <option v-if="ambiluser.purch===1 || ambiluser.suppurch===1" value="Draft">Draft</option>
             <option v-if="ambiluser.purch===1 || ambiluser.suppurch===1" value="Request">Request</option>
             <option value="Acc">Open</option>
             <option v-if="ambiluser.purch===1 || ambiluser.suppurch===1" value="Tolak">Rejected</option>

@@ -109,4 +109,9 @@ class PoController extends Controller
         return   $pdf->stream($po);
     }
 
+    public function laporan()
+    {
+        return PoResource::collection(Po::where('status','Acc')->orWhere('status','Selesai')->orWhere('status','Di Selesaikan')->orderBy('tanggal_po','ASC')->get());
+    }
+
 }

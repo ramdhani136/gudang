@@ -192,7 +192,7 @@ export default {
                 kode_groupso: this.ambiluser.kode_groupso,
                 jenistanggal: 'Y',
                 mulaitanggal: this.FirstDate(),
-                sampaitanggal: this.DateTime(),
+                sampaitanggal: this.today(),
                 status: 'Draft',
                 nomorrso: '',
             },
@@ -500,7 +500,23 @@ export default {
             this.day = this.date.getDate();
             this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + "01";
             this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
-            this.datetimes = this.dates + " " + this.times;
+            this.datetimes = this.dates;
+            return this.datetimes;
+        },
+        today() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates;
             return this.datetimes;
         },
         showfilter() {
@@ -508,7 +524,7 @@ export default {
         },
         cekjenis() {
             this.filter.mulaitanggal = this.FirstDate();
-            this.filter.sampaitanggal = this.DateTime();
+            this.filter.sampaitanggal = this.today();
         }
     }
 }

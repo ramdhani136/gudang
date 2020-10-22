@@ -143,6 +143,8 @@ Route::resource('listpo','Po\ListpoController');
 Route::get('listpo/data/aktif/{nomor}','Po\ListpoController@sisalist');
 Route::get('listpo/data/bcm/{id}','Po\ListpoController@bcm');
 Route::get('listpo/data/{po}/{barang}','Po\ListpoController@hapusbck');
+Route::get('po/data/laporan','Po\PoController@laporan');
+
 
 Route::resource('history','History\HistoryController');
 Route::get('history/data/{nomorso}/{jenis}','History\HistoryController@historyview');
@@ -153,7 +155,6 @@ Route::resource('satuan','Barang\SatuanController');
 
 Route::resource('groupso','Groupso\GroupSoController');
 Route::get('groupso/data/aktif','Groupso\GroupSoController@aktif');
-Route::get('groupso/retur/{groupso}','So\SoController@retur');
 
 Route::resource('formprice','Sales\FormpriceController');
 Route::get('formprice/data/{groupso}','Sales\FormpriceController@groupso');

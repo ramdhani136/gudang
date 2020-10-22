@@ -940,7 +940,8 @@ export default {
                         this.subban += "Y";
                     }
                     if (this.subl === this.subban) {
-                        axios.post("/api/po/" + this.$route.params.nomor, this.lpo)
+                        this.lpo.status = "Request";
+                        axios.put("/api/po/" + this.$route.params.nomor, this.lpo)
                             .then(res => {
                                 axios.get('/api/listpo/' + this.$route.params.nomor)
                                     .then(res => {
