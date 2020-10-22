@@ -239,6 +239,7 @@ export default {
             axios.get("/api/bcm/data/open")
                 .then(res => {
                     this.bcmaktif = res.data.data;
+                    this.load = false;
                 });
         },
         now() {

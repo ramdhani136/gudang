@@ -170,7 +170,12 @@ export default {
             up: {},
             load: true,
             selesaikah: false,
-            sales: {}
+            sales: {},
+            ceklist: {},
+            aplus: 0,
+            blus: '',
+            aband: '',
+            b: ''
         }
     },
     created() {
@@ -284,6 +289,7 @@ export default {
             this.dic.kode = "";
         },
         ConfirmRso(up) {
+            this.load = true;
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success ml-2',
@@ -302,46 +308,81 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {
-                    this.urso.kode_customer = up.kode_customer
-                    this.urso.status = this.akses
-                    this.urso.nomor_rso = up.nomor_rso
-                    this.urso.id_user = up.id_user
-                    this.urso.tanggal_rso = up.tanggal_rso
-                    axios.put(`/api/rso/` + this.urso.nomor_rso, this.urso)
-                        .then((response) => {
-                            this.up.booking = "Y";
-                            axios.put(`/api/listrso/data/booking/` + this.urso.nomor_rso, this.up)
-                            axios.post("/api/history", {
-                                nomor_dok: this.$route.params.id,
-                                id_user: this.ambiluser.id,
-                                notif: "Nomor RSO " + this.$route.params.id + " di konfirmasi Inventory Control",
-                                keterangan: "RSO di konfirmasi Inventory Control",
-                                jenis: "RSO",
-                                tanggal: this.DateTime(),
-                            })
-                            if (this.akses === "Purch") {
-                                axios.post("/api/history", {
-                                    nomor_dok: this.$route.params.id,
-                                    id_user: this.ambiluser.id,
-                                    notif: "Menunggu konfirmasi Purchasing",
-                                    keterangan: "Menunggu konfirmasi Purchasing",
-                                    jenis: "RSO",
-                                    tanggal: this.DateTime(),
+                    axios.get("/api/listrso/" + up.nomor_rso)
+                        .then(res => {
+                            this.ceklist = res.data.data;
+                            this.b = "";
+                            this.bplus = "";
+                            this.aband = "";
+                            this.aplus = 0;
+                            for (let i = 0; i < this.ceklist.length; i++) {
+                                if (this.ceklist[i].qty_tersedia === '' || this.ceklist[i].qty_tersedia < 1 || this.ceklist[i].qty_tersedia === null || this.ceklist[i].qty_tersedia === undefined) {
+                                    this.ceklist[i].qty_tersedia = 0;
+                                }
+                                if (this.ceklist[i].qty_tdktersedia === '' || this.ceklist[i].qty_tdktersedia < 1 || this.ceklist[i].qty_tdktersedia === null || this.ceklist[i].qty_tdktersedia === undefined) {
+                                    this.ceklist[i].qty_tdktersedia = 0;
+                                }
+                                this.aplus = parseInt(this.ceklist[i].qty_tersedia) + parseInt(this.ceklist[i].qty_tdktersedia);
+                                if (this.aplus < 1) {
+                                    this.b = "N";
+                                } else {
+                                    this.b = "Y";
+                                }
+                                this.bplus += this.b;
+                                this.aband += "Y";
+                            }
+                            if (this.bplus === this.aband) {
+                                this.urso.kode_customer = up.kode_customer
+                                this.urso.status = this.akses
+                                this.urso.nomor_rso = up.nomor_rso
+                                this.urso.id_user = up.id_user
+                                this.urso.tanggal_rso = up.tanggal_rso
+                                axios.put(`/api/rso/` + this.urso.nomor_rso, this.urso)
+                                    .then((response) => {
+                                        this.up.booking = "Y";
+                                        axios.put(`/api/listrso/data/booking/` + this.urso.nomor_rso, this.up)
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.$route.params.id,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Nomor RSO " + this.$route.params.id + " di konfirmasi Inventory Control",
+                                            keterangan: "RSO di konfirmasi Inventory Control",
+                                            jenis: "RSO",
+                                            tanggal: this.DateTime(),
+                                        })
+                                        if (this.akses === "Purch") {
+                                            axios.post("/api/history", {
+                                                nomor_dok: this.$route.params.id,
+                                                id_user: this.ambiluser.id,
+                                                notif: "Menunggu konfirmasi Purchasing",
+                                                keterangan: "Menunggu konfirmasi Purchasing",
+                                                jenis: "RSO",
+                                                tanggal: this.DateTime(),
+                                            })
+                                        }
+                                        this.load = false;
+                                        this.$router.push({
+                                            name: 'dic'
+                                        })
+                                    })
+                                swalWithBootstrapButtons.fire(
+                                    'Berhasil!',
+                                    'RSO berhasil di konfirmasi!.',
+                                    'success'
+                                )
+                            } else {
+                                this.load = false;
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Periksa form anda kembali, pastikan semua item sudah di konfirmasi!',
                                 })
                             }
-                            this.$router.push({
-                                name: 'dic'
-                            })
                         })
-                    swalWithBootstrapButtons.fire(
-                        'Berhasil!',
-                        'RSO berhasil di konfirmasi!.',
-                        'success'
-                    )
                 } else if (
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Batal',
                         'RSO batal di konfirmasi :)',

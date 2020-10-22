@@ -1,10 +1,13 @@
 <template>
 <div class="container">
+    <div class="form-group  ml-n4 col-1 my-3 float-right">
+        <button @click="showfilter()" class="btn btn-trans">Filter</button>
+    </div>
     <div class="form-group col-3 my-3 float-right">
-        <input v-model="search" type="text" class="form-control" placeholder="Search">
+        <input v-model="filter.nomor" type="text" class="form-control" placeholder="Nomor PR">
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
-        <select name="status" v-model="status" class="form-control">
+        <select name="status" v-model="filter.status" class="form-control">
             <option value="Purch">Menunggu Acc</option>
             <option value="Confirmed">Confirmed</option>
             <option value="So">Open</option>
@@ -83,6 +86,31 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-filter" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Filter Data</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Mulai Tanggal</label>
+                        <input v-model="filter.mulaitanggal" type="date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Sampai Tanggal</label>
+                        <input v-model="filter.sampaitanggal" type="date" class="form-control" :min="filter.mulaitanggal">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Save Change</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -96,15 +124,19 @@ export default {
     },
     data() {
         return {
-            search: '',
-            load: false,
-            status: 'Confirmed',
+            load: true,
             pr: [],
             historyview: {},
             statusnya: '',
             listso: {},
             openpo: 0,
-            history: {}
+            history: {},
+            filter: {
+                mulaitanggal: this.FirstDate(),
+                sampaitanggal: this.today(),
+                status: 'Confirmed',
+                nomor: ''
+            },
         }
     },
     created() {
@@ -112,21 +144,14 @@ export default {
     },
     computed: {
         FilteredPr() {
-            if (this.search === "") {
-                if (this.status === "Draft") {
-                    return this.pr.filter(elem => elem.status === "Draft")
-                } else if (this.status === "Purch") {
-                    return this.pr.filter(elem => elem.status === "Purch")
-                } else if (this.status === "Confirmed") {
-                    return this.pr.filter(elem => elem.status === "Confirmed")
-                } else if (this.status === "So") {
-                    return this.pr.filter(elem => elem.status === "So")
-                }
-            } else {
-                return this.pr.filter(elem => {
-                    return elem.nomor_rso.toLowerCase().includes(this.search.toLowerCase());
-                });
-            }
+            var vm = this,
+                lists = vm.pr
+            return _.filter(lists, function (query) {
+                var tanggal = query.tanggal_rso >= vm.filter.mulaitanggal && query.tanggal_rso <= vm.filter.sampaitanggal,
+                    nomorpr = vm.filter.nomor ? (query.nomor_rso.toLowerCase().includes(vm.filter.nomor.toLowerCase())) : true,
+                    status = vm.filter.status ? (query.status == vm.filter.status) : true;
+                return tanggal && nomorpr && status;
+            })
         },
     },
     methods: {
@@ -134,6 +159,7 @@ export default {
             axios.get("/api/rso/data/pr")
                 .then(res => {
                     this.pr = res.data.data;
+                    this.load = false;
                 })
         },
         showhistory(lp) {
@@ -225,7 +251,42 @@ export default {
                     )
                 }
             })
-        }
+        },
+        showfilter() {
+            $("#modal-filter").modal("show");
+        },
+        FirstDate() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + "01";
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates;
+            return this.datetimes;
+        },
+        today() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates;
+            return this.datetimes;
+        },
     }
 }
 </script>
