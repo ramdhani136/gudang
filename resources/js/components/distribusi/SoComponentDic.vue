@@ -122,7 +122,7 @@
                     </div>
                     <div class="form-group">
                         <label>Berdasarkan Tanggal</label>
-                        <select @change="cektanggal()" v-model="filter.listtanggal" class="form-control">
+                        <select v-model="filter.listtanggal" class="form-control">
                             <option value="so">Penerbitan SO</option>
                             <option value="rk">Rencana Kirim</option>
                         </select>

@@ -24,7 +24,10 @@ class BbmResource extends JsonResource
             'status'=>$this->status,
             'nomor_po'=>$this->bcm->nomor_po,
             'nopol'=>$this->bcm->nopol,
-            'supplier'=>$this->bcm->po->supplier->nama
+            'kode_supplier'=>$this->bcm->po->supplier->kode_supplier,
+            'supplier'=>$this->bcm->po->supplier->nama,
+            'id_user'=>$this->bcm->po->id_user,
+            'user'=>$this->bcm->po->user->name,
         ];
     }
 }

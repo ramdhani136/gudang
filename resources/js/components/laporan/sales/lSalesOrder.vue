@@ -91,6 +91,13 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label>Berdasarkan Tanggal</label>
+                        <select v-model="filter.listtanggal" class="form-control">
+                            <option value="so">Penerbitan SO</option>
+                            <option value="rk">Rencana Kirim</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Tanggal</label>
                         <select @change="cekjenistanggal()" v-model="jenistanggal" class="form-control">
                             <option value="N">Semua Tanggal</option>
@@ -138,7 +145,8 @@ export default {
                 sales: this.ambiluser.id,
                 status: 'all',
                 mulaitanggal: this.Datesebulan(),
-                akhirtanggal: this.DateTime(),
+                akhirtanggal: this.today(),
+                listtanggal: 'so',
             },
             sales: {},
             groupnya: {},
@@ -161,7 +169,8 @@ export default {
             var vm = this,
                 lists = vm.so
             return _.filter(lists, function (query) {
-                var tanggal = query.tanggal_so >= vm.filter.mulaitanggal && query.tanggal_so <= vm.filter.akhirtanggal,
+                // var tanggal = query.tanggal_so >= vm.filter.mulaitanggal && query.tanggal_so <= vm.filter.akhirtanggal,
+                var tanggal = vm.filter.listtanggal === 'so' ? query.tanggal_so >= vm.filter.mulaitanggal && query.tanggal_so <= vm.filter.akhirtanggal : query.tanggal_kirim >= vm.filter.mulaitanggal && query.tanggal_kirim <= vm.filter.akhirtanggal,
                     // nomorso = vm.nomorso ? (query.nomor_so.toLowerCase().includes(vm.nomorso.toLowerCase())) : true,
                     customer = vm.ket2.kode ? (query.kode_customer == vm.ket2.kode) : true,
                     sales = vm.ambiluser.sales === 1 ? (query.id_user == vm.ambiluser.id) : vm.filter.sales !== 'all' ? (query.id_user == vm.filter.sales) : true,
@@ -262,7 +271,7 @@ export default {
             this.day = this.date.getDate();
             this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
             this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
-            this.datetimes = this.dates + " "
+            this.datetimes = this.dates + " " + times;
             //  + this.times;
             return this.datetimes;
         },
@@ -279,7 +288,7 @@ export default {
             this.day = this.date.getDate();
             this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + "01";
             this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
-            this.datetimes = this.dates + " "
+            this.datetimes = this.dates;
             //  + this.times;
             return this.datetimes;
         },
@@ -310,9 +319,25 @@ export default {
         cekjenistanggal() {
             if (this.jenistanggal === 'N') {
                 this.filter.mulaitanggal = this.Datesebulan();
-                this.filter.akhirtanggal = this.DateTime();
+                this.filter.akhirtanggal = this.today();
             }
-        }
+        },
+        today() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates;
+            return this.datetimes;
+        },
     }
 }
 </script>

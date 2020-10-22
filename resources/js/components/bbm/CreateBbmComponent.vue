@@ -182,7 +182,7 @@ export default {
     },
     data() {
         return {
-            load: false,
+            load: true,
             up: {
                 bbm: this.bbm_nomor(),
                 tanggal: this.now(),

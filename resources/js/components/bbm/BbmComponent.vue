@@ -1,12 +1,14 @@
 <template>
 <div class="container">
+    <div class="form-group  ml-n4 col-1 my-3 float-right">
+        <button @click="showfilter()" class="btn btn-trans">Filter</button>
+    </div>
     <div class="form-group col-3 my-3 float-right">
-        <input v-model="search" type="text" class="form-control" placeholder="Search">
+        <input v-model="filter.nomor" type="text" class="form-control" placeholder="PO/BCM/BBM/Nopol">
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
-        <select name="status" v-model="status" class="form-control">
+        <select name="status" v-model="filter.status" class="form-control">
             <option value="open">Selesai</option>
-            <!-- <option value="close">Close</option> -->
         </select>
     </div>
     <div class="row">
@@ -81,6 +83,59 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-filter" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Filter Data</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Supplier</label>
+                        <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisible" v-text="custom ? custom.nama:''"></div>
+                        <div class="placeholder" v-if="custom==null" v-text="ket.nama">Pilih Customer</div>
+                        <div class="popover" v-show="visible">
+                            <input type="text" @keydown.up="up" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nama customer ..">
+                            <div class="optionbr" ref="optionList">
+                                <ul>
+                                    <li v-for="(match,index) in matches" :key="match.kode" v-text="match.nama" :class="{'selected':(selected==index)}" @click="itemClicked(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Purchasing</label>
+                        <select v-model="filter.id_user" class="form-control">
+                            <option value="">Semua user</option>
+                            <option :value="us.id" v-for="(us,index) in user" :key="index">{{us.name}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Pilih Tanggal</label>
+                        <select @change="cekjenis()" v-model="filter.jenistanggal" class="form-control">
+                            <option value="Y">Bulan Berjalan</option>
+                            <option value="N">Filter Tanggal</option>
+                        </select>
+                    </div>
+                    <div v-if="filter.jenistanggal==='N'" class="form-group">
+                        <label>Mulai Tanggal</label>
+                        <input v-model="filter.mulaitanggal" type="date" class="form-control">
+                    </div>
+                    <div v-if="filter.jenistanggal==='N'&& filter.mulaitanggal!==undifined" class="form-group">
+                        <label>Sampai Tanggal</label>
+                        <input v-model="filter.sampaitanggal" type="date" class="form-control" :min="filter.mulaitanggal">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Save Change</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -95,12 +150,29 @@ export default {
     },
     data() {
         return {
-            search: '',
             load: true,
-            status: 'open',
             bbm: [],
             history: {},
-            historyview: {}
+            historyview: {},
+            visible: false,
+            query: '',
+            selected: 0,
+            custom: null,
+            itemHeight: 39,
+            supplier: [],
+            filter: {
+                kode_supplier: '',
+                id_user: "",
+                jenistanggal: 'Y',
+                mulaitanggal: this.FirstDate(),
+                sampaitanggal: this.today(),
+                status: 'open',
+                nomor: '',
+            },
+            user: {},
+            ket: {
+                nama: "Pilih Supplier"
+            },
         }
     },
     created() {
@@ -108,25 +180,41 @@ export default {
     },
     computed: {
         FilteredBBM() {
-            if (this.search === "") {
-                if (this.status === "open") {
-                    return this.bbm.filter(elem => elem.status === "open")
-                } else if (this.status === "close") {
-                    return this.bbm.filter(elem => elem.status === "close")
-                }
-            } else {
-                return this.bbm.filter(elem => {
-                    return elem.nomor_po.toLowerCase().includes(this.search);
-                });
-            }
+            var vm = this,
+                lists = vm.bbm
+            return _.filter(lists, function (query) {
+                var tanggal = query.tanggal >= vm.filter.mulaitanggal && query.tanggal <= vm.filter.sampaitanggal,
+                    supplier = vm.filter.kode_supplier ? (query.kode_supplier == vm.filter.kode_supplier) : true,
+                    user = vm.filter.id_user ? (query.id_user == vm.filter.id_user) : true,
+                    nomorpo = vm.filter.nomor ? (query.nomor_po.toLowerCase().includes(vm.filter.nomor.toLowerCase())) : true,
+                    bcm = vm.filter.nomor ? (query.nomor_bcm.toLowerCase().includes(vm.filter.nomor.toLowerCase())) : true,
+                    bbm = vm.filter.nomor ? (query.bbm.toLowerCase().includes(vm.filter.nomor.toLowerCase())) : true,
+                    nopol = vm.filter.nomor ? (query.nopol.toLowerCase().includes(vm.filter.nomor.toLowerCase())) : true,
+                    status = vm.filter.status ? (query.status == vm.filter.status) : true;
+                return tanggal && supplier && user && (nomorpo || bcm || nopol || bbm) && status;
+            })
         },
+        matches() {
+            if (this.query == '') {
+                return [];
+            }
+            return this.supplier.filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()))
+        }
     },
     methods: {
         getBbm() {
             axios.get("/api/bbm")
                 .then(res => {
                     this.bbm = res.data.data;
-                    this.load = false;
+                    axios.get("/api/supplier")
+                        .then(res => {
+                            this.supplier = res.data.data;
+                            axios.get("/api/user/data/purch")
+                                .then(res => {
+                                    this.user = res.data.data;
+                                    this.load = false;
+                                })
+                        })
                 })
         },
         DateTime() {
@@ -152,6 +240,74 @@ export default {
                     this.historyview = res.data.data;
                     console.log(this.historyview)
                 })
+        },
+        showfilter() {
+            $("#modal-filter").modal("show");
+        },
+        FirstDate() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + "01";
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates;
+            return this.datetimes;
+        },
+        today() {
+            this.date = new Date();
+            this.month = this.date.getMonth() + 1;
+            this.year = this.date.getFullYear();
+            this.hours = this.date.getHours();
+            this.minute = this.date.getMinutes();
+            this.seconds = this.date.getSeconds();
+            if (this.month > 12) {
+                this.month = 12;
+            }
+            this.day = this.date.getDate();
+            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.datetimes = this.dates;
+            return this.datetimes;
+        },
+        cekjenis() {
+            this.filter.mulaitanggal = this.FirstDate();
+            this.filter.sampaitanggal = this.today();
+        },
+        toggleVisible() {
+            this.visible = !this.visible;
+        },
+        itemClicked(index) {
+            this.selected = index;
+            this.selectItem();
+        },
+        selectItem() {
+            this.custom = this.matches[this.selected];
+            this.filter.kode_supplier = this.custom.kode_supplier;
+            this.visible = false;
+        },
+        up() {
+            if (this.selected == 0) {
+                return;
+            }
+            this.selected -= 1;
+            this.scrollToItem();
+        },
+        down() {
+            if (this.selected >= this.matches.length - 1) {
+                return;
+            }
+            this.selected += 1;
+            this.scrollToItem();
+        },
+        scrollToItem() {
+            this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
         },
     }
 }

@@ -22,7 +22,10 @@ class BcmResource extends JsonResource
             'keterangan'=>$this->keterangan,
             'status'=>$this->status,
             'supplier'=>$this->po->supplier->nama,
-            'nopol'=>$this->nopol
+            'nopol'=>$this->nopol,
+            'kode_supplier'=>$this->po->kode_supplier,
+            'id_user'=>$this->po->id_user,
+            'user'=>$this->po->user->name,
         ];
     }
 }
