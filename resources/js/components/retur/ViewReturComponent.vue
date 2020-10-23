@@ -18,7 +18,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor SO</label>
-                <input v-model="up.nomor_so" @click="showSo()" type="text" class="form-control" placeholder="Pilih Sales Order" :disabled="statusretur!=='Draft' || ambiluser.sales===0">
+                <input v-model="up.nomor_so" @click="showSo()" type="text" class="form-control" placeholder="Pilih Sales Order" disabled>
             </div>
             <div class="form-group">
                 <label>Customer</label>
@@ -96,9 +96,6 @@
                 </button> -->
         <button @click="batal()" class="btn-primary btn ml-4" v-if="ambiluser.sales===0">
             Kembali
-        </button>
-        <button @click="reqedit()" class="btn-orange btn ml-4" v-if="ambiluser.sales===1 && statusretur!=='Draft'">
-            Request Edit
         </button>
     </div>
     <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -309,6 +306,7 @@ export default {
                                                 this.hitung.qty[i] = this.listretur[i].qty;
                                                 this.hitung.keterangan[i] = this.listretur[i].keterangan;
                                                 this.validqty(i);
+                                                this.load = false;
                                             })
                                     })
                             }
@@ -580,6 +578,49 @@ export default {
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
         },
+        reqedit() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin melakukan perbaikan data retur ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.put("/api/retur/" + this.$route.params.nomor, {
+                        status: 'Draft'
+                    }).then(res => {
+                        swalWithBootstrapButtons.fire(
+                            'Sukses!',
+                            'Silahkan edit data anda di list draft retur.',
+                            'success'
+                        )
+                        this.$router.push({
+                            name: 'returcomponent'
+                        })
+                    })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal melakukan permintaan :)',
+                        'error'
+                    )
+                }
+            })
+        }
     },
 }
 </script>

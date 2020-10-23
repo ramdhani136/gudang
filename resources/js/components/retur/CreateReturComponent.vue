@@ -249,7 +249,7 @@ export default {
                 qty_masuk: 0,
             },
             soaktif: [],
-            listso: {},
+            listso: [],
             gagal: false,
             uplist: {},
             qty: 0,
@@ -265,6 +265,10 @@ export default {
             adagak: 0,
             listreturnya: {},
             qty_retur: 0,
+            sortirlist: {},
+            bbknya: 0,
+            oper: {},
+            diretur: {}
         }
     },
     created() {
@@ -280,7 +284,21 @@ export default {
             axios.get("/api/so/data/view/" + this.ambiluser.kode_groupso)
                 .then(res => {
                     this.sopilih = res.data.data;
-
+                    for (let i = 0; i < this.sopilih.length; i++) {
+                        axios.get("/api/listso/" + this.sopilih[i].nomor_so)
+                            .then(res => {
+                                this.sortirlist = res.data.data;
+                                this.bbknya = 0;
+                                for (let k = 0; k < this.sortirlist.length; k++) {
+                                    this.bbknya += parseInt(this.sortirlist[k].bbk) - parseInt(this.sortirlist[k].qtyretur);
+                                }
+                                if (this.bbknya > 0) {
+                                    this.soaktif.push({
+                                        nomor_so: this.sortirlist[0].nomor_so
+                                    })
+                                }
+                            })
+                    }
                     this.load = false;
                 });
         },
@@ -319,20 +337,39 @@ export default {
             this.checker = [];
         },
         pilihSo(aktif) {
-            this.hitung.qty = [];
-            this.checker = [];
-            this.ket.customer = aktif.customer;
-            this.ket.lokasi = aktif.lokasi;
-            this.ket.alamat = aktif.alamat;
-            this.ket.tanggal_kirim = aktif.tanggal_kirim;
-            this.ket.distribusi = aktif.distribusi;
-            this.up.nomor_so = aktif.nomor_so;
-            this.ket.status = aktif.statusso;
-            axios.get("/api/listso/data/lretur/" + this.up.nomor_so)
+            axios.get("/api/so/" + aktif.nomor_so)
                 .then(res => {
-                    this.listso = res.data.data;
-                })
+                    this.so = res.data.data;
+                    this.hitung.qty = [];
+                    this.checker = [];
+                    this.ket.customer = this.so[0].customer;
+                    this.ket.lokasi = this.so[0].lokasi;
+                    this.ket.alamat = this.so[0].alamat;
+                    this.ket.tanggal_kirim = this.so[0].tanggal_kirim;
+                    this.ket.distribusi = this.so[0].distribusi;
+                    this.up.nomor_so = this.so[0].nomor_so;
+                    this.ket.status = this.so[0].statusso;
+                    axios.get("/api/listso/data/lretur/" + this.so[0].nomor_so)
+                        .then(res => {
+                            this.oper = res.data.data;
+                            for (let y = 0; y < this.oper.length; y++) {
+                                if ((parseInt(this.oper[y].bbk) - parseInt(this.oper[y].qtyretur)) > 0) {
+                                    this.listso.push({
+                                        kode_barang: this.oper[y].kode_barang,
+                                        nama_barang: this.oper[y].nama_barang,
+                                        harga: this.oper[y].harga,
+                                        diskon: this.oper[y].diskon,
+                                        bbk: parseInt(this.oper[y].bbk) - parseInt(this.oper[y].qtyretur),
+                                        satuan: this.oper[y].satuan,
+                                    });
+                                }
+                            }
+                            for (let i = 0; i < this.listso.length; i++) {
+                                this.checker.push(this.listso[i]);
+                            }
 
+                        })
+                })
         },
         checklist() {
             $("#modal-po").modal("hide");
@@ -403,6 +440,15 @@ export default {
                                         //             bck: ((parseInt(this.listsokurang[0].bck)) + (parseInt(this.listsokurang[0].bbk) - parseInt(this.listsokurang[0].bck))) - parseInt(this.hitung.qty[i]),
                                         //         })
                                         //     })
+                                    }
+                                    for (let j = 0; j < this.checker.length; j++) {
+                                        axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.checker[j].kode_barang)
+                                            .then(res => {
+                                                this.diretur = res.data.data;
+                                                axios.put("/api/listso/" + this.diretur[0].id, {
+                                                    qtyretur: parseInt(this.diretur[0].qtyretur) + parseInt(this.hitung.qty[j]),
+                                                })
+                                            })
                                     }
                                     // axios.put("/api/so/" + this.up.nomor_so, {
                                     //     status: 'Acc',

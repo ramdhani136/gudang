@@ -4,7 +4,7 @@
         <button @click="showfilter()" class="btn btn-trans">Filter</button>
     </div>
     <div class="form-group col-3 my-3 float-right">
-        <input @input="pilihstatus()" v-model="filter.nomorso" type="text" class="form-control" placeholder="Cari nomor SO">
+        <input @input="pilihstatus()" v-model="filter.nomor" type="text" class="form-control" placeholder="Cari nomor SO/RSO">
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select @change="pilihstatus()" name="status" v-model="filter.status" class="form-control">
@@ -256,7 +256,7 @@ export default {
                 mulaitanggal: this.FirstDate(),
                 sampaitanggal: this.today(),
                 status: 'Acc',
-                nomorso: '',
+                nomor: '',
                 listtanggal: 'so',
             },
             groupso: {},
@@ -277,9 +277,10 @@ export default {
                     customer = vm.filter.kode_customer ? (query.kode_customer == vm.filter.kode_customer) : true,
                     sales = vm.filter.id_user ? (query.id_user == vm.filter.id_user) : true,
                     groupin = vm.filter.kode_groupso ? (query.kode_groupso == vm.filter.kode_groupso) : true,
-                    nomorso = vm.filter.nomorso ? (query.nomor_so.toLowerCase().includes(vm.filter.nomorso.toLowerCase())) : true,
+                    nomorso = vm.filter.nomor ? (query.nomor_so.toLowerCase().includes(vm.filter.nomor.toLowerCase())) : true,
+                    nomorrso = vm.filter.nomor ? (query.nomor_rso.toLowerCase().includes(vm.filter.nomor.toLowerCase())) : true,
                     status = vm.filter.status ? (query.status == vm.filter.status) : true;
-                return tanggal && customer && sales && groupin && nomorso && status;
+                return tanggal && customer && sales && groupin && (nomorso || nomorrso) && status;
             })
 
             // if (this.search === "") {
