@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor PO :</label>
-                <input v-model="lpo.nomor_po" type="text" class="form-control col-12" :disabled="disedit">
+                <input @input="cekinputrso()" v-model="lpo.nomor_po" type="text" class="form-control col-12" :disabled="disedit" maxlength="15" :class="{ 'is-valid': aktif, }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -18,7 +18,7 @@
             </div>
             <div class="form-group">
                 <label>Purchasing</label>
-                <select v-model="lpo.id_user" class="col-12 form-control" :disabled="disedit">
+                <select v-model="lpo.id_user" class="col-12 form-control" disabled>
                     <option v-for="(purch,index) in purchasing" :key="index" :value="purch.id">{{purch.name}}</option>
                 </select>
             </div>
@@ -285,7 +285,9 @@ export default {
             disedit: true,
             listdatabase: {},
             llisthapus: {},
-            listpodel: {}
+            listpodel: {},
+            aktif: false,
+            adapo: {}
         }
     },
     created() {
@@ -918,164 +920,176 @@ export default {
             })
         },
         kirimulang() {
-            if (this.$route.params.nomor === this.lpo.nomor_po) {
-                if (this.listfix.length < 1) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Anda belum menginput data barang!',
-                    })
-                } else {
-                    this.hitunginv();
-                    this.lengkap = "";
-                    this.subl = '';
-                    this.subban = '';
-                    for (let i = 0; i < this.listfix.length; i++) {
-                        if (this.hitung.sub[i] > 0 && this.hitung.subqty[i] > 0) {
-                            this.lengkap = "Y";
-                        } else {
-                            this.lengkap = "N";
-                        }
-                        this.subl += this.lengkap;
-                        this.subban += "Y";
-                    }
-                    if (this.subl === this.subban) {
-                        this.lpo.status = "Request";
-                        axios.put("/api/po/" + this.$route.params.nomor, this.lpo)
-                            .then(res => {
-                                axios.get('/api/listpo/' + this.$route.params.nomor)
-                                    .then(res => {
-                                        this.listdatabase = res.data.data;
-                                        this.sisapo = 0;
-                                        this.openpo = 0;
-                                        this.statuspo = "";
-                                        for (let i = 0; i < this.listdatabase.length; i++) {
-                                            axios.get("/api/listso/data/kembalikanpo/" + this.listdatabase[i].kode_barang)
-                                                .then(res => {
-                                                    this.listhapus = res.data.data;
-                                                    for (let k = 0; k < this.listhapus.length; k++) {
-                                                        if (this.listdatabase[i].qty >= this.listhapus[k].openpo) {
-                                                            this.sisapo = this.listhapus[k].openpo + this.listhapus[k].sisapo;
-                                                            this.openpo = 0;
-                                                            this.statuspo = "N";
-                                                            this.listdatabase[i].qty = parseInt(this.listdatabase[i].qty) - parseInt(this.listhapus[k].openpo);
-                                                        } else {
-                                                            this.openpo = parseInt(this.listhapus[k].openpo) - parseInt(this.listdatabase[i].qty);
-                                                            if (this.listdatabase[i].qty > this.listhapus[k].qty) {
-                                                                this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listhapus[k].open);
-                                                            } else {
-                                                                this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listdatabase[i].qty);
-                                                            }
-                                                            if (this.sisapo < 1) {
-                                                                this.statuspo = "Y";
-                                                            } else {
-                                                                this.statuspo = "N";
-                                                            }
-                                                            this.listdatabase[i].qty = parseInt(this.listdatabase[i].qty) - parseInt(this.listhapus[k].openpo);
-                                                            if (this.listdatabase[i].qty < 1) {
-                                                                this.listdatabase[i].qty = 0;
-                                                            }
-                                                        }
-                                                        axios.put("/api/listso/" + this.listhapus[k].id, {
-                                                            sisapo: this.sisapo,
-                                                            openpo: this.openpo,
-                                                            statuspo: this.statuspo
-                                                        })
-                                                    }
-                                                })
-                                        }
-                                    });
-                                for (let h = 0; h < this.listfix.length; h++) {
-                                    this.uplistpo = {
-                                        nomor_po: this.lpo.nomor_po,
-                                        kode_barang: this.listfix[h].kode_barang,
-                                        harga: this.hitung.harga[h],
-                                        qty: this.hitung.qty[h],
-                                        sisapo: this.hitung.qty[h]
-                                    }
-                                    axios.post("/api/listpo/", this.uplistpo)
-                                }
-                                console.log(this.uplistpo);
-                                this.kasihso = 0;
-                                this.sisapembagi = 0;
-                                this.masihsisa = 0;
-                                this.sisapo = 0;
-                                this.openpo = 0;
-                                for (let i = 0; i < this.listfix.length; i++) {
-                                    axios.get("/api/listso/data/antrianpo/" + this.listfix[i].kode_barang)
-                                        .then(res => {
-                                            this.listbagi = res.data.data;
-                                            this.kasihso = 0;
-                                            this.sisapembagi = 0;
-                                            this.masihsisa = 0;
-                                            this.sisapo = 0;
-                                            this.tutupso = '';
-                                            this.bandingtutup = '';
-                                            this.openpo = 0;
-                                            for (let k = 0; k < this.listbagi.length; k++) {
-                                                /* ini sisa sonya */
-                                                this.sisapembagi = parseInt(this.listbagi[k].qty) - parseInt(this.listbagi[k].openpo);
-                                                /* end */
-                                                if (this.hitung.qty[i] < this.sisapembagi) {
-                                                    this.kasihso = this.hitung.qty[i];
-                                                    this.hitung.qty[i] = 0;
-                                                } else {
-                                                    this.kasihso = this.sisapembagi;
-                                                    this.hitung.qty[i] = parseInt(this.hitung.qty[i]) - parseInt(this.sisapembagi);
-                                                }
+            alert("tes");
+            // if (this.$route.params.nomor === this.lpo.nomor_po) {
+            //     if (this.listfix.length < 1) {
+            //         Swal.fire({
+            //             icon: 'error',
+            //             title: 'Oops...',
+            //             text: 'Anda belum menginput data barang!',
+            //         })
+            //     } else {
+            //         this.hitunginv();
+            //         this.lengkap = "";
+            //         this.subl = '';
+            //         this.subban = '';
+            //         for (let i = 0; i < this.listfix.length; i++) {
+            //             if (this.hitung.sub[i] > 0 && this.hitung.subqty[i] > 0) {
+            //                 this.lengkap = "Y";
+            //             } else {
+            //                 this.lengkap = "N";
+            //             }
+            //             this.subl += this.lengkap;
+            //             this.subban += "Y";
+            //         }
+            //         if (this.subl === this.subban) {
+            //             this.lpo.status = "Request";
+            //             axios.put("/api/po/" + this.$route.params.nomor, this.lpo)
+            //                 .then(res => {
+            //                     axios.get('/api/listpo/' + this.$route.params.nomor)
+            //                         .then(res => {
+            //                             this.listdatabase = res.data.data;
+            //                             this.sisapo = 0;
+            //                             this.openpo = 0;
+            //                             this.statuspo = "";
+            //                             for (let i = 0; i < this.listdatabase.length; i++) {
+            //                                 axios.get("/api/listso/data/kembalikanpo/" + this.listdatabase[i].kode_barang)
+            //                                     .then(res => {
+            //                                         this.listhapus = res.data.data;
+            //                                         for (let k = 0; k < this.listhapus.length; k++) {
+            //                                             if (this.listdatabase[i].qty >= this.listhapus[k].openpo) {
+            //                                                 this.sisapo = this.listhapus[k].openpo + this.listhapus[k].sisapo;
+            //                                                 this.openpo = 0;
+            //                                                 this.statuspo = "N";
+            //                                                 this.listdatabase[i].qty = parseInt(this.listdatabase[i].qty) - parseInt(this.listhapus[k].openpo);
+            //                                             } else {
+            //                                                 this.openpo = parseInt(this.listhapus[k].openpo) - parseInt(this.listdatabase[i].qty);
+            //                                                 if (this.listdatabase[i].qty > this.listhapus[k].qty) {
+            //                                                     this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listhapus[k].open);
+            //                                                 } else {
+            //                                                     this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listdatabase[i].qty);
+            //                                                 }
+            //                                                 if (this.sisapo < 1) {
+            //                                                     this.statuspo = "Y";
+            //                                                 } else {
+            //                                                     this.statuspo = "N";
+            //                                                 }
+            //                                                 this.listdatabase[i].qty = parseInt(this.listdatabase[i].qty) - parseInt(this.listhapus[k].openpo);
+            //                                                 if (this.listdatabase[i].qty < 1) {
+            //                                                     this.listdatabase[i].qty = 0;
+            //                                                 }
+            //                                             }
+            //                                             axios.put("/api/listso/" + this.listhapus[k].id, {
+            //                                                 sisapo: this.sisapo,
+            //                                                 openpo: this.openpo,
+            //                                                 statuspo: this.statuspo
+            //                                             })
+            //                                         }
+            //                                     })
+            //                             }
+            //                         });
+            //                     for (let h = 0; h < this.listfix.length; h++) {
+            //                         this.uplistpo = {
+            //                             nomor_po: this.lpo.nomor_po,
+            //                             kode_barang: this.listfix[h].kode_barang,
+            //                             harga: this.hitung.harga[h],
+            //                             qty: this.hitung.qty[h],
+            //                             sisapo: this.hitung.qty[h]
+            //                         }
+            //                         axios.post("/api/listpo/", this.uplistpo)
+            //                     }
+            //                     console.log(this.uplistpo);
+            //                     this.kasihso = 0;
+            //                     this.sisapembagi = 0;
+            //                     this.masihsisa = 0;
+            //                     this.sisapo = 0;
+            //                     this.openpo = 0;
+            //                     for (let i = 0; i < this.listfix.length; i++) {
+            //                         axios.get("/api/listso/data/antrianpo/" + this.listfix[i].kode_barang)
+            //                             .then(res => {
+            //                                 this.listbagi = res.data.data;
+            //                                 this.kasihso = 0;
+            //                                 this.sisapembagi = 0;
+            //                                 this.masihsisa = 0;
+            //                                 this.sisapo = 0;
+            //                                 this.tutupso = '';
+            //                                 this.bandingtutup = '';
+            //                                 this.openpo = 0;
+            //                                 for (let k = 0; k < this.listbagi.length; k++) {
+            //                                     /* ini sisa sonya */
+            //                                     this.sisapembagi = parseInt(this.listbagi[k].qty) - parseInt(this.listbagi[k].openpo);
+            //                                     /* end */
+            //                                     if (this.hitung.qty[i] < this.sisapembagi) {
+            //                                         this.kasihso = this.hitung.qty[i];
+            //                                         this.hitung.qty[i] = 0;
+            //                                     } else {
+            //                                         this.kasihso = this.sisapembagi;
+            //                                         this.hitung.qty[i] = parseInt(this.hitung.qty[i]) - parseInt(this.sisapembagi);
+            //                                     }
 
-                                                this.sisapo = parseInt(this.listbagi[k].sisapo) - parseInt(this.kasihso);
-                                                this.openpo = parseInt(this.listbagi[k].openpo) + parseInt(this.kasihso);
+            //                                     this.sisapo = parseInt(this.listbagi[k].sisapo) - parseInt(this.kasihso);
+            //                                     this.openpo = parseInt(this.listbagi[k].openpo) + parseInt(this.kasihso);
 
-                                                if (this.sisapo === 0) {
-                                                    this.ubah = "Y";
-                                                } else {
-                                                    this.ubah = "N";
-                                                }
-                                                axios.put("/api/listso/" + this.listbagi[k].id, {
-                                                    sisapo: this.sisapo,
-                                                    openpo: this.openpo,
-                                                    statuspo: this.ubah,
-                                                })
-                                            }
-                                        })
-                                }
-                                /* end input listpo */
-                                axios.post("/api/history", {
-                                    nomor_dok: this.lpo.nomor_po,
-                                    id_user: this.ambiluser.id,
-                                    notif: "Terdapat permintaan PO baru",
-                                    keterangan: "Mengirim PO ke Purch Supervisor",
-                                    jenis: "Po",
-                                    tanggal: this.DateTime(),
-                                })
-                                this.$router.push({
-                                    name: 'po'
-                                })
+            //                                     if (this.sisapo === 0) {
+            //                                         this.ubah = "Y";
+            //                                     } else {
+            //                                         this.ubah = "N";
+            //                                     }
+            //                                     axios.put("/api/listso/" + this.listbagi[k].id, {
+            //                                         sisapo: this.sisapo,
+            //                                         openpo: this.openpo,
+            //                                         statuspo: this.ubah,
+            //                                     })
+            //                                 }
+            //                             })
+            //                     }
+            //                     /* end input listpo */
+            //                     axios.post("/api/history", {
+            //                         nomor_dok: this.lpo.nomor_po,
+            //                         id_user: this.ambiluser.id,
+            //                         notif: "Terdapat permintaan PO baru",
+            //                         keterangan: "Mengirim PO ke Purch Supervisor",
+            //                         jenis: "Po",
+            //                         tanggal: this.DateTime(),
+            //                     })
+            //                     this.$router.push({
+            //                         name: 'po'
+            //                     })
 
-                            }).catch(error => {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: 'Cek kembali data PO anda!',
-                                })
-                            })
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Qty & Harga barang tidak boleh kosong!',
-                        })
-                    }
-                }
-            } else {
-                alert("ubah")
-            }
+            //                 }).catch(error => {
+            //                     Swal.fire({
+            //                         icon: 'error',
+            //                         title: 'Oops...',
+            //                         text: 'Cek kembali data PO anda!',
+            //                     })
+            //                 })
+            //         } else {
+            //             Swal.fire({
+            //                 icon: 'error',
+            //                 title: 'Oops...',
+            //                 text: 'Qty & Harga barang tidak boleh kosong!',
+            //             })
+            //         }
+            //     }
+            // } else {
+            //     alert("ubah")
+            // }
         },
         print() {
             var x = window.open('/data/po/print/' + this.$route.params.nomor, '_blank');
             x.focus();
         },
+        cekinputrso() {
+            axios.get("/api/po/" + this.lpo.nomor_po)
+                .then(res => {
+                    this.adapo = res.data.data;
+                    if (this.lpo.nomor_po.length === 15 && this.adapo.length === 0) {
+                        this.aktif = true;
+                    } else {
+                        this.aktif = false;
+                    };
+                })
+        }
     },
 }
 </script>

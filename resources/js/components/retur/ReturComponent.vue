@@ -16,8 +16,8 @@
             <option value="Selesai">Selesai</option>
         </select>
     </div>
-    <div class="row">
-        <router-link to="/retur/create" class="btn btn-success my-3">+ Create Retur</router-link>
+    <div class="row" v-if="ambiluser.sales===1">
+        <router-link to="/retur/create" class="btn btn-success my-3 ml-n2">+ Create Retur</router-link>
     </div>
     <div id="overflow" class="border-top">
         <table id="thead" class="table table-striped table-bordered" style="width:100%">
@@ -122,6 +122,7 @@
                     <div class="form-group">
                         <label>Group</label>
                         <select v-model="filter.kode_groupso" class="form-control" :disabled="ambiluser.susales!==1">
+                            <option value="">Semua Group</option>
                             <option :value="gr.kode" v-for="(gr,index) in groupso" :key="index">{{gr.area}}</option>
                         </select>
                     </div>
@@ -172,8 +173,8 @@ export default {
             customer: [],
             filter: {
                 kode_customer: '',
-                id_user: this.ambiluser.id,
-                kode_groupso: this.ambiluser.kode_groupso,
+                id_user: "",
+                kode_groupso: '',
                 jenistanggal: 'Y',
                 mulaitanggal: this.FirstDate(),
                 sampaitanggal: this.today(),
@@ -214,6 +215,16 @@ export default {
     },
     methods: {
         getretur() {
+            if (this.ambiluser.sales === 1) {
+                this.filter.status = "Acc";
+                this.filter.kode_groupso = this.ambiluser.kode_groupso;
+            } else if (this.ambiluser.kordisales === 1) {
+                this.filter.status = "Kordinator";
+                this.filter.kode_groupso = this.ambiluser.kode_groupso;
+            } else {
+                this.filter.status = "Supervisor";
+                this.filter.kode_groupso = "";
+            }
             axios.get("/api/retur")
                 .then(res => {
                     this.retur = res.data.data;

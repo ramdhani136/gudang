@@ -85,7 +85,7 @@
                     </div>
                     <div class=" form-group">
                         <label>Group Sales</label>
-                        <select v-model="filter.group" class="form-control" :disabled="ambiluser.susales===0">
+                        <select v-model="filter.group" class="form-control">
                             <option value="all">Pilih Semua</option>
                             <option :value="gr.kode" v-for="(gr,index) in groupnya" :key="index">{{gr.area}}</option>
                         </select>

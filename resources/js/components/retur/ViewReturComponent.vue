@@ -94,8 +94,14 @@
         <!-- <button @click="draftBcm()" class="btn-orange btn ml-4" >
                     Simpan Draft
                 </button> -->
-        <button @click="batal()" class="btn-primary btn ml-4" v-if="ambiluser.sales===0">
+        <button @click="batal()" class="btn-primary btn ml-4">
             Kembali
+        </button>
+        <button v-if="ambiluser.kordisales===1 || ambiluser.susales===1" @click="terima()" class="btn-success btn ml-1">
+            Terima Retur
+        </button>
+        <button v-if="ambiluser.kordisales===1 || ambiluser.susales===1" @click="tolak()" class="btn-danger btn ml-1">
+            Tolak
         </button>
     </div>
     <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">

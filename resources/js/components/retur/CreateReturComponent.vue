@@ -77,7 +77,7 @@
                         <td style="text-align:center">{{listbcm.diskon | currency}}</td>
                         <td style="text-align:center">{{listbcm.bbk}}</td>
                         <td style="text-align:center">
-                            <input @input="validqty(index)" v-model="hitung.qty[index]" type="number" class="form-control">
+                            <input @input="validqty(index)" v-model="hitung.qty[index]" type="number" step="any" class="form-control">
                         </td>
                         <td style="text-align:center">
                             <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
@@ -387,6 +387,9 @@ export default {
             }
         },
         submitretur() {
+            // for (let i = 0; i < this.checker.length; i++) {
+            //     console.log(this.hitung.qty[i]);
+            // }
             this.load = true;
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {

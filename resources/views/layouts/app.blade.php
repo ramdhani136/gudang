@@ -96,6 +96,7 @@
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/confirmso" class="dropdown-item" >Konfirmasi SO</router-link>
                                     <router-link to="/formprice" class="dropdown-item" >Permintaan Harga</router-link>
+                                    <router-link to="/retur" class="dropdown-item" >Request Retur</router-link>
                                     <router-link to="/price/customer" class="dropdown-item" >Data Harga</router-link>
                                 </div>
                             </li>
@@ -114,6 +115,7 @@
                                     <router-link to="/so/data/selesai" class="dropdown-item" >Request SO Selesai</router-link>
                                     <!-- <router-link to="/data/price/request" class="dropdown-item" >Request Special Price</router-link> -->
                                     <router-link to="/formprice" class="dropdown-item" >Request Harga</router-link>
+                                    <router-link to="/retur" class="dropdown-item" >Request Retur</router-link>
                                     <router-link to="/price/customer" class="dropdown-item" >Data Special Price</router-link>
                                     <router-link to="/groupso" class="dropdown-item" >Input Group Customer </router-link>
                                 </div>
