@@ -78,14 +78,14 @@
                     </div>
                     <div class="form-group">
                         <label>Sales</label>
-                        <select v-model="filter.sales" class="form-control" :disabled="ambiluser.susales===0 && ambiluser.kordisales===0">
-                            <option value="all">Semua Sales</option>
+                        <select v-model="filter.sales" class="form-control">
+                            <option value="">Semua Sales</option>
                             <option v-for="(sl,index) in sales" :key="index" :value="sl.id">{{sl.name}}</option>
                         </select>
                     </div>
                     <div class=" form-group">
                         <label>Group Sales</label>
-                        <select v-model="filter.group" class="form-control">
+                        <select v-model="filter.group" class="form-control" :disabled="ambiluser.susales!==1">
                             <option value="all">Pilih Semua</option>
                             <option :value="gr.kode" v-for="(gr,index) in groupnya" :key="index">{{gr.area}}</option>
                         </select>
@@ -173,7 +173,7 @@ export default {
                 var tanggal = vm.filter.listtanggal === 'so' ? query.tanggal_so >= vm.filter.mulaitanggal && query.tanggal_so <= vm.filter.akhirtanggal : query.tanggal_kirim >= vm.filter.mulaitanggal && query.tanggal_kirim <= vm.filter.akhirtanggal,
                     // nomorso = vm.nomorso ? (query.nomor_so.toLowerCase().includes(vm.nomorso.toLowerCase())) : true,
                     customer = vm.ket2.kode ? (query.kode_customer == vm.ket2.kode) : true,
-                    sales = vm.ambiluser.sales === 1 ? (query.id_user == vm.ambiluser.id) : vm.filter.sales !== 'all' ? (query.id_user == vm.filter.sales) : true,
+                    sales = vm.filter.sales ? (query.id_user == vm.filter.sales) : true,
                     groupin = vm.ambiluser.sales === 1 || vm.ambiluser.kordisales === 1 ? (query.kode_groupso == vm.ambiluser.kode_groupso) : vm.filter.group !== 'all' ? (query.kode_groupso == vm.filter.group) : true,
                     status = vm.filter.status === 'acc' ? (query.status == 'Acc') : vm.filter.status === 'selesai' ? (query.status == 'Selesai' || query.status == 'Di Selesaikan') : true;
                 return tanggal && customer && status && sales && groupin
@@ -304,14 +304,14 @@ export default {
                 axios.get("/api/user/view/" + this.ambiluser.kode_groupso)
                     .then(res => {
                         this.sales = res.data.data;
-                        this.filter.sales = "all";
+                        this.filter.sales = "";
                         this.filter.group = this.ambiluser.kode_groupso;
                     })
             } else if (this.ambiluser.susales === 1 || this.ambiluser.distribusi === 1) {
                 axios.get("/api/user/data/all")
                     .then(res => {
                         this.sales = res.data.data;
-                        this.filter.sales = "all";
+                        this.filter.sales = "";
                         this.filter.group = 'all';
                     })
             }
@@ -366,7 +366,7 @@ export default {
 .diam {
     margin-top: -105px;
     position: fixed;
-    width: 71%;
+    width: 72%;
     background-color: #fff;
     z-index: 1000;
     height: auto;

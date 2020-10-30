@@ -116,7 +116,7 @@ class CustpriceController extends Controller
 
     public function view($nomor)
     {
-        return CustpriceResource::collection(Custprice::where('nomor_price',$nomor)->orderBy('kode_barang','ASC')->get());
+        return CustpriceResource::collection(Custprice::where('nomor_price',$nomor)->get());
     }
 
 }

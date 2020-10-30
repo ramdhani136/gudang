@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor SO :</label>
-                <input @input="ceknomorso()" v-model="up.nomor_so" type="text" maxlength="15" class="form-control col-12" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
+                <input @input="ceknomorso()" v-model="up.nomor_so" type="text" maxlength="15" class="form-control col-12" :class="{ 'is-valid': nyala, 'is-invalid': !nyala }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -334,7 +334,7 @@ export default {
             statpo: 'Y',
             statusso: '',
             statusnya: '',
-            aktif: null,
+            nyala: false,
             adaso: {},
             tampil: null,
             defaultal: ''
@@ -879,9 +879,9 @@ export default {
                 .then(res => {
                     this.adaso = res.data.data;
                     if (this.up.nomor_so.length === 15 && this.adaso.length === 0) {
-                        this.aktif = true;
+                        this.nyala = true;
                     } else {
-                        this.aktif = false;
+                        this.nyala = false;
                     };
                 })
         }

@@ -17,7 +17,11 @@ class SoGroupResource extends JsonResource
     public function toArray($request)
     {
         $jumlah= Listso::where('kode_barang',$this->kode_barang)->where('statusso','Tidak Tersedia')->where('statuspo','N')->where('openso','Y')->sum('sisapo');
+        $allminta= Listso::where('kode_barang',$this->kode_barang)->where('statusso','Tidak Tersedia')->sum('qty');
+        $pr= Listso::where('pr','Y')->where('kode_barang',$this->kode_barang)->where('statusso','Tidak Tersedia')->sum('openpo');
         $groupList= Barang::where('kode',$this->kode_barang)->get();
+
+
 
        return 
         [
@@ -25,6 +29,8 @@ class SoGroupResource extends JsonResource
             'nama'=>$groupList[0]->nama,
             'satuan'=>$groupList[0]->satuan, 
             'jumlah'=>$jumlah,
+            'allminta'=>$allminta,
+    
         ];
     }
 }

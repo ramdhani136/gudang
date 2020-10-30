@@ -44,13 +44,13 @@
                         <th>Nama Barang</th>
                         <th>Satuan</th>
                         <th>Harga Terakhir</th>
-                        <th>Request Harga</th>
+                        <th style="width:13%">Request Harga</th>
                         <th v-if="status==='Draft' && ambiluser.sales===1">Aksi</th>
-                        <th v-if="(ambiluser.sales===1 && status !=='Draft') || (ambiluser.susales===1 || ambiluser.kordisales===1)">Aksi</th>
+                        <th style="width:12%;" v-if="(ambiluser.sales===1 && status !=='Draft') || (ambiluser.susales===1 || ambiluser.kordisales===1)">Aksi</th>
                         <th v-if="(ambiluser.sales===1 && status !=='Draft') || (ambiluser.susales===1 || ambiluser.kordisales===1)">Alasan Tolak</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="font-size:0.9em;">
                     <tr v-for="(lp,index) in listpr" :key="index">
                         <td style="text-align:center">{{index+1}}</td>
                         <td>{{lp.kode}}</td>
@@ -58,7 +58,7 @@
                         <td style="text-align:center">{{lp.satuan}}</td>
                         <td style="text-align:center">{{lp.harga | currency}}</td>
                         <td style="text-align:center">
-                            <input type="number" class="form-control" v-model="hitung.harga[index]" :disabled="status!=='Draft' || ambiluser.sales===0">
+                            <input style="font-size:1em;" type="number" class="form-control" v-model="hitung.harga[index]" :disabled="status!=='Draft' || ambiluser.sales===0">
                         </td>
                         <td v-if="status==='Draft' && ambiluser.sales===1" style="text-align:center">
                             <button @click="hapus(index)" style="text-align:center" class="btn btn-danger">Hapus</button>
@@ -70,7 +70,7 @@
                             </select>
                         </td>
                         <td v-if="(ambiluser.sales===1 && status !=='Draft') || (ambiluser.susales===1 || ambiluser.kordisales===1)">
-                            <textarea v-model="alastolak[index]" name="alasan" class="form-control" :disabled="statusminta[index]!=='Di Tolak' || tutup"></textarea>
+                            <textarea style="height:40px" v-model="alastolak[index]" name="alasan" class="form-control" :disabled="statusminta[index]!=='Di Tolak' || tutup"></textarea>
                         </td>
                     </tr>
                 </tbody>
@@ -84,7 +84,7 @@
         <button v-if="(status!=='Draft' && status!=='Confirm') &&  ambiluser.sales===1" class="btn btn-orange ml-1" @click="reqedit()">
             Request Edit
         </button>
-        <button v-if="status!=='Draft'  &&  ambiluser.sales===1" class="btn btn-none ml-1" @click="print()">
+        <button v-if="status==='Confirm'  &&  ambiluser.sales===1" class="btn btn-none ml-4" @click="print()">
             Print
         </button>
 
@@ -297,7 +297,6 @@ export default {
                                 axios.get("/api/view/price/" + this.ket2.kode + "/" + this.listprice[t].kode_barang)
                                     .then(res => {
                                         this.hargaakhir = res.data.data;
-
                                         if (this.hargaakhir.length < 1) {
                                             this.hitung.hargaakhir[t] = 0;
                                         } else {
@@ -309,12 +308,13 @@ export default {
                                             nama: this.listprice[t].nama_barang,
                                             satuan: this.listprice[t].satuan,
                                             harga: this.hitung.hargaakhir[t],
+                                            reqharga: this.listprice[t].harga,
                                             status: this.listprice[t].status,
                                             alastolak: this.listprice[t].alastolak,
                                         })
-                                        this.hitung.harga[t] = this.listprice[t].harga;
                                         this.statusminta[t] = this.listpr[t].status;
                                         this.alastolak[t] = this.listpr[t].alastolak;
+                                        this.hitung.harga[t] = this.listpr[t].reqharga;
                                     });
                             }
                             axios.get("/api/barang/")

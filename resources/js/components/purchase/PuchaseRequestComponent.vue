@@ -12,6 +12,7 @@
                     <th>Kode</th>
                     <th>Nama Barang</th>
                     <th>Diminta</th>
+                    <th>PR Open</th>
                     <th>Satuan</th>
                     <th>Aksi</th>
                 </tr>
@@ -22,6 +23,7 @@
                     <td>{{prlist.kode_barang}}</td>
                     <td>{{prlist.nama}}</td>
                     <td style="text-align:center">{{prlist.jumlah}}</td>
+                    <td style="text-align:center">{{prlist.potersedia}}</td>
                     <td style="text-align:center">{{prlist.satuan}}</td>
                     <td style="text-align:center">
                         <button @click="showmodal(prlist)" class="btn btn-primary">Lihat Rincian</button>
