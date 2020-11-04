@@ -57,7 +57,7 @@
                     <tr>
                         <th>No</th>
                         <th>Kode Barang</th>
-                        <th>Nama Barang</th>
+                        <th style="width:25%">Nama Barang</th>
                         <th>Satuan</th>
                         <th>Harga</th>
                         <th>Diskon</th>
@@ -287,7 +287,7 @@ export default {
                     this.ket = {
                         nomor_so: this.bbk[0].nomor_so,
                         customer: this.bbk[0].customer,
-                        distribusi: this.bbk[0].dsitribusi,
+                        distribusi: this.bbk[0].distribusi,
                         alamat: this.bbk[0].alamat,
                         lokasi: this.bbk[0].lokasi,
                         keterangan: this.bbk[0].keterangan

@@ -23,7 +23,7 @@ class BckResource extends JsonResource
             'status'=>$this->status,
             'kode_customer'=>$this->so->rso->customer->kode,
             'customer'=>$this->so->rso->customer->nama,
-            'id_kendaran'=>$this->id_kendaraan,
+            'id_kendaraan'=>$this->id_kendaraan,
             'distribusi'=>$this->so->distribusi,
             'lokasi'=>$this->so->lokasi,
             'alamat'=>$this->so->alamat,

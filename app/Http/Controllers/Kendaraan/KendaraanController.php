@@ -88,4 +88,9 @@ class KendaraanController extends Controller
         Kendaraan::where('id',$id)->delete();
         return response('deleted',response::HTTP_OK);
     }
+
+    public function nopol($nopol)
+    {
+        return KendaraanResource::collection(Kendaraan::where('nopol',$nopol)->get());
+    }
 }

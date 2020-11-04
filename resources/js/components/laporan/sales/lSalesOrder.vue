@@ -28,7 +28,7 @@
                     <th>Kode Barang</th>
                     <th>Item</th>
                     <th>Di pesan</th>
-                    <th>Di terima</th>
+                    <th>Di Kirim</th>
                     <th>Harga</th>
                     <th>Sisa Pesanan</th>
                 </thead>

@@ -19,7 +19,7 @@
                 <tr v-for="(ln,index) in Filteredlist" :key="index">
                     <td style="text-align:center">{{index+1}}</td>
                     <td>
-                        <router-link :to="{name:'formso',params:{id:ln.nomor_so}}" class="btn btn-primary">
+                        <router-link :to="{name:'viewso',params:{id:ln.nomor_so}}" class="btn btn-none">
                             {{ln.nomor_so}}
                         </router-link>
                     </td>

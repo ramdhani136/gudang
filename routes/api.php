@@ -107,6 +107,7 @@ Route::get('listbck/view/{bck}/{barang}','Bck\ListBckController@viewbbk');
 Route::get('bcm/{barang}/{bcm}','Barang\ListBcmController@getbbm');
 
 Route::resource('kendaraan','Kendaraan\KendaraanController');
+Route::get('kendaraan/view/{nopol}','Kendaraan\KendaraanController@nopol');
 Route::resource('jeniskendaraan','Kendaraan\JenisKendaraanController');
 Route::get('listrso/data/pilihsotersedia/view/{rso}','Rso\ListRsoController@pilihsotersedia');
 Route::get('listrso/data/pilihsotidak/view/{rso}','Rso\ListRsoController@pilihsotidak');

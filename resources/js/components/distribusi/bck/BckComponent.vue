@@ -191,6 +191,8 @@ export default {
             ket: {
                 nama: "Pilih Customer"
             },
+            listbckhps: {},
+            listsohps: {}
         }
     },
     created() {
@@ -229,9 +231,13 @@ export default {
                             axios.get("/api/user/data/all")
                                 .then(res => {
                                     this.user = res.data.data;
+                                    axios.get("/api/customer")
+                                        .then(res => {
+                                            this.customer = res.data.data;
+                                            this.load = false;
+                                        })
                                 })
                         })
-                    this.load = false;
                 })
         },
         DateTime() {
@@ -278,6 +284,7 @@ export default {
                 this.load = true;
                 if (result.isConfirmed) {
                     /* edit status bck so */
+                    this.load = true;
                     axios.put("/api/so/" + bk.nomor_so, {
                             closebck: "N"
                         })
@@ -285,14 +292,14 @@ export default {
                             /* edit listso */
                             axios.get("/api/listbck/" + bk.bck)
                                 .then(res => {
-                                    this.listbck = res.data.data;
-                                    for (let i = 0; i < this.listbck.length; i++) {
+                                    this.listbckhps = res.data.data;
+                                    for (let i = 0; i < this.listbckhps.length; i++) {
                                         this.qtybck = 0;
-                                        axios.get("/api/listso/data/" + bk.nomor_so + "/" + this.listbck[i].kode_barang)
+                                        axios.get("/api/listso/data/" + bk.nomor_so + "/" + this.listbckhps[i].kode_barang)
                                             .then(res => {
-                                                this.listso = res.data.data;
-                                                this.qtybck = parseInt(this.listso[0].bck) - parseInt(this.listbck[i].qty);
-                                                axios.put("/api/listso/" + this.listso[0].id, {
+                                                this.listsohps = res.data.data;
+                                                this.qtybck = parseInt(this.listsohps[0].bck) - parseInt(this.listbckhps[i].qty);
+                                                axios.put("/api/listso/" + this.listsohps[0].id, {
                                                     bck: this.qtybck,
                                                     closeso: "N"
                                                 })
@@ -310,7 +317,7 @@ export default {
                                             }
                                         }).then(res => {
                                             axios.post("/api/history", {
-                                                nomor_dok: bk.nomor_so,
+                                                nomor_dok: bk.bck,
                                                 id_user: this.ambiluser.id,
                                                 notif: "BCK " + bk.bck + " di batalkan",
                                                 keterangan: "Membatalkan BCK nomor : " + bk.bck,

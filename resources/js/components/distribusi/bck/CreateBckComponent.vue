@@ -11,10 +11,8 @@
                 <input v-model="up.tanggal" type="date" @change="validate()" :min="now()" class="form-control col-12">
             </div>
             <div class="form-group">
-                <label>Pilih Kendaraan :</label>
-                <select v-model="up.id_kendaraan" name="kendaraan" class="form-control">
-                    <option :value="kd.id" v-for="(kd,index) in kendaraan" :key="index">{{kd.nopol}}</option>
-                </select>
+                <label>Kendaraan :</label>
+                <input v-model="ket.nopol" class="form-control" @click="showkendaraan()" autocomplete="off" placeholder="Pilih Kendaraan">
             </div>
         </div>
         <div class="col-4">
@@ -59,13 +57,12 @@
                     <tr>
                         <th>No</th>
                         <th>Kode Barang</th>
-                        <th>Nama Barang</th>
+                        <th style="width:20%;">Nama Barang</th>
                         <th>Satuan</th>
                         <th>Harga</th>
                         <th>Diskon</th>
                         <th>Sisa SO</th>
-                        <th>Qty Tersedia</th>
-                        <th>Rencana Kirim</th>
+                        <th style="width:12%;">Rencana Kirim</th>
                         <th>Keterangan</th>
                         <th>Aksi</th>
                     </tr>
@@ -78,8 +75,7 @@
                         <td style="text-align:center">{{listbcm.satuan}}</td>
                         <td style="text-align:center">{{listbcm.harga | currency}}</td>
                         <td style="text-align:center">{{listbcm.diskon | currency}}</td>
-                        <td style="text-align:center">{{ket.sisasopilih[index]}}</td>
-                        <td style="text-align:center">{{ket.tersedia[index]}}</td>
+                        <td style="text-align:center">{{listbcm.qty-listbcm.bck}}</td>
                         <td style="text-align:center">
                             <input @input="validqty(index)" v-model="hitung.qty[index]" type="number" class="form-control">
                         </td>
@@ -117,7 +113,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Pilih SO</label>
-                        <select @change="pilihSo(aktif)" v-model="aktif" class="form-control">
+                        <select @change="pilihSo(ambil)" v-model="ambil" class="form-control">
                             <option :value="aktif" v-for="(aktif,index) in soaktif" :key="index">{{aktif.nomor_so}}</option>
                         </select>
                     </div>
@@ -134,7 +130,6 @@
                                     <th style="text-align:center">Item</th>
                                     <th style="text-align:center">Satuan</th>
                                     <th style="text-align:center">Sisa SO</th>
-                                    <th style="text-align:center">Qty Tersedia</th>
                                     <th style="text-align:center">Pilih</th>
                                 </tr>
                             </thead>
@@ -145,7 +140,6 @@
                                     <td>{{ls.nama_barang}}</td>
                                     <td style="text-align:center">{{ls.satuan}}</td>
                                     <td style="text-align:center">{{ket.sisaso[index]}}</td>
-                                    <td style="text-align:center">{{ket.tersedia[index]}}</td>
                                     <td style="text-align:center">
                                         <input @change="pilihlistchecker()" v-model="checker" type="checkbox" :value="ls" :disabled="ket.ltersedia[index]===0">
                                     </td>
@@ -161,58 +155,70 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div v-if="gagal" class="row mt-2">
+        <div id="alastolak">
+            <div>
+                <b>Belum ada list Request Sales Order Yang di pilih! </b>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-kendaraan" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div id="modal-width" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Form Kendaraan</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="scrollList">
-                        <table id="thead" class="table table-striped table-bordered" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th style="text-align:center">No</th>
-                                    <th style="text-align:center">Nomor SO</th>
-                                    <th>Customer</th>
-                                    <th style="text-align:center">Jumlah</th>
-                                    <th style="text-align:center">Satuan</th>
-                                    <th style="text-align:center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="text-align:center"></td>
-                                    <td style="text-align:center"></td>
-                                    <td></td>
-                                    <td style="text-align:center"></td>
-                                    <td style="text-align:center"></td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="form-group">
+                        <select @change="cekopsi()" v-model="opsikendaraan" class="form-control">
+                            <option value="ambil">Daftar Kendaraan</option>
+                            <option value="baru">Input Kendaraan</option>
+                        </select>
+                    </div>
+                    <div class="form-group" v-if="opsikendaraan==='ambil'">
+                        <label>Nomor Kendaraan</label>
+                        <div class="autocomplete"></div>
+                        <div class="input" @click="toggleVisible" v-text="custom ? custom.nopol:''"></div>
+                        <div class="placeholder" v-if="custom==null" v-text="ket.nama">Pilih Kendaraan</div>
+                        <div class="popover" v-show="visible">
+                            <input type="text" @keydown.up="upin" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nomor kendaraan ..">
+                            <div class="optionbr" ref="optionList">
+                                <ul>
+                                    <li v-for="(match,index) in matches" :key="match.kode" v-text="match.nopol" :class="{'selected':(selected==index)}" @click="itemClicked(index)"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" v-if="opsikendaraan!=='ambil'">
+                        <label>Nomor Kendaraan</label>
+                        <input @input="ceknopol()" v-model="ketup.nopol" type="text" class="form-control" placeholder="Contoh : F.2617.HG" :class="{ 'is-valid': nyala, 'is-invalid': !nyala }">
+                    </div>
+                    <div class="form-group">
+                        <label>Merk</label>
+                        <input v-model="ketup.nama" type="text" class="form-control" :disabled="opsikendaraan==='ambil'" placeholder="Contoh: Canter, Dyna 105 ">
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis</label>
+                        <select v-model="ketup.id_jenis" class="form-control" :disabled="opsikendaraan==='ambil'">
+                            <option :value="jn.id" v-for="(jn,index) in jeniskendaraan" :key="index">{{jn.nama}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kubikasi (M3)</label>
+                        <input v-model="ketup.kubikasi" type="number" class="form-control" :disabled="opsikendaraan==='ambil'">
+                    </div>
+                    <div class="form-group">
+                        <label>Tonase (KG)</label>
+                        <input v-model="ketup.tonase" type="number" class="form-control" :disabled="opsikendaraan==='ambil'">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button @click="savekendaraan()" type="button" class="btn btn-primary">Save changes</button>
                 </div>
-                <div class="error-actions">
-                    <router-link to="/so" class="btn btn-primary btn-lg">
-                        Lihat Data SO
-                    </router-link>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div v-if="gagal" class="row mt-2">
-        <div id="alastolak">
-            <div>
-                <b>Belum ada list Request Sales Order Yang di pilih! </b>
             </div>
         </div>
     </div>
@@ -239,9 +245,9 @@ export default {
                 sisaso: [],
                 sisasopilih: [],
                 tersedia: [],
-                ltersedia: []
+                ltersedia: [],
+                nama: "Pilih Kendaraan",
             },
-            aktif: {},
             listsisa: {},
             checker: [],
             listbcm: {},
@@ -264,13 +270,25 @@ export default {
             harga: 0,
             subtotal: 0,
             total: 0,
-            kendaraan: {},
             listso: {},
             qtymasuk: 0,
             sisanya: 0,
             listsoall: {},
             aktif: false,
-            adabck: {}
+            adabck: {},
+            ambil: {},
+            opsikendaraan: 'ambil',
+            visible: false,
+            query: '',
+            selected: 0,
+            custom: null,
+            itemHeight: 39,
+            kendaraan: [],
+            ketup: {},
+            jeniskendaraan: {},
+            nyala: false,
+            adakendaraan: {},
+            inken: {},
         }
     },
     created() {
@@ -279,7 +297,12 @@ export default {
         this.timer();
     },
     computed: {
-
+        matches() {
+            if (this.query == '') {
+                return [];
+            }
+            return this.kendaraan.filter((item) => item.nopol.toLowerCase().includes(this.query.toLowerCase()))
+        }
     },
     methods: {
         getSoAktif() {
@@ -289,7 +312,11 @@ export default {
                     axios.get("/api/kendaraan")
                         .then(res => {
                             this.kendaraan = res.data.data;
-                            this.load = false;
+                            axios.get("/api/jeniskendaraan")
+                                .then(res => {
+                                    this.jeniskendaraan = res.data.data;
+                                    this.load = false;
+                                })
                         })
                 });
         },
@@ -327,22 +354,23 @@ export default {
         resetForm() {
             this.checker = [];
         },
-        pilihSo(aktif) {
+        pilihSo(ambil) {
             this.validqty();
             this.hitung.qty = [];
             this.checker = [];
-            this.ket.customer = aktif.customer;
-            this.ket.lokasi = aktif.lokasi;
-            this.ket.alamat = aktif.alamat;
-            this.ket.distribusi = aktif.distribusi;
-            this.up.nomor_so = aktif.nomor_so;
-            this.ket.status = aktif.statusso;
-            this.ket.nomor_rso = aktif.nomor_rso;
-            this.up.keterangan = aktif.keterangan;
-            axios.get("/api/listso/data/listbck/" + aktif.nomor_so)
+            this.ket.customer = ambil.customer;
+            this.ket.lokasi = ambil.lokasi;
+            this.ket.alamat = ambil.alamat;
+            this.ket.distribusi = ambil.distribusi;
+            this.up.nomor_so = ambil.nomor_so;
+            this.ket.status = ambil.statusso;
+            this.ket.nomor_rso = ambil.nomor_rso;
+            this.up.keterangan = ambil.keterangan;
+            axios.get("/api/listso/data/listbck/" + ambil.nomor_so)
                 .then(res => {
                     this.listso = res.data.data;
                     for (let i = 0; i < this.listso.length; i++) {
+                        this.checker.push(this.listso[i]);
                         this.ket.sisaso[i] = parseInt(this.listso[i].qty) - parseInt(this.listso[i].bck)
                         this.ket.tersedia[i] = parseInt(this.listso[i].tersedia) - parseInt(this.listso[i].bck)
                     }
@@ -509,11 +537,11 @@ export default {
             })
         },
         validqty(index) {
-            if (parseInt(this.hitung.qty[index]) > parseInt(this.ket.tersedia[index])) {
-                this.hitung.qty[index] = this.ket.tersedia[index];
-            }
             this.total = 0;
             for (let i = 0; i < this.checker.length; i++) {
+                if (this.hitung.qty[i] > (parseInt(this.checker[i].qty) - parseInt(this.checker[i].bck))) {
+                    this.hitung.qty[i] = (parseInt(this.checker[i].qty) - parseInt(this.checker[i].bck));
+                }
                 if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === "") {
                     this.hitung.jumlah[i] = 0;
                 } else {
@@ -537,6 +565,7 @@ export default {
             this.checker.splice(index, 1);
             this.hitung.qty.splice(index, 1);
             this.hitung.keterangan.splice(index, 1);
+            this.ket.sisasopilih.splice(index, 1);
             this.validqty();
         },
         DateTime() {
@@ -565,6 +594,85 @@ export default {
                         this.aktif = false;
                     }
                 })
+        },
+        showkendaraan() {
+            this.getSoAktif();
+            $("#modal-kendaraan").modal("show");
+        },
+        toggleVisible() {
+            this.visible = !this.visible;
+        },
+        itemClicked(index) {
+            this.selected = index;
+            this.selectItem();
+        },
+        selectItem() {
+            this.custom = this.matches[this.selected];
+            this.up.id_kendaraan = this.custom.id;
+            this.ketup.nama = this.custom.nama;
+            this.ketup.id_jenis = this.custom.id_jenis;
+            this.ketup.kubikasi = this.custom.kubikasi;
+            this.ketup.tonase = this.custom.tonase;
+            this.ket.nopol = this.custom.nopol;
+            this.visible = false;
+        },
+        upin() {
+            if (this.selected == 0) {
+                return;
+            }
+            this.selected -= 1;
+            this.scrollToItem();
+        },
+        down() {
+            if (this.selected >= this.matches.length - 1) {
+                return;
+            }
+            this.selected += 1;
+            this.scrollToItem();
+        },
+        scrollToItem() {
+            this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
+        },
+        cekopsi() {
+            this.ketup = {};
+            this.ket.nopol = "";
+            this.up.id_kendaraan = "";
+            this.ket.nama = "Pilih Kendaraan";
+            this.query = "";
+            this.custom = null;
+            this.up.id_kendaraan = "";
+        },
+        ceknopol() {
+            axios.get("/api/kendaraan/view/" + this.ketup.nopol)
+                .then(res => {
+                    this.adakendaraan = res.data.data;
+                    if (this.ketup.nopol.length > 0 && this.adakendaraan.length < 1) {
+                        this.nyala = true;
+                    } else {
+                        this.nyala = false;
+                    }
+                })
+        },
+        savekendaraan() {
+            // console.log(this.ketup);
+            if (this.opsikendaraan === 'ambil') {
+                $("#modal-kendaraan").modal("hide");
+            } else {
+                axios.post("/api/kendaraan", this.ketup)
+                    .then(res => {
+                        axios.get("/api/kendaraan/view/" + this.ketup.nopol)
+                            .then(res => {
+                                this.inken = res.data.data;
+                                this.up.id_kendaraan = this.inken[0].id;
+                                this.ket.nopol = this.inken[0].nopol;
+                                this.ket.nama = this.inken[0].nopol;
+                                this.getSoAktif();
+                                this.opsikendaraan = "ambil";
+                                this.visible = false;
+                                $("#modal-kendaraan").modal("hide");
+                            })
+                    })
+            }
         }
     },
 }

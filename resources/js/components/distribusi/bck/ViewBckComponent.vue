@@ -11,9 +11,9 @@
                 <input v-model="up.tanggal" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="statusbck!=='draft' || ambiluser.distribusi===0">
             </div>
             <div class="form-group">
-                <label>Nopol Kendaraan :</label>
+                <label>Nomor Kendaraan :</label>
                 <select v-model="up.id_kendaraan" name="kendaraan" class="form-control" :disabled="statusbck!=='draft' || ambiluser.distribusi===0">
-                    <option :value="up.id_kendaraan" v-for="(kd,index) in kendaraan" :key="index">{{kd.nopol}}</option>
+                    <option :value="kd.id" v-for="(kd,index) in kendaraan" :key="index">{{kd.nopol}}</option>
                 </select>
             </div>
         </div>
@@ -59,12 +59,11 @@
                     <tr>
                         <th>No</th>
                         <th>Kode Barang</th>
-                        <th>Nama Barang</th>
+                        <th style="width:25%">Nama Barang</th>
                         <th>Satuan</th>
                         <th>Harga</th>
                         <th>Diskon</th>
                         <th>Sisa SO</th>
-                        <th>Qty Tersedia</th>
                         <th>Rencana Kirim</th>
                         <th>Keterangan</th>
                         <th v-if="statusbck==='draft'">Aksi</th>
@@ -79,7 +78,6 @@
                         <td style="text-align:center">{{listbcm.harga | currency}}</td>
                         <td style="text-align:center">{{listbcm.diskon | currency}}</td>
                         <td style="text-align:center">{{hitung.sisaso[index]}}</td>
-                        <td style="text-align:center">{{hitung.tersedia[index]}}</td>
                         <td style="text-align:center">
                             <input @input="validqty(index)" v-model="hitung.qty[index]" type="number" class="form-control" :disabled="statusbck!=='draft' || ambiluser.distribusi===0">
                         </td>

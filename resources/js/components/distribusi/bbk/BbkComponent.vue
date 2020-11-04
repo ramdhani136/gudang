@@ -22,7 +22,6 @@
                     <th>Nomor BBK</th>
                     <th>Tanggal</th>
                     <th>Nomor BCK</th>
-                    <th>Nomor SO</th>
                     <th>Customer</th>
                     <th>Aksi</th>
                 </tr>
@@ -37,7 +36,6 @@
                     </td>
                     <td style="text-align:center">{{bk.tanggal}}</td>
                     <td style="text-align:center">{{bk.nomor_bck}}</td>
-                    <td style="text-align:center">{{bk.nomor_so}}</td>
                     <td>{{bk.customer}}</td>
                     <td style="text-align:center">
                         <button @click="showhistory(bk)" class="btn btn-primary">
@@ -283,7 +281,7 @@ export default {
                     }).then(res => {
                         /* status open bck */
                         axios.put("/api/bck/" + bk.nomor_bck, {
-                            status: 'draft'
+                            status: 'open'
                             /* end */
                         }).then(res => {
                             this.closesoplus = [];

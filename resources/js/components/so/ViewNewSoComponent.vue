@@ -61,15 +61,15 @@
                     <tr>
                         <th>No</th>
                         <th>Kode</th>
-                        <th>Nama Barang</th>
-                        <th>Qty</th>
+                        <th style="width:20%">Nama Barang</th>
+                        <th style="width:12%">Qty</th>
                         <th>Satuan</th>
                         <th>Harga</th>
                         <th>Diskon</th>
-                        <th>Status</th>
+                        <th style="width:5%">Status</th>
                         <th v-if="ket.status==='Tidak Tersedia'">Estimasi</th>
-                        <th>Sudah Tersedia</th>
                         <th v-if="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">Sudah Kirim</th>
+                        <th v-if="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'">Sisa SO</th>
                         <th v-if="ket.statusnya==='Draft' || ket.statusnya==='Tolak'">Aksi</th>
                     </tr>
                 </thead>
@@ -86,8 +86,8 @@
                         <td style="text-align:center">{{ch.diskon |currency}}</td>
                         <td style="text-align:center">{{ket.status}}</td>
                         <td v-if="ket.status==='Tidak Tersedia'" style="text-align:center">{{ch.tgl_datang}}</td>
-                        <td style="text-align:center">{{ch.tersedia}}</td>
                         <td v-if="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'" style="text-align:center">{{ch.bbk}}</td>
+                        <td v-if="ket.statusnya!=='Draft' && ket.statusnya!=='Tolak'" style="text-align:center">{{ch.qty-ch.bbk}}</td>
                         <td v-if="ket.statusnya==='Draft' || ket.statusnya==='Tolak'" style="text-align:center">
                             <button @click="hapuslistSo(index)" class="btn btn-danger">Hapus</button>
                         </td>

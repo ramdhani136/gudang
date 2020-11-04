@@ -66,9 +66,10 @@
                         <th>Satuan</th>
                         <th>Harga</th>
                         <th>Sub Total</th>
-                        <th>Status</th>
+                        <th style="width:10%">Status</th>
                         <th v-if="lstatus==='Tidak Tersedia'">Estimasi</th>
                         <th>Sudah Kirim</th>
+                        <th>Sisa SO</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -83,6 +84,7 @@
                         <td style="text-align:center">{{lstatus}}</td>
                         <td v-if="lstatus==='Tidak Tersedia'" style="text-align:center">{{ch.tgl_datang}}</td>
                         <td>{{ch.bbk}}</td>
+                        <td>{{ch.qty-ch.bbk}}</td>
                     </tr>
                 </tbody>
             </table>

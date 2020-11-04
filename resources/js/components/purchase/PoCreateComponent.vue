@@ -34,8 +34,8 @@
             </div>
         </div>
     </div>
+    <button style="font-size:1em;" @click="showmodal()" class=" float-left  ml-2 mt-4 label">Ambil Item</button>
     <div class="row">
-        <button @click="showmodal()" class="row float-left  ml-4 mt-4 label">Ambil Permintaan</button>
         <div id="totalpo" class="mt-3 ml-auto mr-3">Total Invoice &nbsp; : &nbsp;{{totalPrice | currency}}</div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">

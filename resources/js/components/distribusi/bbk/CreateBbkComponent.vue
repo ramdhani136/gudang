@@ -57,11 +57,11 @@
                     <tr>
                         <th>No</th>
                         <th>Kode Barang</th>
-                        <th>Nama Barang</th>
+                        <th style="width:23%;">Nama Barang</th>
                         <th>Satuan</th>
-                        <th>Harga</th>
-                        <th>Diskon</th>
-                        <th>Qty BCK</th>
+                        <th style="width:12%;">Harga</th>
+                        <th style="width:7%;">Diskon</th>
+                        <th style="width:10%;">Qty BCK</th>
                         <th>Qty termuat</th>
                         <th>Keterangan</th>
                     </tr>
@@ -109,8 +109,8 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Pilih BCK</label>
-                        <select @change="pilihBck(aktif)" v-model="aktif" class="form-control">
-                            <option :value="aktif" v-for="(aktif,index) in bckaktif" :key="index">{{aktif.bck}}</option>
+                        <select @change="pilihBck(ambil)" v-model="ambil" class="form-control">
+                            <option :value="ambil" v-for="(ambil,index) in bckaktif" :key="index">{{ambil.bck}}</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -226,7 +226,7 @@ export default {
                 tanggal: this.now(),
             },
             ket: {},
-            aktif: {},
+            ambil: {},
             checker: [],
             listbcm: {},
             hitung: {
@@ -293,15 +293,15 @@ export default {
         resetForm() {
             this.checker = [];
         },
-        pilihBck(aktif) {
+        pilihBck(ambil) {
             this.hitung.qty = [];
             this.checker = [];
-            this.ket.customer = aktif.customer;
-            this.ket.nomor_so = aktif.nomor_so;
-            this.ket.lokasi = aktif.lokasi;
-            this.ket.alamat = aktif.alamat;
-            this.ket.distribusi = aktif.distribusi;
-            this.up.nomor_bck = aktif.bck;
+            this.ket.customer = ambil.customer;
+            this.ket.nomor_so = ambil.nomor_so;
+            this.ket.lokasi = ambil.lokasi;
+            this.ket.alamat = ambil.alamat;
+            this.ket.distribusi = ambil.distribusi;
+            this.up.nomor_bck = ambil.bck;
 
             axios.get("/api/listbck/data/aktif/" + this.up.nomor_bck)
                 .then(res => {
