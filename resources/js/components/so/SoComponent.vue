@@ -599,6 +599,7 @@ export default {
             }).then((result) => {
                 if (result.value) {
                     this.input.rs = "N";
+                    this.input.rss = "N";
                     this.input.alasselesai = "";
                     axios.put("/api/so/" + rs.nomor_so, this.input)
                         .then(res => {

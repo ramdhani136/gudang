@@ -276,6 +276,8 @@ export default {
                     /* Ubah status so */
                     axios.put("/api/so/" + bk.nomor_so, {
                         status: 'Acc',
+                        rs: 'N',
+                        rss: 'N',
                         closebck: 'N'
                         /* end */
                     }).then(res => {

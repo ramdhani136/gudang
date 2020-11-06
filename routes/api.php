@@ -60,7 +60,8 @@ Route::resource('so','So\SoController');
 Route::get('so/data/realso','So\SoController@realso');
 Route::get('so/laporan/data','So\SoController@laporan');
 Route::get('so/data/aktif','So\SoController@aktif');
-Route::get('so/selesai/view','So\SoController@sselesai');
+Route::get('so/selesai/kordinator/{groupso}','So\SoController@skordinator');
+Route::get('so/selesai/supervisor','So\SoController@ssupervisor');
 Route::get('so/rso/{rso}','So\SoController@statusopen');
 Route::get('so/data/view/{groupso}','So\SoController@groupso');
 
@@ -99,6 +100,7 @@ Route::resource('listbbm','Bbm\ListBbmController');
 Route::resource('bck','Bck\BckController');
 
 Route::get('bck/data/aktif','Bck\BckController@aktif');
+Route::get('bck/data/so/{so}','Bck\BckController@so');
 
 Route::resource('listbck','Bck\ListBckController');
 Route::get('listbck/data/aktif/{bck}','Bck\ListBckController@aktif');

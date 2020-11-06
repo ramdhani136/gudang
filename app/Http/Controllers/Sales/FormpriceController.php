@@ -115,7 +115,7 @@ class FormpriceController extends Controller
    
 
         // $pdf = view('print.formprice',['form'=>$getform,'list'=>$getcustprice,'hargas'=>$ambilharga]);
-        $pdf = PDF::loadview('print.formprice',['form'=>$getform,'list'=>$getcustprice])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        $pdf = PDF::loadview('print.formprice',['form'=>$getform,'list'=>$getcustprice])->setPaper([0, 0, 684, 396], 'potrait');
         // return $pdf;
         return   $pdf->stream($nomor);
     }

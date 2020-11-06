@@ -95,7 +95,7 @@ class BbkController extends Controller
         $getbbk=Bbk::where('bbk',$bbk)->get();    
         $getlist=Listbbk::where('nomor_bbk',$bbk)->get();
         // $pdf = view('print.bbk',['bbk'=>$getbbk,'list'=>$getlist]);
-        $pdf = PDF::loadview('print.bbk',['bbk'=>$getbbk,'list'=>$getlist])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        $pdf = PDF::loadview('print.bbk',['bbk'=>$getbbk,'list'=>$getlist])->setPaper([0, 0, 684, 396], 'potrait');
         // return $pdf;
         return   $pdf->stream($bbk);
     }

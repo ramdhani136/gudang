@@ -18,6 +18,7 @@
                     <th>Nomor RSO</th>
                     <th>Tanggal</th>
                     <th>Customer</th>
+                    <th>Sales</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -31,6 +32,7 @@
                     </td>
                     <td style="text-align:center">{{rs.tanggal_rso}}</td>
                     <td>{{rs.customer}}</td>
+                    <td style="text-align:center">{{rs.namauser}}</td>
                     <td v-if="rs.status=='Sent'" style="text-align:center">
                         <button @click="showhistory(rs)" class="btn btn-primary">
                             Lihat History

@@ -104,7 +104,7 @@ class PoController extends Controller
         $getpo=Po::where('nomor_po',$po)->get();    
         $getlist=Listpo::where('nomor_po',$po)->get();
         // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
-        $pdf = PDF::loadview('print.po',['po'=>$getpo,'list'=>$getlist])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        $pdf = PDF::loadview('print.po',['po'=>$getpo,'list'=>$getlist])->setPaper([0, 0, 684, 396], 'potrait');
         // return $pdf;
         return   $pdf->stream($po);
     }

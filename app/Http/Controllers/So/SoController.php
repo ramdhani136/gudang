@@ -107,9 +107,14 @@ class SoController extends Controller
         return SoResource::collection(So::where('pr','N')->orderBy('nomor_so','ASC')->get());
     }
     
-    public function sselesai()
+    public function skordinator($groupso)
     {
-        return SoResource::collection(So::where('status','Acc')->where('rs','Y')->orderBy('nomor_so','ASC')->get());
+        return SoResource::collection(So::where('status','Acc')->where('rs','Y')->where('rss','N')->where('kode_groupso',$groupso)->orderBy('nomor_so','ASC')->get());
+    }
+
+    public function ssupervisor()
+    {
+        return SoResource::collection(So::where('status','Acc')->where('rs','Y')->where('rss','Y')->orderBy('nomor_so','ASC')->get());
     }
 
     public function statusopen($rso)
@@ -126,7 +131,7 @@ class SoController extends Controller
         $getso=So::where('nomor_so',$so)->get();    
         $getlistso=Listso::where('nomor_so',$so)->get();
         // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
-        $pdf = PDF::loadview('print.so',['so'=>$getso,'listso'=>$getlistso])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        $pdf = PDF::loadview('print.so',['so'=>$getso,'listso'=>$getlistso])->setPaper([0, 0, 684, 396], 'potrait');
         // return $pdf;
         return   $pdf->stream($so);
     }

@@ -105,4 +105,9 @@ class BckController extends Controller
         // return $pdf;
         return   $pdf->stream($bck);
     }
+
+    public function so($so)
+    {
+        return BckResource::collection(Bck::where('nomor_so',$so)->where('status','open')->get());
+    }
 }

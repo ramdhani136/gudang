@@ -95,7 +95,7 @@ class BbmController extends Controller
         $getbbm=Bbm::where('bbm',$bbm)->get();    
         $getlist=Listbbm::where('nomor_bbm',$bbm)->get();
         // $pdf = view('print.bbm',['bbm'=>$getbbm,'list'=>$getlist]);
-        $pdf = PDF::loadview('print.bbm',['bbm'=>$getbbm,'list'=>$getlist])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        $pdf = PDF::loadview('print.bbm',['bbm'=>$getbbm,'list'=>$getlist])->setPaper([0, 0, 684, 396], 'potrait');
         // return $pdf;
         return   $pdf->stream($bbm);
     }

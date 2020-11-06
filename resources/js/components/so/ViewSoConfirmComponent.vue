@@ -202,7 +202,7 @@ export default {
                             this.listso = res.data.data;
                             this.ket.tolak = 0;
                             for (let i = 0; i < this.listso.length; i++) {
-                                this.ket.total += parseInt(this.listso[i].qty) * parseInt(this.listso[i].harga);
+                                this.ket.total += parseFloat(this.listso[i].qty) * parseFloat(this.listso[i].harga);
                             }
                             this.load = false;
                         })

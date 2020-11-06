@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-            <div class="card" style="width:130%;margin-left:-1%">
+            <div class="card" style="width:100%;">
                 <div class="card-body">
                    <!--  {{Request::path() === '/' ? 'tes':'no'}} -->
                   <!--  {{Request::is('/')? 'aktif':'tdk aktif'}} -->

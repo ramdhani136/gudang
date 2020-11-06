@@ -127,7 +127,7 @@ class RsoController extends Controller
         $getrso=Rso::where('nomor_rso',$rso)->get();    
         $getlist=Listrso::where('nomor_rso',$rso)->where('status','Tersedia')->get();
         // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
-        $pdf = PDF::loadview('print.rsotersedia',['rso'=>$getrso,'list'=>$getlist])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        $pdf = PDF::loadview('print.rsotersedia',['rso'=>$getrso,'list'=>$getlist])->setPaper([0, 0, 684, 396], 'potrait');
         // return $pdf;
         return   $pdf->stream($rso);
     }
@@ -136,7 +136,7 @@ class RsoController extends Controller
         $getrso=Rso::where('nomor_rso',$rso)->get();    
         $getlist=Listrso::where('nomor_rso',$rso)->where('status','Tidak Tersedia')->get();
         // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
-        $pdf = PDF::loadview('print.rsott',['rso'=>$getrso,'list'=>$getlist])->setPaper([0, 0, 396.8, 585.98], 'landscape');
+        $pdf = PDF::loadview('print.rsott',['rso'=>$getrso,'list'=>$getlist])->setPaper([0, 0, 684, 396], 'potrait');
         // return $pdf;
         return   $pdf->stream($rso);
     }

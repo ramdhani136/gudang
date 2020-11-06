@@ -51,7 +51,9 @@
         </div>
     </div>
     <div class="row">
-        <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{invoice | currency}}</div>
+        <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp;
+            {{invoice | currency}}
+        </div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
@@ -173,7 +175,8 @@
     <div v-if="gagal" class="row mt-2">
         <div id="alastolak">
             <div>
-                <b>Belum ada list Request Sales Order Yang di pilih! </b>
+                <b>Belum ada list Request Sales Order Yang di pilih!
+                </b>
             </div>
         </div>
     </div>
@@ -324,12 +327,15 @@ export default {
             if (this.query == '') {
                 return [];
             }
-            return this.dataekspedisi.filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()))
-        },
+            return this
+                .dataekspedisi
+                .filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()))
+        }
     },
     methods: {
         getso() {
-            axios.get("/api/so/" + this.$route.params.id)
+            axios
+                .get("/api/so/" + this.$route.params.id)
                 .then(res => {
                     this.so = res.data.data;
                     this.ket.customer = this.so[0].customer;
@@ -340,7 +346,8 @@ export default {
                     } else {
                         this.ket.status = "Tidak Tersedia"
                     }
-                    axios.get("/api/listso/" + this.$route.params.id)
+                    axios
+                        .get("/api/listso/" + this.$route.params.id)
                         .then(res => {
                             this.listnewso = res.data.data;
                             this.invoice = 0;
@@ -352,7 +359,7 @@ export default {
                                     this.sub = this.hitung.qty[i];
                                 }
 
-                                this.invoice += parseInt(this.sub) * (parseInt(this.listnewso[i].harga) - parseInt(this.listnewso[i].diskon));
+                                this.invoice += parseFloat(this.sub) * (parseFloat(this.listnewso[i].harga) - parseFloat(this.listnewso[i].diskon));
 
                             }
                             this.load = false;
@@ -360,7 +367,8 @@ export default {
                 })
         },
         getekspedisi() {
-            axios.get("/api/ekspedisi")
+            axios
+                .get("/api/ekspedisi")
                 .then(res => {
                     this.dataekspedisi = res.data.data;
                 });
@@ -370,7 +378,11 @@ export default {
             var month = d.getMonth() + 1;
             var day = d.getDate();
 
-            var output = d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-" + (day < 10 ? '0' : '') + day;
+            var output = d.getFullYear() + "-" + (month < 10 ?
+                '0' :
+                '') + month + "-" + (day < 10 ?
+                '0' :
+                '') + day;
             return output
         },
         validate() {
@@ -383,14 +395,20 @@ export default {
             var month = d.getMonth() + 1;
             var day = d.getDate() + 2;
 
-            var output = d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-" + (day < 10 ? '0' : '') + day;
+            var output = d.getFullYear() + "-" + (month < 10 ?
+                '0' :
+                '') + month + "-" + (day < 10 ?
+                '0' :
+                '') + day;
             return output
         },
         so_nomor() {
             var d = new Date();
             var month = d.getMonth() + 1;
 
-            var output = "SO-" + d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-";
+            var output = "SO-" + d.getFullYear() + "-" + (month < 10 ?
+                '0' :
+                '') + month + "-";
             return output
         },
         submitSo(vso) {
@@ -402,201 +420,206 @@ export default {
                 buttonsStyling: false
             })
 
-            swalWithBootstrapButtons.fire({
-                title: 'Apakah anda yakin?',
-                text: "Ingin mengirim SO ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Iya, Yakin!',
-                cancelButtonText: 'Tidak!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.diisi = "";
-                    this.banding = "";
-                    this.aksi = "";
-                    for (let c = 0; c < this.listnewso.length; c++) {
-                        if (this.hitung.qty[c] === undefined || this.hitung.qty[c] === "" || this.hitung.qty[c] < 1) {
-                            this.diisi = "N";
-                        } else {
-                            this.diisi = "Y";
+            swalWithBootstrapButtons
+                .fire({
+                    title: 'Apakah anda yakin?',
+                    text: "Ingin mengirim SO ini!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Iya, Yakin!',
+                    cancelButtonText: 'Tidak!',
+                    reverseButtons: true
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        this.diisi = "";
+                        this.banding = "";
+                        this.aksi = "";
+                        for (let c = 0; c < this.listnewso.length; c++) {
+                            if (this.hitung.qty[c] === undefined || this.hitung.qty[c] === "" || this.hitung.qty[c] < 1) {
+                                this.diisi = "N";
+                            } else {
+                                this.diisi = "Y";
+                            }
+                            this.aksi += this.diisi;
+                            this.banding += "Y";
                         }
-                        this.aksi += this.diisi;
-                        this.banding += "Y";
-                    }
-                    if (this.aksi === this.banding) {
-                        if (vso.nomor_so === this.listnewso[0].nomor_so) {
-                            this.uploadso = {
-                                nomor_so: vso.nomor_so,
-                                tanggal_kirim: vso.tanggal_kirim,
-                                keterangan: vso.keterangan,
-                                distribusi: vso.distribusi,
-                                alamat: vso.alamat,
-                                lokasi: vso.lokasi,
-                                status: 'Kordinator',
-                                alastolak: '',
-                                id_ekspedisi: vso.id_ekspedisi,
-                                id_user: this.ambiluser.id
-                            };
-                            axios.put("/api/so/" + this.listnewso[0].nomor_so, this.uploadso)
-                                .then(res => {
-                                    axios.get("/api/listso/" + this.$route.params.id)
-                                        .then(res => {
-                                            this.listfull = res.data.data
-                                            for (let n = 0; n < this.listfull.length; n++) {
-                                                axios.delete("/api/listso/" + this.listfull[n].id)
-                                                    .then(res => {})
-                                            }
-                                            this.ada = 0;
-                                            for (let i = 0; i < this.listnewso.length; i++) {
-                                                if (vso.statusso === "tersedia") {
-                                                    this.ada = this.hitung.qty[i];
-                                                } else {
-                                                    this.ada = 0;
+                        if (this.aksi === this.banding) {
+                            if (vso.nomor_so === this.listnewso[0].nomor_so) {
+                                this.uploadso = {
+                                    nomor_so: vso.nomor_so,
+                                    tanggal_kirim: vso.tanggal_kirim,
+                                    keterangan: vso.keterangan,
+                                    distribusi: vso.distribusi,
+                                    alamat: vso.alamat,
+                                    lokasi: vso.lokasi,
+                                    status: 'Kordinator',
+                                    alastolak: '',
+                                    id_ekspedisi: vso.id_ekspedisi,
+                                    id_user: this.ambiluser.id
+                                };
+                                axios
+                                    .put("/api/so/" + this.listnewso[0].nomor_so, this.uploadso)
+                                    .then(res => {
+                                        axios
+                                            .get("/api/listso/" + this.$route.params.id)
+                                            .then(res => {
+                                                this.listfull = res.data.data
+                                                for (let n = 0; n < this.listfull.length; n++) {
+                                                    axios
+                                                        .delete("/api/listso/" + this.listfull[n].id)
+                                                        .then(res => {})
                                                 }
-                                                this.uplist = {
-                                                    tanggal_datang: this.listnewso[i].tgl_datang,
-                                                    nomor_so: vso.nomor_so,
-                                                    kode_barang: this.listnewso[i].kode_barang,
-                                                    harga: this.listnewso[i].harga,
-                                                    id_custprice: this.listnewso[i].id_custprice,
-                                                    qty: this.hitung.qty[i],
-                                                    qtyrso: 0,
-                                                    tersedia: this.ada,
-                                                    statusso: this.ket.status,
-                                                    diskon: this.listnewso[i].diskon,
+                                                this.ada = 0;
+                                                for (let i = 0; i < this.listnewso.length; i++) {
+                                                    if (vso.statusso === "tersedia") {
+                                                        this.ada = this.hitung.qty[i];
+                                                    } else {
+                                                        this.ada = 0;
+                                                    }
+                                                    this.uplist = {
+                                                        tanggal_datang: this.listnewso[i].tgl_datang,
+                                                        nomor_so: vso.nomor_so,
+                                                        kode_barang: this.listnewso[i].kode_barang,
+                                                        harga: this.listnewso[i].harga,
+                                                        id_custprice: this.listnewso[i].id_custprice,
+                                                        qty: this.hitung.qty[i],
+                                                        qtyrso: 0,
+                                                        tersedia: this.ada,
+                                                        statusso: this.ket.status,
+                                                        diskon: this.listnewso[i].diskon
+                                                    }
+                                                    axios.post("/api/listso", this.uplist)
                                                 }
-                                                axios.post("/api/listso", this.uplist)
-                                            }
+                                            })
+                                        axios.post("/api/history", {
+                                            nomor_dok: vso.nomor_so,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Anda mendapatkan permintaan SO baru",
+                                            keterangan: "So di kirim ke Sales Kordinator",
+                                            jenis: "So",
+                                            tanggal: this.DateTime()
                                         })
-                                    axios.post("/api/history", {
-                                        nomor_dok: vso.nomor_so,
-                                        id_user: this.ambiluser.id,
-                                        notif: "Anda mendapatkan permintaan SO baru",
-                                        keterangan: "So di kirim ke Sales Kordinator",
-                                        jenis: "So",
-                                        tanggal: this.DateTime(),
+                                        this
+                                            .$router
+                                            .push({
+                                                name: 'so'
+                                            })
+                                        swalWithBootstrapButtons.fire('Terkirim!', 'So berhasil di kirim.', 'success')
                                     })
-                                    this.$router.push({
-                                        name: 'so'
+                            } else {
+                                axios
+                                    .delete("/api/so/" + this.$route.params.id)
+                                    .then(res => {
+                                        this.uploadso = {
+                                            nomor_so: vso.nomor_so + this.ambiluser.kode_groupso,
+                                            tanggal_kirim: vso.tanggal_kirim,
+                                            keterangan: vso.keterangan,
+                                            distribusi: vso.distribusi,
+                                            alamat: vso.alamat,
+                                            lokasi: vso.lokasi,
+                                            status: 'Kordinator',
+                                            id_ekspedisi: vso.id_ekspedisi,
+                                            statusso: vso.statusso,
+                                            tanggal_so: vso.tanggal_so,
+                                            nomor_rso: vso.nomor_rso,
+                                            id_user: this.ambiluser.id
+                                        };
+                                        axios
+                                            .post("/api/so", this.uploadso)
+                                            .then(res => {
+                                                this.ada = 0;
+                                                for (let i = 0; i < this.listnewso.length; i++) {
+                                                    if (vso.statusso === "tersedia") {
+                                                        this.ada = this.hitung.qty[i];
+                                                    } else {
+                                                        this.ada = 0;
+                                                    }
+                                                    this.uplist = {
+                                                        nomor_so: vso.nomor_so + this.ambiluser.kode_groupso,
+                                                        kode_barang: this.listnewso[i].kode_barang,
+                                                        harga: this.listnewso[i].harga,
+                                                        id_custprice: this.listnewso[i].id_custprice,
+                                                        qty: this.hitung.qty[i],
+                                                        qtyrso: 0,
+                                                        tersedia: this.ada,
+                                                        diskon: this.listnewso[i].diskon
+                                                    }
+                                                    axios.post("/api/listso", this.uplist)
+                                                }
+                                            })
+                                        this.history = {};
+                                        axios
+                                            .get("/api/history/" + this.$route.params.id)
+                                            .then(res => {
+                                                this.history = res.data.data;
+                                                for (let j = 0; j < this.history.length; j++) {
+                                                    axios.put("/api/history/" + this.history[j].id, {
+                                                        nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso
+                                                    })
+                                                }
+                                            })
+                                        axios.post("/api/history", {
+                                            nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
+                                            nomor_ref: vso.nomor_rso,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Anda mendapatkan permintaan SO baru",
+                                            keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso
+                                                .nomor_so
+                                                .slice(0, 15) + this.ambiluser.kode_groupso,
+                                            jenis: "So",
+                                            tanggal: this.DateTime()
+                                        })
+                                        axios.post("/api/history", {
+                                            nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
+                                            nomor_ref: vso.nomor_rso,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Anda mendapatkan permintaan SO baru",
+                                            keterangan: "Mengirim SO ke Sales Supervisor",
+                                            jenis: "So",
+                                            tanggal: this.DateTime()
+                                        })
+                                        axios.post("/api/history", {
+                                            nomor_dok: vso.nomor_rso,
+                                            nomor_ref: vso.nomor_so + this.ambiluser.kode_groupso,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Anda mendapatkan permintaan SO baru",
+                                            keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso
+                                                .nomor_so
+                                                .slice(0, 15) + this.ambiluser.kode_groupso,
+                                            jenis: "RSO",
+                                            tanggal: this.DateTime(),
+                                            aktif: "N"
+                                        })
+                                        swalWithBootstrapButtons.fire('Terkirim!', 'So berhasil di kirim.', 'success')
+                                        this
+                                            .$router
+                                            .push({
+                                                name: 'so'
+                                            })
                                     })
-                                    swalWithBootstrapButtons.fire(
-                                        'Terkirim!',
-                                        'So berhasil di kirim.',
-                                        'success'
-                                    )
-                                })
+                            }
                         } else {
-                            axios.delete("/api/so/" + this.$route.params.id)
-                                .then(res => {
-                                    this.uploadso = {
-                                        nomor_so: vso.nomor_so + this.ambiluser.kode_groupso,
-                                        tanggal_kirim: vso.tanggal_kirim,
-                                        keterangan: vso.keterangan,
-                                        distribusi: vso.distribusi,
-                                        alamat: vso.alamat,
-                                        lokasi: vso.lokasi,
-                                        status: 'Kordinator',
-                                        id_ekspedisi: vso.id_ekspedisi,
-                                        statusso: vso.statusso,
-                                        tanggal_so: vso.tanggal_so,
-                                        nomor_rso: vso.nomor_rso,
-                                        id_user: this.ambiluser.id
-                                    };
-                                    axios.post("/api/so", this.uploadso)
-                                        .then(res => {
-                                            this.ada = 0;
-                                            for (let i = 0; i < this.listnewso.length; i++) {
-                                                if (vso.statusso === "tersedia") {
-                                                    this.ada = this.hitung.qty[i];
-                                                } else {
-                                                    this.ada = 0;
-                                                }
-                                                this.uplist = {
-                                                    nomor_so: vso.nomor_so + this.ambiluser.kode_groupso,
-                                                    kode_barang: this.listnewso[i].kode_barang,
-                                                    harga: this.listnewso[i].harga,
-                                                    id_custprice: this.listnewso[i].id_custprice,
-                                                    qty: this.hitung.qty[i],
-                                                    qtyrso: 0,
-                                                    tersedia: this.ada,
-                                                    diskon: this.listnewso[i].diskon,
-                                                }
-                                                axios.post("/api/listso", this.uplist)
-                                            }
-                                        })
-                                    this.history = {};
-                                    axios.get("/api/history/" + this.$route.params.id)
-                                        .then(res => {
-                                            this.history = res.data.data;
-                                            for (let j = 0; j < this.history.length; j++) {
-                                                axios.put("/api/history/" + this.history[j].id, {
-                                                    nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso
-                                                })
-                                            }
-                                        })
-                                    axios.post("/api/history", {
-                                        nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
-                                        nomor_ref: vso.nomor_rso,
-                                        id_user: this.ambiluser.id,
-                                        notif: "Anda mendapatkan permintaan SO baru",
-                                        keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso.nomor_so.slice(0, 15) + this.ambiluser.kode_groupso,
-                                        jenis: "So",
-                                        tanggal: this.DateTime(),
-                                    })
-                                    axios.post("/api/history", {
-                                        nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
-                                        nomor_ref: vso.nomor_rso,
-                                        id_user: this.ambiluser.id,
-                                        notif: "Anda mendapatkan permintaan SO baru",
-                                        keterangan: "Mengirim SO ke Sales Supervisor",
-                                        jenis: "So",
-                                        tanggal: this.DateTime(),
-                                    })
-                                    axios.post("/api/history", {
-                                        nomor_dok: vso.nomor_rso,
-                                        nomor_ref: vso.nomor_so + this.ambiluser.kode_groupso,
-                                        id_user: this.ambiluser.id,
-                                        notif: "Anda mendapatkan permintaan SO baru",
-                                        keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso.nomor_so.slice(0, 15) + this.ambiluser.kode_groupso,
-                                        jenis: "RSO",
-                                        tanggal: this.DateTime(),
-                                        aktif: "N",
-                                    })
-                                    swalWithBootstrapButtons.fire(
-                                        'Terkirim!',
-                                        'So berhasil di kirim.',
-                                        'success'
-                                    )
-                                    this.$router.push({
-                                        name: 'so'
-                                    })
-                                })
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Qty item tidak boleh kosong'
+                            })
                         }
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Qty item tidak boleh kosong',
-                        })
-                    }
 
-                } else if (
-                    /* Read more about handling dismissals below */
-                    result.dismiss === Swal.DismissReason.cancel
-                ) {
-                    swalWithBootstrapButtons.fire(
-                        'Cancelled',
-                        'Batal mengirim SO :)',
-                        'error'
-                    )
-                }
-            })
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel) {
+                        swalWithBootstrapButtons.fire('Cancelled', 'Batal mengirim SO :)', 'error')
+                    }
+                })
         },
         kembali() {
-            this.$router.push({
-                name: 'so'
-            })
+            this
+                .$router
+                .push({
+                    name: 'so'
+                })
         },
         reqedit(vso) {
             const swalWithBootstrapButtons = Swal.mixin({
@@ -607,67 +630,68 @@ export default {
                 buttonsStyling: false
             })
 
-            swalWithBootstrapButtons.fire({
-                title: 'Apakah anda yakin?',
-                text: "Ingin melakukan permintaan ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Iya, yakin!',
-                cancelButtonText: 'Batalkan!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.get("/api/listso/" + this.$route.params.id)
-                        .then(res => {
-                            this.listfull = res.data.data;
-                            for (let i = 0; i < this.listfull.length; i++) {
-                                if (this.listfull[i].bbk === null || this.listfull[i].bbk === "") {
-                                    this.listfull[i].bbk = 0;
+            swalWithBootstrapButtons
+                .fire({
+                    title: 'Apakah anda yakin?',
+                    text: "Ingin melakukan permintaan ini!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Iya, yakin!',
+                    cancelButtonText: 'Batalkan!',
+                    reverseButtons: true
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        axios
+                            .get("/api/listso/" + this.$route.params.id)
+                            .then(res => {
+                                this.listfull = res.data.data;
+                                for (let i = 0; i < this.listfull.length; i++) {
+                                    if (this.listfull[i].bbk === null || this.listfull[i].bbk === "") {
+                                        this.listfull[i].bbk = 0;
+                                    }
+                                    this.bbk += this.listfull[i].bbk;
                                 }
-                                this.bbk += this.listfull[i].bbk;
-                            }
-                            if (this.bbk < 1) {
-                                axios.put("/api/so/" + this.$route.params.id, {
-                                        alastolak: '',
-                                        status: 'Draft'
+                                if (this.bbk < 1) {
+                                    axios
+                                        .put("/api/so/" + this.$route.params.id, {
+                                            alastolak: '',
+                                            status: 'Draft'
+                                        })
+                                        .then(res => {
+                                            axios.post("/api/history", {
+                                                nomor_dok: this.$route.params.id,
+                                                id_user: this.ambiluser.id,
+                                                notif: "Rso nomor : " + this.$route.params.id + "di tarik sales",
+                                                keterangan: "Sales menarik kembali SO (Edit SO)",
+                                                jenis: "So",
+                                                tanggal: this.DateTime()
+                                            })
+                                            this
+                                                .$router
+                                                .push({
+                                                    name: 'so'
+                                                })
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Berhasil...',
+                                                text: 'Silahkan edit SO anda di list draft SO'
+                                            })
+                                        });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim'
                                     })
-                                    .then(res => {
-                                        axios.post("/api/history", {
-                                            nomor_dok: this.$route.params.id,
-                                            id_user: this.ambiluser.id,
-                                            notif: "Rso nomor : " + this.$route.params.id + "di tarik sales",
-                                            keterangan: "Sales menarik kembali SO (Edit SO)",
-                                            jenis: "So",
-                                            tanggal: this.DateTime(),
-                                        })
-                                        this.$router.push({
-                                            name: 'so'
-                                        })
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Berhasil...',
-                                            text: 'Silahkan edit SO anda di list draft SO',
-                                        })
-                                    });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: 'Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim',
-                                })
-                            }
-                        });
-                } else if (
-                    /* Read more about handling dismissals below */
-                    result.dismiss === Swal.DismissReason.cancel
-                ) {
-                    swalWithBootstrapButtons.fire(
-                        'Cancelled',
-                        'Batal melakukan permintaan :)',
-                        'error'
-                    )
-                }
-            })
+                                }
+                            });
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel) {
+                        swalWithBootstrapButtons.fire('Cancelled', 'Batal melakukan permintaan :)', 'error')
+                    }
+                })
         },
         reqbatal(vso) {
             const swalWithBootstrapButtons = Swal.mixin({
@@ -678,73 +702,75 @@ export default {
                 buttonsStyling: false
             })
 
-            swalWithBootstrapButtons.fire({
-                title: 'Apakah anda yakin?',
-                text: "Semua item pada SO ini akan di unbooking",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Iya, yakin!',
-                cancelButtonText: 'Batalkan!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.get("/api/listso/" + this.$route.params.id)
-                        .then(res => {
-                            this.listfull = res.data.data;
-                            for (let i = 0; i < this.listfull.length; i++) {
-                                if (this.listfull[i].bbk === null || this.listfull[i].bbk === "") {
-                                    this.listfull[i].bbk = 0;
+            swalWithBootstrapButtons
+                .fire({
+                    title: 'Apakah anda yakin?',
+                    text: "Semua item pada SO ini akan di unbooking",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Iya, yakin!',
+                    cancelButtonText: 'Batalkan!',
+                    reverseButtons: true
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        axios
+                            .get("/api/listso/" + this.$route.params.id)
+                            .then(res => {
+                                this.listfull = res.data.data;
+                                for (let i = 0; i < this.listfull.length; i++) {
+                                    if (this.listfull[i].bbk === null || this.listfull[i].bbk === "") {
+                                        this.listfull[i].bbk = 0;
+                                    }
+                                    this.bbk += this.listfull[i].bbk;
                                 }
-                                this.bbk += this.listfull[i].bbk;
-                            }
-                            if (this.bbk < 1) {
-                                axios.delete("/api/so/" + this.$route.params.id)
-                                    .then(res => {
-                                        axios.get("/api/history/data/" + this.$route.params.id + "/So")
-                                            .then(res => {
-                                                this.history = res.data.data;
-                                                for (let i = 0; i < this.history.length; i++) {
-                                                    axios.delete("/api/history/" + this.history[i].id);
-                                                }
-                                            });
-                                        axios.post("/api/history", {
-                                            nomor_dok: vso.nomor_rso,
-                                            nomor_ref: this.$route.params.id,
-                                            id_user: this.ambiluser.id,
-                                            notif: "So di hapus",
-                                            keterangan: "Membatalkan SO nomor : " + this.$route.params.id,
-                                            jenis: "RSO",
-                                            tanggal: this.DateTime(),
-                                            aktif: "N",
-                                        })
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Sukses...',
-                                            text: 'SO berhasil dihapus dari database',
-                                        })
-                                        this.$router.push({
-                                            name: 'so'
-                                        })
-                                    });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: 'Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim',
-                                })
-                            }
-                        });
-                } else if (
-                    /* Read more about handling dismissals below */
-                    result.dismiss === Swal.DismissReason.cancel
-                ) {
-                    swalWithBootstrapButtons.fire(
-                        'Cancelled',
-                        'Batal melakukan permintaan :)',
-                        'error'
-                    )
-                }
-            })
+                                if (this.bbk < 1) {
+                                    axios
+                                        .delete("/api/so/" + this.$route.params.id)
+                                        .then(res => {
+                                            axios
+                                                .get("/api/history/data/" + this.$route.params.id + "/So")
+                                                .then(res => {
+                                                    this.history = res.data.data;
+                                                    for (let i = 0; i < this.history.length; i++) {
+                                                        axios.delete("/api/history/" + this.history[i].id);
+                                                    }
+                                                });
+                                            axios.post("/api/history", {
+                                                nomor_dok: vso.nomor_rso,
+                                                nomor_ref: this.$route.params.id,
+                                                id_user: this.ambiluser.id,
+                                                notif: "So di hapus",
+                                                keterangan: "Membatalkan SO nomor : " + this.$route.params.id,
+                                                jenis: "RSO",
+                                                tanggal: this.DateTime(),
+                                                aktif: "N"
+                                            })
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Sukses...',
+                                                text: 'SO berhasil dihapus dari database'
+                                            })
+                                            this
+                                                .$router
+                                                .push({
+                                                    name: 'so'
+                                                })
+                                        });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim'
+                                    })
+                                }
+                            });
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel) {
+                        swalWithBootstrapButtons.fire('Cancelled', 'Batal melakukan permintaan :)', 'error')
+                    }
+                })
         },
         validasiqty() {
             this.invoice = 0;
@@ -759,55 +785,78 @@ export default {
                     this.sub = this.hitung.qty[i];
                 }
 
-                this.invoice += parseInt(this.sub) * (parseInt(this.listnewso[i].harga) - parseInt(this.listnewso[i].diskon));
+                this.invoice += parseFloat(this.sub) * (parseFloat(this.listnewso[i].harga) - parseFloat(this.listnewso[i].diskon));
             }
         },
         hapuslistSo(index) {
             if (this.listnewso.length < 2) {
-                Swal.fire({
-                    title: 'Apakah anda yakin?',
-                    text: "tidak ada item lain jika anda menghapus item ini dan SO akan otomatis dihapus!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6 ml-2',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.listnewso.splice(index, 1);
-                        this.ket.coba.splice(index, 1);
-                        this.hitung.qty.splice(index, 1);
-                        this.validasiqty();
-                        axios.delete("/api/so/" + this.$route.params.id)
-                            .then(res => {
-                                Swal.fire({
-                                    icon: 'Terhapus',
-                                    title: 'Oops...',
-                                    text: 'SO sudah terhapus dari database',
+                Swal
+                    .fire({
+                        title: 'Apakah anda yakin?',
+                        text: "tidak ada item lain jika anda menghapus item ini dan SO akan otomatis dihapus!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6 ml-2',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            this
+                                .listnewso
+                                .splice(index, 1);
+                            this
+                                .ket
+                                .coba
+                                .splice(index, 1);
+                            this
+                                .hitung
+                                .qty
+                                .splice(index, 1);
+                            this.validasiqty();
+                            axios
+                                .delete("/api/so/" + this.$route.params.id)
+                                .then(res => {
+                                    Swal.fire({
+                                        icon: 'Terhapus',
+                                        title: 'Oops...',
+                                        text: 'SO sudah terhapus dari database'
+                                    })
+                                    this
+                                        .$router
+                                        .push({
+                                            name: 'so'
+                                        })
                                 })
-                                this.$router.push({
-                                    name: 'so'
-                                })
-                            })
-                    }
-                })
+                        }
+                    })
             } else {
-                Swal.fire({
-                    title: 'Apakah anda yakin?',
-                    text: "item akan di unbooking setelah anda mengirim SO ini!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6 ml-2',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.listnewso.splice(index, 1);
-                        this.ket.coba.splice(index, 1);
-                        this.hitung.qty.splice(index, 1);
-                        this.validasiqty();
-                    }
-                })
+                Swal
+                    .fire({
+                        title: 'Apakah anda yakin?',
+                        text: "item akan di unbooking setelah anda mengirim SO ini!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6 ml-2',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            this
+                                .listnewso
+                                .splice(index, 1);
+                            this
+                                .ket
+                                .coba
+                                .splice(index, 1);
+                            this
+                                .hitung
+                                .qty
+                                .splice(index, 1);
+                            this.validasiqty();
+                        }
+                    })
             }
 
         },
@@ -888,57 +937,56 @@ export default {
                 buttonsStyling: false
             })
 
-            swalWithBootstrapButtons.fire({
-                title: 'Apakah anda yakin?',
-                text: "Ingin Menerima SO ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Iya, Yakin!',
-                cancelButtonText: 'Tidak!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.put("/api/so/" + vso.nomor_so, {
-                        status: "Acc"
-                    }).then(res => {
-                        axios.get("/api/listso/" + vso.nomor_so).then(res => {
-                            this.listsoup = res.data.data;
-                            for (let y = 0; y < this.listsoup.length; y++) {
-                                axios.put("/api/listso/" + this.listsoup[y].id, {
-                                    openso: 'Y',
-                                    accdate: this.DateTime(),
+            swalWithBootstrapButtons
+                .fire({
+                    title: 'Apakah anda yakin?',
+                    text: "Ingin Menerima SO ini!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Iya, Yakin!',
+                    cancelButtonText: 'Tidak!',
+                    reverseButtons: true
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        axios
+                            .put("/api/so/" + vso.nomor_so, {
+                                status: "Acc"
+                            })
+                            .then(res => {
+                                axios
+                                    .get("/api/listso/" + vso.nomor_so)
+                                    .then(res => {
+                                        this.listsoup = res.data.data;
+                                        for (let y = 0; y < this.listsoup.length; y++) {
+                                            axios.put("/api/listso/" + this.listsoup[y].id, {
+                                                openso: 'Y',
+                                                accdate: this.DateTime()
+                                            })
+                                        }
+                                    })
+                                axios.post("/api/history", {
+                                    nomor_dok: vso.nomor_so,
+                                    id_user: this.ambiluser.id,
+                                    notif: "So nomor : " + vso.nomor_so + " di terima DIC",
+                                    keterangan: "SO di terima DIC",
+                                    jenis: "So",
+                                    tanggal: this.DateTime()
                                 })
-                            }
-                        })
-                        axios.post("/api/history", {
-                            nomor_dok: vso.nomor_so,
-                            id_user: this.ambiluser.id,
-                            notif: "So nomor : " + vso.nomor_so + " di terima DIC",
-                            keterangan: "SO di terima DIC",
-                            jenis: "So",
-                            tanggal: this.DateTime(),
-                        })
-                        this.$router.push({
-                            name: 'distribusiso'
-                        })
-                        swalWithBootstrapButtons.fire(
-                            'Sukses!',
-                            'SO berhasil di terima.',
-                            'success'
-                        )
-                    })
+                                this
+                                    .$router
+                                    .push({
+                                        name: 'distribusiso'
+                                    })
+                                swalWithBootstrapButtons.fire('Sukses!', 'SO berhasil di terima.', 'success')
+                            })
 
-                } else if (
-                    /* Read more about handling dismissals below */
-                    result.dismiss === Swal.DismissReason.cancel
-                ) {
-                    swalWithBootstrapButtons.fire(
-                        'Cancelled',
-                        'Batal menerima SO :)',
-                        'error'
-                    )
-                }
-            })
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel) {
+                        swalWithBootstrapButtons.fire('Cancelled', 'Batal menerima SO :)', 'error')
+                    }
+                })
         },
         formtolak() {
             $("#modal-tolak").modal("show");
@@ -952,76 +1000,92 @@ export default {
                 buttonsStyling: false
             })
 
-            swalWithBootstrapButtons.fire({
-                title: 'Apakah anda yakin',
-                text: "Ingin menolak SO ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Iya,Yakin!',
-                cancelButtonText: 'Tidak!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.put("/api/so/" + this.$route.params.id, {
-                        status: "Tolak",
-                        alastolak: this.up.alastolak,
-                    }).then(res => {
-                        axios.get("/api/listso/" + this.$route.params.id).then(res => {
-                            this.listsoup = res.data.data;
-                            for (let y = 0; y < this.listsoup.length; y++) {
-                                axios.put("/api/listso/" + this.listsoup[y].id, {
-                                    openso: 'N'
+            swalWithBootstrapButtons
+                .fire({
+                    title: 'Apakah anda yakin',
+                    text: "Ingin menolak SO ini!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Iya,Yakin!',
+                    cancelButtonText: 'Tidak!',
+                    reverseButtons: true
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        axios
+                            .put("/api/so/" + this.$route.params.id, {
+                                status: "Tolak",
+                                alastolak: this.up.alastolak
+                            })
+                            .then(res => {
+                                axios
+                                    .get("/api/listso/" + this.$route.params.id)
+                                    .then(res => {
+                                        this.listsoup = res.data.data;
+                                        for (let y = 0; y < this.listsoup.length; y++) {
+                                            axios.put("/api/listso/" + this.listsoup[y].id, {
+                                                openso: 'N'
+                                            })
+                                        }
+                                    })
+                                axios.post("/api/history", {
+                                    nomor_dok: this.nomorso,
+                                    id_user: this.ambiluser.id,
+                                    notif: "So nomor : " + this.nomorso + " di tolak DIC",
+                                    keterangan: "SO di tolak DIC",
+                                    jenis: "So",
+                                    tanggal: this.DateTime()
                                 })
-                            }
-                        })
-                        axios.post("/api/history", {
-                            nomor_dok: this.nomorso,
-                            id_user: this.ambiluser.id,
-                            notif: "So nomor : " + this.nomorso + " di tolak DIC",
-                            keterangan: "SO di tolak DIC",
-                            jenis: "So",
-                            tanggal: this.DateTime(),
-                        })
-                        swalWithBootstrapButtons.fire(
-                            'Sukses!',
-                            'So berhasil di tolak.',
-                            'success'
-                        )
-                        $("#modal-tolak").modal("hide");
-                        this.$router.push({
-                            name: 'distribusiso'
-                        })
-                    })
-                } else if (
-                    /* Read more about handling dismissals below */
-                    result.dismiss === Swal.DismissReason.cancel
-                ) {
-                    swalWithBootstrapButtons.fire(
-                        'Cancelled',
-                        'Batal melakukan penolakan :)',
-                        'error'
-                    )
-                }
-            })
+                                swalWithBootstrapButtons.fire('Sukses!', 'So berhasil di tolak.', 'success')
+                                $("#modal-tolak").modal("hide");
+                                this
+                                    .$router
+                                    .push({
+                                        name: 'distribusiso'
+                                    })
+                            })
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel) {
+                        swalWithBootstrapButtons.fire('Cancelled', 'Batal melakukan penolakan :)', 'error')
+                    }
+                })
         },
         DateTime() {
             this.date = new Date();
-            this.month = this.date.getMonth() + 1;
-            this.year = this.date.getFullYear();
-            this.hours = this.date.getHours();
-            this.minute = this.date.getMinutes();
-            this.seconds = this.date.getSeconds();
+            this.month = this
+                .date
+                .getMonth() + 1;
+            this.year = this
+                .date
+                .getFullYear();
+            this.hours = this
+                .date
+                .getHours();
+            this.minute = this
+                .date
+                .getMinutes();
+            this.seconds = this
+                .date
+                .getSeconds();
             if (this.month > 12) {
                 this.month = 12;
             }
-            this.day = this.date.getDate();
-            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
-            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.day = this
+                .date
+                .getDate();
+            this.dates = this.year + "-" + (this.month < 10 ?
+                '0' :
+                '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ?
+                '0' :
+                '') + this.seconds;
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
         },
         ceknomorso(vso) {
-            axios.get("/api/so/" + vso.nomor_so + this.ambiluser.kode_groupso)
+            axios
+                .get("/api/so/" + vso.nomor_so + this.ambiluser.kode_groupso)
                 .then(res => {
                     this.adaso = res.data.data;
                     if (vso.nomor_so.length === 15 && this.adaso.length === 0) {
@@ -1039,6 +1103,4 @@ export default {
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

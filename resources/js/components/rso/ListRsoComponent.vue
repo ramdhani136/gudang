@@ -101,7 +101,7 @@
         <button v-if="status==='Draft'" @click="kirimrso()" class="btn-success btn ml-1" :disabled="bolehkirim">
             Kirim Permintaan
         </button>
-        <button v-if="status==='Confirmed'" @click="reqedit()" class="btn-orange btn ml-3">
+        <button v-if="status==='Confirmed' && btnedit===true" @click="reqedit()" class="btn-orange btn ml-3">
             Request Ulang
         </button>
         <router-link v-if="status==='Confirmed'" to="/so/new" class="btn btn-success ml-1">+ Create SO</router-link>
@@ -324,6 +324,7 @@ export default {
             bolehkirim: true,
             distersedia: false,
             distt: false,
+            btnedit: true,
         }
     },
     created() {
@@ -702,6 +703,7 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {
+                    this.btnedit = false;
                     if (this.listpr.length > 0) {
                         this.init = "";
                         this.cek = "";
@@ -1145,8 +1147,8 @@ export default {
                     this.inhitung.diskon[i] = this.diskon[i];
                 }
 
-                this.subtotal = (parseInt(this.listpr[i].harga) - parseInt(this.inhitung.diskon[i])) * parseInt(this.inhitung.qty[i])
-                this.invoice += this.subtotal;
+                this.subtotal = (parseFloat(this.listpr[i].harga) - parseFloat(this.inhitung.diskon[i])) * parseFloat(this.inhitung.qty[i])
+                this.invoice += parseFloat(this.subtotal);
                 this.cekkirim();
             }
         },

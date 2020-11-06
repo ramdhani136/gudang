@@ -719,8 +719,8 @@ export default {
                 } else {
                     this.inhitung.diskon[i] = this.diskon[i];
                 }
-                this.subtotal = (parseInt(this.listpr[i].harga) - parseInt(this.inhitung.diskon[i])) * parseInt(this.inhitung.qty[i])
-                this.invoice += this.subtotal;
+                this.subtotal = (parseFloat(this.listpr[i].harga) - parseFloat(this.inhitung.diskon[i])) * parseFloat(this.inhitung.qty[i])
+                this.invoice += parseFloat(this.subtotal);
                 if (this.listpr[i].harga < 1 || this.hitung.qty[i] < 1 || this.hitung.qty[i] === '' || this.hitung.qty[i] === undefined) {
                     this.a = "N";
                 } else {

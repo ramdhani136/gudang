@@ -16,7 +16,7 @@ Vue.use(VueCurrencyFilter,
     {
         symbol : 'Rp.',
         thousandsSeparator: '.',
-        fractionCount: 0,
+        fractionCount: 2,
         fractionSeparator: ',',
         symbolPosition: 'front',
         symbolSpacing: true

@@ -644,7 +644,7 @@ export default {
                     this.checkrso[i].diskon = 0;
                 }
 
-                this.invoice += parseInt(this.sub) * (parseInt(this.checkrso[i].harga) - parseInt(this.checkrso[i].diskon));
+                this.invoice += parseFloat(this.sub) * (parseFloat(this.checkrso[i].harga) - parseFloat(this.checkrso[i].diskon));
             }
         },
         draftSo() {

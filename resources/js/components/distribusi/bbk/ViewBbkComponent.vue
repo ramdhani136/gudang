@@ -297,7 +297,7 @@ export default {
                             this.listbbk = res.data.data;
                             this.ket.qtybck = [];
                             for (let k = 0; k < this.listbbk.length; k++) {
-                                this.total += parseInt(this.listbbk[k].qty) * parseInt(this.listbbk[k].harga);
+                                this.total += parseFloat(this.listbbk[k].qty) * parseFloat(this.listbbk[k].harga);
                                 this.inputin.qty[k] = this.listbbk[k].qty;
                                 axios.get("/api/listbck/view/" + this.up.nomor_bck + "/" + this.listbbk[k].kode_barang)
                                     .then(res => {
@@ -374,7 +374,7 @@ export default {
                                 this.nomor_bbk = this.up.bbk;
                                 this.kode_barang = this.checker[i].kode_barang;
                                 this.qty = 0;
-                                this.qty = parseInt(this.hitung.qty[i]);
+                                this.qty = parseFloat(this.hitung.qty[i]);
                                 this.harga = this.checker[i].harga;
                                 this.qty_bck = this.checker[i].qty;
                                 this.keterangan = this.hitung.keterangan[i];
@@ -396,9 +396,9 @@ export default {
                                                     .then(res => {
                                                         this.listrso = res.data.data;
                                                         for (let o = 0; o < this.listrso.length; o++) {
-                                                            if (parseInt(this.hitung.qty[i]) < this.checker[i].qty) {
+                                                            if (parseFloat(this.hitung.qty[i]) < this.checker[i].qty) {
                                                                 if (this.checker[i].statusso === 'tersedia') {
-                                                                    this.qtyupdate = (parseInt(this.listrso[o].keluar_tersedia) - parseInt(this.checker[i].qty)) + parseInt(this.hitung.qty[i]);
+                                                                    this.qtyupdate = (parseFloat(this.listrso[o].keluar_tersedia) - parseFloat(this.checker[i].qty)) + parseFloat(this.hitung.qty[i]);
                                                                     this.uplistrso = {
                                                                         out_yes: this.qtyupdate,
                                                                         sotersedia_close: 'N'
@@ -416,7 +416,7 @@ export default {
                                                                                 })
                                                                         })
                                                                 } else {
-                                                                    this.qtyupdate = (parseInt(this.listrso[o].keluar_tdktersedia) - parseInt(this.checker[i].qty)) + parseInt(this.hitung.qty[i]);
+                                                                    this.qtyupdate = (parseFloat(this.listrso[o].keluar_tdktersedia) - parseFloat(this.checker[i].qty)) + parseFloat(this.hitung.qty[i]);
                                                                     this.uplistrso = {
                                                                         out_no: this.qtyupdate,
                                                                         sotdk_close: 'N'
@@ -451,7 +451,7 @@ export default {
             }
         },
         validqty(index) {
-            if (parseInt(this.hitung.qty[index]) > parseInt(this.checker[index].qty)) {
+            if (parseFloat(this.hitung.qty[index]) > parseFloat(this.checker[index].qty)) {
                 this.hitung.qty[index] = this.checker[index].qty;
             }
             this.total = 0;
@@ -461,8 +461,8 @@ export default {
                 } else {
                     this.hitung.jumlah[i] = this.hitung.qty[i];
                 }
-                this.subtotal = (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) * parseInt(this.hitung.jumlah[i]);
-                this.total += parseInt(this.subtotal);
+                this.subtotal = (parseFloat(this.checker[i].harga) - parseFloat(this.checker[i].diskon)) * parseFloat(this.hitung.jumlah[i]);
+                this.total += parseFloat(this.subtotal);
             }
         },
         batal() {

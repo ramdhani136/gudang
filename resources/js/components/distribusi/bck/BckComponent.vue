@@ -8,7 +8,6 @@
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select name="status" v-model="filter.status" class="form-control">
-            <option value="draft">Draft</option>
             <option value="open">Open</option>
             <option value="close">Close</option>
         </select>

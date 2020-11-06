@@ -302,8 +302,8 @@ export default {
                                 axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.listbck[i].kode_barang)
                                     .then(res => {
                                         this.listsonya = res.data.data;
-                                        this.hitung.sisaso[i] = (parseInt(this.listsonya[0].qty) - parseInt(this.listsonya[0].bck)) + parseInt(this.listbck[i].qty);
-                                        this.hitung.tersedia[i] = (parseInt(this.listsonya[0].tersedia) - parseInt(this.listsonya[0].bck)) + parseInt(this.listbck[i].qty)
+                                        this.hitung.sisaso[i] = (parseFloat(this.listsonya[0].qty) - parseFloat(this.listsonya[0].bck)) + parseFloat(this.listbck[i].qty);
+                                        this.hitung.tersedia[i] = (parseFloat(this.listsonya[0].tersedia) - parseFloat(this.listsonya[0].bck)) + parseFloat(this.listbck[i].qty)
                                         this.hitung.keterangan[i] = this.listbck[i].keterangan;
                                     })
                             }
@@ -370,8 +370,8 @@ export default {
                 .then(res => {
                     this.listso = res.data.data;
                     for (let i = 0; i < this.listso.length; i++) {
-                        this.ket.sisaso[i] = parseInt(this.listso[i].qty) - parseInt(this.listso[i].bck)
-                        this.ket.tersedia[i] = parseInt(this.listso[i].tersedia) - parseInt(this.listso[i].bck)
+                        this.ket.sisaso[i] = parseFloat(this.listso[i].qty) - parseFloat(this.listso[i].bck)
+                        this.ket.tersedia[i] = parseFloat(this.listso[i].tersedia) - parseFloat(this.listso[i].bck)
                     }
 
                 })
@@ -439,8 +439,8 @@ export default {
                                                 axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.checker[i].kode_barang)
                                                     .then(res => {
                                                         this.listso = res.data.data;
-                                                        this.qtymasuk = parseInt(this.listso[0].bck) + parseInt(this.hitung.qty[i]);
-                                                        this.sisanya = parseInt(this.listso[0].qty) - (parseInt(this.listso[0].bck) + parseInt(this.hitung.qty[i]));
+                                                        this.qtymasuk = parseFloat(this.listso[0].bck) + parseFloat(this.hitung.qty[i]);
+                                                        this.sisanya = parseFloat(this.listso[0].qty) - (parseFloat(this.listso[0].bck) + parseFloat(this.hitung.qty[i]));
                                                         if (this.sisanya < 1) {
                                                             this.closepo = "Y";
                                                         } else {
@@ -533,7 +533,7 @@ export default {
             })
         },
         validqty(index) {
-            if (parseInt(this.hitung.qty[index]) > parseInt(this.hitung.tersedia[index])) {
+            if (parseFloat(this.hitung.qty[index]) > parseFloat(this.hitung.tersedia[index])) {
                 this.hitung.qty[index] = this.hitung.tersedia[index];
             }
             this.total = 0;
@@ -543,8 +543,8 @@ export default {
                 } else {
                     this.hitung.jumlah[i] = this.hitung.qty[i];
                 }
-                this.subtotal = (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) * parseInt(this.hitung.jumlah[i]);
-                this.total += parseInt(this.subtotal);
+                this.subtotal = (parseFloat(this.checker[i].harga) - parseFloat(this.checker[i].diskon)) * parseFloat(this.hitung.jumlah[i]);
+                this.total += parseFloat(this.subtotal);
             }
         },
         batal() {
@@ -613,7 +613,7 @@ export default {
                                         axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.listbckhps[i].kode_barang)
                                             .then(res => {
                                                 this.listsohps = res.data.data;
-                                                this.qtybck = parseInt(this.listsohps[0].bck) - parseInt(this.listbckhps[i].qty);
+                                                this.qtybck = parseFloat(this.listsohps[0].bck) - parseFloat(this.listbckhps[i].qty);
                                                 axios.put("/api/listso/" + this.listsohps[0].id, {
                                                     bck: this.qtybck,
                                                     closeso: "N"

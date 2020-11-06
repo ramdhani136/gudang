@@ -338,7 +338,7 @@ export default {
                         this.aplus = '';
                         this.banding = '';
                         for (let i = 0; i < this.checker.length; i++) {
-                            if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 1 || this.hitung.qty[i] === '') {
+                            if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 0 || this.hitung.qty[i] === '') {
                                 this.a = "N";
                             } else {
                                 this.a = "Y";
@@ -367,8 +367,8 @@ export default {
                                                 axios.get("/api/listso/data/" + this.checker[i].nomor_so + "/" + this.checker[i].kode_barang)
                                                     .then(res => {
                                                         this.listso = res.data.data;
-                                                        this.qtybbk = parseInt(this.listso[0].bbk) + parseInt(this.hitung.qty[i]);
-                                                        this.qtybck = (parseInt(this.listso[0].bck) - parseInt(this.checker[i].qty)) + parseInt(this.hitung.qty[i]);
+                                                        this.qtybbk = parseFloat(this.listso[0].bbk) + parseFloat(this.hitung.qty[i]);
+                                                        this.qtybck = (parseFloat(this.listso[0].bck) - parseFloat(this.checker[i].qty)) + parseFloat(this.hitung.qty[i]);
                                                         if (this.qtybck >= this.listso[0].qty) {
                                                             this.a = "Y";
                                                             this.qtybck = this.listso[0].qty;
@@ -459,6 +459,7 @@ export default {
                                     })
                                 })
                         } else {
+                            this.load = false;
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
@@ -466,6 +467,7 @@ export default {
                             })
                         }
                     } else {
+                        this.load = false;
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
@@ -477,6 +479,7 @@ export default {
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal menyimpan BCK :)',
@@ -496,8 +499,8 @@ export default {
                 } else {
                     this.hitung.jumlah[i] = this.hitung.qty[i];
                 }
-                this.subtotal = (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) * parseInt(this.hitung.jumlah[i]);
-                this.total += parseInt(this.subtotal);
+                this.subtotal = (parseFloat(this.checker[i].harga) - parseFloat(this.checker[i].diskon)) * parseFloat(this.hitung.jumlah[i]);
+                this.total += parseFloat(this.subtotal);
             }
         },
         batal() {
