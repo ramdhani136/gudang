@@ -32,7 +32,6 @@
                     <th>Nomor SO</th>
                     <th>Tanggal</th>
                     <th>Customer</th>
-                    <th>Tanggal Kirim</th>
                     <th>Sales</th>
                     <th>Aksi</th>
                 </tr>
@@ -47,7 +46,6 @@
                     </td>
                     <td style="text-align:center">{{rs.tanggal_so}}</td>
                     <td>{{rs.customer}}</td>
-                    <td style="text-align:center">{{rs.tanggal_kirim}}</td>
                     <td style="text-align:center">{{rs.sales}}</td>
                     <td style="text-align:center">
                         <button v-if="rs.status!=='Draft'" @click="showhistory(rs)" class="btn btn-primary">Lihat History</button>
