@@ -366,6 +366,7 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
+                    this.load = true;
                     axios.get("/api/listpo/" + pl.nomor_po)
                         .then(res => {
                             this.listpo = res.data.data;
@@ -416,6 +417,7 @@ export default {
                                                 axios.delete("/api/history/" + this.history[o].id)
                                             }
                                         })
+                                    this.load = false;
                                     swalWithBootstrapButtons.fire(
                                         'Deleted!',
                                         'PO berhasil di hapus.',
@@ -428,6 +430,7 @@ export default {
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal menghapis PO ini :)',

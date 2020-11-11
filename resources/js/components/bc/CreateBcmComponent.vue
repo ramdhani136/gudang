@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor Checker :</label>
-                <input @input="ceknomorbcm()" v-model="up.bcm" type="text" maxlength="16" class="form-control col-12" autocomplete="disabled" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
+                <input @input="ceknomorbcm()" v-model="up.bcm" type="text" maxlength="16" class="form-control col-12" autocomplete="disabled" :class="{ 'is-valid': nyala, 'is-invalid': !nyala }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -233,7 +233,7 @@ export default {
             poselesai: '',
             tutuppo: '',
             bandingtutup: '',
-            aktif: false,
+            nyala: false,
             adabcm: {},
         }
     },
@@ -400,6 +400,7 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
+                    this.load = true;
                     if (this.checker.length < 1) {
                         Swal.fire({
                             icon: 'error',
@@ -483,12 +484,14 @@ export default {
                                     this.$router.push({
                                         name: 'bcmcomponent'
                                     });
+                                    this.load = false;
                                     swalWithBootstrapButtons.fire(
                                         'Terkirim!',
                                         'Bukti Checker Masuk berhasil di kirim.',
                                         'success'
                                     )
                                 }).catch(error => {
+                                    this.load = false;
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Oops...',
@@ -496,6 +499,7 @@ export default {
                                     })
                                 })
                         } else {
+                            this.load = false;
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
@@ -507,6 +511,7 @@ export default {
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal mengirim bukti checker :)',
@@ -705,9 +710,9 @@ export default {
                 .then(res => {
                     this.adabcm = res.data.data;
                     if (this.up.bcm.length === 16 && this.adabcm.length === 0) {
-                        this.aktif = true;
+                        this.nyala = true;
                     } else {
-                        this.aktif = false;
+                        this.nyala = false;
                     };
                 })
         }

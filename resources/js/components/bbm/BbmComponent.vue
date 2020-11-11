@@ -41,7 +41,7 @@
                         <button @click="showhistory(bm)" class="btn btn-primary">
                             Lihat History
                         </button>
-                        <button class="btn btn-danger">Batalkan</button>
+                        <button @click="batalkan(bm)" class="btn btn-danger">Batalkan</button>
                     </td>
                 </tr>
             </tbody>
@@ -173,6 +173,10 @@ export default {
             ket: {
                 nama: "Pilih Supplier"
             },
+            listbbm: {},
+            listpo: {},
+            updatebbm: 0,
+            history: {}
         }
     },
     created() {
@@ -309,6 +313,81 @@ export default {
         scrollToItem() {
             this.$refs.optionList.scrollTop = this.selected * this.itemHeight;
         },
+        batalkan(bm) {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menghapus BBM ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.load = true;
+                    axios.get("/api/listbbm/" + bm.bbm)
+                        .then(res => {
+                            this.listbbm = res.data.data;
+                            this.updatebbm = 0;
+                            for (let i = 0; i < this.listbbm.length; i++) {
+                                axios.get("/api/listpo/data/" + bm.nomor_po + "/" + this.listbbm[i].kode_barang)
+                                    .then(res => {
+                                        this.listpo = res.data.data;
+                                        this.updatebbm = parseFloat(this.listpo[0].bbm) - parseFloat(this.listbbm[i].qty);
+                                        axios.put("/api/listpo/" + this.listpo[0].id, {
+                                            bbm: this.updatebbm
+                                        })
+                                    })
+                            }
+                            axios.put("/api/bcm/" + bm.nomor_bcm, {
+                                status: 'open'
+                            }).then(res => {
+                                axios.delete("/api/bbm/" + bm.bbm)
+                                    .then(res => {
+                                        axios.put("/api/po/" + bm.nomor_po, {
+                                                status: 'Acc'
+                                            })
+                                            .then(res => {
+                                                axios.get("/api/history/" + bm.bbm)
+                                                    .then(res => {
+                                                        this.history = res.data.data;
+                                                        for (let y = 0; y < this.history.length; y++) {
+                                                            axios.delete("/api/history/" + this.history[y].id);
+                                                        }
+                                                    }).then(res => {
+                                                        this.getBbm();
+                                                        this.load = false;
+                                                        swalWithBootstrapButtons.fire(
+                                                            'Deleted!',
+                                                            'BBM berhasil di hapus.',
+                                                            'success'
+                                                        )
+                                                    })
+                                            })
+                                    })
+                            })
+                        })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    this.load = false;
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menghapus form BBM :)',
+                        'error'
+                    )
+                }
+            })
+        }
     }
 }
 </script>

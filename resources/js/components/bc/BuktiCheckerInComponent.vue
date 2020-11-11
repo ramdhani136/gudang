@@ -238,7 +238,6 @@ export default {
                 },
                 buttonsStyling: false
             })
-
             swalWithBootstrapButtons.fire({
                 title: 'Apakah anda yakin?',
                 text: "Ingin menghapus checker masuk ini!",
@@ -249,6 +248,7 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
+                    this.load = true;
                     /* batalin selesai po */
                     axios.put("/api/po/" + bm.nomor_po, {
                             poselesai: "N"
@@ -263,40 +263,43 @@ export default {
                                         axios.get("/api/listpo/data/" + bm.nomor_po + "/" + this.listbcm[i].kode_barang)
                                             .then(res => {
                                                 this.listpo = res.data.data;
-                                                this.sisapo = parseInt(this.listpo[0].sisapo) + parseInt(this.listbcm[i].sj);
+                                                this.sisapo = parseFloat(this.listpo[0].sisapo) + parseFloat(this.listbcm[i].sj);
                                                 axios.put("/api/listpo/" + this.listpo[0].id, {
                                                     sisapo: this.sisapo,
                                                     closepo: "N"
                                                 })
                                             })
                                     }
-                                })
-                            /* End */
-                            /* Menghapus bcm */
-                            axios.delete("/api/bcm/" + bm.bcm)
-                                .then(res => {
-                                    axios.get("/api/history/" + bm.bcm)
+                                }).then(res => {
+                                    /* Menghapus bcm */
+                                    axios.delete("/api/bcm/" + bm.bcm)
                                         .then(res => {
-                                            this.history = res.data.data;
-                                            for (let k = 0; k < this.history.length; k++) {
-                                                axios.delete("/api/history/" + this.history[k].id);
-                                            }
+                                            axios.get("/api/history/" + bm.bcm)
+                                                .then(res => {
+                                                    this.history = res.data.data;
+                                                    for (let k = 0; k < this.history.length; k++) {
+                                                        axios.delete("/api/history/" + this.history[k].id);
+                                                    }
+                                                })
+                                            axios.post("/api/history", {
+                                                nomor_dok: bm.nomor_po,
+                                                nomor_ref: bm.bcm,
+                                                id_user: this.ambiluser.id,
+                                                notif: "BCM nomor" + bm.bcm + " Di tarik DIC",
+                                                keterangan: "Membatalkan Form Checker Keluar " + bm.bcm,
+                                                jenis: "Po",
+                                                tanggal: this.DateTime(),
+                                            }).then(res => {
+                                                this.getBcm();
+                                                this.load = false;
+                                                swalWithBootstrapButtons.fire(
+                                                    'Deleted!',
+                                                    'Berhasil menghapus BCK.',
+                                                    'success'
+                                                )
+                                            })
                                         })
-                                    axios.post("/api/history", {
-                                        nomor_dok: bm.nomor_po,
-                                        nomor_ref: bm.bcm,
-                                        id_user: this.ambiluser.id,
-                                        notif: "BCM nomor" + bm.bcm + " Di tarik DIC",
-                                        keterangan: "Membatalkan Form Checker Keluar " + bm.bcm,
-                                        jenis: "Po",
-                                        tanggal: this.DateTime(),
-                                    })
-                                    swalWithBootstrapButtons.fire(
-                                        'Deleted!',
-                                        'Berhasil menghapus BCK.',
-                                        'success'
-                                    )
-                                    this.getBcm();
+                                    /* End */
                                 })
                             /* End */
                         })
@@ -305,6 +308,7 @@ export default {
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
+                    this.load = false;
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal menghapus BCK :)',

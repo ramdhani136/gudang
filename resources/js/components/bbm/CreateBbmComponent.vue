@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor BBM :</label>
-                <input @input="ceknomorbbm()" v-model="up.bbm" type="text" class="form-control col-12" maxlength="16" autocomplete="disabled" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
+                <input @input="ceknomorbbm()" v-model="up.bbm" type="text" class="form-control col-12" maxlength="16" autocomplete="disabled" :class="{ 'is-valid': nyala, 'is-invalid': !nyala }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -223,7 +223,7 @@ export default {
             listtutuppo: {},
             bbm: 0,
             listbagi: {},
-            aktif: false,
+            nyala: false,
             adabbm: {}
         }
     },
@@ -516,9 +516,9 @@ export default {
                 .then(res => {
                     this.adabbm = res.data.data;
                     if (this.up.bbm.length === 16 && this.adabbm.length === 0) {
-                        this.aktif = true;
+                        this.nyala = true;
                     } else {
-                        this.aktif = false;
+                        this.nyala = false;
                     };
                 })
         }

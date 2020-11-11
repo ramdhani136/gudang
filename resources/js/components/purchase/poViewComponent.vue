@@ -87,9 +87,6 @@
         <button @click="kembali()" class="btn-primary btn ml-4">
             Kembali
         </button>
-        <button v-if="(ambiluser.purch===1 || ambiluser.superadmin===1) && (statusnya!=='Selesai' &&  statusnya!=='Di Selesaikan'&&  statusnya!=='Draft')" @click="reqedit()" class="btn-orange btn ml-1">
-            Request Edit
-        </button>
         <button v-if="(ambiluser.purch===1 || ambiluser.superadmin===1) && (statusnya!=='Tolak'&&  statusnya!=='Draft')" @click="print()" class="btn-none btn ml-1">
             Print
         </button>
@@ -354,7 +351,7 @@ export default {
                                             this.qtysisa = this.sisalain[0].jumlah;
                                         }
                                         this.hitung.qty[i] = this.listfix[i].qty;
-                                        this.listfix[i].qty = parseInt(this.listfix[i].qty) + parseInt(this.qtysisa);
+                                        this.listfix[i].qty = parseFloat(this.listfix[i].qty) + parseFloat(this.qtysisa);
                                         this.hitung.harga[i] = this.listfix[i].harga;
                                     })
                             }
@@ -387,7 +384,7 @@ export default {
                     this.prlist = res.data.data;
                     this.form.jumlah = 0;
                     for (let i = 0; i < this.prlist.length; i++) {
-                        this.form.jumlah += parseInt(this.prlist[i].jumlah);
+                        this.form.jumlah += parseFloat(this.prlist[i].jumlah);
                     }
                     this.load = false;
                     this.form.kode_barang = this.prlist[0].kode;
@@ -631,18 +628,18 @@ export default {
                                                     this.openpo = 0;
                                                     for (let k = 0; k < this.listbagi.length; k++) {
                                                         /* ini sisa sonya */
-                                                        this.sisapembagi = parseInt(this.listbagi[k].qty) - parseInt(this.listbagi[k].openpo);
+                                                        this.sisapembagi = parseFloat(this.listbagi[k].qty) - parseFloat(this.listbagi[k].openpo);
                                                         /* end */
                                                         if (this.hitung.qty[i] < this.sisapembagi) {
                                                             this.kasihso = this.hitung.qty[i];
                                                             this.hitung.qty[i] = 0;
                                                         } else {
                                                             this.kasihso = this.sisapembagi;
-                                                            this.hitung.qty[i] = parseInt(this.hitung.qty[i]) - parseInt(this.sisapembagi);
+                                                            this.hitung.qty[i] = parseFloat(this.hitung.qty[i]) - parseFloat(this.sisapembagi);
                                                         }
 
-                                                        this.sisapo = parseInt(this.listbagi[k].sisapo) - parseInt(this.kasihso);
-                                                        this.openpo = parseInt(this.listbagi[k].openpo) + parseInt(this.kasihso);
+                                                        this.sisapo = parseFloat(this.listbagi[k].sisapo) - parseFloat(this.kasihso);
+                                                        this.openpo = parseFloat(this.listbagi[k].openpo) + parseFloat(this.kasihso);
 
                                                         if (this.sisapo === 0) {
                                                             this.ubah = "Y";
@@ -759,7 +756,7 @@ export default {
                     this.hitung.qty[i] = this.listfix[i].qty;
                 }
 
-                this.totalPrice += parseInt(this.hitung.subqty[i]) * parseInt(this.hitung.sub[i]);
+                this.totalPrice += parseFloat(this.hitung.subqty[i]) * parseFloat(this.hitung.sub[i]);
             }
         },
         kembali() {
@@ -930,7 +927,7 @@ export default {
                                 this.listponya = res.data.data;
                                 this.bbmnya = 0;
                                 for (let i = 0; i < this.listponya.length; i++) {
-                                    this.bbmnya += parseInt(this.listponya[i].bbm);
+                                    this.bbmnya += parseFloat(this.listponya[i].bbm);
                                 }
                                 if (this.bbmnya < 1) {
                                     axios

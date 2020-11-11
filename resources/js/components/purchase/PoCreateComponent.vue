@@ -4,7 +4,7 @@
         <div class="col-4">
             <div class="form-group">
                 <label>Nomor PO :</label>
-                <input @input="cekinputrso()" v-model="lpo.nomor_po" type="text" class="form-control col-12" maxlength="15" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }">
+                <input @input="cekinputrso()" v-model="lpo.nomor_po" type="text" class="form-control col-12" maxlength="15" :class="{ 'is-valid': nyala, 'is-invalid': !nyala }">
             </div>
             <div class="form-group">
                 <label>Tanggal :</label>
@@ -213,7 +213,7 @@ export default {
             pr: {},
             chooseItem: '',
             prlist: {},
-            aktif: false,
+            nyala: false,
             po: {},
             file: {},
             listpo: [],
@@ -264,7 +264,6 @@ export default {
             masihsisa: 0,
             sisapo: 0,
             openpo: 0,
-            aktif: false,
             adapo: {}
         }
     },
@@ -348,7 +347,6 @@ export default {
             $("#modal-form").modal("show");
         },
         resetForm() {
-            this.aktif = false;
             this.chooseItem = '';
             this.prlist = {};
             /* this.checked = []; */
@@ -502,18 +500,18 @@ export default {
                                                 this.openpo = 0;
                                                 for (let k = 0; k < this.listbagi.length; k++) {
                                                     /* ini sisa sonya */
-                                                    this.sisapembagi = parseInt(this.listbagi[k].qty) - parseInt(this.listbagi[k].openpo);
+                                                    this.sisapembagi = parseFloat(this.listbagi[k].qty) - parseFloat(this.listbagi[k].openpo);
                                                     /* end */
                                                     if (this.hitung.qty[i] < this.sisapembagi) {
                                                         this.kasihso = this.hitung.qty[i];
                                                         this.hitung.qty[i] = 0;
                                                     } else {
                                                         this.kasihso = this.sisapembagi;
-                                                        this.hitung.qty[i] = parseInt(this.hitung.qty[i]) - parseInt(this.sisapembagi);
+                                                        this.hitung.qty[i] = parseFloat(this.hitung.qty[i]) - parseFloat(this.sisapembagi);
                                                     }
 
-                                                    this.sisapo = parseInt(this.listbagi[k].sisapo) - parseInt(this.kasihso);
-                                                    this.openpo = parseInt(this.listbagi[k].openpo) + parseInt(this.kasihso);
+                                                    this.sisapo = parseFloat(this.listbagi[k].sisapo) - parseFloat(this.kasihso);
+                                                    this.openpo = parseFloat(this.listbagi[k].openpo) + parseFloat(this.kasihso);
 
                                                     if (this.sisapo === 0) {
                                                         this.ubah = "Y";
@@ -643,7 +641,7 @@ export default {
                     this.hitung.qty[i] = this.listfix[i].qty;
                 }
 
-                this.totalPrice += parseInt(this.hitung.subqty[i]) * parseInt(this.hitung.sub[i]);
+                this.totalPrice += parseFloat(this.hitung.subqty[i]) * parseFloat(this.hitung.sub[i]);
             }
         },
         DateTime() {
@@ -667,9 +665,9 @@ export default {
                 .then(res => {
                     this.adapo = res.data.data;
                     if (this.lpo.nomor_po.length === 15 && this.adapo.length === 0) {
-                        this.aktif = true;
+                        this.nyala = true;
                     } else {
-                        this.aktif = false;
+                        this.nyala = false;
                     };
                 })
         }
