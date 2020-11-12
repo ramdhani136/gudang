@@ -51,9 +51,8 @@
                         <th style="width:12%;">Qty PO</th>
                         <th>Satuan</th>
                         <th style="width:12%;">Harga</th>
-                        <th v-if="statusnya!=='Draft' && statusnya!=='Request'">Qty Masuk</th>
                         <th>Sub Total</th>
-                        <th>Sudah Terima</th>
+                        <th v-if="statusnya!=='Draft' && statusnya!=='Request'">Qty Masuk</th>
                         <th v-if="statusnya!=='Draft'">Sisa PO</th>
                         <th v-if="statusnya==='Draft' && (ambiluser.purch===1 || ambiluser.superadmin===1)">Aksi</th>
                     </tr>
@@ -71,9 +70,8 @@
                         <td style="text-align:center">
                             <input :disabled="disedit" @input="hitunginv()" v-model="hitung.harga[index]" type="number" class="form-control">
                         </td>
-                        <td v-if="statusnya!=='Draft' && statusnya!=='Request'" style="text-align:center">{{list.bbm}}</td>
                         <td style="text-align:center">{{hitung.qty[index]*hitung.sub[index] | currency}}</td>
-                        <td v-if="statusnya!=='Draft'" style="text-align:center">{{list.bbm}}</td>
+                        <td v-if="statusnya!=='Draft' && statusnya!=='Request'" style="text-align:center">{{list.bbm}}</td>
                         <td v-if="statusnya!=='Draft'" style="text-align:center">{{hitung.qty[index]-list.bbm}}</td>
                         <td v-if="statusnya==='Draft' && (ambiluser.purch===1 || ambiluser.superadmin===1)" style="text-align:center">
                             <button @click="deletelist(index)" class="btn btn-danger">Hapus</button>

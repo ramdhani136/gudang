@@ -176,7 +176,9 @@ export default {
             listbbm: {},
             listpo: {},
             updatebbm: 0,
-            history: {}
+            history: {},
+            closepo: '',
+            sisapo: 0,
         }
     },
     created() {
@@ -324,7 +326,7 @@ export default {
 
             swalWithBootstrapButtons.fire({
                 title: 'Apakah anda yakin?',
-                text: "Ingin menghapus BBM ini!",
+                text: "Ingin menghapus BBM ini! , BCM akan ikut di batalkan",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Iya, Yakin!',
@@ -337,43 +339,82 @@ export default {
                         .then(res => {
                             this.listbbm = res.data.data;
                             this.updatebbm = 0;
+                            this.closepo = '';
+                            this.sisapo = 0;
                             for (let i = 0; i < this.listbbm.length; i++) {
                                 axios.get("/api/listpo/data/" + bm.nomor_po + "/" + this.listbbm[i].kode_barang)
                                     .then(res => {
                                         this.listpo = res.data.data;
                                         this.updatebbm = parseFloat(this.listpo[0].bbm) - parseFloat(this.listbbm[i].qty);
+                                        this.sisapo = parseFloat(this.listpo[0].qty) - parseFloat(this.updatebbm);
+
+                                        if (this.sisapo < 1) {
+                                            this.closepo = "Y";
+                                        } else {
+                                            this.closepo = "N";
+                                        }
                                         axios.put("/api/listpo/" + this.listpo[0].id, {
-                                            bbm: this.updatebbm
+                                            bbm: this.updatebbm,
+                                            sisapo: this.sisapo,
+                                            closepo: this.closepo,
                                         })
                                     })
                             }
-                            axios.put("/api/bcm/" + bm.nomor_bcm, {
-                                status: 'open'
-                            }).then(res => {
-                                axios.delete("/api/bbm/" + bm.bbm)
-                                    .then(res => {
-                                        axios.put("/api/po/" + bm.nomor_po, {
-                                                status: 'Acc'
-                                            })
-                                            .then(res => {
-                                                axios.get("/api/history/" + bm.bbm)
-                                                    .then(res => {
-                                                        this.history = res.data.data;
-                                                        for (let y = 0; y < this.history.length; y++) {
-                                                            axios.delete("/api/history/" + this.history[y].id);
-                                                        }
-                                                    }).then(res => {
-                                                        this.getBbm();
-                                                        this.load = false;
-                                                        swalWithBootstrapButtons.fire(
-                                                            'Deleted!',
-                                                            'BBM berhasil di hapus.',
-                                                            'success'
-                                                        )
-                                                    })
-                                            })
-                                    })
-                            })
+                            axios.delete("/api/bbm/" + bm.bbm)
+                                .then(res => {
+                                    axios.put("/api/po/" + bm.nomor_po, {
+                                            status: 'Acc',
+                                            poselesai: 'N',
+                                        })
+                                        .then(res => {
+                                            axios.delete("/api/bcm/" + bm.nomor_bcm)
+                                                .then(res => {
+                                                    axios.get("/api/history/" + bm.nomor_bcm)
+                                                        .then(res => {
+                                                            this.history = res.data.data;
+                                                            for (let y = 0; y < this.history.length; y++) {
+                                                                axios.delete("/api/history/" + this.history[y].id);
+                                                            }
+                                                        }).then(res => {
+                                                            axios.get("/api/history/" + bm.bbm)
+                                                                .then(res => {
+                                                                    this.history = res.data.data;
+                                                                    for (let y = 0; y < this.history.length; y++) {
+                                                                        axios.delete("/api/history/" + this.history[y].id);
+                                                                    }
+                                                                }).then(res => {
+                                                                    axios.post("/api/history", {
+                                                                        nomor_dok: bm.nomor_po,
+                                                                        nomor_ref: bm.nomor_bcm,
+                                                                        id_user: this.ambiluser.id,
+                                                                        notif: "BCM dihapus",
+                                                                        keterangan: "Membatalkan BCM nomor : " + bm.nomor_bcm,
+                                                                        jenis: "Po",
+                                                                        tanggal: this.DateTime(),
+                                                                    }).then(res => {
+                                                                        axios.post("/api/history", {
+                                                                            nomor_dok: bm.nomor_po,
+                                                                            nomor_ref: bm.bbm,
+                                                                            id_user: this.ambiluser.id,
+                                                                            notif: "BBM dihapus",
+                                                                            keterangan: "Membatalkan BBM nomor : " + bm.bbm,
+                                                                            jenis: "Po",
+                                                                            tanggal: this.DateTime(),
+                                                                        }).then(res => {
+                                                                            this.getBbm();
+                                                                            this.load = false;
+                                                                            swalWithBootstrapButtons.fire(
+                                                                                'Deleted!',
+                                                                                'BBM berhasil di hapus.',
+                                                                                'success'
+                                                                            )
+                                                                        })
+                                                                    })
+                                                                });
+                                                        })
+                                                })
+                                        })
+                                })
                         })
                 } else if (
                     /* Read more about handling dismissals below */
