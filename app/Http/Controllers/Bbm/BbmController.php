@@ -91,6 +91,7 @@ class BbmController extends Controller
         return response('deleted',response::HTTP_OK);
     }
 
+
     public function print($bbm){
         $getbbm=Bbm::where('bbm',$bbm)->get();    
         $getlist=Listbbm::where('nomor_bbm',$bbm)->get();
@@ -99,4 +100,6 @@ class BbmController extends Controller
         // return $pdf;
         return   $pdf->stream($bbm);
     }
+
+  
 }

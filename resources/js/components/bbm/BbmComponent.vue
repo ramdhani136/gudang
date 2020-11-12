@@ -7,11 +7,14 @@
         <input v-model="filter.nomor" type="text" class="form-control" placeholder="PO/BCM/BBM/Nopol">
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
-        <select name="status" v-model="filter.status" class="form-control">
-            <option value="open">Selesai</option>
+        <select name="status" v-model="filter.request" class="form-control">
+            <option value="">Semua Data</option>
+            <option v-if="ambiluser.incoming===1" value="Acc">Draft</option>
+            <option value="Edit">Request Perbaikan</option>
+            <option value="Batal">Request Pembatalan</option>
         </select>
     </div>
-    <div class="row">
+    <div class="row" v-if="ambiluser.incoming===1">
         <router-link to="/dic/incoming/view" class="btn btn-success my-3">+ Create BBM</router-link>
     </div>
     <div id="overflow" class="border-top">
@@ -41,7 +44,7 @@
                         <button @click="showhistory(bm)" class="btn btn-primary">
                             Lihat History
                         </button>
-                        <button @click="batalkan(bm)" class="btn btn-danger">Batalkan</button>
+                        <button v-if="ambiluser.incoming===1" @click="batalkan(bm)" class="btn btn-danger">Batalkan</button>
                     </td>
                 </tr>
             </tbody>
@@ -168,6 +171,7 @@ export default {
                 sampaitanggal: this.today(),
                 status: 'open',
                 nomor: '',
+                request: ""
             },
             user: {},
             ket: {
@@ -196,7 +200,8 @@ export default {
                     bcm = vm.filter.nomor ? (query.nomor_bcm.toLowerCase().includes(vm.filter.nomor.toLowerCase())) : true,
                     bbm = vm.filter.nomor ? (query.bbm.toLowerCase().includes(vm.filter.nomor.toLowerCase())) : true,
                     nopol = vm.filter.nomor ? (query.nopol.toLowerCase().includes(vm.filter.nomor.toLowerCase())) : true,
-                    status = vm.filter.status ? (query.status == vm.filter.status) : true;
+                    status = vm.filter.status ? (query.status == vm.filter.status) : true,
+                    status = vm.filter.request ? (query.request == vm.filter.request) : true;
                 return tanggal && supplier && user && (nomorpo || bcm || nopol || bbm) && status;
             })
         },
@@ -244,7 +249,6 @@ export default {
             axios.get("/api/history/data/" + bm.bbm + "/Bbm")
                 .then(res => {
                     this.historyview = res.data.data;
-                    console.log(this.historyview)
                 })
         },
         showfilter() {
