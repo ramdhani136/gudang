@@ -92,4 +92,8 @@ class ListBbmController extends Controller
     public function getbbm(){
         return ListBbmResource::collection(Listbbm::all());
     }
+
+    public function barang($bbm,$barang){
+        return ListBbmResource::collection(Listbbm::where('nomor_bbm',$bbm)->where('kode_barang',$barang)->get());
+    }
 }

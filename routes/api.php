@@ -95,6 +95,7 @@ Route::resource('ekspedisi','Ekspedisi\EkspedisiController');
 
 Route::resource('bbm','Bbm\BbmController');
 Route::resource('listbbm','Bbm\ListBbmController');
+Route::get('listbbm/data/{bbm}/{barang}','Bbm\ListBbmController@barang');
 
 
 Route::resource('bck','Bck\BckController');

@@ -19,7 +19,7 @@ class BbmController extends Controller
      */
     public function index()
     {
-        return BbmResource::collection(Bbm::orderBy('updated_at','ASC')->get());
+        return BbmResource::collection(Bbm::orderBy('bbm','ASC')->get());
     }
 
     /**

@@ -9,7 +9,7 @@
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select name="status" v-model="filter.request" class="form-control">
             <option value="">Semua Data</option>
-            <option v-if="ambiluser.incoming===1" value="Acc">Draft</option>
+            <option value="Accedit">Draft</option>
             <option value="Edit">Request Perbaikan</option>
             <option value="Batal">Request Pembatalan</option>
         </select>
@@ -44,7 +44,13 @@
                         <button @click="showhistory(bm)" class="btn btn-primary">
                             Lihat History
                         </button>
-                        <button v-if="ambiluser.incoming===1" @click="batalkan(bm)" class="btn btn-danger">Batalkan</button>
+                        <button v-if="ambiluser.incoming===1 && bm.request==='Acchapus'" @click="batalkan(bm)" class="btn btn-danger">Batalkan</button>
+                        <router-link v-if="ambiluser.incoming===1 && bm.request==='Accedit'" :to="{name:'viewbbm',params:{nomor:bm.bbm}}" class="btn btn-orange">
+                            Edit BBM
+                        </router-link>
+                        <button v-if="ambiluser.incoming===1 && (bm.request!=='Batal' && bm.request!=='Acchapus' && bm.request!=='Tolakhapus' && bm.request!=='Accedit') " @click="showbatal(bm)" class="btn btn-orange">Request Batal</button>
+                        <button v-if="ambiluser.incoming===1 && bm.request==='Batal' " @click="batalrequest(bm)" class="btn btn-none">Batal Request</button>
+                        <button v-if="ambiluser.incoming===1 && bm.request==='Tolakhapus' " @click="showbatal(bm)" class="btn btn-danger">Lihat Tolak</button>
                     </td>
                 </tr>
             </tbody>
@@ -139,6 +145,28 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-batal" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form pemintaan pembatalan BBM</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <textarea v-model="keteranganedit" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="kirimbatal()" class="btn btn-success">Request Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -183,6 +211,8 @@ export default {
             history: {},
             closepo: '',
             sisapo: 0,
+            keteranganedit: '',
+            pilihbatal: {}
         }
     },
     created() {
@@ -428,6 +458,150 @@ export default {
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
                         'Batal menghapus form BBM :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        showbatal(bm) {
+            $("#modal-batal").modal("show");
+            this.pilihbatal = bm;
+        },
+        kirimbatal() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin meminta pembatalan BBM!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.load = true;
+                    if (this.keteranganedit === "") {
+                        this.load = false;
+                        $("#modal-batal").modal("hide");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Keterangan wajib di isi!',
+                        })
+                    } else {
+                        axios.put("/api/bbm/" + this.pilihbatal.bbm, {
+                            request: 'Batal',
+                            keteranganedit: this.keteranganedit,
+                        }).then(res => {
+                            axios.post("/api/history", {
+                                nomor_dok: this.pilihbatal.bbm,
+                                nomor_ref: this.pilihbatal.bbm,
+                                id_user: this.ambiluser.id,
+                                notif: "request batal bbm",
+                                keterangan: "Mengirim permintaan pembatalan nomor : " + this.pilihbatal.bbm,
+                                jenis: "Bbm",
+                                tanggal: this.DateTime(),
+                            }).then(res => {
+                                axios.post("/api/history", {
+                                    nomor_dok: this.pilihbatal.nomor_bcm,
+                                    nomor_ref: this.pilihbatal.bbm,
+                                    id_user: this.ambiluser.id,
+                                    notif: "request batal bbm",
+                                    keterangan: "Mengirim permintaan pembatalan nomor : " + this.pilihbatal.bbm,
+                                    jenis: "Bcm",
+                                    tanggal: this.DateTime(),
+                                }).then(res => {
+                                    this.load = false;
+                                    $("#modal-batal").modal("hide");
+                                    swalWithBootstrapButtons.fire(
+                                        'Sukses!',
+                                        'Permintaan berhasil di kirim.',
+                                        'success'
+                                    )
+                                    this.getBbm();
+                                })
+                            })
+                        })
+                    }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal mengirim permintaan pembatalan :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        batalrequest(bm) {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin membatalkan permintaan pembatalan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.load = true;
+                    axios.put("/api/bbm/" + bm.bbm, {
+                        request: 'N',
+                        keteranganedit: ''
+                    }).then(res => {
+                        axios.post("/api/history", {
+                            nomor_dok: bm.bbm,
+                            nomor_ref: bm.bbm,
+                            id_user: this.ambiluser.id,
+                            notif: "batal melakukan request pembatalan",
+                            keterangan: "Batal melakukan request pembatalan : " + bm.bbm,
+                            jenis: "Bbm",
+                            tanggal: this.DateTime(),
+                        }).then(res => {
+                            axios.post("/api/history", {
+                                nomor_dok: bm.nomor_bcm,
+                                nomor_ref: bm.bbm,
+                                id_user: this.ambiluser.id,
+                                notif: "batal melakukan request pembatalan",
+                                keterangan: "Batal melakukan request pembatalan : " + bm.bbm,
+                                jenis: "Bcm",
+                                tanggal: this.DateTime(),
+                            }).then(res => {
+                                this.load = false;
+                                swalWithBootstrapButtons.fire(
+                                    'Sukses!',
+                                    'Permintaan berhasil di batalkan.',
+                                    'success'
+                                )
+                                this.getBbm();
+                            })
+                        })
+                    })
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    this.load = false;
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal melakukan pembatalan :)',
                         'error'
                     )
                 }

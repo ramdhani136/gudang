@@ -6,7 +6,7 @@
     <title>{{$bck[0]->bck}}</title>
 </head>
 <body>
-    <h1 style="text-align:center;font-size:14pt;margin-top:-20px">BUKTI CHECKER KELUAR</h1>
+    <h1 style="text-align:center;font-size:14pt;margin-top:-20px">BUKTI CHECKER BARANG KELUAR</h1>
     <div style="width:100%;height:auto;">
         @foreach($bck as $b)
         <table style="width:100%;height:auto; font-size:9pt;margin-top:5px">

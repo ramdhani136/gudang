@@ -28,9 +28,13 @@
                 <label>Plat.No :</label>
                 <input v-model="up.nopol" type="text" class="form-control col-12" disabled>
             </div>
-            <div class="form-group">
+            <div v-if="tutup===true" class="form-group">
                 <label>keterangan</label>
-                <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12" :disabled="request!=='Acc'"></textarea>
+                <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12" disabled></textarea>
+            </div>
+            <div v-if="tutup===false" class="form-group">
+                <label>keterangan</label>
+                <textarea v-model="bbmketerangan" name="keterangan" class="form-control col-12"></textarea>
             </div>
         </div>
     </div>
@@ -57,21 +61,24 @@
                         <td style="text-align:center">{{listbbm.satuan}}</td>
                         <td style="text-align:center">{{hitung.qty[index]}}</td>
                         <td style="text-align:center">
-                            <input v-model="listbbm.qty" type="number" class="form-control" :disabled="request!=='Acc'">
+                            <input v-if="tutup===true" v-model="listbbm.qty" type="number" class="form-control" disabled>
+                            <input @input="cekinput()" v-if="tutup===false" v-model="upl.qty[index]" type="number" class="form-control">
                         </td>
                         <td style="text-align:center">
-                            <textarea v-model="listbbm.keterangan" class="form-control" :disabled="request!=='Acc'"></textarea>
+                            <textarea v-if="tutup===true" v-model="listbbm.keterangan" class="form-control" disabled></textarea>
+                            <textarea v-if="tutup===false" v-model="upl.keterangan[index]" class="form-control"></textarea>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <div v-if="request==='Edit' || request==='Batal' " class="row mt-2">
+    <div v-if=" request==='Edit' || request==='Batal' " class=" row mt-2">
         <div id="alastolak" style="width:95%;margin-left:2.5%">
             <div>
                 <b>
-                    {{input.keteranganedit}} ({{request}})
+                    {{input.keteranganedit}}
+                    ({{request}})
                 </b>
             </div>
         </div>
@@ -79,6 +86,9 @@
     <div class="row mt-2">
         <button @click="kembali()" class="btn-primary btn ml-4">
             Kembali
+        </button>
+        <button v-if="ambiluser.incoming===1&&request==='Accedit'" @click="simpanbbm()" class="btn-orange btn ml-1">
+            Simpan BBM
         </button>
         <button v-if="ambiluser.purch===1&&(request==='Edit' || request==='Batal')" @click="terimarequest()" class="btn-success btn ml-1">
             Terima
@@ -191,7 +201,7 @@ export default {
             bbm: {},
             poaktif: {},
             ket: {
-                qty: [],
+                qty: []
             },
             aktif: {},
             listsisa: {},
@@ -212,7 +222,21 @@ export default {
                 keteranganedit: ""
             },
             listedit: {},
-            qtybbm: 0
+            qtybbm: 0,
+            nomorbcm: '',
+            tutup: true,
+            upl: {
+                qty: [],
+                keterangan: []
+            },
+            bbmketerangan: '',
+            uplistpo: {},
+            uplistbbm: {},
+            done: '',
+            banding: '',
+            ada: '',
+            jmada: '',
+            jmband: ''
         }
     },
     created() {
@@ -222,27 +246,33 @@ export default {
         this.resetForm();
         this.default();
     },
-    computed: {
-
-    },
+    computed: {},
     methods: {
         getlistbm() {
-            axios.get("/api/listbbm/" + this.$route.params.nomor)
+            axios
+                .get("/api/listbbm/" + this.$route.params.nomor)
                 .then(res => {
                     this.checker = res.data.data;
                     for (let i = 0; i < this.checker.length; i++) {
-                        axios.get("/api/bcm/" + this.checker[i].bcm + "/" + this.checker[i].kode_barang)
+                        axios
+                            .get("/api/bcm/" + this.checker[i].bcm + "/" + this.checker[i].kode_barang)
                             .then(res => {
                                 this.daftarbbm = res.data.data;
                                 this.masukan = {
                                     qty: this.daftarbbm[0].qty
                                 };
-                                this.listqty.push(this.masukan);
+                                this
+                                    .listqty
+                                    .push(this.masukan);
                                 this.hitung.qty[i] = this.daftarbbm[0].bongkar;
-                                this.checker.push([{
-                                    qty: this.hitung.qty[i]
-                                }])
-                                this.checker.splice(this.checker.length - 1);
+                                this
+                                    .checker
+                                    .push([{
+                                        qty: this.hitung.qty[i]
+                                    }])
+                                this
+                                    .checker
+                                    .splice(this.checker.length - 1);
                                 this.load = false;
                             });
                     }
@@ -250,16 +280,28 @@ export default {
 
         },
         getBbm() {
-            axios.get("/api/bbm/" + this.$route.params.nomor)
+            axios
+                .get("/api/bbm/" + this.$route.params.nomor)
                 .then(res => {
                     this.bbm = res.data.data;
                     this.statusbbm = this.bbm[0].status;
                     this.request = this.bbm[0].request;
                     this.input.keteranganedit = this.bbm[0].keteranganedit;
+                    this.input.keteranganedit = this.bbm[0].keteranganedit;
+                    this.bbmketerangan = this.bbm[0].keterangan;
+                    this.nomorbcm = this.bbm[0].nomor_bcm;
                     if (this.bbm[0].alastolak === null || this.bbm[0].alastolak === "" || this.bbm[0].alastolak === undefined) {
                         this.alastolak = null;
                     } else {
                         this.alastolak = this.this.bbm[0].alastolak;
+                    }
+
+                    if (this.ambiluser.purch === 1) {
+                        this.tutup = true;
+                    } else if (this.ambiluser.incoming === 1 && this.request === 'Accedit') {
+                        this.tutup = false;
+                    } else {
+                        this.tutup = true;
                     }
                 });
         },
@@ -267,7 +309,8 @@ export default {
             $("#modal-edit").modal("show");
         },
         getPoAktif() {
-            axios.get("/api/poaktif/")
+            axios
+                .get("/api/poaktif/")
                 .then(res => {
                     this.poaktif = res.data.data;
                 });
@@ -277,7 +320,11 @@ export default {
             var month = d.getMonth() + 1;
             var day = d.getDate();
 
-            var output = d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-" + (day < 10 ? '0' : '') + day;
+            var output = d.getFullYear() + "-" + (month < 10 ?
+                '0' :
+                '') + month + "-" + (day < 10 ?
+                '0' :
+                '') + day;
             return output
         },
         validate() {
@@ -290,14 +337,20 @@ export default {
             var month = d.getMonth() + 1;
             var day = d.getDate() + 2;
 
-            var output = d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-" + (day < 10 ? '0' : '') + day;
+            var output = d.getFullYear() + "-" + (month < 10 ?
+                '0' :
+                '') + month + "-" + (day < 10 ?
+                '0' :
+                '') + day;
             return output
         },
         bbm_nomor() {
             var d = new Date();
             var month = d.getMonth() + 1;
 
-            var output = "BBM-" + d.getFullYear() + "-" + (month < 10 ? '0' : '') + month + "-";
+            var output = "BBM-" + d.getFullYear() + "-" + (month < 10 ?
+                '0' :
+                '') + month + "-";
             return output
         },
         showPo() {
@@ -310,7 +363,8 @@ export default {
             this.checker = [];
             this.ket.supplier = aktif.supplier;
             this.ket.nomor_po = aktif.nomor_po;
-            axios.get("/api/listrso/data/listpo/" + aktif.nomor_po)
+            axios
+                .get("/api/listrso/data/listpo/" + aktif.nomor_po)
                 .then(res => {
                     this.listsisa = res.data.data;
                 });
@@ -320,22 +374,39 @@ export default {
         },
         DateTime() {
             this.date = new Date();
-            this.month = this.date.getMonth() + 1;
-            this.year = this.date.getFullYear();
-            this.hours = this.date.getHours();
-            this.minute = this.date.getMinutes();
-            this.seconds = this.date.getSeconds();
+            this.month = this
+                .date
+                .getMonth() + 1;
+            this.year = this
+                .date
+                .getFullYear();
+            this.hours = this
+                .date
+                .getHours();
+            this.minute = this
+                .date
+                .getMinutes();
+            this.seconds = this
+                .date
+                .getSeconds();
             if (this.month > 12) {
                 this.month = 12;
             }
-            this.day = this.date.getDate();
-            this.dates = this.year + "-" + (this.month < 10 ? '0' : '') + this.month + "-" + this.day;
-            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? '0' : '') + this.seconds;
+            this.day = this
+                .date
+                .getDate();
+            this.dates = this.year + "-" + (this.month < 10 ?
+                '0' :
+                '') + this.month + "-" + this.day;
+            this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ?
+                '0' :
+                '') + this.seconds;
             this.datetimes = this.dates + " " + this.times;
             return this.datetimes;
         },
         default () {
-            axios.get("/api/bbm/" + this.$route.params.nomor)
+            axios
+                .get("/api/bbm/" + this.$route.params.nomor)
                 .then(res => {
                     this.bbm = res.data.data;
                     this.ket.nomor_po = this.bbm[0].nomor_po;
@@ -343,9 +414,11 @@ export default {
                 });
         },
         kembali() {
-            this.$router.push({
-                name: 'ingoods'
-            });
+            this
+                .$router
+                .push({
+                    name: 'ingoods'
+                });
         },
         print() {
             var x = window.open('/data/bbm/print/' + this.$route.params.nomor, '_blank');
@@ -359,74 +432,71 @@ export default {
                 },
                 buttonsStyling: false
             })
-            swalWithBootstrapButtons.fire({
-                title: 'Apakah anda yakin?',
-                text: "Ingin mengirim permintaan ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Iya, Yakin!',
-                cancelButtonText: 'Tidak!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    if (this.input.keteranganedit === "") {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Keterangan tidak boleh kosong!',
-                        })
-                    } else {
-                        this.load = true;
-                        axios.put("/api/bbm/" + this.$route.params.nomor, {
-                            request: 'Edit',
-                            keteranganedit: this.input.keteranganedit,
-                        }).then(res => {
-                            axios.post("/api/history", {
-                                nomor_dok: this.$route.params.nomor,
-                                nomor_ref: this.$route.params.nomor,
-                                id_user: this.ambiluser.id,
-                                notif: "Request perbaikan BBM",
-                                keterangan: "Request perbaikan BBM nomor : " + this.$route.params.nomor,
-                                jenis: "Bbm",
-                                tanggal: this.DateTime(),
-                            }).then(res => {
-                                axios.post("/api/history", {
-                                    nomor_dok: this.ket.nomor_po,
-                                    nomor_ref: this.$route.params.nomor,
-                                    id_user: this.ambiluser.id,
-                                    notif: "Request perbaikan BBM",
-                                    keterangan: "Request perbaikan BBM nomor : " + this.$route.params.nomor,
-                                    jenis: "Po",
-                                    tanggal: this.DateTime(),
-                                })
+            swalWithBootstrapButtons
+                .fire({
+                    title: 'Apakah anda yakin?',
+                    text: "Ingin mengirim permintaan ini!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Iya, Yakin!',
+                    cancelButtonText: 'Tidak!',
+                    reverseButtons: true
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        if (this.input.keteranganedit === "") {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Keterangan tidak boleh kosong!'
                             })
-                            this.load = false;
-                            $("#modal-edit").modal("hide");
-                            this.getPoAktif();
-                            this.getBbm();
-                            this.getlistbm();
-                            this.resetForm();
-                            this.default();
-                            swalWithBootstrapButtons.fire(
-                                'Berhasil!',
-                                'Mengirim permintaan.',
-                                'success'
-                            )
-                        })
+                        } else {
+                            this.load = true;
+                            axios
+                                .put("/api/bbm/" + this.$route.params.nomor, {
+                                    request: 'Edit',
+                                    keteranganedit: this.input.keteranganedit
+                                })
+                                .then(res => {
+                                    axios
+                                        .post("/api/history", {
+                                            nomor_dok: this.$route.params.nomor,
+                                            nomor_ref: this.$route.params.nomor,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Request perbaikan BBM",
+                                            keterangan: "Request perbaikan BBM nomor : " + this.$route.params.nomor,
+                                            jenis: "Bbm",
+                                            tanggal: this.DateTime()
+                                        })
+                                        .then(res => {
+                                            axios.post("/api/history", {
+                                                nomor_dok: this.ket.nomor_po,
+                                                nomor_ref: this.$route.params.nomor,
+                                                id_user: this.ambiluser.id,
+                                                notif: "Request perbaikan BBM",
+                                                keterangan: "Request perbaikan BBM nomor : " + this.$route.params.nomor,
+                                                jenis: "Po",
+                                                tanggal: this.DateTime()
+                                            })
+                                        })
+                                    this.load = false;
+                                    $("#modal-edit").modal("hide");
+                                    this.getPoAktif();
+                                    this.getBbm();
+                                    this.getlistbm();
+                                    this.resetForm();
+                                    this.default();
+                                    swalWithBootstrapButtons.fire('Berhasil!', 'Mengirim permintaan.', 'success')
+                                })
+                        }
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel) {
+                        $("#modal-edit").modal("hide");
+                        this.load = false;
+                        swalWithBootstrapButtons.fire('Cancelled', 'Batal mengirim permintaan :)', 'error')
                     }
-                } else if (
-                    /* Read more about handling dismissals below */
-                    result.dismiss === Swal.DismissReason.cancel
-                ) {
-                    $("#modal-edit").modal("hide");
-                    this.load = false;
-                    swalWithBootstrapButtons.fire(
-                        'Cancelled',
-                        'Batal mengirim permintaan :)',
-                        'error'
-                    )
-                }
-            })
+                })
         },
         bataledit() {
             const swalWithBootstrapButtons = Swal.mixin({
@@ -437,9 +507,74 @@ export default {
                 buttonsStyling: false
             })
 
+            swalWithBootstrapButtons
+                .fire({
+                    title: 'Apakah anda yakin?',
+                    text: "Ingin membatalkan pemintaan ini!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Iya, Yakin!',
+                    cancelButtonText: 'Tidak!',
+                    reverseButtons: true
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        this.load = true;
+                        axios
+                            .put("/api/bbm/" + this.$route.params.nomor, {
+                                request: 'N',
+                                keteranganedit: ''
+                            })
+                            .then(res => {
+                                this.getPoAktif();
+                                this.getBbm();
+                                this.getlistbm();
+                                this.resetForm();
+                                this.default();
+                                this.load = false;
+                                axios
+                                    .post("/api/history", {
+                                        nomor_dok: this.$route.params.nomor,
+                                        nomor_ref: this.$route.params.nomor,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Request perbaikan BBM",
+                                        keterangan: "Membatalkan request perbaikan BBM nomor : " + this.$route.params.nomor,
+                                        jenis: "Bbm",
+                                        tanggal: this.DateTime()
+                                    })
+                                    .then(res => {
+                                        axios.post("/api/history", {
+                                            nomor_dok: this.ket.nomor_po,
+                                            nomor_ref: this.$route.params.nomor,
+                                            id_user: this.ambiluser.id,
+                                            notif: "Request perbaikan BBM",
+                                            keterangan: "Membatalkan request perbaikan BBM nomor : " + this.$route.params.nomor,
+                                            jenis: "Po",
+                                            tanggal: this.DateTime()
+                                        })
+                                    })
+                                swalWithBootstrapButtons.fire('Berhasil!', 'Permintaan berhasil di batalkan.', 'success')
+                            })
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel) {
+                        this.load = false;
+                        swalWithBootstrapButtons.fire('Batal', 'Batal melakukan pembatalan :)', 'error')
+                    }
+                })
+        },
+        terimarequest() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
             swalWithBootstrapButtons.fire({
                 title: 'Apakah anda yakin?',
-                text: "Ingin membatalkan pemintaan ini!",
+                text: "Ingin menerima permintaan ini!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Iya, Yakin!',
@@ -448,107 +583,259 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     this.load = true;
-                    axios.put("/api/bbm/" + this.$route.params.nomor, {
-                        request: 'N',
-                        keteranganedit: '',
-                    }).then(res => {
-                        this.getPoAktif();
-                        this.getBbm();
-                        this.getlistbm();
-                        this.resetForm();
-                        this.default();
-                        this.load = false;
-                        axios.post("/api/history", {
-                            nomor_dok: this.$route.params.nomor,
-                            nomor_ref: this.$route.params.nomor,
-                            id_user: this.ambiluser.id,
-                            notif: "Request perbaikan BBM",
-                            keterangan: "Membatalkan request perbaikan BBM nomor : " + this.$route.params.nomor,
-                            jenis: "Bbm",
-                            tanggal: this.DateTime(),
+                    if (this.request === 'Edit') {
+                        axios.put("/api/po/" + this.ket.nomor_po, {
+                                status: 'Acc'
+                            })
+                            .then(Res => {
+                                axios.put("/api/bbm/" + this.$route.params.nomor, {
+                                        request: 'Accedit',
+                                        alastolak: '',
+                                        keteranganedit: ''
+                                    })
+                                    .then(res => {
+                                        this.qtybbm = 0;
+                                        this.sisapo = 0;
+                                        for (let i = 0; i < this.checker.length; i++) {
+                                            axios
+                                                .get("/api/listpo/data/" + this.ket.nomor_po + "/" + this.checker[i].kode_barang)
+                                                .then(res => {
+                                                    this.listedit = res.data.data;
+                                                    this.qtybbm = (parseFloat(this.listedit[0].qty) - parseFloat(this.listedit[0].sisapo)) - parseFloat(this.checker[i].qty);
+                                                    this.sisapo = parseFloat(this.listedit[0].qty) - parseFloat(this.qtybbm);
+                                                    if (this.sisapo < 1) {
+                                                        this.closepo = 'Y';
+                                                    } else {
+                                                        this.closepo = 'N';
+                                                    }
+                                                    axios.put("/api/listpo/" + this.listedit[0].id, {
+                                                        bbm: this.qtybbm,
+                                                        sisapo: this.sisapo,
+                                                        closepo: this.closepo
+                                                    })
+                                                })
+                                        }
+                                        axios.post("/api/history", {
+                                                nomor_dok: this.$route.params.nomor,
+                                                nomor_ref: this.$route.params.nomor,
+                                                id_user: this.ambiluser.id,
+                                                notif: "Request perbaikan BBM",
+                                                keterangan: "Request perbaikan nomor : " + this.$route.params.nomor + " Di terima",
+                                                jenis: "Bbm",
+                                                tanggal: this.DateTime()
+                                            })
+                                            .then(res => {
+                                                axios.post("/api/history", {
+                                                    nomor_dok: this.ket.nomor_po,
+                                                    nomor_ref: this.$route.params.nomor,
+                                                    id_user: this.ambiluser.id,
+                                                    notif: "Request perbaikan BBM",
+                                                    keterangan: "Request perbaikan nomor : " + this.$route.params.nomor + " Di terima",
+                                                    jenis: "Po",
+                                                    tanggal: this.DateTime()
+                                                }).then(res => {
+                                                    this.load = false;
+                                                    swalWithBootstrapButtons.fire(
+                                                        'Sukses!',
+                                                        'Data berhasil di konfirmasi.',
+                                                        'success'
+                                                    )
+                                                    this.kembali();
+                                                })
+                                            })
+                                    })
+                            })
+                    } else if (this.request === 'Batal') {
+                        axios.put("/api/bbm/" + this.$route.params.nomor, {
+                            request: 'Acchapus',
+                            alastolak: '',
+                            keteranganedit: ''
                         }).then(res => {
                             axios.post("/api/history", {
                                 nomor_dok: this.ket.nomor_po,
                                 nomor_ref: this.$route.params.nomor,
                                 id_user: this.ambiluser.id,
-                                notif: "Request perbaikan BBM",
-                                keterangan: "Membatalkan request perbaikan BBM nomor : " + this.$route.params.nomor,
+                                notif: "Request pembatalan BBM diterima",
+                                keterangan: "Request pembatalan nomor : " + this.$route.params.nomor + " Di terima",
                                 jenis: "Po",
-                                tanggal: this.DateTime(),
+                                tanggal: this.DateTime()
+                            }).then(res => {
+                                axios.post("/api/history", {
+                                    nomor_dok: this.$route.params.nomor,
+                                    nomor_ref: this.$route.params.nomor,
+                                    id_user: this.ambiluser.id,
+                                    notif: "Request pembatalan BBM diterima",
+                                    keterangan: "Request pembatalan nomor : " + this.$route.params.nomor + " Di terima",
+                                    jenis: "Bbm",
+                                    tanggal: this.DateTime()
+                                }).then(res => {
+                                    this.load = false;
+                                    swalWithBootstrapButtons.fire(
+                                        'Sukses!',
+                                        'Data berhasil di konfirmasi.',
+                                        'success'
+                                    )
+                                    this.kembali();
+                                })
                             })
                         })
-                        swalWithBootstrapButtons.fire(
-                            'Berhasil!',
-                            'Permintaan berhasil di batalkan.',
-                            'success'
-                        )
-                    })
+                    }
+
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menerima permintaan :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        simpanbbm() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menyimpan BBM ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.load = true;
+                    for (let i = 0; i < this.checker.length; i++) {
+                        if (this.upl.qty[i] === undefined || this.upl.qty[i] < 0 || this.upl.qty[i] === "") {
+                            this.ada = "N"
+                        } else {
+                            this.ada = "Y"
+                        }
+                        this.jmada += this.ada;
+                        this.jmband += "Y";
+                    }
+                    if (this.jmada === this.jmband) {
+                        this.qtybbm = 0;
+                        this.sisapo = 0;
+                        for (let i = 0; i < this.checker.length; i++) {
+                            if (this.upl.qty[i] === undefined || this.upl.qty[i] < 0 || this.upl.qty[i] === "") {
+                                this.upl.qty[i] = 0;
+                            }
+                            axios.get("/api/listbbm/data/" + this.$route.params.nomor + "/" + this.checker[i].kode_barang)
+                                .then(res => {
+                                    this.uplistbbm = res.data.data;
+                                    axios.put("/api/listbbm/" + this.uplistbbm[0].id, {
+                                        qty: this.upl.qty[i],
+                                        keterangan: this.upl.keterangan[i]
+                                    }).then(res => {
+                                        axios.get("/api/listpo/data/" + this.ket.nomor_po + "/" + this.checker[i].kode_barang)
+                                            .then(res => {
+                                                this.uplistpo = res.data.data;
+                                                this.qtybbm = parseFloat(this.uplistpo[0].bbm) + parseFloat(this.upl.qty[i]);
+                                                this.sisapo = parseFloat(this.uplistpo[0].qty) - parseFloat(this.qtybbm);
+                                                if (this.sisapo < 1) {
+                                                    this.closepo = "Y";
+                                                } else {
+                                                    this.closepo = "N";
+                                                }
+
+                                                this.done += this.closepo;
+                                                this.banding += "Y";
+                                                if (this.done === this.banding) {
+                                                    axios.put("/api/po/" + this.ket.nomor_po, {
+                                                        status: 'Selesai',
+                                                        poselesai: 'Y'
+                                                    })
+                                                } else {
+                                                    axios.put("/api/po/" + this.ket.nomor_po, {
+                                                        status: 'Acc',
+                                                        poselesai: 'N'
+                                                    })
+                                                }
+
+                                                axios.put("/api/listpo/" + this.uplistpo[0].id, {
+                                                    bbm: this.qtybbm,
+                                                    sisapo: this.sisapo,
+                                                    closepo: this.closepo
+                                                })
+                                            })
+                                    })
+                                }).then(res => {
+                                    axios.put("/api/bbm/" + this.$route.params.nomor, {
+                                        request: 'N',
+                                        keterangan: this.bbmketerangan,
+                                        keteranganedit: '',
+                                        alastolak: '',
+                                    })
+                                })
+                        }
+                        axios.post("/api/history", {
+                            nomor_dok: this.ket.nomor_po,
+                            nomor_ref: this.$route.params.nomor,
+                            id_user: this.ambiluser.id,
+                            notif: "Request perbaikan BBM",
+                            keterangan: "Mengupdate BBM nomor : " + this.$route.params.nomor,
+                            jenis: "Po",
+                            tanggal: this.DateTime()
+                        }).then(res => {
+                            axios.post("/api/history", {
+                                nomor_dok: this.$route.params.nomor,
+                                nomor_ref: this.$route.params.nomor,
+                                id_user: this.ambiluser.id,
+                                notif: "Request perbaikan BBM",
+                                keterangan: "Mengupdate BBM nomor : " + this.$route.params.nomor,
+                                jenis: "Bbm",
+                                tanggal: this.DateTime()
+                            }).then(res => {
+                                this.load = false;
+                                swalWithBootstrapButtons.fire(
+                                    'Sukses!',
+                                    'Berhasil mengirim form BBM.',
+                                    'success'
+                                )
+                                this.kembali();
+                            })
+                        })
+                    } else {
+                        this.load = false;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Jumlah barang tidak boleh kosong!',
+                        })
+                    }
                 } else if (
                     /* Read more about handling dismissals below */
                     result.dismiss === Swal.DismissReason.cancel
                 ) {
                     this.load = false;
                     swalWithBootstrapButtons.fire(
-                        'Batal',
-                        'Batal melakukan pembatalan :)',
+                        'Cancelled',
+                        'Batal mengirim form BBM :)',
                         'error'
                     )
                 }
             })
         },
-        terimarequest() {
-            if (this.request === 'Edit') {
-                axios.put("/api/bbm/" + this.$route.params.nomor, {
-                    request: 'Acc',
-                    alastolak: '',
-                    keteranganedit: '',
-                }).then(res => {
-                    this.qtybbm = 0;
-                    this.sisapo = 0;
-                    for (let i = 0; i < this.checker.length; i++) {
-                        axios.get("/api/listpo/data/" + this.ket.nomor_po + "/" + this.checker[i].kode_barang)
-                            .then(res => {
-                                this.listedit = res.data.data;
-                                this.qtybbm = (parseFloat(this.listedit[0].qty) - parseFloat(this.listedit[0].sisapo)) - parseFloat(this.checker[i].qty);
-                                this.sisapo = parseFloat(this.listedit[0].qty) - parseFloat(this.qtybbm);
-                                if (this.sisapo < 1) {
-                                    this.closepo = 'Y';
-                                } else {
-                                    this.closepo = 'N';
-                                }
-                                axios.put("/api/listpo/" + this.listedit[0].id, {
-                                    bbm: this.qtybbm,
-                                    sisapo: this.sisapo,
-                                    closepo: this.closepo
-                                })
-                            })
-                    }
-                    axios.post("/api/history", {
-                        nomor_dok: this.$route.params.nomor,
-                        nomor_ref: this.$route.params.nomor,
-                        id_user: this.ambiluser.id,
-                        notif: "Request perbaikan BBM",
-                        keterangan: "Request perbaikan nomor: " + this.$route.params.nomor + " Di terima",
-                        jenis: "Bbm",
-                        tanggal: this.DateTime(),
-                    }).then(res => {
-                        axios.post("/api/history", {
-                            nomor_dok: this.ket.nomor_po,
-                            nomor_ref: this.$route.params.nomor,
-                            id_user: this.ambiluser.id,
-                            notif: "Request perbaikan BBM",
-                            keterangan: "Request perbaikan nomor : " + this.$route.params.nomor + " Di terima",
-                            jenis: "Po",
-                            tanggal: this.DateTime(),
-                        })
-                    })
-                })
+        cekinput() {
+            for (let i = 0; i < this.checker.length; i++) {
+                if (this.upl.qty[i] > this.hitung.qty[i]) {
+                    this.upl.qty[i] = this.hitung.qty[i];
+                } else if (this.upl.qty[i] < 0) {
+                    this.upl.qty[i] = 0;
+                }
             }
         }
-    },
+    }
 }
 </script>
 
-<style>
-
-</style>
+<style></style>
