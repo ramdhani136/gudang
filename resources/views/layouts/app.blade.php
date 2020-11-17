@@ -152,6 +152,7 @@
                                     <router-link to="/dic/bcm" class="dropdown-item" >Bukti Checker</router-link>
                                     <!-- <router-link to="/dic/rbcm" class="dropdown-item" >Request Bukti Checker</router-link> -->
                                     <router-link to="/dic/incoming" class="dropdown-item" >Bukti Barang Masuk</router-link>
+                                    <router-link to="/retur" class="dropdown-item" >Request Retur</router-link>
                                     <!-- <router-link to="/dic/incoming/confirm" class="dropdown-item" >Incoming Goods</router-link> -->
                                 </div>
                             </li>

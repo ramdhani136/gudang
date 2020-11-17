@@ -8,8 +8,8 @@
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
         <select name="status" v-model="filter.request" class="form-control">
-            <option value="">Semua Data</option>
             <option value="Accedit">Draft</option>
+            <option value="N">Open</option>
             <option value="Edit">Request Perbaikan</option>
             <option value="Batal">Request Pembatalan</option>
         </select>
@@ -50,7 +50,7 @@
                         </router-link>
                         <button v-if="ambiluser.incoming===1 && (bm.request!=='Batal' && bm.request!=='Acchapus' && bm.request!=='Tolakhapus' && bm.request!=='Accedit') " @click="showbatal(bm)" class="btn btn-orange">Request Batal</button>
                         <button v-if="ambiluser.incoming===1 && bm.request==='Batal' " @click="batalrequest(bm)" class="btn btn-none">Batal Request</button>
-                        <button v-if="ambiluser.incoming===1 && bm.request==='Tolakhapus' " @click="showbatal(bm)" class="btn btn-danger">Lihat Tolak</button>
+                        <button v-if="ambiluser.incoming===1 && bm.request==='Tolakhapus' " @click="detailtolak(bm)" class="btn btn-danger">Detail Penolakan</button>
                     </td>
                 </tr>
             </tbody>
@@ -167,6 +167,28 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-detailtolak" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Detail Penolakan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Alasan Penolakan</label>
+                        <textarea v-model="alastolak" class="form-control" disabled></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="requlangbatal()" class="btn btn-success">Request Ulang</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -199,7 +221,7 @@ export default {
                 sampaitanggal: this.today(),
                 status: 'open',
                 nomor: '',
-                request: ""
+                request: "N"
             },
             user: {},
             ket: {
@@ -212,7 +234,9 @@ export default {
             closepo: '',
             sisapo: 0,
             keteranganedit: '',
-            pilihbatal: {}
+            pilihbatal: {},
+            alastolak: '',
+            ambilbbm: ''
         }
     },
     created() {
@@ -499,6 +523,7 @@ export default {
                         axios.put("/api/bbm/" + this.pilihbatal.bbm, {
                             request: 'Batal',
                             keteranganedit: this.keteranganedit,
+                            alastolak: ''
                         }).then(res => {
                             axios.post("/api/history", {
                                 nomor_dok: this.pilihbatal.bbm,
@@ -564,7 +589,8 @@ export default {
                     this.load = true;
                     axios.put("/api/bbm/" + bm.bbm, {
                         request: 'N',
-                        keteranganedit: ''
+                        keteranganedit: '',
+                        alastolak: ''
                     }).then(res => {
                         axios.post("/api/history", {
                             nomor_dok: bm.bbm,
@@ -606,6 +632,15 @@ export default {
                     )
                 }
             })
+        },
+        detailtolak(bm) {
+            this.alastolak = bm.alastolak;
+            $("#modal-detailtolak").modal("show");
+            this.pilihbatal = bm;
+        },
+        requlangbatal() {
+            $("#modal-detailtolak").modal("hide");
+            this.showbatal(this.pilihbatal);
         }
     }
 }

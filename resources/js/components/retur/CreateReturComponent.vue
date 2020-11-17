@@ -434,15 +434,6 @@ export default {
                                             catatan: this.hitung.keterangan[i]
                                         }
                                         axios.post("/api/listretur", this.uplist);
-                                        // axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.checker[i].kode_barang)
-                                        //     .then(res => {
-                                        //         this.listsokurang = res.data.data;
-                                        //         axios.put("/api/listso/" + this.listsokurang[0].id, {
-                                        //             bbk: parseInt(this.listsokurang[0].bbk) - parseInt(this.hitung.qty[i]),
-                                        //             closeso: 'N',
-                                        //             bck: ((parseInt(this.listsokurang[0].bck)) + (parseInt(this.listsokurang[0].bbk) - parseInt(this.listsokurang[0].bck))) - parseInt(this.hitung.qty[i]),
-                                        //         })
-                                        //     })
                                     }
                                     for (let j = 0; j < this.checker.length; j++) {
                                         axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.checker[j].kode_barang)
@@ -453,10 +444,14 @@ export default {
                                                 })
                                             })
                                     }
-                                    // axios.put("/api/so/" + this.up.nomor_so, {
-                                    //     status: 'Acc',
-                                    //     closebck: 'N'
-                                    // }).then(res => {
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.up.nomor_so,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Anda mendapatkan permintaan Retur baru!",
+                                        keterangan: "Mengirim permintaan retur nomor : " + this.up.nomor_retur,
+                                        jenis: "So",
+                                        tanggal: this.DateTime(),
+                                    })
                                     axios.post("/api/history", {
                                         nomor_dok: this.up.nomor_retur,
                                         id_user: this.ambiluser.id,

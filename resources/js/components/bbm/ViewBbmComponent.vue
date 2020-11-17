@@ -96,14 +96,14 @@
         <button v-if="ambiluser.purch===1&&(request==='Edit' || request==='Batal')" @click="showtolak()" class="btn-danger btn ml-1">
             Tolak
         </button>
-        <button v-if="statusbbm==='open' && request==='N' && alastolak===null && ambiluser.incoming===1" @click="reqedit()" class="btn-orange btn ml-1">
+        <button v-if="statusbbm==='open' && request==='N' && ambiluser.incoming===1" @click="reqedit()" class="btn-orange btn ml-1">
             Request Edit
         </button>
-        <button v-if="statusbbm==='open' && request==='Edit' && alastolak===null  && ambiluser.incoming===1" @click="bataledit()" class="btn-none btn ml-1">
+        <button v-if="statusbbm==='open' && request==='Edit'  && ambiluser.incoming===1" @click="bataledit()" class="btn-none btn ml-1">
             Batal Edit
         </button>
-        <button v-if="statusbbm==='open' && request==='N' && alastolak!==null  && ambiluser.incoming===1" @click="lihatalasan()" class="btn-danger btn ml-1">
-            Request di tolak
+        <button v-if="statusbbm==='open' && request==='Tolakedit' && alastolak!==null  && ambiluser.incoming===1" @click="detailtolak()" class="btn-danger btn ml-1">
+            Detail Penolakan
         </button>
         <button v-if="statusbbm==='open' &&  ambiluser.incoming===1" @click="print()" class="btn-success btn ml-1">
             Print
@@ -183,6 +183,50 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-tolak" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Form Penolakan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Alasan Penolakan</label>
+                        <textarea v-model="input.alastolak" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="kirimtolak()" class="btn btn-success">kirim Penolakan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-detailtolak" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div id="modal-width" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Detail Penolakan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Alasan Penolakan</label>
+                        <textarea v-model="alastolak" class="form-control" disabled></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" @click="reqedit()" class="btn btn-success">Request Ulang</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -219,7 +263,8 @@ export default {
             request: '',
             alastolak: '',
             input: {
-                keteranganedit: ""
+                keteranganedit: "",
+                alastolak: ""
             },
             listedit: {},
             qtybbm: 0,
@@ -236,7 +281,8 @@ export default {
             banding: '',
             ada: '',
             jmada: '',
-            jmband: ''
+            jmband: '',
+            alastolak: ''
         }
     },
     created() {
@@ -290,6 +336,7 @@ export default {
                     this.input.keteranganedit = this.bbm[0].keteranganedit;
                     this.bbmketerangan = this.bbm[0].keterangan;
                     this.nomorbcm = this.bbm[0].nomor_bcm;
+                    this.alastolak = this.bbm[0].alastolak;
                     if (this.bbm[0].alastolak === null || this.bbm[0].alastolak === "" || this.bbm[0].alastolak === undefined) {
                         this.alastolak = null;
                     } else {
@@ -306,6 +353,7 @@ export default {
                 });
         },
         reqedit() {
+            $("#modal-detailtolak").modal("hide");
             $("#modal-edit").modal("show");
         },
         getPoAktif() {
@@ -455,7 +503,8 @@ export default {
                             axios
                                 .put("/api/bbm/" + this.$route.params.nomor, {
                                     request: 'Edit',
-                                    keteranganedit: this.input.keteranganedit
+                                    keteranganedit: this.input.keteranganedit,
+                                    alastolak: ''
                                 })
                                 .then(res => {
                                     axios
@@ -523,7 +572,8 @@ export default {
                         axios
                             .put("/api/bbm/" + this.$route.params.nomor, {
                                 request: 'N',
-                                keteranganedit: ''
+                                keteranganedit: '',
+                                alastolak: ''
                             })
                             .then(res => {
                                 this.getPoAktif();
@@ -694,6 +744,8 @@ export default {
             })
         },
         simpanbbm() {
+            this.jmada = "";
+            this.jmband = "";
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success ml-2',
@@ -833,6 +885,126 @@ export default {
                     this.upl.qty[i] = 0;
                 }
             }
+        },
+        showtolak() {
+            $("#modal-tolak").modal("show");
+        },
+        kirimtolak() {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ml-2',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menolak permintaan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, Yakin!',
+                cancelButtonText: 'Tidak!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.load = true;
+                    if (this.input.alastolak === "") {
+                        this.load = false;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Alasan tolak wajib diisi!',
+                        })
+                        $("#modal-tolak").modal("hide");
+                    } else {
+                        if (this.request === 'Batal') {
+                            axios.put("/api/bbm/" + this.$route.params.nomor, {
+                                request: 'Tolakhapus',
+                                alastolak: this.input.alastolak,
+                                keteranganedit: ''
+                            }).then(res => {
+                                axios.post("/api/history", {
+                                    nomor_dok: this.nomorbcm,
+                                    nomor_ref: this.$route.params.nomor,
+                                    id_user: this.ambiluser.id,
+                                    notif: "Request pembatalan di tolak",
+                                    keterangan: "Request pembatalan nomor : " + this.$route.params.nomor + " Di tolak",
+                                    jenis: "Bcm",
+                                    tanggal: this.DateTime()
+                                }).then(res => {
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.$route.params.nomor,
+                                        nomor_ref: this.$route.params.nomor,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Request pembatalan di tolak",
+                                        keterangan: "Request pembatalan nomor : " + this.$route.params.nomor + " Di tolak",
+                                        jenis: "Bbm",
+                                        tanggal: this.DateTime()
+                                    }).then(res => {
+                                        this.load = false;
+                                        swalWithBootstrapButtons.fire(
+                                            'Sukses!',
+                                            'Berhasil mengirimkan penolakan.',
+                                            'success'
+                                        )
+                                        $("#modal-tolak").modal("hide");
+                                        this.kembali();
+                                    })
+                                })
+                            })
+                        } else if (this.request === 'Edit') {
+                            axios.put("/api/bbm/" + this.$route.params.nomor, {
+                                request: 'Tolakedit',
+                                alastolak: this.input.alastolak,
+                                keteranganedit: ''
+                            }).then(res => {
+                                axios.post("/api/history", {
+                                    nomor_dok: this.nomorbcm,
+                                    nomor_ref: this.$route.params.nomor,
+                                    id_user: this.ambiluser.id,
+                                    notif: "Request perbaikan di tolak",
+                                    keterangan: "Request perbaikan di tolak",
+                                    jenis: "Bcm",
+                                    tanggal: this.DateTime()
+                                }).then(res => {
+                                    axios.post("/api/history", {
+                                        nomor_dok: this.$route.params.nomor,
+                                        nomor_ref: this.$route.params.nomor,
+                                        id_user: this.ambiluser.id,
+                                        notif: "Request perbaikan di tolak",
+                                        keterangan: "Request perbaikan di tolak",
+                                        jenis: "Bbm",
+                                        tanggal: this.DateTime()
+                                    }).then(res => {
+                                        this.load = false;
+                                        swalWithBootstrapButtons.fire(
+                                            'Sukses!',
+                                            'Berhasil mengirimkan penolakan.',
+                                            'success'
+                                        )
+                                        $("#modal-tolak").modal("hide");
+                                        this.kembali();
+                                    })
+                                })
+                            })
+                        }
+                    }
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    this.load = false;
+                    swalWithBootstrapButtons.fire(
+                        'Cancelled',
+                        'Batal menolak permintaan :)',
+                        'error'
+                    )
+                }
+            })
+        },
+        detailtolak() {
+            $("#modal-detailtolak").modal("show");
         }
     }
 }
