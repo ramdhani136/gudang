@@ -59,6 +59,7 @@ class ListRsoResource extends JsonResource
             'bbk_tdktersedia'=>$this->bbk_tdktersedia,
             'pr'=>$this->pr,
             'diskon'=>$this->diskon,
+            'idx'=>$this->idx,
         ];
     }
 }

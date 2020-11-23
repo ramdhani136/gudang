@@ -110,12 +110,12 @@
             <thead>
               <tr>
                 <th>No</th>
-                <th>Kode Barang</th>
-                <th>Nama Barang</th>
+                <th style="width: 2%">Kode Barang</th>
+                <th style="width: 20%">Nama Barang</th>
                 <th>Satuan</th>
                 <th>Harga</th>
-                <th>Diskon Harga</th>
-                <th>Qty</th>
+                <th style="width: 20%">Diskon Harga</th>
+                <th style="width: 20%">Qty</th>
                 <th v-if="status === 'Draft'">Catatan</th>
                 <th v-if="status === 'So' || status === 'Confirmed'">Status</th>
                 <th v-if="status === 'So' || status === 'Confirmed'">
@@ -127,9 +127,7 @@
                 <th v-if="status === 'So' || status === 'Confirmed'">
                   Estimasi Kedatangan
                 </th>
-                <th v-if="status === 'Draft' || status === 'Confirmed'">
-                  Aksi
-                </th>
+                <th v-if="status === 'Draft'">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -197,7 +195,7 @@
                     Lihat
                   </button>
                 </td>
-                <td v-if="status === 'Draft' || status === 'Confirmed'">
+                <td v-if="status === 'Draft'">
                   <button
                     @click="hapus(index)"
                     style="text-align: center"
@@ -232,7 +230,7 @@
           @click="reqedit()"
           class="btn-orange btn ml-3"
         >
-          Request Ulang
+          Request Perbaikan
         </button>
         <router-link
           v-if="status === 'Confirmed'"
@@ -864,12 +862,12 @@ export default {
           this.listpr.push(this.barangs);
         }
       } else {
-        if (this.Filteredlist.length > 0) {
+        if (this.Filteredlist.length > 1) {
           Swal.fire({
             icon: "error",
             title: "Oops...",
             text:
-              "Item sudah diinput sebelumnya, hapus terlebih dahulu untuk memperbarui item!",
+              "Hanya dapat memilih 2 item yang sama, hapus terlebih dahulu satu item sebelumnya!",
           });
         } else {
           if (this.ket.kode === undefined) {
@@ -974,6 +972,7 @@ export default {
                               qty: this.hitung.qty[i],
                               catatan: this.hitung.keterangan[i],
                               diskon: this.diskon[i],
+                              idx: i,
                             };
                             axios.post("/api/listrso", this.uplist);
                           }
@@ -981,6 +980,7 @@ export default {
                       if (this.$route.params.id === this.upload.nomor_rso) {
                         axios.post("/api/history", {
                           nomor_dok: this.$route.params.id,
+                          nomor_ref: this.$route.params.id,
                           id_user: this.ambiluser.id,
                           notif: "Anda mendapatkan permintaan RSO baru",
                           keterangan: "RSO di kirim ke Inventory Control",
@@ -1015,6 +1015,7 @@ export default {
                         });
                         axios.post("/api/history", {
                           nomor_dok: this.upload.nomor_rso,
+                          nomor_ref: this.$route.params.id,
                           id_user: this.ambiluser.id,
                           notif: "Anda mendapatkan permintaan RSO baru",
                           keterangan: "RSO di kirim ke Inventory Control",
@@ -1079,312 +1080,52 @@ export default {
 
       swalWithBootstrapButtons
         .fire({
-          title: "Apakah anda yakin?",
-          text: "Ingin merubah RSO ini",
+          title: "Apakah anda yakin",
+          text: "Ingin melakukan perbaikan untuk RSO ini!",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonText: "Iya, yakin",
-          cancelButtonText: "Batalkan",
+          confirmButtonText: "Iya, Yakin!",
+          cancelButtonText: "Tidak!",
           reverseButtons: true,
         })
         .then((result) => {
-          if (result.value) {
-            this.getakses();
-            if (this.akses === true) {
-              this.btnedit = false;
-              if (this.listpr.length > 0) {
-                this.init = "";
-                this.cek = "";
-                this.banding = "";
-                for (let j = 0; j < this.listpr.length; j++) {
-                  if (
-                    this.hitung.qty[j] === undefined ||
-                    this.hitung.qty[j] === ""
-                  ) {
-                    this.init = "N";
-                  } else {
-                    this.init = "Y";
-                  }
-                  this.cek += this.init;
-                  this.banding += "Y";
-                }
-                if (this.cek === this.banding) {
-                  this.upload.status = "Draft";
-                  this.upload.kode_customer = this.kodecustomer;
-                  this.upload.nomor_rso =
-                    this.upload.nomor_rso + this.upload.kode_groupso;
-                  axios
-                    .put("/api/rso/" + this.$route.params.id, this.upload)
-                    .then((res) => {
-                      axios
-                        .get("/api/listrso/" + this.upload.nomor_rso)
-                        .then((res) => {
-                          this.listrso = res.data.data;
-                          for (let o = 0; o < this.listrso.length; o++) {
-                            axios.delete("/api/listrso/" + this.listrso[o].id);
-                          }
-                          for (let i = 0; i < this.listpr.length; i++) {
-                            if (this.hitung.keterangan[i] === undefined) {
-                              this.hitung.keterangan[i] = "";
-                            }
-                            this.uplist = {
-                              nomor_rso: this.upload.nomor_rso,
-                              tanggal_rso: this.upload.tanggal_rso,
-                              kode_barang: this.listpr[i].lkode_barang,
-                              harga: this.listpr[i].harga,
-                              id_custprice: this.listpr[i].id_custprice,
-                              qty: this.hitung.qty[i],
-                              catatan: this.hitung.keterangan[i],
-                              diskon: this.diskon[i],
-                            };
-                            axios.post("/api/listrso", this.uplist);
-                          }
-                        });
-                      axios.post("/api/history", {
-                        nomor_dok: this.$route.params.id,
-                        id_user: this.ambiluser.id,
-                        notif:
-                          "RSO nomor " +
-                          this.$route.params.id +
-                          " Di tarik kembali Sales",
-                        keterangan: "Sales menarik kembali RSO (Edit RSO)",
-                        jenis: "RSO",
-                        tanggal: this.DateTime(),
-                      });
-                      this.$router.push({
-                        name: "rso",
-                      });
-                      swalWithBootstrapButtons.fire(
-                        "Save!",
-                        "Silahkan edit RSO ini di list draft RSO.",
-                        "success"
-                      );
-                    })
-                    .catch((error) => {
-                      Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: "Cek kembali rincian rso anda!",
-                      });
+          if (result.isConfirmed) {
+            this.load = true;
+            axios
+              .put("/api/rso/" + this.$route.params.id, {
+                status: "Draft",
+              })
+              .then((res) => {
+                axios
+                  .post("/api/history", {
+                    nomor_dok: this.$route.params.id,
+                    nomor_ref: this.$route.params.id,
+                    id_user: this.ambiluser.id,
+                    notif: "RSO di edit",
+                    keterangan: "Menarik RSO kembali (Edit)",
+                    jenis: "RSO",
+                    tanggal: this.DateTime(),
+                  })
+                  .then((res) => {
+                    this.load = false;
+                    swalWithBootstrapButtons.fire(
+                      "Sukses!",
+                      "Silahkan edit RSO anda di list draft RSO",
+                      "success"
+                    );
+                    this.$router.push({
+                      name: "rso",
                     });
-                } else {
-                  Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Qty item tidak boleh kosong",
                   });
-                }
-              } else {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "Anda belum menginput item apapun!",
-                });
-              }
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Anda tidak mempunyai akses!",
               });
-            }
-          } else if (result.dismiss === Swal.DismissReason.cancel) {
+          } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+          ) {
+            this.load = false;
             swalWithBootstrapButtons.fire(
               "Cancelled",
-              "Permintaan ini di batalkan :)",
-              "error"
-            );
-          }
-        });
-    },
-    requlang() {
-      const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-          confirmButton: "btn btn-success ml-2",
-          cancelButton: "btn btn-danger",
-        },
-        buttonsStyling: false,
-      });
-
-      swalWithBootstrapButtons
-        .fire({
-          title: "Apakah anda yakin?",
-          text:
-            "Semua item pada RSO ini akan di unbooking dan melakukan konfirmasi ulang oleh Inventory Control",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Iya, yakin",
-          cancelButtonText: "Batalkan",
-          reverseButtons: true,
-        })
-        .then((result) => {
-          if (result.value) {
-            this.getakses();
-            if (this.akses === true) {
-              if (this.listpr.length > 0) {
-                this.init = "";
-                this.cek = "";
-                this.banding = "";
-                for (let j = 0; j < this.listpr.length; j++) {
-                  if (
-                    this.hitung.qty[j] === undefined ||
-                    this.hitung.qty[j] === ""
-                  ) {
-                    this.init = "N";
-                  } else {
-                    this.init = "Y";
-                  }
-                  this.cek += this.init;
-                  this.banding += "Y";
-                }
-                if (this.cek === this.banding) {
-                  axios
-                    .get("/api/so/rso/" + this.$route.params.id)
-                    .then((res) => {
-                      this.dso = res.data.data;
-                      if (this.dso.length < 1) {
-                        this.openso = false;
-                      } else {
-                        this.openso = true;
-                      }
-                      if (this.openso === false) {
-                        this.upload.status = "Sent";
-                        this.upload.kode_customer = this.kodecustomer;
-                        this.upload.nomor_rso =
-                          this.upload.nomor_rso + this.upload.kode_groupso;
-                        axios
-                          .put("/api/rso/" + this.$route.params.id, this.upload)
-                          .then((res) => {
-                            axios
-                              .get("/api/listrso/" + this.upload.nomor_rso)
-                              .then((res) => {
-                                this.listrso = res.data.data;
-                                for (let o = 0; o < this.listrso.length; o++) {
-                                  axios.delete(
-                                    "/api/listrso/" + this.listrso[o].id
-                                  );
-                                }
-                                for (let i = 0; i < this.listpr.length; i++) {
-                                  if (this.hitung.keterangan[i] === undefined) {
-                                    this.hitung.keterangan[i] = "";
-                                  }
-                                  this.uplist = {
-                                    nomor_rso: this.upload.nomor_rso,
-                                    tanggal_rso: this.upload.tanggal_rso,
-                                    kode_barang: this.listpr[i].lkode_barang,
-                                    harga: this.listpr[i].harga,
-                                    id_custprice: this.listpr[i].id_custprice,
-                                    qty: this.hitung.qty[i],
-                                    catatan: this.hitung.keterangan[i],
-                                    diskon: this.diskon[i],
-                                  };
-                                  axios.post("/api/listrso", this.uplist);
-                                }
-                              });
-                            if (
-                              this.$route.params.id === this.upload.nomor_rso
-                            ) {
-                              axios.post("/api/history", {
-                                nomor_dok: this.$route.params.id,
-                                id_user: this.ambiluser.id,
-                                notif: "Anda mendapatkan permintaan RSO baru",
-                                keterangan:
-                                  "RSO di kirim ulang ke Inventory Control",
-                                jenis: "RSO",
-                                tanggal: this.DateTime(),
-                              });
-                            } else {
-                              axios
-                                .get("/api/history/" + this.$route.params.id)
-                                .then((res) => {
-                                  this.history = res.data.data;
-                                  for (
-                                    let i = 0;
-                                    1 < this.history.length;
-                                    i++
-                                  ) {
-                                    axios.put(
-                                      "/api/history/" + this.history[i].id,
-                                      {
-                                        nomor_dok: this.upload.nomor_rso,
-                                      }
-                                    );
-                                  }
-                                });
-                              axios.post("/api/history", {
-                                nomor_dok: this.upload.nomor_rso,
-                                id_user: this.ambiluser.id,
-                                notif:
-                                  "RSO " +
-                                  this.$route.params.id +
-                                  " di ganti dengan RSO " +
-                                  this.upload.nomor_rs,
-                                keterangan:
-                                  "Mengubah nomor RSO lama : " +
-                                  this.$route.params.id,
-                                jenis: "RSO",
-                                tanggal: this.DateTime(),
-                                aktif: "N",
-                              });
-                              axios.post("/api/history", {
-                                nomor_dok: this.$route.params.id,
-                                id_user: this.ambiluser.id,
-                                notif: "Anda mendapatkan permintaan ulang RSO!",
-                                keterangan:
-                                  "RSO di kirim ulang ke Inventory Control",
-                                jenis: "RSO",
-                                tanggal: this.DateTime(),
-                              });
-                            }
-                            this.$router.push({
-                              name: "rso",
-                            });
-                            swalWithBootstrapButtons.fire(
-                              "Save!",
-                              "Berhasil mengirimkan ulang RSO.",
-                              "success"
-                            );
-                          })
-                          .catch((error) => {
-                            Swal.fire({
-                              icon: "error",
-                              title: "Oops...",
-                              text: "Cek kembali rincian rso anda!",
-                            });
-                          });
-                      } else {
-                        Swal.fire({
-                          icon: "error",
-                          title: "Tidak dapat mengirim ulang RSO ini.",
-                          text: "RSO ini sudah digunakan untuk pembuatan SO",
-                        });
-                      }
-                    });
-                } else {
-                  Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Qty item tidak boleh kosong",
-                  });
-                }
-              } else {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "Anda belum menginput item apapun!",
-                });
-              }
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Anda tidak mempunyai akses!",
-              });
-            }
-          } else if (result.dismiss === Swal.DismissReason.cancel) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal mengirim ulang RSO :)",
+              "Batal melakukan perbaikan :)",
               "error"
             );
           }
@@ -1441,6 +1182,7 @@ export default {
                             qty: this.hitung.qty[i],
                             catatan: this.hitung.keterangan[i],
                             diskon: this.diskon[i],
+                            idx: i,
                           };
                           axios.post("/api/listrso", this.uplist);
                         }
