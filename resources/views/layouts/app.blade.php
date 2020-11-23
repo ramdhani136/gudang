@@ -57,7 +57,7 @@
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <router-link to="/atk" class="dropdown-item" >Permintaan ATK</router-link>
+                                    <router-link to="/atk/home" class="dropdown-item" >Permintaan ATK</router-link>
                                     <!-- <router-link to="/barang" class="dropdown-item" >Barang</router-link>
                                     <router-link to="/customer" class="dropdown-item" >Customer</router-link>
                                     <router-link to="/divisi" class="dropdown-item" >Divisi</router-link>

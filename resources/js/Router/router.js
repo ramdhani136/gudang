@@ -100,6 +100,9 @@ import lPenjualan from '../components/laporan/sales/lPenjualan.vue'
 
 import lpurchaseorder from '../components/laporan/purch/lpurchaseorder.vue'
 
+/* ATK */
+import homeAtk from '../components/lainnya/atk/homeAtk.vue'
+
 
 
 
@@ -203,6 +206,9 @@ const routes=[
     {name:'sisaso', path:'/view/sisaso', component:lSalesOrder},
     {name:'penjualan', path:'/view/penjualan', component:lPenjualan},
     {name:'laporpo', path:'/view/laporpo', component:lpurchaseorder},
+
+    /* ATK */
+    {name:'homeAtk', path:'/atk/home', component:homeAtk}
     
 ]
 
