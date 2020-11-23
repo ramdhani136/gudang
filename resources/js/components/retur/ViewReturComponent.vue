@@ -100,8 +100,15 @@
       </div>
     </div>
     <div class="row">
-      <div id="total" class="mt-3 ml-auto mr-3">
+      <div v-if="statusretur !== 'Acc'" id="total" class="mt-3 ml-auto mr-3">
         Total Invoice :&nbsp; {{ total | currency }}
+      </div>
+      <div
+        v-if="statusretur === 'Acc' || statusretur === 'Selesai'"
+        id="total"
+        class="mt-3 ml-auto mr-3"
+      >
+        Total Invoice :&nbsp; {{ totalreal | currency }}
       </div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
@@ -120,8 +127,11 @@
               <th>Satuan</th>
               <th>Harga</th>
               <th>Diskon</th>
-              <th>Terkirim</th>
+              <th>SO Terkirim</th>
               <th>Jumlah Retur</th>
+              <th v-if="statusretur === 'Acc' && ambiluser.incoming === 1">
+                Jumlah Real
+              </th>
               <th>Keterangan</th>
               <th v-if="statusretur === 'Draft' && ambiluser.sales === 1">
                 Aksi
@@ -146,6 +156,17 @@
                   type="number"
                   class="form-control"
                   :disabled="statusretur !== 'Draft' || ambiluser.sales === 0"
+                />
+              </td>
+              <td
+                v-if="statusretur === 'Acc' && ambiluser.incoming === 1"
+                style="text-align: center"
+              >
+                <input
+                  @input="validreal(index)"
+                  v-model="hitung.real[index]"
+                  type="number"
+                  class="form-control"
                 />
               </td>
               <td style="text-align: center">
@@ -406,6 +427,8 @@ export default {
         qty: [],
         keterangan: [],
         jumlah: [],
+        real: [],
+        jumlahreal: [],
       },
       soaktif: [],
       listso: {},
@@ -428,6 +451,8 @@ export default {
       listreturall: {},
       jumlahlist: 0,
       tombolaktif: false,
+      totalreal: 0,
+      listsonya: {},
     };
   },
   created() {
@@ -489,6 +514,7 @@ export default {
                   )
                   .then((res) => {
                     this.listsoview.push({
+                      id: res.data.data[0].id,
                       bbk: res.data.data[0].bbk,
                       kode_barang: res.data.data[0].kode_barang,
                       harga: res.data.data[0].harga,
@@ -505,23 +531,30 @@ export default {
                         this.listreturall = res.data.data;
                         this.jumlahlist = 0;
                         for (let j = 0; j < this.listreturall.length; j++) {
-                          this.jumlahlist += parseInt(this.listreturall[j].qty);
+                          this.jumlahlist += parseFloat(
+                            this.listreturall[j].qty
+                          );
                         }
                         this.terkirim =
-                          parseInt(this.listsoview[i].bbk) -
-                          parseInt(this.jumlahlist) +
-                          parseInt(this.listretur[i].qty);
+                          parseFloat(this.listsoview[i].bbk) -
+                          parseFloat(this.jumlahlist) +
+                          parseFloat(this.listretur[i].qty);
                         this.checker.push({
+                          id: this.listretur[i].id,
                           kode_barang: this.listretur[i].kode_barang,
                           nama_barang: this.listretur[i].nama_barang,
                           satuan: this.listretur[i].satuan,
                           harga: this.listsoview[i].harga,
                           diskon: this.listsoview[i].diskon,
                           bbk: this.terkirim,
+                          qty: this.listretur[i].qty,
+                          id_so: this.listsoview[i].id,
                         });
                         this.hitung.qty[i] = this.listretur[i].qty;
+                        this.hitung.real[i] = this.listretur[i].real;
                         this.hitung.keterangan[i] = this.listretur[i].catatan;
                         this.validqty(i);
+                        this.validreal(i);
                         this.load = false;
                       });
                   });
@@ -539,7 +572,7 @@ export default {
                         this.listaktif = res.data.data;
                         this.adagak = 0;
                         for (let o = 0; o < this.listaktif.length; o++) {
-                          this.adagak += parseInt(this.listaktif[o].bbk);
+                          this.adagak += parseFloat(this.listaktif[o].bbk);
                         }
                         if (this.adagak > 0) {
                           this.soaktif.push(this.sopilih[i]);
@@ -621,18 +654,18 @@ export default {
       for (let i = 0; i < this.checker.length; i++) {
         if (this.aktif.statusso === "tersedia") {
           this.ket.sisasopilih[i] =
-            parseInt(this.checker[i].qty_tersedia) -
-            parseInt(this.checker[i].keluar_tersedia);
+            parseFloat(this.checker[i].qty_tersedia) -
+            parseFloat(this.checker[i].keluar_tersedia);
           this.ket.tersedia[i] =
-            parseInt(this.checker[i].qty_tersedia) -
-            parseInt(this.checker[i].keluar_tersedia);
+            parseFloat(this.checker[i].qty_tersedia) -
+            parseFloat(this.checker[i].keluar_tersedia);
         } else {
           this.ket.sisasopilih[i] =
-            parseInt(this.checker[i].qty_tdktersedia) -
-            parseInt(this.checker[i].keluar_tdktersedia);
+            parseFloat(this.checker[i].qty_tdktersedia) -
+            parseFloat(this.checker[i].keluar_tdktersedia);
           this.ket.tersedia[i] =
-            parseInt(this.checker[i].qty_masuk) -
-            parseInt(this.checker[i].keluar_tdktersedia);
+            parseFloat(this.checker[i].qty_masuk) -
+            parseFloat(this.checker[i].keluar_tdktersedia);
         }
       }
     },
@@ -763,7 +796,8 @@ export default {
     },
     validqty(index) {
       if (
-        parseInt(this.hitung.qty[index]) > parseInt(this.checker[index].bbk) ||
+        parseFloat(this.hitung.qty[index]) >
+          parseFloat(this.checker[index].bbk) ||
         this.hitung.qty[index] < 0
       ) {
         this.hitung.qty[index] = this.checker[index].bbk;
@@ -776,9 +810,29 @@ export default {
           this.hitung.jumlah[i] = this.hitung.qty[i];
         }
         this.subtotal =
-          (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) *
-          parseInt(this.hitung.jumlah[i]);
-        this.total += parseInt(this.subtotal);
+          (parseFloat(this.checker[i].harga) -
+            parseFloat(this.checker[i].diskon)) *
+          parseFloat(this.hitung.jumlah[i]);
+        this.total += parseFloat(this.subtotal);
+      }
+    },
+    validreal(index) {
+      if (this.hitung.real[index] < 0) {
+        this.hitung.real[index] = 0;
+      } else if (this.hitung.real[index] > this.hitung.qty[index]) {
+        this.hitung.real[index] = this.hitung.qty[index];
+      }
+      this.totalreal = 0;
+      for (let i = 0; i < this.checker.length; i++) {
+        if (this.hitung.real[i] === undefined || this.hitung.real[i] === "") {
+          this.hitung.jumlahreal[i] = 0;
+        } else {
+          this.hitung.jumlahreal[i] = this.hitung.real[i];
+        }
+        this.totalreal +=
+          (parseFloat(this.checker[i].harga) -
+            parseFloat(this.checker[i].diskon)) *
+          parseFloat(this.hitung.jumlahreal[i]);
       }
     },
     batal() {
@@ -815,9 +869,10 @@ export default {
           this.hitung.jumlah[i] = this.hitung.qty[i];
         }
         this.subtotal =
-          (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) *
-          parseInt(this.hitung.jumlah[i]);
-        this.total += parseInt(this.subtotal);
+          (parseFloat(this.checker[i].harga) -
+            parseFloat(this.checker[i].diskon)) *
+          parseFloat(this.hitung.jumlah[i]);
+        this.total += parseFloat(this.subtotal);
       }
     },
     DateTime() {
@@ -1082,6 +1137,29 @@ export default {
             );
           }
         });
+    },
+    kirimbbm() {
+      // axios
+      //   .put("/api/retur/" + this.$route.params.nomor, {
+      //     status: "Selesai",
+      //   })
+      //   .then((res) => {
+      for (let i = 0; i < this.checker.length; i++) {
+        // axios.put("/api/listretur/" + this.checker[i].id, {
+        //   real: this.hitung.real[i],
+        // });
+        axios
+          .get("/api/listso/" + this.checker[i].id_so + "/edit")
+          .then((res) => {
+            this.listsonya = res.data.data;
+            console.log(this.listsonya[0].bbk);
+            console.log(this.listsonya[0].bck);
+            console.log(this.listsonya[0].closeso);
+            console.log(this.listsonya[0].qtyretur);
+            console.log(this.listsonya[0].qty);
+          });
+      }
+      // });
     },
   },
 };

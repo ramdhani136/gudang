@@ -290,7 +290,7 @@ export default {
                                 this.sortirlist = res.data.data;
                                 this.bbknya = 0;
                                 for (let k = 0; k < this.sortirlist.length; k++) {
-                                    this.bbknya += parseInt(this.sortirlist[k].bbk) - parseInt(this.sortirlist[k].qtyretur);
+                                    this.bbknya += parseFloat(this.sortirlist[k].bbk) - parseFloat(this.sortirlist[k].qtyretur);
                                 }
                                 if (this.bbknya > 0) {
                                     this.soaktif.push({
@@ -353,13 +353,13 @@ export default {
                         .then(res => {
                             this.oper = res.data.data;
                             for (let y = 0; y < this.oper.length; y++) {
-                                if ((parseInt(this.oper[y].bbk) - parseInt(this.oper[y].qtyretur)) > 0) {
+                                if ((parseFloat(this.oper[y].bbk) - parseFloat(this.oper[y].qtyretur)) > 0) {
                                     this.listso.push({
                                         kode_barang: this.oper[y].kode_barang,
                                         nama_barang: this.oper[y].nama_barang,
                                         harga: this.oper[y].harga,
                                         diskon: this.oper[y].diskon,
-                                        bbk: parseInt(this.oper[y].bbk) - parseInt(this.oper[y].qtyretur),
+                                        bbk: parseFloat(this.oper[y].bbk) - parseFloat(this.oper[y].qtyretur),
                                         satuan: this.oper[y].satuan,
                                     });
                                 }
@@ -377,11 +377,11 @@ export default {
         pilihlistchecker() {
             for (let i = 0; i < this.checker.length; i++) {
                 if (this.aktif.statusso === "tersedia") {
-                    this.ket.sisasopilih[i] = parseInt(this.checker[i].qty_tersedia) - parseInt(this.checker[i].keluar_tersedia);
-                    this.ket.tersedia[i] = parseInt(this.checker[i].qty_tersedia) - parseInt(this.checker[i].keluar_tersedia);
+                    this.ket.sisasopilih[i] = parseFloat(this.checker[i].qty_tersedia) - parseFloat(this.checker[i].keluar_tersedia);
+                    this.ket.tersedia[i] = parseFloat(this.checker[i].qty_tersedia) - parseFloat(this.checker[i].keluar_tersedia);
                 } else {
-                    this.ket.sisasopilih[i] = parseInt(this.checker[i].qty_tdktersedia) - parseInt(this.checker[i].keluar_tdktersedia);
-                    this.ket.tersedia[i] = parseInt(this.checker[i].qty_masuk) - parseInt(this.checker[i].keluar_tdktersedia);
+                    this.ket.sisasopilih[i] = parseFloat(this.checker[i].qty_tdktersedia) - parseFloat(this.checker[i].keluar_tdktersedia);
+                    this.ket.tersedia[i] = parseFloat(this.checker[i].qty_masuk) - parseFloat(this.checker[i].keluar_tdktersedia);
                 }
 
             }
@@ -440,7 +440,7 @@ export default {
                                             .then(res => {
                                                 this.diretur = res.data.data;
                                                 axios.put("/api/listso/" + this.diretur[0].id, {
-                                                    qtyretur: parseInt(this.diretur[0].qtyretur) + parseInt(this.hitung.qty[j]),
+                                                    qtyretur: parseFloat(this.diretur[0].qtyretur) + parseFloat(this.hitung.qty[j]),
                                                 })
                                             })
                                     }
@@ -509,7 +509,7 @@ export default {
             })
         },
         validqty(index) {
-            if (parseInt(this.hitung.qty[index]) > parseInt(this.checker[index].bbk) || this.hitung.qty[index] < 0) {
+            if (parseFloat(this.hitung.qty[index]) > parseFloat(this.checker[index].bbk) || this.hitung.qty[index] < 0) {
                 this.hitung.qty[index] = this.checker[index].bbk;
             }
             this.total = 0;
@@ -519,8 +519,8 @@ export default {
                 } else {
                     this.hitung.jumlah[i] = this.hitung.qty[i];
                 }
-                this.subtotal = (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) * parseInt(this.hitung.jumlah[i]);
-                this.total += parseInt(this.subtotal);
+                this.subtotal = (parseFloat(this.checker[i].harga) - parseFloat(this.checker[i].diskon)) * parseFloat(this.hitung.jumlah[i]);
+                this.total += parseFloat(this.subtotal);
             }
         },
         batal() {
@@ -555,8 +555,8 @@ export default {
                 } else {
                     this.hitung.jumlah[i] = this.hitung.qty[i];
                 }
-                this.subtotal = (parseInt(this.checker[i].harga) - parseInt(this.checker[i].diskon)) * parseInt(this.hitung.jumlah[i]);
-                this.total += parseInt(this.subtotal);
+                this.subtotal = (parseFloat(this.checker[i].harga) - parseFloat(this.checker[i].diskon)) * parseFloat(this.hitung.jumlah[i]);
+                this.total += parseFloat(this.subtotal);
             }
         },
         DateTime() {

@@ -22,6 +22,7 @@ class ListReturResource extends JsonResource
             'nama_barang'=>$this->barang->nama,
             'satuan'=>$this->barang->satuan,
             'qty'=>$this->qty,
+            'real'=>$this->real,
             'catatan'=>$this->catatan,
             'nomor_so'=>$this->nomor_so,
         ];

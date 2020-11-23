@@ -104,7 +104,6 @@ import lpurchaseorder from '../components/laporan/purch/lpurchaseorder.vue'
 
 
 
-
 const routes=[
     {name:'barang', path:'/barang', component:BarangComponent},
     {name:'purchasebarang', path:'/purchase/barang/', component:PurchaseBarangComponent},

@@ -61,7 +61,7 @@ class ListReturController extends Controller
      */
     public function edit($id)
     {
-        //
+        return ListReturResource::collection(Listretur::where('id',$id)->get());
     }
 
     /**
