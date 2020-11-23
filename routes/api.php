@@ -105,7 +105,7 @@ Route::get('bck/data/so/{so}','Bck\BckController@so');
 
 Route::resource('listbck','Bck\ListBckController');
 Route::get('listbck/data/aktif/{bck}','Bck\ListBckController@aktif');
-Route::get('listbck/view/{bck}/{barang}','Bck\ListBckController@viewbbk');
+Route::get('listbck/view/{bck}/{barang}/{idx}','Bck\ListBckController@viewbbk');
 
 Route::get('bcm/{barang}/{bcm}','Barang\ListBcmController@getbbm');
 
@@ -139,7 +139,7 @@ Route::get('listso/data/kembalikanpo/{barang}','So\ListSoController@kembalikanpo
 Route::get('listso/data/bbmbagi/{barang}','So\ListSoController@bbmbagi');
 
 Route::get('listso/data/listbck/{so}','So\ListSoController@listbck');
-Route::get('listso/data/{so}/{barang}','So\ListSoController@listsobck');
+Route::get('listso/data/{so}/{barang}/{idx}','So\ListSoController@listsobck');
 
 Route::resource('pr','Pr\PrController');
 

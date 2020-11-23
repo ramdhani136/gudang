@@ -119,8 +119,8 @@ class ListSoController extends Controller
         return ListSoResource::collection(Listso::where('nomor_so',$so)->where('openso','Y')->where('closeso','N')->get());
     }
 
-    public function  listsobck($so,$barang){
-        return ListSoResource::collection(Listso::where('nomor_so',$so)->where('kode_barang',$barang)->get());
+    public function  listsobck($so,$barang,$idx){
+        return ListSoResource::collection(Listso::where('nomor_so',$so)->where('kode_barang',$barang)->where('idx',$idx)->get());
     }
 
     public function listretur($so){

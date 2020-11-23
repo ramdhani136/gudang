@@ -736,9 +736,7 @@ export default {
                         .then((res) => {
                           this.listfull = res.data.data;
                           for (let n = 0; n < this.listfull.length; n++) {
-                            axios
-                              .delete("/api/listso/" + this.listfull[n].id)
-                              .then((res) => {});
+                            axios.delete("/api/listso/" + this.listfull[n].id);
                           }
                           this.ada = 0;
                           for (let i = 0; i < this.listnewso.length; i++) {
@@ -758,6 +756,7 @@ export default {
                               tersedia: this.ada,
                               statusso: this.ket.status,
                               diskon: this.listnewso[i].diskon,
+                              idx: this.listnewso[i].idx,
                             };
                             axios.post("/api/listso", this.uplist);
                           }
@@ -815,6 +814,7 @@ export default {
                             qtyrso: 0,
                             tersedia: this.ada,
                             diskon: this.listnewso[i].diskon,
+                            idx: this.listnewso[i].idx,
                           };
                           axios.post("/api/listso", this.uplist);
                         }

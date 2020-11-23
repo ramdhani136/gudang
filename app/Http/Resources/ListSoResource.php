@@ -44,6 +44,7 @@ class ListSoResource extends JsonResource
             'blmdatang'=>$this->qty-$this->tersedia,
             'kode_groupso'=>$this->so->kode_groupso,
             'qtyretur'=>$this->qtyretur,
+            'idx'=>$this->idx,
         ];
     }
 }

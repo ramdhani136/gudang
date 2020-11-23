@@ -27,6 +27,7 @@ class ListBbkResource extends JsonResource
             'harga'=>$this->harga,
             'diskon'=>$this->diskon,
             'keterangan'=>$this->keterangan,
+            'idx'=>$this->idx,
         ];
     }
 }
