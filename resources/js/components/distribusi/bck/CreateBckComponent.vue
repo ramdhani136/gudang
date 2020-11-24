@@ -4,110 +4,55 @@
       <div class="col-4">
         <div class="form-group">
           <label>Nomor Checker :</label>
-          <input
-            @input="cekbck()"
-            v-model="up.bck"
-            type="text"
-            class="form-control col-12"
-            maxlength="16"
-            :class="{ 'is-valid': aktif, 'is-invalid': !aktif }"
-          />
+          <input @input="cekbck()" v-model="up.bck" type="text" class="form-control col-12" maxlength="16" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }" />
         </div>
         <div class="form-group">
           <label>Tanggal :</label>
-          <input
-            v-model="up.tanggal"
-            type="date"
-            @change="validate()"
-            :min="now()"
-            class="form-control col-12"
-          />
+          <input v-model="up.tanggal" type="date" @change="validate()" :min="now()" class="form-control col-12" />
         </div>
         <div class="form-group">
           <label>Kendaraan :</label>
-          <input
-            v-model="ket.nopol"
-            class="form-control"
-            @click="showkendaraan()"
-            autocomplete="off"
-            placeholder="Pilih Kendaraan"
-          />
+          <input v-model="ket.nopol" class="form-control" @click="showkendaraan()" autocomplete="off" placeholder="Pilih Kendaraan" />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Nomor SO</label>
-          <input
-            v-model="up.nomor_so"
-            @click="showSo()"
-            type="text"
-            class="form-control"
-            placeholder="Pilih Sales Order"
-          />
+          <input v-model="up.nomor_so" @click="showSo()" type="text" class="form-control" placeholder="Pilih Sales Order" />
         </div>
         <div class="form-group">
           <label>Customer</label>
-          <select
-            v-model="ket.customer"
-            name="customer"
-            class="col-12 form-control"
-            disabled
-          >
+          <select v-model="ket.customer" name="customer" class="col-12 form-control" disabled>
             <option :value="ket.customer">{{ ket.customer }}</option>
           </select>
         </div>
         <div class="form-group">
           <label>Distribusi</label>
-          <input
-            v-model="ket.distribusi"
-            type="text"
-            class="form-control"
-            disabled
-          />
+          <input v-model="ket.distribusi" type="text" class="form-control" disabled />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Lokasi</label>
-          <input
-            v-model="ket.lokasi"
-            type="text"
-            class="form-control"
-            disabled
-          />
+          <input v-model="ket.lokasi" type="text" class="form-control" disabled />
         </div>
         <div class="form-group">
           <label>Alamat</label>
-          <textarea
-            v-model="ket.alamat"
-            name="keterangan"
-            class="form-control col-12"
-            disabled
-          ></textarea>
+          <textarea v-model="ket.alamat" name="keterangan" class="form-control col-12" disabled></textarea>
         </div>
         <div class="form-group">
           <label>keterangan</label>
-          <textarea
-            v-model="up.keterangan"
-            name="keterangan"
-            class="form-control col-12"
-          ></textarea>
+          <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
         </div>
       </div>
     </div>
     <div class="row">
-      <div id="total" class="mt-3 ml-auto mr-3">
-        Total Invoice :&nbsp; {{ total | currency }}
-      </div>
+      <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ total | currency }}</div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
       <div class="row mt-1 mx-auto col-12">
         <Circle5 id="load3" v-if="load"></Circle5>
-        <table
-          id="rsthead"
-          class="table mt-2 table-striped table-bordered"
-          style="width: 100%"
-        >
+        <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
           <thead>
             <tr>
               <th>No</th>
@@ -136,23 +81,13 @@
                 {{ listbcm.qty - listbcm.bck }}
               </td>
               <td style="text-align: center">
-                <input
-                  @input="validqty(index)"
-                  v-model="hitung.qty[index]"
-                  type="number"
-                  class="form-control"
-                />
+                <input @input="validqty(index)" v-model="hitung.qty[index]" type="number" class="form-control" />
               </td>
               <td style="text-align: center">
-                <textarea
-                  v-model="hitung.keterangan[index]"
-                  class="form-control"
-                ></textarea>
+                <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
               </td>
               <td style="text-align: center">
-                <button @click="hapusitem(index)" class="btn btn-danger">
-                  Hapus
-                </button>
+                <button @click="hapusitem(index)" class="btn btn-danger">Hapus</button>
               </td>
             </tr>
           </tbody>
@@ -166,59 +101,38 @@
       <button @click="batal()" class="btn-orange btn ml-2">Batal</button>
       <button @click="submitBck()" class="btn-success btn ml-1">Simpan</button>
     </div>
-    <div
-      class="modal fade"
-      id="modal-po"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Form SO</h5>
-            <button
-              @click="resetForm()"
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
+              <label>Mulai Tanggal</label>
+              <input @change="reset()" v-model="filter.mulaitanggal" type="date" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label>Sampai Tanggal</label>
+              <input @change="reset()" v-model="filter.sampaitanggal" type="date" :min="filter.mulaitanggal" class="form-control" />
+            </div>
+            <div class="form-group">
               <label>Pilih SO</label>
-              <select
-                @change="pilihSo(ambil)"
-                v-model="ambil"
-                class="form-control"
-              >
-                <option
-                  :value="aktif"
-                  v-for="(aktif, index) in soaktif"
-                  :key="index"
-                >
+              <select @change="pilihSo(ambil)" v-model="ambil" class="form-control">
+                <option :value="aktif" v-for="(aktif, index) in Filterso" :key="index">
                   {{ aktif.nomor_so }}
                 </option>
               </select>
             </div>
             <div class="form-group">
               <label>Customer</label>
-              <input
-                v-model="ket.customer"
-                type="text"
-                class="form-control"
-                disabled
-              />
+              <input v-model="ket.customer" type="text" class="form-control" disabled />
             </div>
             <div id="overflowBody">
-              <table
-                class="table mt-2 table-striped table-bordered"
-                style="width: 100%"
-              >
+              <table class="table mt-2 table-striped table-bordered" style="width: 100%">
                 <thead id="rsthead">
                   <tr>
                     <th style="text-align: center">No</th>
@@ -237,13 +151,7 @@
                     <td style="text-align: center">{{ ls.satuan }}</td>
                     <td style="text-align: center">{{ ket.sisaso[index] }}</td>
                     <td style="text-align: center">
-                      <input
-                        @change="pilihlistchecker()"
-                        v-model="checker"
-                        type="checkbox"
-                        :value="ls"
-                        :disabled="ket.ltersedia[index] === 0"
-                      />
+                      <input @change="pilihlistchecker()" v-model="checker" type="checkbox" :value="ls" :disabled="ket.ltersedia[index] === 0" />
                     </td>
                   </tr>
                 </tbody>
@@ -251,17 +159,8 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              @click="resetForm()"
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" @click="checklist()" class="btn btn-primary">
-              Save changes
-            </button>
+            <button @click="resetForm()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" @click="checklist()" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>
@@ -273,34 +172,18 @@
         </div>
       </div>
     </div>
-    <div
-      class="modal fade"
-      id="modal-kendaraan"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-kendaraan" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Form Kendaraan</h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <select
-                @change="cekopsi()"
-                v-model="opsikendaraan"
-                class="form-control"
-              >
+              <select @change="cekopsi()" v-model="opsikendaraan" class="form-control">
                 <option value="ambil">Daftar Kendaraan</option>
                 <option value="baru">Input Kendaraan</option>
               </select>
@@ -308,107 +191,45 @@
             <div class="form-group" v-if="opsikendaraan === 'ambil'">
               <label>Nomor Kendaraan</label>
               <div class="autocomplete"></div>
-              <div
-                class="input"
-                @click="toggleVisible"
-                v-text="custom ? custom.nopol : ''"
-              ></div>
-              <div class="placeholder" v-if="custom == null" v-text="ket.nama">
-                Pilih Kendaraan
-              </div>
+              <div class="input" @click="toggleVisible" v-text="custom ? custom.nopol : ''"></div>
+              <div class="placeholder" v-if="custom == null" v-text="ket.nama">Pilih Kendaraan</div>
               <div class="popover" v-show="visible">
-                <input
-                  type="text"
-                  @keydown.up="upin"
-                  @keydown.down="down"
-                  @keydown.enter="selectItem"
-                  v-model="query"
-                  placeholder="Masukan nomor kendaraan .."
-                />
+                <input type="text" @keydown.up="upin" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nomor kendaraan .." />
                 <div class="optionbr" ref="optionList">
                   <ul>
-                    <li
-                      v-for="(match, index) in matches"
-                      :key="match.kode"
-                      v-text="match.nopol"
-                      :class="{ selected: selected == index }"
-                      @click="itemClicked(index)"
-                    ></li>
+                    <li v-for="(match, index) in matches" :key="match.kode" v-text="match.nopol" :class="{ selected: selected == index }" @click="itemClicked(index)"></li>
                   </ul>
                 </div>
               </div>
             </div>
             <div class="form-group" v-if="opsikendaraan !== 'ambil'">
               <label>Nomor Kendaraan</label>
-              <input
-                @input="ceknopol()"
-                v-model="ketup.nopol"
-                type="text"
-                class="form-control"
-                placeholder="Contoh : F.2617.HG"
-                :class="{ 'is-valid': nyala, 'is-invalid': !nyala }"
-              />
+              <input @input="ceknopol()" v-model="ketup.nopol" type="text" class="form-control" placeholder="Contoh : F.2617.HG" :class="{ 'is-valid': nyala, 'is-invalid': !nyala }" />
             </div>
             <div class="form-group">
               <label>Merk</label>
-              <input
-                v-model="ketup.nama"
-                type="text"
-                class="form-control"
-                :disabled="opsikendaraan === 'ambil'"
-                placeholder="Contoh: Canter, Dyna 105 "
-              />
+              <input v-model="ketup.nama" type="text" class="form-control" :disabled="opsikendaraan === 'ambil'" placeholder="Contoh: Canter, Dyna 105 " />
             </div>
             <div class="form-group">
               <label>Jenis</label>
-              <select
-                v-model="ketup.id_jenis"
-                class="form-control"
-                :disabled="opsikendaraan === 'ambil'"
-              >
-                <option
-                  :value="jn.id"
-                  v-for="(jn, index) in jeniskendaraan"
-                  :key="index"
-                >
+              <select v-model="ketup.id_jenis" class="form-control" :disabled="opsikendaraan === 'ambil'">
+                <option :value="jn.id" v-for="(jn, index) in jeniskendaraan" :key="index">
                   {{ jn.nama }}
                 </option>
               </select>
             </div>
             <div class="form-group">
               <label>Kubikasi (M3)</label>
-              <input
-                v-model="ketup.kubikasi"
-                type="number"
-                class="form-control"
-                :disabled="opsikendaraan === 'ambil'"
-              />
+              <input v-model="ketup.kubikasi" type="number" class="form-control" :disabled="opsikendaraan === 'ambil'" />
             </div>
             <div class="form-group">
               <label>Tonase (KG)</label>
-              <input
-                v-model="ketup.tonase"
-                type="number"
-                class="form-control"
-                :disabled="opsikendaraan === 'ambil'"
-              />
+              <input v-model="ketup.tonase" type="number" class="form-control" :disabled="opsikendaraan === 'ambil'" />
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button
-              @click="savekendaraan()"
-              type="button"
-              class="btn btn-primary"
-            >
-              Save changes
-            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button @click="savekendaraan()" type="button" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>
@@ -478,6 +299,10 @@ export default {
       nyala: false,
       adakendaraan: {},
       inken: {},
+      filter: {
+        mulaitanggal: this.FirstDate(),
+        sampaitanggal: this.today(),
+      },
     };
   },
   created() {
@@ -486,19 +311,26 @@ export default {
     this.timer();
   },
   computed: {
+    Filterso() {
+      var vm = this,
+        lists = vm.soaktif;
+      return _.filter(lists, function (query) {
+        var tanggal = query.tanggal_kirim >= vm.filter.mulaitanggal && query.tanggal_kirim <= vm.filter.sampaitanggal;
+        return tanggal;
+      });
+    },
     matches() {
       if (this.query == "") {
         return [];
       }
-      return this.kendaraan.filter((item) =>
-        item.nopol.toLowerCase().includes(this.query.toLowerCase())
-      );
+      return this.kendaraan.filter((item) => item.nopol.toLowerCase().includes(this.query.toLowerCase()));
     },
   },
   methods: {
     getSoAktif() {
       axios.get("/api/so/data/aktif").then((res) => {
         this.soaktif = res.data.data;
+        console.log(this.soaktif);
         axios.get("/api/kendaraan").then((res) => {
           this.kendaraan = res.data.data;
           axios.get("/api/jeniskendaraan").then((res) => {
@@ -508,19 +340,32 @@ export default {
         });
       });
     },
+    reset() {
+      this.ambil = {};
+      this.validqty();
+      this.hitung.qty = [];
+      this.checker = [];
+      this.ket.customer = "";
+      this.ket.lokasi = "";
+      this.ket.alamat = "";
+      this.ket.distribusi = "";
+      this.up.nomor_so = "";
+      this.ket.status = "";
+      this.ket.nomor_rso = "";
+      this.up.keterangan = "";
+      this.ket.sisaso = [];
+      this.ket.tersedia = [];
+      this.listso = {};
+      if (this.filter.sampaitanggal < this.filter.mulaitanggal) {
+        this.filter.sampaitanggal = this.filter.mulaitanggal;
+      }
+    },
     now() {
       var d = new Date();
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     validate() {
@@ -533,22 +378,14 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate() + 2;
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     bck_nomor() {
       var d = new Date();
       var month = d.getMonth() + 1;
 
-      var output =
-        "BCK-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
+      var output = "BCK-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
       return output;
     },
     showSo() {
@@ -573,11 +410,8 @@ export default {
         this.listso = res.data.data;
         for (let i = 0; i < this.listso.length; i++) {
           this.checker.push(this.listso[i]);
-          this.ket.sisaso[i] =
-            parseFloat(this.listso[i].qty) - parseFloat(this.listso[i].bck);
-          this.ket.tersedia[i] =
-            parseFloat(this.listso[i].tersedia) -
-            parseFloat(this.listso[i].bck);
+          this.ket.sisaso[i] = parseFloat(this.listso[i].qty) - parseFloat(this.listso[i].bck);
+          this.ket.tersedia[i] = parseFloat(this.listso[i].tersedia) - parseFloat(this.listso[i].bck);
         }
       });
     },
@@ -617,11 +451,7 @@ export default {
               this.aplus = "";
               this.banding = "";
               for (let i = 0; i < this.checker.length; i++) {
-                if (
-                  this.hitung.qty[i] === undefined ||
-                  this.hitung.qty[i] < 1 ||
-                  this.hitung.qty[i] === ""
-                ) {
+                if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 1 || this.hitung.qty[i] === "") {
                   this.hitung.qty[i] = 0;
                 }
                 if (this.hitung.qty[i] < 1) {
@@ -649,64 +479,39 @@ export default {
                         keterangan: this.hitung.keterangan[i],
                         idx: this.checker[i].idx,
                       };
-                      axios
-                        .post("/api/listbck", this.uploadlist)
-                        .then((res) => {
+                      axios.post("/api/listbck", this.uploadlist).then((res) => {
+                        axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.checker[i].kode_barang + "/" + this.checker[i].idx).then((res) => {
+                          this.listso = res.data.data;
+                          this.qtymasuk = parseFloat(this.listso[0].bck) + parseFloat(this.hitung.qty[i]);
+                          this.sisanya = parseFloat(this.listso[0].qty) - (parseFloat(this.listso[0].bck) + parseFloat(this.hitung.qty[i]));
+                          if (this.sisanya < 1) {
+                            this.closepo = "Y";
+                          } else {
+                            this.closepo = "N";
+                          }
                           axios
-                            .get(
-                              "/api/listso/data/" +
-                                this.up.nomor_so +
-                                "/" +
-                                this.checker[i].kode_barang +
-                                "/" +
-                                this.checker[i].idx
-                            )
+                            .put("/api/listso/" + this.listso[0].id, {
+                              bck: this.qtymasuk,
+                              closeso: this.closepo,
+                            })
                             .then((res) => {
-                              this.listso = res.data.data;
-                              this.qtymasuk =
-                                parseFloat(this.listso[0].bck) +
-                                parseFloat(this.hitung.qty[i]);
-                              this.sisanya =
-                                parseFloat(this.listso[0].qty) -
-                                (parseFloat(this.listso[0].bck) +
-                                  parseFloat(this.hitung.qty[i]));
-                              if (this.sisanya < 1) {
-                                this.closepo = "Y";
-                              } else {
-                                this.closepo = "N";
-                              }
-                              axios
-                                .put("/api/listso/" + this.listso[0].id, {
-                                  bck: this.qtymasuk,
-                                  closeso: this.closepo,
-                                })
-                                .then((res) => {
-                                  axios
-                                    .get("/api/listso/" + this.up.nomor_so)
-                                    .then((res) => {
-                                      this.listsoall = res.data.data;
-                                      this.bplus = "";
-                                      this.bban = "";
-                                      for (
-                                        let i = 0;
-                                        i < this.listsoall.length;
-                                        i++
-                                      ) {
-                                        this.bplus += this.listsoall[i].closeso;
-                                        this.bban += "Y";
-                                      }
-                                      if (this.bplus === this.bban) {
-                                        axios.put(
-                                          "/api/so/" + this.up.nomor_so,
-                                          {
-                                            closebck: "Y",
-                                          }
-                                        );
-                                      }
-                                    });
-                                });
+                              axios.get("/api/listso/" + this.up.nomor_so).then((res) => {
+                                this.listsoall = res.data.data;
+                                this.bplus = "";
+                                this.bban = "";
+                                for (let i = 0; i < this.listsoall.length; i++) {
+                                  this.bplus += this.listsoall[i].closeso;
+                                  this.bban += "Y";
+                                }
+                                if (this.bplus === this.bban) {
+                                  axios.put("/api/so/" + this.up.nomor_so, {
+                                    closebck: "Y",
+                                  });
+                                }
+                              });
                             });
                         });
+                      });
                     }
                     this.$nextTick(() => {
                       axios.post("/api/history", {
@@ -728,11 +533,7 @@ export default {
                         })
                         .then((res) => {
                           this.load = false;
-                          swalWithBootstrapButtons.fire(
-                            "Sukses!",
-                            "BCK berhasil di kirim.",
-                            "success"
-                          );
+                          swalWithBootstrapButtons.fire("Sukses!", "BCK berhasil di kirim.", "success");
                           this.$router.push({
                             name: "bck",
                           });
@@ -767,33 +568,22 @@ export default {
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal mengirim BCK :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal mengirim BCK :)", "error");
           }
         });
     },
     validqty(index) {
       this.total = 0;
       for (let i = 0; i < this.checker.length; i++) {
-        if (
-          this.hitung.qty[i] >
-          parseFloat(this.checker[i].qty) - parseFloat(this.checker[i].bck)
-        ) {
-          this.hitung.qty[i] =
-            parseFloat(this.checker[i].qty) - parseFloat(this.checker[i].bck);
+        if (this.hitung.qty[i] > parseFloat(this.checker[i].qty) - parseFloat(this.checker[i].bck)) {
+          this.hitung.qty[i] = parseFloat(this.checker[i].qty) - parseFloat(this.checker[i].bck);
         }
         if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === "") {
           this.hitung.jumlah[i] = 0;
         } else {
           this.hitung.jumlah[i] = this.hitung.qty[i];
         }
-        this.subtotal =
-          (parseFloat(this.checker[i].harga) -
-            parseFloat(this.checker[i].diskon)) *
-          parseFloat(this.hitung.jumlah[i]);
+        this.subtotal = (parseFloat(this.checker[i].harga) - parseFloat(this.checker[i].diskon)) * parseFloat(this.hitung.jumlah[i]);
         this.total += parseFloat(this.subtotal);
       }
     },
@@ -825,20 +615,8 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates =
-        this.year +
-        "-" +
-        (this.month < 10 ? "0" : "") +
-        this.month +
-        "-" +
-        this.day;
-      this.times =
-        this.hours +
-        ":" +
-        this.minute +
-        ":" +
-        (this.seconds < 10 ? "0" : "") +
-        this.seconds;
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
       this.datetimes = this.dates + " " + this.times;
       return this.datetimes;
     },
@@ -927,6 +705,38 @@ export default {
           });
         });
       }
+    },
+    FirstDate() {
+      this.date = new Date();
+      this.month = this.date.getMonth() + 1;
+      this.year = this.date.getFullYear();
+      this.hours = this.date.getHours();
+      this.minute = this.date.getMinutes();
+      this.seconds = this.date.getSeconds();
+      if (this.month > 12) {
+        this.month = 12;
+      }
+      this.day = this.date.getDate();
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + "01";
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
+      this.datetimes = this.dates;
+      return this.datetimes;
+    },
+    today() {
+      this.date = new Date();
+      this.month = this.date.getMonth() + 1;
+      this.year = this.date.getFullYear();
+      this.hours = this.date.getHours();
+      this.minute = this.date.getMinutes();
+      this.seconds = this.date.getSeconds();
+      if (this.month > 12) {
+        this.month = 12;
+      }
+      this.day = this.date.getDate();
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
+      this.datetimes = this.dates;
+      return this.datetimes;
     },
   },
 };
