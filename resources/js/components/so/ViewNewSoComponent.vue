@@ -6,80 +6,37 @@
         <div class="col-4">
           <div class="form-group">
             <label>Nomor SO :</label>
-            <input
-              @input="ceknomorso(vso)"
-              v-model="vso.nomor_so"
-              type="text"
-              class="form-control col-12"
-              :disabled="ket.statusnya !== 'Draft'"
-              maxlength="15"
-              :class="{ 'is-valid': aktif }"
-            />
+            <input @input="ceknomorso(vso)" v-model="vso.nomor_so" type="text" class="form-control col-12" :disabled="ket.statusnya !== 'Draft'" maxlength="15" :class="{ 'is-valid': aktif }" />
           </div>
           <div class="form-group">
             <label>Tanggal :</label>
-            <input
-              v-model="vso.tanggal_so"
-              type="date"
-              @change="validate()"
-              :min="now()"
-              class="form-control col-12"
-              disabled
-            />
+            <input v-model="vso.tanggal_so" type="date" @change="validate()" :min="now()" class="form-control col-12" disabled />
           </div>
           <div class="form-group">
             <label>Tanggal Kirim :</label>
-            <input
-              v-model="vso.tanggal_kirim"
-              type="date"
-              @change="validate()"
-              :min="now()"
-              class="form-control col-12"
-              :disabled="ket.statusnya !== 'Draft'"
-            />
+            <input v-model="vso.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="ket.statusnya !== 'Draft'" />
           </div>
         </div>
         <div class="col-4">
           <div class="form-group">
             <label>Customer</label>
-            <select
-              v-model="ket.customer"
-              name="customer"
-              class="col-12 form-control"
-              disabled
-            >
+            <select v-model="ket.customer" name="customer" class="col-12 form-control" disabled>
               <option :value="ket.customer">{{ ket.customer }}</option>
             </select>
           </div>
           <div class="form-group">
             <label>Nomor RSO</label>
-            <input
-              v-model="vso.nomor_rso"
-              type="text"
-              class="form-control"
-              placeholder="Pilih RSO"
-              disabled
-            />
+            <input v-model="vso.nomor_rso" type="text" class="form-control" placeholder="Pilih RSO" disabled />
           </div>
           <div class="form-group">
             <label>keterangan</label>
-            <textarea
-              v-model="vso.keterangan"
-              name="keterangan"
-              class="form-control col-12"
-              :disabled="ket.statusnya !== 'Draft'"
-            ></textarea>
+            <textarea v-model="vso.keterangan" name="keterangan" class="form-control col-12" :disabled="ket.statusnya !== 'Draft'"></textarea>
           </div>
         </div>
         <div class="col-4">
           <div class="form-group">
             <label>Distribusi :</label>
-            <select
-              class="form-control"
-              v-model="vso.distribusi"
-              @change="aksidistribusi(vso)"
-              :disabled="ket.statusnya !== 'Draft'"
-            >
+            <select class="form-control" v-model="vso.distribusi" @change="aksidistribusi(vso)" :disabled="ket.statusnya !== 'Draft'">
               <option value="default">- Masukan pilihan anda -</option>
               <option value="kirim">Di Kirim</option>
               <option value="ambil">Ambil Sendiri</option>
@@ -87,22 +44,11 @@
           </div>
           <div class="form-group">
             <label>Lokasi</label>
-            <input
-              @click="clikdistribusi()"
-              v-model="vso.lokasi"
-              name="alamat"
-              class="form-control col-12"
-              disabled
-            />
+            <input @click="clikdistribusi()" v-model="vso.lokasi" name="alamat" class="form-control col-12" disabled />
           </div>
           <div class="form-group">
             <label>Alamat</label>
-            <textarea
-              v-model="vso.alamat"
-              name="alamat"
-              class="form-control col-12"
-              disabled
-            ></textarea>
+            <textarea v-model="vso.alamat" name="alamat" class="form-control col-12" disabled></textarea>
           </div>
         </div>
       </div>
@@ -114,11 +60,7 @@
       </div>
       <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
-          <table
-            id="rsthead"
-            class="table mt-2 table-striped table-bordered"
-            style="width: 100%"
-          >
+          <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
             <thead>
               <tr>
                 <th>No</th>
@@ -130,21 +72,9 @@
                 <th>Diskon</th>
                 <th style="width: 5%">Status</th>
                 <th v-if="ket.status === 'Tidak Tersedia'">Estimasi</th>
-                <th
-                  v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'"
-                >
-                  Sudah Kirim
-                </th>
-                <th
-                  v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'"
-                >
-                  Sisa SO
-                </th>
-                <th
-                  v-if="ket.statusnya === 'Draft' || ket.statusnya === 'Tolak'"
-                >
-                  Aksi
-                </th>
+                <th v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'">Sudah Kirim</th>
+                <th v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'">Sisa SO</th>
+                <th v-if="ket.statusnya === 'Draft' || ket.statusnya === 'Tolak'">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -153,44 +83,23 @@
                 <td>{{ ch.kode_barang }}</td>
                 <td>{{ ch.nama_barang }}</td>
                 <td style="text-align: center">
-                  <input
-                    style="text-align: center"
-                    @input="validasiqty"
-                    v-model="hitung.qty[index]"
-                    type="number"
-                    class="form-control"
-                    :disabled="ket.statusnya !== 'Draft'"
-                  />
+                  <input style="text-align: center" @input="validasiqty" v-model="hitung.qty[index]" type="number" class="form-control" :disabled="ket.statusnya !== 'Draft'" />
                 </td>
                 <td style="text-align: center">{{ ch.satuan }}</td>
                 <td style="text-align: center">{{ ch.harga | currency }}</td>
                 <td style="text-align: center">{{ ch.diskon | currency }}</td>
                 <td style="text-align: center">{{ ket.status }}</td>
-                <td
-                  v-if="ket.status === 'Tidak Tersedia'"
-                  style="text-align: center"
-                >
+                <td v-if="ket.status === 'Tidak Tersedia'" style="text-align: center">
                   {{ ch.tgl_datang }}
                 </td>
-                <td
-                  v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'"
-                  style="text-align: center"
-                >
+                <td v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'" style="text-align: center">
                   {{ ch.bbk }}
                 </td>
-                <td
-                  v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'"
-                  style="text-align: center"
-                >
+                <td v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'" style="text-align: center">
                   {{ ch.qty - ch.bbk }}
                 </td>
-                <td
-                  v-if="ket.statusnya === 'Draft' || ket.statusnya === 'Tolak'"
-                  style="text-align: center"
-                >
-                  <button @click="hapuslistSo(index)" class="btn btn-danger">
-                    Hapus
-                  </button>
+                <td v-if="ket.statusnya === 'Draft' || ket.statusnya === 'Tolak'" style="text-align: center">
+                  <button @click="hapuslistSo(index)" class="btn btn-danger">Hapus</button>
                 </td>
               </tr>
             </tbody>
@@ -201,104 +110,31 @@
         <!-- <button v-if="ket.statusnya==='Di Selesaikan' || ket.statusnya==='Draft' || ket.statusnya==='Tolak' || ket.statusnya==='Selesai'" @click="kembali()" class="btn-primary btn ml-4 mt-2" >
                     Kembali
                 </button> -->
-        <button
-          v-if="ket.statusnya === 'Draft'"
-          @click="submitSo(vso)"
-          class="btn-success btn ml-4 mt-2"
-        >
-          Kirim SO
-        </button>
-        <button
-          v-if="
-            (ket.statusnya === 'Dic' ||
-              ket.statusnya === 'Kordinator' ||
-              ket.statusnya === 'Sent' ||
-              ket.statusnya === 'Acc' ||
-              ket.statusnya === 'Tolak') &&
-            (ambiluser.sales === 1 || ambiluser.superadmin === 1)
-          "
-          @click="reqedit(vso)"
-          class="btn-orange btn ml-4 mt-2"
-        >
-          Request Edit SO
-        </button>
-        <button
-          v-if="ambiluser.sales === 1"
-          @click="print()"
-          class="btn-none btn ml-1 mt-2"
-        >
-          Print
-        </button>
-        <button
-          v-if="ket.statusnya === 'Tolak'"
-          @click="submitSo(vso)"
-          class="btn-success btn ml-2 mt-2"
-        >
-          Kirim Ulang SO
-        </button>
-        <button
-          v-if="ket.statusnya === 'Sent' || ket.statusnya === 'Draft'"
-          @click="reqbatal(vso)"
-          class="btn-none btn ml-1 mt-2"
-        >
-          Batalkan SO
-        </button>
-        <button
-          v-if="ambiluser.distribusi === 1 && ket.statusnya === 'Dic'"
-          @click="formtolak(vso)"
-          class="btn-none btn ml-4 mt-2"
-        >
-          Tolak SO
-        </button>
-        <button
-          v-if="ambiluser.distribusi === 1 && ket.statusnya === 'Dic'"
-          @click="AccDic(vso)"
-          class="btn-success btn ml-2 mt-2"
-        >
-          Terima SO
-        </button>
+        <button v-if="ket.statusnya === 'Draft'" @click="submitSo(vso)" class="btn-success btn ml-4 mt-2">Kirim SO</button>
+        <button v-if="(ket.statusnya === 'Dic' || ket.statusnya === 'Kordinator' || ket.statusnya === 'Sent' || ket.statusnya === 'Acc' || ket.statusnya === 'Tolak') && (ambiluser.sales === 1 || ambiluser.superadmin === 1)" @click="reqedit(vso)" class="btn-orange btn ml-4 mt-2">Request Edit SO</button>
+        <button v-if="ambiluser.sales === 1 && (ket.statusnya === 'Acc' || ket.statusnya === 'Selesai' || ket.statusnya === 'Di Selesaikan')" @click="print()" class="btn-none btn ml-1 mt-2">Print</button>
+        <button v-if="ket.statusnya === 'Tolak'" @click="submitSo(vso)" class="btn-success btn ml-2 mt-2">Kirim Ulang SO</button>
+        <button v-if="ket.statusnya === 'Sent' || ket.statusnya === 'Draft'" @click="reqbatal(vso)" class="btn-none btn ml-1 mt-2">Batalkan SO</button>
+        <button v-if="ambiluser.distribusi === 1 && ket.statusnya === 'Dic'" @click="formtolak(vso)" class="btn-none btn ml-4 mt-2">Tolak SO</button>
+        <button v-if="ambiluser.distribusi === 1 && ket.statusnya === 'Dic'" @click="AccDic(vso)" class="btn-success btn ml-2 mt-2">Terima SO</button>
       </div>
-      <div
-        v-if="vso.status == 'Tolak'"
-        v-for="(vso, index) in so"
-        :key="index"
-        id="alastolak"
-        class="mt-3"
-      >
+      <div v-if="vso.status == 'Tolak'" v-for="(vso, index) in so" :key="index" id="alastolak" class="mt-3">
         <div v-for="(lso, index) in so" :key="index">
           <b>{{ lso.alastolak }}</b>
         </div>
       </div>
-      <div
-        class="modal fade"
-        id="modal-pr"
-        tabindex="-1"
-        data-backdrop="static"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
+      <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div id="modal-width" class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">
-                Rincian Permintaan
-              </h5>
-              <button
-                type="button"
-                class="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
+              <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
               <div id="scrollList">
-                <table
-                  id="thead"
-                  class="table table-striped table-bordered"
-                  style="width: 100%"
-                >
+                <table id="thead" class="table table-striped table-bordered" style="width: 100%">
                   <thead>
                     <tr>
                       <th style="text-align: center">No</th>
@@ -317,13 +153,7 @@
                       <td style="text-align: center"></td>
                       <td style="text-align: center"></td>
                       <td>
-                        <button
-                          type="button"
-                          class="btn btn-danger"
-                          data-dismiss="modal"
-                        >
-                          Delete
-                        </button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
                       </td>
                     </tr>
                   </tbody>
@@ -331,13 +161,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Close
-              </button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
@@ -349,26 +173,12 @@
           </div>
         </div>
       </div>
-      <div
-        class="modal fade"
-        id="modal-lokasi"
-        tabindex="-1"
-        data-backdrop="static"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
+      <div class="modal fade" id="modal-lokasi" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div id="modal-width" class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">
-                Form Tujuan Pengiriman
-              </h5>
-              <button
-                type="button"
-                class="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
+              <h5 class="modal-title" id="exampleModalLabel">Form Tujuan Pengiriman</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -384,32 +194,13 @@
               <div class="form-group" v-if="lokasi === 'ekspedisi'">
                 <label>Lokasi</label>
                 <div class="autocomplete"></div>
-                <div
-                  class="input"
-                  @click="toggleVisible"
-                  v-text="eks ? eks.nama : ''"
-                ></div>
-                <div class="placeholder" v-if="eks == null">
-                  Pilih Ekspedisi
-                </div>
+                <div class="input" @click="toggleVisible" v-text="eks ? eks.nama : ''"></div>
+                <div class="placeholder" v-if="eks == null">Pilih Ekspedisi</div>
                 <div class="popover" v-show="visible">
-                  <input
-                    type="text"
-                    @keydown.up="up"
-                    @keydown.down="down"
-                    @keydown.enter="selectItem"
-                    v-model="query"
-                    placeholder="Masukan nama ekspedisi.."
-                  />
+                  <input type="text" @keydown.up="up" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nama ekspedisi.." />
                   <div class="optionbr" ref="optionList">
                     <ul>
-                      <li
-                        v-for="(match, index) in matches"
-                        :key="match.id"
-                        v-text="match.nama"
-                        :class="{ selected: selected == index }"
-                        @click="itemClicked(index)"
-                      ></li>
+                      <li v-for="(match, index) in matches" :key="match.id" v-text="match.nama" :class="{ selected: selected == index }" @click="itemClicked(index)"></li>
                     </ul>
                   </div>
                 </div>
@@ -417,19 +208,11 @@
 
               <div v-if="lokasi === 'ekspedisi'" class="form-group mt-3">
                 <label>Alamat</label>
-                <textarea
-                  v-model="eksal"
-                  class="form-control"
-                  disabled
-                ></textarea>
+                <textarea v-model="eksal" class="form-control" disabled></textarea>
               </div>
               <div v-if="lokasi === 'default'" class="form-group">
                 <label>Alamat</label>
-                <textarea
-                  v-model="defaultal"
-                  class="form-control"
-                  disabled
-                ></textarea>
+                <textarea v-model="defaultal" class="form-control" disabled></textarea>
               </div>
               <div v-if="lokasi === 'lainnya'" class="form-group">
                 <label>Tempat/Gedung</label>
@@ -441,77 +224,36 @@
               </div>
             </div>
             <div class="modal-footer" v-for="vso in so" :key="vso.nomor_so">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                @click="selectLokasi(vso)"
-                class="btn btn-primary"
-                data-dismiss="modal"
-              >
-                Save Change
-              </button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" @click="selectLokasi(vso)" class="btn btn-primary" data-dismiss="modal">Save Change</button>
             </div>
           </div>
         </div>
       </div>
-      <div
-        class="modal fade"
-        id="modal-tolak"
-        tabindex="-1"
-        data-backdrop="static"
-        role="dialog"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
+      <div class="modal fade" id="modal-tolak" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div id="modal-width" class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">
-                Form Penolakan SO
-              </h5>
-              <button
-                type="button"
-                class="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
+              <h5 class="modal-title" id="exampleModalLabel">Form Penolakan SO</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
               <div class="form-group">
                 <label>Alasan Penolakan</label>
-                <textarea
-                  v-model="up.alastolak"
-                  class="form-control"
-                ></textarea>
+                <textarea v-model="up.alastolak" class="form-control"></textarea>
               </div>
             </div>
             <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Close
-              </button>
-              <button type="button" @click="tolakSo()" class="btn btn-primary">
-                Konfirmasi Tolak
-              </button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" @click="tolakSo()" class="btn btn-primary">Konfirmasi Tolak</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="(akses === false) & (load === false)" class="row akses">
-      Anda tidak mempunyai akses untuk halaman ini!
-    </div>
+    <div v-if="(akses === false) & (load === false)" class="row akses">Anda tidak mempunyai akses untuk halaman ini!</div>
   </div>
 </template>
 
@@ -580,9 +322,7 @@ export default {
       if (this.query == "") {
         return [];
       }
-      return this.dataekspedisi.filter((item) =>
-        item.nama.toLowerCase().includes(this.query.toLowerCase())
-      );
+      return this.dataekspedisi.filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()));
     },
   },
   methods: {
@@ -610,10 +350,7 @@ export default {
               this.sub = this.hitung.qty[i];
             }
 
-            this.invoice +=
-              parseFloat(this.sub) *
-              (parseFloat(this.listnewso[i].harga) -
-                parseFloat(this.listnewso[i].diskon));
+            this.invoice += parseFloat(this.sub) * (parseFloat(this.listnewso[i].harga) - parseFloat(this.listnewso[i].diskon));
           }
           this.load = false;
         });
@@ -638,14 +375,7 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     validate() {
@@ -658,22 +388,14 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate() + 2;
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     so_nomor() {
       var d = new Date();
       var month = d.getMonth() + 1;
 
-      var output =
-        "SO-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
+      var output = "SO-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
       return output;
     },
     submitSo(vso) {
@@ -702,11 +424,7 @@ export default {
               this.banding = "";
               this.aksi = "";
               for (let c = 0; c < this.listnewso.length; c++) {
-                if (
-                  this.hitung.qty[c] === undefined ||
-                  this.hitung.qty[c] === "" ||
-                  this.hitung.qty[c] < 1
-                ) {
+                if (this.hitung.qty[c] === undefined || this.hitung.qty[c] === "" || this.hitung.qty[c] < 1) {
                   this.diisi = "N";
                 } else {
                   this.diisi = "Y";
@@ -728,156 +446,128 @@ export default {
                     id_ekspedisi: vso.id_ekspedisi,
                     id_user: this.ambiluser.id,
                   };
-                  axios
-                    .put("/api/so/" + this.listnewso[0].nomor_so, this.uploadso)
-                    .then((res) => {
-                      axios
-                        .get("/api/listso/" + this.$route.params.id)
-                        .then((res) => {
-                          this.listfull = res.data.data;
-                          for (let n = 0; n < this.listfull.length; n++) {
-                            axios.delete("/api/listso/" + this.listfull[n].id);
-                          }
+                  axios.put("/api/so/" + this.listnewso[0].nomor_so, this.uploadso).then((res) => {
+                    axios.get("/api/listso/" + this.$route.params.id).then((res) => {
+                      this.listfull = res.data.data;
+                      for (let n = 0; n < this.listfull.length; n++) {
+                        axios.delete("/api/listso/" + this.listfull[n].id);
+                      }
+                      this.ada = 0;
+                      for (let i = 0; i < this.listnewso.length; i++) {
+                        if (vso.statusso === "tersedia") {
+                          this.ada = this.hitung.qty[i];
+                        } else {
                           this.ada = 0;
-                          for (let i = 0; i < this.listnewso.length; i++) {
-                            if (vso.statusso === "tersedia") {
-                              this.ada = this.hitung.qty[i];
-                            } else {
-                              this.ada = 0;
-                            }
-                            this.uplist = {
-                              tanggal_datang: this.listnewso[i].tgl_datang,
-                              nomor_so: vso.nomor_so,
-                              kode_barang: this.listnewso[i].kode_barang,
-                              harga: this.listnewso[i].harga,
-                              id_custprice: this.listnewso[i].id_custprice,
-                              qty: this.hitung.qty[i],
-                              qtyrso: 0,
-                              tersedia: this.ada,
-                              statusso: this.ket.status,
-                              diskon: this.listnewso[i].diskon,
-                              idx: this.listnewso[i].idx,
-                            };
-                            axios.post("/api/listso", this.uplist);
-                          }
-                        });
-                      axios.post("/api/history", {
-                        nomor_dok: vso.nomor_so,
-                        id_user: this.ambiluser.id,
-                        notif: "Anda mendapatkan permintaan SO baru",
-                        keterangan: "So di kirim ke Sales Kordinator",
-                        jenis: "So",
-                        tanggal: this.DateTime(),
-                      });
-                      this.$router.push({
-                        name: "so",
-                      });
-                      swalWithBootstrapButtons.fire(
-                        "Terkirim!",
-                        "So berhasil di kirim.",
-                        "success"
-                      );
-                    });
-                } else {
-                  axios
-                    .delete("/api/so/" + this.$route.params.id)
-                    .then((res) => {
-                      this.uploadso = {
-                        nomor_so: vso.nomor_so + this.ambiluser.kode_groupso,
-                        tanggal_kirim: vso.tanggal_kirim,
-                        keterangan: vso.keterangan,
-                        distribusi: vso.distribusi,
-                        alamat: vso.alamat,
-                        lokasi: vso.lokasi,
-                        status: "Kordinator",
-                        id_ekspedisi: vso.id_ekspedisi,
-                        statusso: vso.statusso,
-                        tanggal_so: vso.tanggal_so,
-                        nomor_rso: vso.nomor_rso,
-                        id_user: this.ambiluser.id,
-                      };
-                      axios.post("/api/so", this.uploadso).then((res) => {
-                        this.ada = 0;
-                        for (let i = 0; i < this.listnewso.length; i++) {
-                          if (vso.statusso === "tersedia") {
-                            this.ada = this.hitung.qty[i];
-                          } else {
-                            this.ada = 0;
-                          }
-                          this.uplist = {
-                            nomor_so:
-                              vso.nomor_so + this.ambiluser.kode_groupso,
-                            kode_barang: this.listnewso[i].kode_barang,
-                            harga: this.listnewso[i].harga,
-                            id_custprice: this.listnewso[i].id_custprice,
-                            qty: this.hitung.qty[i],
-                            qtyrso: 0,
-                            tersedia: this.ada,
-                            diskon: this.listnewso[i].diskon,
-                            idx: this.listnewso[i].idx,
-                          };
-                          axios.post("/api/listso", this.uplist);
                         }
-                      });
-                      this.history = {};
-                      axios
-                        .get("/api/history/" + this.$route.params.id)
-                        .then((res) => {
-                          this.history = res.data.data;
-                          for (let j = 0; j < this.history.length; j++) {
-                            axios.put("/api/history/" + this.history[j].id, {
-                              nomor_dok:
-                                vso.nomor_so + this.ambiluser.kode_groupso,
-                            });
-                          }
-                        });
-                      axios.post("/api/history", {
-                        nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
-                        nomor_ref: vso.nomor_rso,
-                        id_user: this.ambiluser.id,
-                        notif: "Anda mendapatkan permintaan SO baru",
-                        keterangan:
-                          "Merubah nomor SO " +
-                          this.$route.params.id +
-                          " dengan " +
-                          vso.nomor_so.slice(0, 15) +
-                          this.ambiluser.kode_groupso,
-                        jenis: "So",
-                        tanggal: this.DateTime(),
-                      });
-                      axios.post("/api/history", {
-                        nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
-                        nomor_ref: vso.nomor_rso,
-                        id_user: this.ambiluser.id,
-                        notif: "Anda mendapatkan permintaan SO baru",
-                        keterangan: "Mengirim SO ke Sales Supervisor",
-                        jenis: "So",
-                        tanggal: this.DateTime(),
-                      });
-                      axios.post("/api/history", {
-                        nomor_dok: vso.nomor_rso,
-                        nomor_ref: vso.nomor_so + this.ambiluser.kode_groupso,
-                        id_user: this.ambiluser.id,
-                        notif: "Anda mendapatkan permintaan SO baru",
-                        keterangan:
-                          "Merubah nomor SO " +
-                          this.$route.params.id +
-                          " dengan " +
-                          vso.nomor_so.slice(0, 15) +
-                          this.ambiluser.kode_groupso,
-                        jenis: "RSO",
-                        tanggal: this.DateTime(),
-                        aktif: "N",
-                      });
-                      swalWithBootstrapButtons.fire(
-                        "Terkirim!",
-                        "So berhasil di kirim.",
-                        "success"
-                      );
-                      this.$router.push({
-                        name: "so",
-                      });
+                        this.uplist = {
+                          tanggal_datang: this.listnewso[i].tgl_datang,
+                          nomor_so: vso.nomor_so,
+                          kode_barang: this.listnewso[i].kode_barang,
+                          harga: this.listnewso[i].harga,
+                          id_custprice: this.listnewso[i].id_custprice,
+                          qty: this.hitung.qty[i],
+                          qtyrso: 0,
+                          tersedia: this.ada,
+                          statusso: this.ket.status,
+                          diskon: this.listnewso[i].diskon,
+                          idx: this.listnewso[i].idx,
+                        };
+                        axios.post("/api/listso", this.uplist);
+                      }
                     });
+                    axios.post("/api/history", {
+                      nomor_dok: vso.nomor_so,
+                      id_user: this.ambiluser.id,
+                      notif: "Anda mendapatkan permintaan SO baru",
+                      keterangan: "So di kirim ke Sales Kordinator",
+                      jenis: "So",
+                      tanggal: this.DateTime(),
+                    });
+                    this.$router.push({
+                      name: "so",
+                    });
+                    swalWithBootstrapButtons.fire("Terkirim!", "So berhasil di kirim.", "success");
+                  });
+                } else {
+                  axios.delete("/api/so/" + this.$route.params.id).then((res) => {
+                    this.uploadso = {
+                      nomor_so: vso.nomor_so + this.ambiluser.kode_groupso,
+                      tanggal_kirim: vso.tanggal_kirim,
+                      keterangan: vso.keterangan,
+                      distribusi: vso.distribusi,
+                      alamat: vso.alamat,
+                      lokasi: vso.lokasi,
+                      status: "Kordinator",
+                      id_ekspedisi: vso.id_ekspedisi,
+                      statusso: vso.statusso,
+                      tanggal_so: vso.tanggal_so,
+                      nomor_rso: vso.nomor_rso,
+                      id_user: this.ambiluser.id,
+                    };
+                    axios.post("/api/so", this.uploadso).then((res) => {
+                      this.ada = 0;
+                      for (let i = 0; i < this.listnewso.length; i++) {
+                        if (vso.statusso === "tersedia") {
+                          this.ada = this.hitung.qty[i];
+                        } else {
+                          this.ada = 0;
+                        }
+                        this.uplist = {
+                          nomor_so: vso.nomor_so + this.ambiluser.kode_groupso,
+                          kode_barang: this.listnewso[i].kode_barang,
+                          harga: this.listnewso[i].harga,
+                          id_custprice: this.listnewso[i].id_custprice,
+                          qty: this.hitung.qty[i],
+                          qtyrso: 0,
+                          tersedia: this.ada,
+                          diskon: this.listnewso[i].diskon,
+                          idx: this.listnewso[i].idx,
+                        };
+                        axios.post("/api/listso", this.uplist);
+                      }
+                    });
+                    this.history = {};
+                    axios.get("/api/history/" + this.$route.params.id).then((res) => {
+                      this.history = res.data.data;
+                      for (let j = 0; j < this.history.length; j++) {
+                        axios.put("/api/history/" + this.history[j].id, {
+                          nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
+                        });
+                      }
+                    });
+                    axios.post("/api/history", {
+                      nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
+                      nomor_ref: vso.nomor_rso,
+                      id_user: this.ambiluser.id,
+                      notif: "Anda mendapatkan permintaan SO baru",
+                      keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso.nomor_so.slice(0, 15) + this.ambiluser.kode_groupso,
+                      jenis: "So",
+                      tanggal: this.DateTime(),
+                    });
+                    axios.post("/api/history", {
+                      nomor_dok: vso.nomor_so + this.ambiluser.kode_groupso,
+                      nomor_ref: vso.nomor_rso,
+                      id_user: this.ambiluser.id,
+                      notif: "Anda mendapatkan permintaan SO baru",
+                      keterangan: "Mengirim SO ke Sales Supervisor",
+                      jenis: "So",
+                      tanggal: this.DateTime(),
+                    });
+                    axios.post("/api/history", {
+                      nomor_dok: vso.nomor_rso,
+                      nomor_ref: vso.nomor_so + this.ambiluser.kode_groupso,
+                      id_user: this.ambiluser.id,
+                      notif: "Anda mendapatkan permintaan SO baru",
+                      keterangan: "Merubah nomor SO " + this.$route.params.id + " dengan " + vso.nomor_so.slice(0, 15) + this.ambiluser.kode_groupso,
+                      jenis: "RSO",
+                      tanggal: this.DateTime(),
+                      aktif: "N",
+                    });
+                    swalWithBootstrapButtons.fire("Terkirim!", "So berhasil di kirim.", "success");
+                    this.$router.push({
+                      name: "so",
+                    });
+                  });
                 }
               } else {
                 Swal.fire({
@@ -897,11 +587,7 @@ export default {
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal mengirim SO :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal mengirim SO :)", "error");
           }
         });
     },
@@ -935,10 +621,7 @@ export default {
               axios.get("/api/listso/" + this.$route.params.id).then((res) => {
                 this.listfull = res.data.data;
                 for (let i = 0; i < this.listfull.length; i++) {
-                  if (
-                    this.listfull[i].bbk === null ||
-                    this.listfull[i].bbk === ""
-                  ) {
+                  if (this.listfull[i].bbk === null || this.listfull[i].bbk === "") {
                     this.listfull[i].bbk = 0;
                   }
                   this.bbk += this.listfull[i].bbk;
@@ -953,10 +636,7 @@ export default {
                       axios.post("/api/history", {
                         nomor_dok: this.$route.params.id,
                         id_user: this.ambiluser.id,
-                        notif:
-                          "Rso nomor : " +
-                          this.$route.params.id +
-                          "di tarik sales",
+                        notif: "Rso nomor : " + this.$route.params.id + "di tarik sales",
                         keterangan: "Sales menarik kembali SO (Edit SO)",
                         jenis: "So",
                         tanggal: this.DateTime(),
@@ -974,8 +654,7 @@ export default {
                   Swal.fire({
                     icon: "error",
                     title: "Oops...",
-                    text:
-                      "Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim",
+                    text: "Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim",
                   });
                 }
               });
@@ -990,11 +669,7 @@ export default {
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal melakukan permintaan :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal melakukan permintaan :)", "error");
           }
         });
     },
@@ -1023,54 +698,43 @@ export default {
               axios.get("/api/listso/" + this.$route.params.id).then((res) => {
                 this.listfull = res.data.data;
                 for (let i = 0; i < this.listfull.length; i++) {
-                  if (
-                    this.listfull[i].bbk === null ||
-                    this.listfull[i].bbk === ""
-                  ) {
+                  if (this.listfull[i].bbk === null || this.listfull[i].bbk === "") {
                     this.listfull[i].bbk = 0;
                   }
                   this.bbk += this.listfull[i].bbk;
                 }
                 if (this.bbk < 1) {
-                  axios
-                    .delete("/api/so/" + this.$route.params.id)
-                    .then((res) => {
-                      axios
-                        .get(
-                          "/api/history/data/" + this.$route.params.id + "/So"
-                        )
-                        .then((res) => {
-                          this.history = res.data.data;
-                          for (let i = 0; i < this.history.length; i++) {
-                            axios.delete("/api/history/" + this.history[i].id);
-                          }
-                        });
-                      axios.post("/api/history", {
-                        nomor_dok: vso.nomor_rso,
-                        nomor_ref: this.$route.params.id,
-                        id_user: this.ambiluser.id,
-                        notif: "So di hapus",
-                        keterangan:
-                          "Membatalkan SO nomor : " + this.$route.params.id,
-                        jenis: "RSO",
-                        tanggal: this.DateTime(),
-                        aktif: "N",
-                      });
-                      Swal.fire({
-                        icon: "success",
-                        title: "Sukses...",
-                        text: "SO berhasil dihapus dari database",
-                      });
-                      this.$router.push({
-                        name: "so",
-                      });
+                  axios.delete("/api/so/" + this.$route.params.id).then((res) => {
+                    axios.get("/api/history/data/" + this.$route.params.id + "/So").then((res) => {
+                      this.history = res.data.data;
+                      for (let i = 0; i < this.history.length; i++) {
+                        axios.delete("/api/history/" + this.history[i].id);
+                      }
                     });
+                    axios.post("/api/history", {
+                      nomor_dok: vso.nomor_rso,
+                      nomor_ref: this.$route.params.id,
+                      id_user: this.ambiluser.id,
+                      notif: "So di hapus",
+                      keterangan: "Membatalkan SO nomor : " + this.$route.params.id,
+                      jenis: "RSO",
+                      tanggal: this.DateTime(),
+                      aktif: "N",
+                    });
+                    Swal.fire({
+                      icon: "success",
+                      title: "Sukses...",
+                      text: "SO berhasil dihapus dari database",
+                    });
+                    this.$router.push({
+                      name: "so",
+                    });
+                  });
                 } else {
                   Swal.fire({
                     icon: "error",
                     title: "Oops...",
-                    text:
-                      "Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim",
+                    text: "Tidak dapat melakukan permintaan karena sebagian Item di SO ini sudah terkirim",
                   });
                 }
               });
@@ -1085,11 +749,7 @@ export default {
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal melakukan permintaan :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal melakukan permintaan :)", "error");
           }
         });
     },
@@ -1106,18 +766,14 @@ export default {
           this.sub = this.hitung.qty[i];
         }
 
-        this.invoice +=
-          parseFloat(this.sub) *
-          (parseFloat(this.listnewso[i].harga) -
-            parseFloat(this.listnewso[i].diskon));
+        this.invoice += parseFloat(this.sub) * (parseFloat(this.listnewso[i].harga) - parseFloat(this.listnewso[i].diskon));
       }
     },
     hapuslistSo(index) {
       if (this.listnewso.length < 2) {
         Swal.fire({
           title: "Apakah anda yakin?",
-          text:
-            "tidak ada item lain jika anda menghapus item ini dan SO akan otomatis dihapus!",
+          text: "tidak ada item lain jika anda menghapus item ini dan SO akan otomatis dihapus!",
           icon: "warning",
           showCancelButton: true,
           confirmButtonColor: "#3085d6 ml-2",
@@ -1173,8 +829,7 @@ export default {
         $("#modal-lokasi").modal("show");
       } else if (vso.distribusi === "ambil") {
         vso.lokasi = "PT. Ekatunggal Tunas Mandiri";
-        vso.alamat =
-          "Jl. Pahlawan No.29A, RT.003/005 Citeureup, Kab. Bogor, Jawa Barat";
+        vso.alamat = "Jl. Pahlawan No.29A, RT.003/005 Citeureup, Kab. Bogor, Jawa Barat";
       } else if (vso.distribusi === "default") {
         vso.alamat = "";
         vso.lokasi = "";
@@ -1275,21 +930,13 @@ export default {
                 this.$router.push({
                   name: "distribusiso",
                 });
-                swalWithBootstrapButtons.fire(
-                  "Sukses!",
-                  "SO berhasil di terima.",
-                  "success"
-                );
+                swalWithBootstrapButtons.fire("Sukses!", "SO berhasil di terima.", "success");
               });
           } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal menerima SO :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal menerima SO :)", "error");
           }
         });
     },
@@ -1323,16 +970,14 @@ export default {
                 alastolak: this.up.alastolak,
               })
               .then((res) => {
-                axios
-                  .get("/api/listso/" + this.$route.params.id)
-                  .then((res) => {
-                    this.listsoup = res.data.data;
-                    for (let y = 0; y < this.listsoup.length; y++) {
-                      axios.put("/api/listso/" + this.listsoup[y].id, {
-                        openso: "N",
-                      });
-                    }
-                  });
+                axios.get("/api/listso/" + this.$route.params.id).then((res) => {
+                  this.listsoup = res.data.data;
+                  for (let y = 0; y < this.listsoup.length; y++) {
+                    axios.put("/api/listso/" + this.listsoup[y].id, {
+                      openso: "N",
+                    });
+                  }
+                });
                 axios.post("/api/history", {
                   nomor_dok: this.nomorso,
                   id_user: this.ambiluser.id,
@@ -1341,11 +986,7 @@ export default {
                   jenis: "So",
                   tanggal: this.DateTime(),
                 });
-                swalWithBootstrapButtons.fire(
-                  "Sukses!",
-                  "So berhasil di tolak.",
-                  "success"
-                );
+                swalWithBootstrapButtons.fire("Sukses!", "So berhasil di tolak.", "success");
                 $("#modal-tolak").modal("hide");
                 this.$router.push({
                   name: "distribusiso",
@@ -1355,11 +996,7 @@ export default {
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal melakukan penolakan :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal melakukan penolakan :)", "error");
           }
         });
     },
@@ -1374,34 +1011,20 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates =
-        this.year +
-        "-" +
-        (this.month < 10 ? "0" : "") +
-        this.month +
-        "-" +
-        this.day;
-      this.times =
-        this.hours +
-        ":" +
-        this.minute +
-        ":" +
-        (this.seconds < 10 ? "0" : "") +
-        this.seconds;
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
       this.datetimes = this.dates + " " + this.times;
       return this.datetimes;
     },
     ceknomorso(vso) {
-      axios
-        .get("/api/so/" + vso.nomor_so + this.ambiluser.kode_groupso)
-        .then((res) => {
-          this.adaso = res.data.data;
-          if (vso.nomor_so.length === 15 && this.adaso.length === 0) {
-            this.aktif = true;
-          } else {
-            this.aktif = false;
-          }
-        });
+      axios.get("/api/so/" + vso.nomor_so + this.ambiluser.kode_groupso).then((res) => {
+        this.adaso = res.data.data;
+        if (vso.nomor_so.length === 15 && this.adaso.length === 0) {
+          this.aktif = true;
+        } else {
+          this.aktif = false;
+        }
+      });
     },
     print() {
       var x = window.open("/data/so/print/" + this.$route.params.id, "_blank");

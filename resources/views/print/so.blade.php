@@ -43,12 +43,11 @@
             <tr>
                 <td style="width:25%;"><b>Rencana Kirim</b> : {{$s->tanggal_kirim}}</td>
                 <td style="width:32%;margin-left: 5%;"><b>Distibusi</b> : {{$s->distribusi}}</td>
-                <td style="width:32%;margin-left: 5%;"><b>Keterangan</b> : {{$s->keterangan}}</td>
             </tr>
         </tbody>
     </table>
     @endforeach
-    <div class="row" style="height:260px">  
+    <div class="row" style="height:240px">  
         <table cellspacing="0" class="table" style="font-size: 10pt; width:100% ;margin-top:20px;border-bottom:solid 1px #000">
             <thead style="border:solid 1px #000;">
                 <tr>
@@ -100,6 +99,12 @@
             </thead>
         </table>
     </div> 
+    <div class="row" style="font-size: 10pt;height:20px;">
+    <b>Catatan :</b>
+    @foreach($so as $s)
+    {{$s->keterangan}}
+    @endforeach
+    </div>
     <div class="row">
         <table  cellspacing="0" class="ttd" style="width: 80%;margin-top: 10px;text-align: center;font-size:9pt;">
             <thead>
