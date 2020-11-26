@@ -98,7 +98,7 @@ class FormpriceController extends Controller
 
     public function print($nomor){
         $getform=Formprice::where('nomor_price',$nomor)->get();    
-        $getcustprice=Custprice::where('nomor_price',$nomor)->get();
+        $getcustprice=Custprice::where('nomor_price',$nomor)->where('status','Aktif')->get();
         // $count=0;
         // $harga=array();
         // foreach($getcustprice as $a){
@@ -114,8 +114,8 @@ class FormpriceController extends Controller
         // return $getform
    
 
-        // $pdf = view('print.formprice',['form'=>$getform,'list'=>$getcustprice,'hargas'=>$ambilharga]);
-        $pdf = PDF::loadview('print.formprice',['form'=>$getform,'list'=>$getcustprice])->setPaper([0, 0, 684, 396], 'potrait');
+        // $pdf = view('print.formprice',['form'=>$getform,'list'=>$getcustprice]);
+        $pdf = PDF::loadview('print.formprice',['form'=>$getform,'list'=>$getcustprice])->setPaper([0, 0, 609.45, 396.85], 'potrait');
         // return $pdf;
         return   $pdf->stream($nomor);
     }

@@ -25,7 +25,12 @@ class FormpriceResource extends JsonResource
             'status'=>$this->status,
             'keterangan'=>$this->keterangan,
             'kode_groupso'=>$this->kode_groupso,
-            'salesarea'=>$this->groupso->area
+            'salesarea'=>$this->groupso->area,
+            'tgl_kordinator'=>$this->tgl_kordinator,
+            'tgl_sent'=>$this->tgl_sent,
+            'kordinator'=>$this->kordinator,
+            'spv'=>$this->spv,
+            'tgl_spv'=>$this->tgl_spv,
         ];
     }
 }

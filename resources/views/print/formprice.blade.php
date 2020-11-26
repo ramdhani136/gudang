@@ -10,18 +10,18 @@
 <body>
     @php 
     function format_uang($angka){ 
-    $hasil =  number_format($angka,0, ',' , '.'); 
+    $hasil =  number_format($angka,2, ',' , '.'); 
     return $hasil; 
     } @endphp
 
     <div class="wrapper" style="width: 100%;margin:0;padding:0">
-    <div style="font-size:12pt;text-align:center;margin-bottom:20px;margin-top:-20px">
+    <div style="font-size:12pt;text-align:center;margin-bottom:20px;margin-top:-10px">
         <b >FORM REQUEST HARGA</b>
     </div>
     <div class="row">
     @php $i=1 @endphp
     @foreach($form as $s)
-    <table style="font-size: 10pt;width:100%">
+    <table style="font-size: 10.5pt;width:100%">
         <tbody>
             <tr>
                 <td style="width:25%;"><b>Nomor</b> : {{$s->nomor_price}}</td>
@@ -35,48 +35,72 @@
         </tbody>
     </table>
     @endforeach
-    <div class="row">  
-        <table cellspacing="0" class="table" style="font-size: 9Pt; width:100% ;margin-top:20px">
-            <thead style="border:solid 1px #000;background-color:lightgray">
+    <div class="row" style="height:250px">
+        <table cellspacing="0" class="table" style="font-size: 9.5Pt; width:100% ;margin-top:20px;border-bottom:solid 1px #000;padding-bottom:10px">
+            <thead style="border:solid 1px #000;">
                 <tr>
-                    <th style="height: 20px;border:solid 1px #000;">NO</th>
-                    <th style="border:solid 1px #000;">KODE ITEM</th>
-                    <th style="border:solid 1px #000;">ITEM</th>
-                    <th style="border:solid 1px #000;">SATUAN</th>
-                    <th style="border:solid 1px #000;">REQUEST HARGA</th> 
-                    <th style="border:solid 1px #000;">CATATAN</th> 
+                  <th style="height:25px;width:1%;text-align:left;"></th>
+                    <th style="height:25px;width:5%;text-align:left;">No</th>
+                    <th style="width:17%;text-align:left">Kode Barang</th>
+                    <th style="width:1%;text-align:left"></th>
+                    <th style="width: 46%;text-align:left">Deskripsi</th>
+                    <th style="width: 10%;text-align:left">Satuan</th>
+                    <th style="width: 20%;text-align:left">Harga</th> 
                 </tr>
             </thead>
-            <tbody  style="border:solid 1px #000">
+            <tbody>
                 @php $i=1;
                 @endphp
                 @foreach($list as $p)
                 <tr>
-                    <td style="text-align:center;border:solid 1px #000;">{{ $i++ }}</td>
-                    <td style="border:solid 1px #000;">{{$p->kode_barang}}</td>
-                    <td style="border:solid 1px #000;">{{$p->barang->nama}}</td>
-                    <td style="text-align:center;border:solid 1px #000;">{{$p->barang->satuan}}</td>
-                    <td style="border:solid 1px #000;">Rp. {{format_uang($p->harga)}}</td>   
-                    <td style="border:solid 1px #000;">{{$p->catatan}}</td>     
+                     <td style="text-align:left;padding-top:3px;padding-bottom:3px"></td>
+                    <td style="text-align:left;">{{ $i++ }}</td>
+                    <td>{{$p->kode_barang}}</td>
+                    <td></td>
+                    <td>{{$p->barang->nama}}</td>
+                    <td style="text-align:left;">{{$p->barang->satuan}}</td>
+                    <td>Rp. {{format_uang($p->harga)}}</td>     
                 </tr>  
                 @endforeach
             </tbody>
         </table>
     </div> 
     <div class="row">
-        <table cellspacing="0" class="ttd" style="width: 55%;margin-top: 10px;text-align: center;font-size:9pt;">
+        <table cellspacing="0" class="ttd" style="width: 70%;margin-top: 10px;text-align: center;font-size:9pt;">
             <thead>
                 <tr >
-                    <th style="border:solid 1px #000;width:25%">Sales</th>
-                    <th style="border:solid 1px #000;width:25%">Kordinator</th>
-                    <th style="border:solid 1px #000;width:25%">Supervisor</th>
+                    <th style="width:25%;">Sales</th>
+                    <th style="width:10%;"></th>
+                    <th style="width:25%;">Kordinator</th>
+                    <th style="width:10%;"></th>
+                    <th style="width:25%;">Supervisor</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td style="height: 75px;border:solid 1px #000;width:25%"></td>
-                    <td style="height: 75px;border:solid 1px #000;width:25%"></td>
-                    <td style="height: 75px;border:solid 1px #000;width:25%"></td>
+                    <td style="height: auto;width:25%;border-bottom:solid 1px #000;">
+                        @php $i=1 @endphp
+                         @foreach($form as $s)
+                         {{$s->tgl_sent}} <br>
+                         {{$s->user->name}}
+                         @endforeach
+                    </td>
+                    <td style="height: auto;width:10%"></td>
+                    <td style="height: auto;width:25%;border-bottom:solid 1px #000;">
+                      @php $i=1 @endphp
+                         @foreach($form as $s)
+                         {{$s->tgl_kordinator}} <br>
+                         {{$s->kordinator}}
+                         @endforeach
+                    </td>
+                    <td style="height: auto;width:10%"></td>
+                    <td style="height: auto;width:25%;border-bottom:solid 1px #000;">
+                         @php $i=1 @endphp
+                         @foreach($form as $s)
+                         {{$s->tgl_spv}} <br>
+                         {{$s->spv}}
+                         @endforeach
+                    </td>
                 </tr>
             </tbody>
         </table>
