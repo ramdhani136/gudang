@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <router-link to="/rso/create" class="btn btn-success my-3">+ Input RSO</router-link>
+    <router-link v-if="ambiluser.sales === 1" to="/rso/create" class="btn btn-success my-3">+ Input RSO</router-link>
     <div class="form-group ml-n4 col-1 my-3 float-right">
       <button @click="showfilter()" class="btn btn-trans">Filter</button>
     </div>
@@ -9,7 +9,7 @@
     </div>
     <div class="form-group ml-n3 col-3 my-3 float-left">
       <select @change="statusData()" name="status" v-model="filter.status" class="form-control">
-        <option value="Draft">Draft</option>
+        <option v-if="ambiluser.sales === 1" value="Draft">Draft</option>
         <option value="Sent">Inventory Control</option>
         <option value="Purch">Purchasing</option>
         <option value="Confirmed">Confirmed</option>
@@ -41,7 +41,7 @@
             <td style="text-align: center">{{ rs.namauser }}</td>
             <td style="text-align: center">
               <button @click="showhistory(rs)" class="btn btn-primary">Lihat History</button>
-              <button v-if="rs.status !== 'So'" @click="deleteRso(rs)" class="btn btn-danger">Batalkan</button>
+              <button v-if="rs.status !== 'So' && ambiluser.sales === 1" @click="deleteRso(rs)" class="btn btn-danger">Batalkan</button>
             </td>
           </tr>
         </tbody>
@@ -124,6 +124,7 @@
             <div class="form-group">
               <label>Group</label>
               <select v-model="filter.kode_groupso" class="form-control" disabled>
+                <option value="" :key="index">Semua Group</option>
                 <option :value="gr.kode" v-for="(gr, index) in groupso" :key="index">{{ gr.area }}</option>
               </select>
             </div>
@@ -191,7 +192,7 @@ export default {
         jenistanggal: "Y",
         mulaitanggal: this.FirstDate(),
         sampaitanggal: this.today(),
-        status: "Draft",
+        status: "Confirmed",
         nomorrso: "",
       },
       groupso: {},
@@ -238,6 +239,8 @@ export default {
           this.load = false;
         });
       } else {
+        this.filter.id_user = "";
+        this.filter.kode_groupso = "";
         axios.get("/api/rso/data/realrso/").then((res) => {
           this.rso = res.data.data;
           this.statusData();

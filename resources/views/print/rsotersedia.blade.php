@@ -100,8 +100,8 @@
                     <td style="height: auto;width:20%;border-bottom:solid 1px #000;">
                     @php $i=1 @endphp
                     @foreach($rso as $s)
-                        {{$s->tgl_kordinator}} <br>
-                        Approved by : {{$s->kordinator}}
+                        {{$s->tgl_dic}} <br>
+                        Approved by : {{$s->dic}}
                     @endforeach
                     </td>
                 </tr>

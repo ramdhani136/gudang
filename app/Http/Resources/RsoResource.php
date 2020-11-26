@@ -30,6 +30,11 @@ class RsoResource extends JsonResource
             'kode_groupso'=>$this->kode_groupso,
             'areagroup'=>$this->groupso->area,
             'gketerangan'=>$this->groupso->keterangan,
+            'tgl_sales'=>$this->tgl_sales,
+            'dic'=>$this->dic,
+            'tgl_dic'=>$this->tgl_dic,
+            'purchasing'=>$this->purchasing,
+            'tgl_purchasing'=>$this->tgl_purchasing,
         ];
     }
 }

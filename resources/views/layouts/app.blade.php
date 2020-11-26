@@ -205,6 +205,8 @@
                                     <router-link to="/purchase/pr" class="dropdown-item" >Purchasing Request</router-link>
                                     <router-link to="/purchase/po/" class="dropdown-item" >Purchasing Order</router-link>
                                     <router-link to="/dic/incoming" class="dropdown-item" >Bukti Barang Masuk</router-link>
+                                    <router-link to="/rso" class="dropdown-item" >Request Sales Order</router-link>
+                                     <router-link to="/distribusi/so" class="dropdown-item" >Sales Order</router-link>
                                     <router-link to="/purchase/barang/" class="dropdown-item" >Input Barang</router-link>
                                 </div>
                             </li>

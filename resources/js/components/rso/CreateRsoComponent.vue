@@ -451,7 +451,7 @@ export default {
               }
               if (this.cek === this.banding) {
                 this.upload.status = "Sent";
-                this.upload.nomor_rso = this.upload.nomor_rso + this.upload.kode_groupso;
+                (this.upload.tgl_sales = this.DateTime()), (this.upload.nomor_rso = this.upload.nomor_rso + this.upload.kode_groupso);
                 axios
                   .post("/api/rso", this.upload)
                   .then((res) => {
