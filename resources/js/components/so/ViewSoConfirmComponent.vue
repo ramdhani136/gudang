@@ -4,79 +4,39 @@
       <div class="col-4">
         <div class="form-group">
           <label>Nomor SO :</label>
-          <input
-            v-model="vso.nomor_so"
-            type="text"
-            class="form-control col-12"
-            disabled
-          />
+          <input v-model="vso.nomor_so" type="text" class="form-control col-12" disabled />
         </div>
         <div class="form-group">
           <label>Tanggal :</label>
-          <input
-            v-model="vso.tanggal_so"
-            type="date"
-            @change="validate()"
-            :min="now()"
-            class="form-control col-12"
-            disabled
-          />
+          <input v-model="vso.tanggal_so" type="date" @change="validate()" :min="now()" class="form-control col-12" disabled />
         </div>
         <div class="form-group">
           <label>Tanggal Kirim :</label>
-          <input
-            v-model="vso.tanggal_kirim"
-            type="date"
-            @change="validate()"
-            :min="now()"
-            class="form-control col-12"
-            disabled
-          />
+          <input v-model="vso.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" disabled />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Customer</label>
-          <select
-            v-model="vso.kode_customer"
-            name="customer"
-            class="col-12 form-control"
-            disabled
-          >
+          <select v-model="vso.kode_customer" name="customer" class="col-12 form-control" disabled>
             <option :value="vso.kode_customer">{{ vso.customer }}</option>
           </select>
         </div>
         <div class="form-group">
           <label>Marketing</label>
-          <select
-            v-model="vso.nip_sales"
-            name="marketing"
-            class="col-12 form-control"
-            disabled
-          >
+          <select v-model="vso.nip_sales" name="marketing" class="col-12 form-control" disabled>
             <option :value="vso.nip_sales">{{ vso.sales }}</option>
           </select>
         </div>
         <div class="form-group">
           <label>keterangan</label>
-          <textarea
-            v-model="vso.keterangan"
-            name="keterangan"
-            class="form-control col-12"
-            disabled
-          ></textarea>
+          <textarea v-model="vso.keterangan" name="keterangan" class="form-control col-12" disabled></textarea>
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Distribusi :</label>
-          <select
-            class="form-control"
-            v-model="vso.distribusi"
-            @click="ifkirim()"
-            @change="aksidistribusi()"
-            disabled
-          >
+          <select class="form-control" v-model="vso.distribusi" @click="ifkirim()" @change="aksidistribusi()" disabled>
             <option value="default">- Masukan pilihan anda -</option>
             <option value="kirim">Di Kirim</option>
             <option value="ambil">Ambil Sendiri</option>
@@ -84,36 +44,19 @@
         </div>
         <div class="form-group">
           <label>Lokasi</label>
-          <input
-            @click="clikdistribusi()"
-            v-model="vso.lokasi"
-            name="alamat"
-            class="form-control col-12"
-            disabled
-          />
+          <input @click="clikdistribusi()" v-model="vso.lokasi" name="alamat" class="form-control col-12" disabled />
         </div>
         <div class="form-group">
           <label>Alamat</label>
-          <textarea
-            v-model="vso.alamat"
-            name="alamat"
-            class="form-control col-12"
-            disabled
-          ></textarea>
+          <textarea v-model="vso.alamat" name="alamat" class="form-control col-12" disabled></textarea>
         </div>
       </div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
-      <div id="total" class="mt-3 ml-auto mr-3">
-        Total Invoice :&nbsp; {{ ket.total | currency }}
-      </div>
+      <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ ket.total | currency }}</div>
       <div class="row mt-1 mx-auto col-12">
         <Circle5 id="load3" v-if="load"></Circle5>
-        <table
-          id="rsthead"
-          class="table mt-2 table-striped table-bordered"
-          style="width: 100%"
-        >
+        <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
           <thead>
             <tr></tr>
             <tr>
@@ -139,10 +82,7 @@
               <td style="text-align: center">{{ ch.harga | currency }}</td>
               <td>{{ (ch.harga * ch.qty) | currency }}</td>
               <td style="text-align: center">{{ lstatus }}</td>
-              <td
-                v-if="lstatus === 'Tidak Tersedia'"
-                style="text-align: center"
-              >
+              <td v-if="lstatus === 'Tidak Tersedia'" style="text-align: center">
                 {{ ch.tgl_datang }}
               </td>
               <td>{{ ch.bbk }}</td>
@@ -153,94 +93,28 @@
       </div>
     </div>
     <div class="row mt-2" v-for="(lso, index) in so" :key="index">
-      <button
-        v-if="lso.status == 'Sent' && ambiluser.susales === 1"
-        @click="confirmSO(lso)"
-        class="btn-orange btn ml-3"
-      >
-        Terima SO
-      </button>
-      <button
-        @click="showModal()"
-        v-if="lso.status == 'Sent' && ambiluser.susales === 1"
-        class="btn-danger btn ml-1"
-      >
-        Tolak SO
-      </button>
+      <button v-if="lso.status == 'Sent' && ambiluser.susales === 1" @click="confirmSO(lso)" class="btn-orange btn ml-3">Terima SO</button>
+      <button @click="showModal()" v-if="lso.status == 'Sent' && ambiluser.susales === 1" class="btn-danger btn ml-1">Tolak SO</button>
 
-      <button
-        v-if="lso.status == 'Kordinator' && ambiluser.kordisales === 1"
-        @click="kordinconfirm(lso)"
-        class="btn-orange btn ml-3"
-      >
-        Terima SO
-      </button>
+      <button v-if="lso.status == 'Kordinator' && ambiluser.kordisales === 1" @click="kordinconfirm(lso)" class="btn-orange btn ml-3">Terima SO</button>
 
-      <button
-        v-if="lso.status == 'Kordinator' && ambiluser.kordisales === 1"
-        @click="showModal()"
-        class="btn-danger btn ml-1"
-      >
-        Tolak SO
-      </button>
+      <button v-if="lso.status == 'Kordinator' && ambiluser.kordisales === 1" @click="showModal()" class="btn-danger btn ml-1">Tolak SO</button>
 
-      <button
-        v-if="
-          lso.status == 'Kordinator' &&
-          ambiluser.susales === 1 &&
-          ambiluser.kode_groupso === 'GR' &&
-          groupso === 'GR'
-        "
-        @click="kordinconfirm(lso)"
-        class="btn-orange btn ml-3"
-      >
-        Terima SO
-      </button>
+      <button v-if="lso.status == 'Kordinator' && ambiluser.susales === 1 && ambiluser.kode_groupso === 'GR' && groupso === 'GR'" @click="kordinconfirm(lso)" class="btn-orange btn ml-3">Terima S</button>
 
-      <button
-        v-if="
-          lso.status == 'Kordinator' &&
-          ambiluser.susales === 1 &&
-          ambiluser.kode_groupso === 'GR' &&
-          groupso === 'GR'
-        "
-        @click="showModal()"
-        class="btn-danger btn ml-1"
-      >
-        Tolak SO
-      </button>
+      <button v-if="lso.status == 'Kordinator' && ambiluser.susales === 1 && ambiluser.kode_groupso === 'GR' && groupso === 'GR'" @click="showModal()" class="btn-danger btn ml-1">Tolak SO</button>
     </div>
-    <div
-      v-if="vso.status == 'Tolak'"
-      v-for="vso in so"
-      :key="vso.nomor_so"
-      id="alastolak"
-    >
+    <div v-if="vso.status == 'Tolak'" v-for="vso in so" :key="vso.nomor_so" id="alastolak">
       <div v-for="(lso, index) in so" :key="index">
         <b>{{ lso.alastolak }}</b>
       </div>
     </div>
-    <div
-      class="modal fade"
-      id="modal-form"
-      tabindex="-1"
-      data-backdrop="static"
-      role="dialog"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Form Penolakan SO
-            </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <h5 class="modal-title" id="exampleModalLabel">Form Penolakan SO</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -251,30 +125,9 @@
             </div>
           </div>
           <div v-for="(lso, index) in so" :key="index" class="modal-footer">
-            <button
-              type="button"
-              @click="resetForm()"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button
-              v-if="ambiluser.susales === 1"
-              type="button"
-              @click="tolakSo(lso)"
-              class="btn btn-primary"
-            >
-              Konfirmasi Tolak
-            </button>
-            <button
-              v-if="ambiluser.kordisales === 1"
-              type="button"
-              @click="tolakkordinatorSo(lso)"
-              class="btn btn-primary"
-            >
-              Konfirmasi Tolak
-            </button>
+            <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button v-if="ambiluser.susales === 1" type="button" @click="tolakSo(lso)" class="btn btn-primary">Konfirmasi Tolak</button>
+            <button v-if="ambiluser.kordisales === 1" type="button" @click="tolakkordinatorSo(lso)" class="btn btn-primary">Konfirmasi Tolak</button>
           </div>
         </div>
       </div>
@@ -334,8 +187,7 @@ export default {
           this.listso = res.data.data;
           this.ket.tolak = 0;
           for (let i = 0; i < this.listso.length; i++) {
-            this.ket.total +=
-              parseFloat(this.listso[i].qty) * parseFloat(this.listso[i].harga);
+            this.ket.total += parseFloat(this.listso[i].qty) * parseFloat(this.listso[i].harga);
           }
           this.load = false;
         });
@@ -346,14 +198,7 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     validate() {
@@ -366,14 +211,7 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate() + 2;
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     validateKirim() {
@@ -408,49 +246,35 @@ export default {
             this.up.nomor_rso = lso.nomor_rso;
             this.up.keterangan = lso.keterangan;
             this.up.status = "Dic";
-            axios
-              .put("/api/so/" + this.up.nomor_so, this.up)
-              .then((response) => {
-                axios.post("/api/history", {
-                  nomor_dok: this.$route.params.id,
-                  id_user: this.ambiluser.id,
-                  notif:
-                    "So nomor : " +
-                    this.$route.params.id +
-                    " DI konfirmasi SPV",
-                  keterangan: "SO di terima Sales Supervisor",
-                  jenis: "So",
-                  tanggal: this.DateTime(),
-                });
-                axios.post("/api/history", {
-                  nomor_dok: this.$route.params.id,
-                  id_user: this.ambiluser.id,
-                  notif:
-                    "So nomor : " +
-                    this.$route.params.id +
-                    " DI konfirmasi SPV",
-                  keterangan: "Menunggu konfirmasi DIC",
-                  jenis: "So",
-                  tanggal: this.DateTime(),
-                });
-                this.$router.push({
-                  name: "soconfirm",
-                });
-                swalWithBootstrapButtons.fire(
-                  "Selesai!",
-                  "SO Berhasil di terima !",
-                  "success"
-                );
+            this.up.tgl_spv = this.DateTime();
+            this.up.spv = this.ambiluser.name;
+            axios.put("/api/so/" + this.up.nomor_so, this.up).then((response) => {
+              axios.post("/api/history", {
+                nomor_dok: this.$route.params.id,
+                id_user: this.ambiluser.id,
+                notif: "So nomor : " + this.$route.params.id + " DI konfirmasi SPV",
+                keterangan: "SO di terima Sales Supervisor",
+                jenis: "So",
+                tanggal: this.DateTime(),
               });
+              axios.post("/api/history", {
+                nomor_dok: this.$route.params.id,
+                id_user: this.ambiluser.id,
+                notif: "So nomor : " + this.$route.params.id + " DI konfirmasi SPV",
+                keterangan: "Menunggu konfirmasi DIC",
+                jenis: "So",
+                tanggal: this.DateTime(),
+              });
+              this.$router.push({
+                name: "soconfirm",
+              });
+              swalWithBootstrapButtons.fire("Selesai!", "SO Berhasil di terima !", "success");
+            });
           } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Batal",
-              "SO Batal diterima :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Batal", "SO Batal diterima :)", "error");
           }
         });
     },
@@ -481,49 +305,35 @@ export default {
             this.up.nomor_rso = lso.nomor_rso;
             this.up.keterangan = lso.keterangan;
             this.up.status = "Sent";
-            axios
-              .put("/api/so/" + this.up.nomor_so, this.up)
-              .then((response) => {
-                axios.post("/api/history", {
-                  nomor_dok: this.$route.params.id,
-                  id_user: this.ambiluser.id,
-                  notif:
-                    "So nomor : " +
-                    this.$route.params.id +
-                    " DI konfirmasi Kordinator Sales",
-                  keterangan: "SO di terima Sales Kordinator",
-                  jenis: "So",
-                  tanggal: this.DateTime(),
-                });
-                axios.post("/api/history", {
-                  nomor_dok: this.$route.params.id,
-                  id_user: this.ambiluser.id,
-                  notif:
-                    "So nomor : " +
-                    this.$route.params.id +
-                    " DI konfirmasi kordinator",
-                  keterangan: "Menunggu konfirmasi Sales SPV",
-                  jenis: "So",
-                  tanggal: this.DateTime(),
-                });
-                this.$router.push({
-                  name: "soconfirm",
-                });
-                swalWithBootstrapButtons.fire(
-                  "Selesai!",
-                  "SO Berhasil di terima !",
-                  "success"
-                );
+            this.up.tgl_kordinator = this.DateTime();
+            this.up.kordinator = this.ambiluser.name;
+            axios.put("/api/so/" + this.up.nomor_so, this.up).then((response) => {
+              axios.post("/api/history", {
+                nomor_dok: this.$route.params.id,
+                id_user: this.ambiluser.id,
+                notif: "So nomor : " + this.$route.params.id + " DI konfirmasi Kordinator Sales",
+                keterangan: "SO di terima Sales Kordinator",
+                jenis: "So",
+                tanggal: this.DateTime(),
               });
+              axios.post("/api/history", {
+                nomor_dok: this.$route.params.id,
+                id_user: this.ambiluser.id,
+                notif: "So nomor : " + this.$route.params.id + " DI konfirmasi kordinator",
+                keterangan: "Menunggu konfirmasi Sales SPV",
+                jenis: "So",
+                tanggal: this.DateTime(),
+              });
+              this.$router.push({
+                name: "soconfirm",
+              });
+              swalWithBootstrapButtons.fire("Selesai!", "SO Berhasil di terima !", "success");
+            });
           } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Batal",
-              "SO Batal diterima :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Batal", "SO Batal diterima :)", "error");
           }
         });
     },
@@ -554,37 +364,26 @@ export default {
             this.up.nomor_rso = lso.nomor_rso;
             this.up.keterangan = lso.keterangan;
             this.up.status = "Tolak";
-            axios
-              .put("/api/so/" + this.up.nomor_so, this.up)
-              .then((response) => {
-                $("#modal-form").modal("hide");
-                axios.post("/api/history", {
-                  nomor_dok: this.$route.params.id,
-                  id_user: this.ambiluser.id,
-                  notif:
-                    "So nomor : " + this.$route.params.id + " Di tolak SPV",
-                  keterangan: "SO di tolak Sales Supervisor",
-                  jenis: "So",
-                  tanggal: this.DateTime(),
-                });
-                swalWithBootstrapButtons.fire(
-                  "Sukses!",
-                  "SO berhasil di tolak !",
-                  "success"
-                );
-                this.$router.push({
-                  name: "soconfirm",
-                });
+            axios.put("/api/so/" + this.up.nomor_so, this.up).then((response) => {
+              $("#modal-form").modal("hide");
+              axios.post("/api/history", {
+                nomor_dok: this.$route.params.id,
+                id_user: this.ambiluser.id,
+                notif: "So nomor : " + this.$route.params.id + " Di tolak SPV",
+                keterangan: "SO di tolak Sales Supervisor",
+                jenis: "So",
+                tanggal: this.DateTime(),
               });
+              swalWithBootstrapButtons.fire("Sukses!", "SO berhasil di tolak !", "success");
+              this.$router.push({
+                name: "soconfirm",
+              });
+            });
           } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal melakukan penolakan :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal melakukan penolakan :)", "error");
           }
         });
     },
@@ -615,39 +414,26 @@ export default {
             this.up.nomor_rso = lso.nomor_rso;
             this.up.keterangan = lso.keterangan;
             this.up.status = "Tolak";
-            axios
-              .put("/api/so/" + this.up.nomor_so, this.up)
-              .then((response) => {
-                $("#modal-form").modal("hide");
-                axios.post("/api/history", {
-                  nomor_dok: this.$route.params.id,
-                  id_user: this.ambiluser.id,
-                  notif:
-                    "So nomor : " +
-                    this.$route.params.id +
-                    " Di tolak Kordinator Sales",
-                  keterangan: "SO di tolak Sales Kordinator",
-                  jenis: "So",
-                  tanggal: this.DateTime(),
-                });
-                swalWithBootstrapButtons.fire(
-                  "Sukses!",
-                  "SO berhasil di tolak !",
-                  "success"
-                );
-                this.$router.push({
-                  name: "soconfirm",
-                });
+            axios.put("/api/so/" + this.up.nomor_so, this.up).then((response) => {
+              $("#modal-form").modal("hide");
+              axios.post("/api/history", {
+                nomor_dok: this.$route.params.id,
+                id_user: this.ambiluser.id,
+                notif: "So nomor : " + this.$route.params.id + " Di tolak Kordinator Sales",
+                keterangan: "SO di tolak Sales Kordinator",
+                jenis: "So",
+                tanggal: this.DateTime(),
               });
+              swalWithBootstrapButtons.fire("Sukses!", "SO berhasil di tolak !", "success");
+              this.$router.push({
+                name: "soconfirm",
+              });
+            });
           } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal melakukan penolakan :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal melakukan penolakan :)", "error");
           }
         });
     },
@@ -662,20 +448,8 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates =
-        this.year +
-        "-" +
-        (this.month < 10 ? "0" : "") +
-        this.month +
-        "-" +
-        this.day;
-      this.times =
-        this.hours +
-        ":" +
-        this.minute +
-        ":" +
-        (this.seconds < 10 ? "0" : "") +
-        this.seconds;
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
       this.datetimes = this.dates + " " + this.times;
       console.log(this.datetimes);
       return this.datetimes;

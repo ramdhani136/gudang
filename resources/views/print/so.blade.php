@@ -47,7 +47,7 @@
         </tbody>
     </table>
     @endforeach
-    <div class="row" style="height:240px">  
+    <div class="row" style="height:210px">  
         <table cellspacing="0" class="table" style="font-size: 10pt; width:100% ;margin-top:20px;border-bottom:solid 1px #000">
             <thead style="border:solid 1px #000;">
                 <tr>
@@ -75,7 +75,7 @@
                     <td style="text-align:left"></td>
                     <td>{{$p->barang->nama}}</td>
                     <td style="text-align:left"></td>
-                    <td style="text-align:left;">{{format_qty($p->qty)}}</td>
+                    <td style="text-align:left;">{{format_uang($p->qty)}}</td>
                     <td style="text-align:left"></td>
                     <td style="text-align:left">{{$p->barang->satuan}}</td>
                     <td style="text-align:left"></td>
@@ -106,7 +106,7 @@
     @endforeach
     </div>
     <div class="row">
-        <table  cellspacing="0" class="ttd" style="width: 80%;margin-top: 10px;text-align: center;font-size:9pt;">
+        <table  cellspacing="0" class="ttd" style="width: 100%;margin-top: 10px;text-align: center;font-size:9pt;">
             <thead>
                 <tr >
                     <th style="width:20%">Sales</th>
@@ -120,13 +120,37 @@
             </thead>
             <tbody>
                 <tr>
-                    <td style="height: auto;;width:20%;border-bottom:solid 1px #000;"></td>
+                    <td style="height: auto;;width:20%;border-bottom:solid 1px #000;">
+                    @php $i=1 @endphp
+                    @foreach($so as $s)
+                        {{$s->tgl_sales}} <br>
+                        {{$s->user->name}}
+                    @endforeach
+                    </td>
                     <td style="height: auto;width:5%"></td>
-                    <td style="height: auto;width:20%;border-bottom:solid 1px #000;"></td>
+                    <td style="height: auto;width:20%;border-bottom:solid 1px #000;">
+                    @php $i=1 @endphp
+                    @foreach($so as $s)
+                        {{$s->tgl_kordinator}} <br>
+                        Approved by : {{$s->kordinator}}
+                    @endforeach
+                    </td>
                     <td style="height: auto;width:5%"></td>
-                    <td style="height: auto;width:20%;border-bottom:solid 1px #000;"></td>
+                    <td style="height: auto;width:20%;border-bottom:solid 1px #000;">
+                    @php $i=1 @endphp
+                    @foreach($so as $s)
+                        {{$s->tgl_spv}} <br>
+                        Approved by : {{$s->spv}}
+                    @endforeach
+                    </td>
                     <td style="height: auto;width:5%"></td>
-                    <td style="height: auto;width:20%;border-bottom:solid 1px #000;"></td>
+                    <td style="height: auto;width:20%;border-bottom:solid 1px #000;">
+                    @php $i=1 @endphp
+                    @foreach($so as $s)
+                        {{$s->tgl_dic}} <br>
+                        Approved by : {{$s->dic}}
+                    @endforeach
+                    </td>
                 </tr>
             </tbody>
         </table>

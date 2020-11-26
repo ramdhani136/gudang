@@ -40,7 +40,14 @@ class SoResource extends JsonResource
             'id_user'=>$this->id_user,
             'sales'=>$this->user->name,
             'kode_groupso'=>$this->user->kode_groupso,
-            'areagroup'=>$this->groupso->area
+            'areagroup'=>$this->groupso->area,
+            'tgl_sales'=>$this->tgl_sales,
+            'kordinator'=>$this->kordinator,
+            'tgl_kordinator'=>$this->tgl_kordinator,
+            'spv'=>$this->spv,
+            'tgl_spv'=>$this->tgl_spv,
+            'dic'=>$this->dic,
+            'tgl_dic'=>$this->tgl_dic,
         ];
     }
 }

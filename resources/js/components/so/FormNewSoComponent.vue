@@ -4,76 +4,37 @@
       <div class="col-4">
         <div class="form-group">
           <label>Nomor SO :</label>
-          <input
-            @input="ceknomorso()"
-            v-model="up.nomor_so"
-            type="text"
-            maxlength="15"
-            class="form-control col-12"
-            :class="{ 'is-valid': nyala, 'is-invalid': !nyala }"
-          />
+          <input @input="ceknomorso()" v-model="up.nomor_so" type="text" maxlength="15" class="form-control col-12" :class="{ 'is-valid': nyala, 'is-invalid': !nyala }" />
         </div>
         <div class="form-group">
           <label>Tanggal :</label>
-          <input
-            v-model="up.tanggal_so"
-            type="date"
-            @change="validate()"
-            :min="now()"
-            class="form-control col-12"
-          />
+          <input v-model="up.tanggal_so" type="date" @change="validate()" :min="now()" class="form-control col-12" />
         </div>
         <div class="form-group">
           <label>Tanggal Kirim :</label>
-          <input
-            v-model="up.tanggal_kirim"
-            type="date"
-            @change="validate()"
-            :min="now()"
-            class="form-control col-12"
-          />
+          <input v-model="up.tanggal_kirim" type="date" @change="validate()" :min="now()" class="form-control col-12" />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Customer</label>
-          <select
-            v-model="ket.customer"
-            name="customer"
-            class="col-12 form-control"
-            disabled
-          >
+          <select v-model="ket.customer" name="customer" class="col-12 form-control" disabled>
             <option :value="ket.customer">{{ ket.customer }}</option>
           </select>
         </div>
         <div class="form-group">
           <label>Nomor RSO</label>
-          <input
-            v-model="up.nomor_rso"
-            @click="showPo()"
-            type="text"
-            class="form-control"
-            placeholder="Pilih RSO"
-          />
+          <input v-model="up.nomor_rso" @click="showPo()" type="text" class="form-control" placeholder="Pilih RSO" />
         </div>
         <div class="form-group">
           <label>keterangan</label>
-          <textarea
-            v-model="up.keterangan"
-            name="keterangan"
-            class="form-control col-12"
-          ></textarea>
+          <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12"></textarea>
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Distribusi :</label>
-          <select
-            class="form-control"
-            v-model="up.distribusi"
-            @change="aksidistribusi()"
-            :disabled="disabled == 1"
-          >
+          <select class="form-control" v-model="up.distribusi" @change="aksidistribusi()" :disabled="disabled == 1">
             <option value="default">- Masukan pilihan anda -</option>
             <option value="kirim">Di Kirim</option>
             <option value="ambil">Ambil Sendiri</option>
@@ -81,38 +42,21 @@
         </div>
         <div class="form-group">
           <label>Lokasi</label>
-          <input
-            @click="clikdistribusi()"
-            v-model="up.lokasi"
-            name="alamat"
-            class="form-control col-12"
-            disabled
-          />
+          <input @click="clikdistribusi()" v-model="up.lokasi" name="alamat" class="form-control col-12" disabled />
         </div>
         <div class="form-group">
           <label>Alamat</label>
-          <textarea
-            v-model="up.alamat"
-            name="alamat"
-            class="form-control col-12"
-            disabled
-          ></textarea>
+          <textarea v-model="up.alamat" name="alamat" class="form-control col-12" disabled></textarea>
         </div>
       </div>
     </div>
     <div class="row">
-      <div id="total" class="mt-3 ml-auto mr-3">
-        Total Invoice :&nbsp; {{ invoice | currency }}
-      </div>
+      <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ invoice | currency }}</div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
       <div class="row mt-1 mx-auto col-12">
         <Circle5 id="load3" v-if="load"></Circle5>
-        <table
-          id="rsthead"
-          class="table mt-2 table-striped table-bordered"
-          style="width: 100%"
-        >
+        <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
           <thead>
             <tr>
               <th>No</th>
@@ -134,12 +78,7 @@
               <td>{{ ch.nama_barang }}</td>
               <td style="text-align: center">{{ ket.coba[index] }}</td>
               <td style="text-align: center">
-                <input
-                  @input="validasiqty"
-                  v-model="hitung.qty[index]"
-                  type="number"
-                  class="form-control"
-                />
+                <input @input="validasiqty" v-model="hitung.qty[index]" type="number" class="form-control" />
               </td>
               <td style="text-align: center">{{ ch.satuan }}</td>
               <td style="text-align: center">{{ ch.harga | currency }}</td>
@@ -152,9 +91,7 @@
                 {{ ch.tgl_datang }}
               </td>
               <td style="text-align: center">
-                <button @click="hapuslistSo(index)" class="btn btn-danger">
-                  Hapus
-                </button>
+                <button @click="hapuslistSo(index)" class="btn btn-danger">Hapus</button>
               </td>
             </tr>
           </tbody>
@@ -164,61 +101,31 @@
     <div class="row mt-2">
       <button @click="submitSo()" class="btn-success btn ml-1">Kirim SO</button>
     </div>
-    <div
-      class="modal fade"
-      id="modal-po"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Form SO</h5>
-            <button
-              @click="resetForm()"
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
               <label>Pilih RSO</label>
-              <select
-                @change="pilihRso(aktif)"
-                v-model="aktif"
-                class="form-control"
-              >
-                <option
-                  :value="aktif"
-                  v-for="(aktif, index) in rso"
-                  :key="index"
-                >
+              <select @change="pilihRso(aktif)" v-model="aktif" class="form-control">
+                <option :value="aktif" v-for="(aktif, index) in rso" :key="index">
                   {{ aktif.nomor_rso }}
                 </option>
               </select>
             </div>
             <div class="form-group">
               <label>Customer</label>
-              <input
-                v-model="ket.customer"
-                type="text"
-                class="form-control"
-                disabled
-              />
+              <input v-model="ket.customer" type="text" class="form-control" disabled />
             </div>
             <div class="form-group">
               <label>Status</label>
-              <select
-                @change="pilihStatus()"
-                v-model="status"
-                class="form-control"
-              >
+              <select @change="pilihStatus()" v-model="status" class="form-control">
                 <option value="Tersedia">Tersedia</option>
                 <option value="TidakTersedia">Tidak Tersedia</option>
               </select>
@@ -227,11 +134,7 @@
             <div class="form-group">
               <label>Rincian Barang</label>
             </div>
-            <table
-              id="rsthead"
-              class="table table-striped table-bordered mt-n2"
-              style="width: 100%"
-            >
+            <table id="rsthead" class="table table-striped table-bordered mt-n2" style="width: 100%">
               <thead>
                 <tr>
                   <th>No</th>
@@ -258,51 +161,24 @@
             <div id="overflowBody"></div>
           </div>
           <div class="modal-footer">
-            <button
-              @click="resetForm()"
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" @click="inputlist()" class="btn btn-primary">
-              Save changes
-            </button>
+            <button @click="resetForm()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" @click="inputlist()" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>
     </div>
-    <div
-      class="modal fade"
-      id="modal-pr"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Rincian Permintaan
-            </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div id="scrollList">
-              <table
-                id="thead"
-                class="table table-striped table-bordered"
-                style="width: 100%"
-              >
+              <table id="thead" class="table table-striped table-bordered" style="width: 100%">
                 <thead>
                   <tr>
                     <th style="text-align: center">No</th>
@@ -321,13 +197,7 @@
                     <td style="text-align: center"></td>
                     <td style="text-align: center"></td>
                     <td>
-                      <button
-                        type="button"
-                        class="btn btn-danger"
-                        data-dismiss="modal"
-                      >
-                        Delete
-                      </button>
+                      <button type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
                     </td>
                   </tr>
                 </tbody>
@@ -335,13 +205,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
@@ -353,26 +217,12 @@
         </div>
       </div>
     </div>
-    <div
-      class="modal fade"
-      id="modal-lokasi"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-lokasi" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Form Tujuan Pengiriman
-            </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <h5 class="modal-title" id="exampleModalLabel">Form Tujuan Pengiriman</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -388,30 +238,13 @@
             <div class="form-group" v-if="lokasi === 'ekspedisi'">
               <label>Lokasi</label>
               <div class="autocomplete"></div>
-              <div
-                class="input"
-                @click="toggleVisible"
-                v-text="eks ? eks.nama : ''"
-              ></div>
+              <div class="input" @click="toggleVisible" v-text="eks ? eks.nama : ''"></div>
               <div class="placeholder" v-if="eks == null">Pilih Ekspedisi</div>
               <div class="popover" v-show="visible">
-                <input
-                  type="text"
-                  @keydown.up="up"
-                  @keydown.down="down"
-                  @keydown.enter="selectItem"
-                  v-model="query"
-                  placeholder="Masukan nama ekspedisi.."
-                />
+                <input type="text" @keydown.up="up" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nama ekspedisi.." />
                 <div class="optionbr" ref="optionList">
                   <ul>
-                    <li
-                      v-for="(match, index) in matches"
-                      :key="match.id"
-                      v-text="match.nama"
-                      :class="{ selected: selected == index }"
-                      @click="itemClicked(index)"
-                    ></li>
+                    <li v-for="(match, index) in matches" :key="match.id" v-text="match.nama" :class="{ selected: selected == index }" @click="itemClicked(index)"></li>
                   </ul>
                 </div>
               </div>
@@ -419,19 +252,11 @@
 
             <div v-if="lokasi === 'ekspedisi'" class="form-group mt-3">
               <label>Alamat</label>
-              <textarea
-                v-model="eksal"
-                class="form-control"
-                disabled
-              ></textarea>
+              <textarea v-model="eksal" class="form-control" disabled></textarea>
             </div>
             <div v-if="lokasi === 'default'" class="form-group">
               <label>Alamat</label>
-              <textarea
-                v-model="defaultal"
-                class="form-control"
-                disabled
-              ></textarea>
+              <textarea v-model="defaultal" class="form-control" disabled></textarea>
             </div>
             <div v-if="lokasi === 'lainnya'" class="form-group">
               <label>Tempat/Gedung</label>
@@ -443,21 +268,8 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button
-              type="button"
-              @click="selectLokasi()"
-              class="btn btn-primary"
-              data-dismiss="modal"
-            >
-              Save Change
-            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" @click="selectLokasi()" class="btn btn-primary" data-dismiss="modal">Save Change</button>
           </div>
         </div>
       </div>
@@ -535,36 +347,25 @@ export default {
       if (this.query == "") {
         return [];
       }
-      return this.dataekspedisi.filter((item) =>
-        item.nama.toLowerCase().includes(this.query.toLowerCase())
-      );
+      return this.dataekspedisi.filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()));
     },
   },
   methods: {
     getRso() {
-      axios
-        .get("/api/rso/data/confirm/" + this.ambiluser.kode_groupso)
-        .then((res) => {
-          this.rso = res.data.data;
-          axios.get("/api/ekspedisi").then((res) => {
-            this.dataekspedisi = res.data.data;
-            this.load = false;
-          });
+      axios.get("/api/rso/data/confirm/" + this.ambiluser.kode_groupso).then((res) => {
+        this.rso = res.data.data;
+        axios.get("/api/ekspedisi").then((res) => {
+          this.dataekspedisi = res.data.data;
+          this.load = false;
         });
+      });
     },
     now() {
       var d = new Date();
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     validate() {
@@ -577,22 +378,14 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate() + 2;
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     so_nomor() {
       var d = new Date();
       var month = d.getMonth() + 1;
 
-      var output =
-        "SO-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
+      var output = "SO-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
       return output;
     },
     showPo() {
@@ -690,10 +483,7 @@ export default {
             this.banding = "";
             this.ok = "";
             for (let i = 0; i < this.checkrso.length; i++) {
-              if (
-                this.hitung.qty[i] === undefined ||
-                this.hitung.qty[i] === ""
-              ) {
+              if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === "") {
                 this.ok = "N";
               } else {
                 this.ok = "Y";
@@ -711,6 +501,7 @@ export default {
               this.up.id_user = this.ambiluser.id;
               this.up.nomor_so = this.up.nomor_so + this.ambiluser.kode_groupso;
               this.up.kode_groupso = this.ambiluser.kode_groupso;
+              this.up.tgl_sales = this.DateTime();
               axios
                 .post("/api/so", this.up)
                 .then((res) => {
@@ -751,32 +542,22 @@ export default {
                         } else {
                           this.uprso.so_tdktersedia = "Y";
                         }
-                        axios
-                          .put("/api/listrso/" + this.listso[n].id, this.uprso)
-                          .then((res) => {
-                            axios
-                              .get("/api/listrso/" + this.up.nomor_rso)
-                              .then((res) => {
-                                this.lisallrso = res.data.data;
-                                this.done = "";
-                                this.pembanding = "";
-                                for (
-                                  let h = 0;
-                                  h < this.lisallrso.length;
-                                  h++
-                                ) {
-                                  this.done +=
-                                    this.lisallrso[h].so_tersedia +
-                                    this.lisallrso[h].so_tdktersedia;
-                                  this.pembanding += "YY";
-                                }
-                                if (this.done === this.pembanding) {
-                                  axios.put("/api/rso/" + this.up.nomor_rso, {
-                                    status: "So",
-                                  });
-                                }
+                        axios.put("/api/listrso/" + this.listso[n].id, this.uprso).then((res) => {
+                          axios.get("/api/listrso/" + this.up.nomor_rso).then((res) => {
+                            this.lisallrso = res.data.data;
+                            this.done = "";
+                            this.pembanding = "";
+                            for (let h = 0; h < this.lisallrso.length; h++) {
+                              this.done += this.lisallrso[h].so_tersedia + this.lisallrso[h].so_tdktersedia;
+                              this.pembanding += "YY";
+                            }
+                            if (this.done === this.pembanding) {
+                              axios.put("/api/rso/" + this.up.nomor_rso, {
+                                status: "So",
                               });
+                            }
                           });
+                        });
                       }
                     });
                   }
@@ -800,11 +581,7 @@ export default {
                       nomor_ref: this.up.nomor_so,
                       id_user: this.ambiluser.id,
                       notif: "Anda mendapatkan permintaan SO baru",
-                      keterangan:
-                        "Membuat SO " +
-                        this.statusnya +
-                        " nomor : " +
-                        this.up.nomor_so,
+                      keterangan: "Membuat SO " + this.statusnya + " nomor : " + this.up.nomor_so,
                       jenis: "RSO",
                       tanggal: this.DateTime(),
                       aktif: "N",
@@ -814,11 +591,7 @@ export default {
                         name: "so",
                       });
                     });
-                  swalWithBootstrapButtons.fire(
-                    "Sukses!",
-                    "SO berhasil di kirim.",
-                    "success"
-                  );
+                  swalWithBootstrapButtons.fire("Sukses!", "SO berhasil di kirim.", "success");
                 })
                 .catch((error) => {
                   Swal.fire({
@@ -838,11 +611,7 @@ export default {
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal mengirim SO :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal mengirim SO :)", "error");
           }
         });
     },
@@ -863,10 +632,7 @@ export default {
           this.checkrso[i].diskon = 0;
         }
 
-        this.invoice +=
-          parseFloat(this.sub) *
-          (parseFloat(this.checkrso[i].harga) -
-            parseFloat(this.checkrso[i].diskon));
+        this.invoice += parseFloat(this.sub) * (parseFloat(this.checkrso[i].harga) - parseFloat(this.checkrso[i].diskon));
       }
     },
     draftSo() {
@@ -894,10 +660,7 @@ export default {
             this.banding = "";
             this.ok = "";
             for (let i = 0; i < this.checkrso.length; i++) {
-              if (
-                this.hitung.qty[i] === undefined ||
-                this.hitung.qty[i] === ""
-              ) {
+              if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === "") {
                 this.ok = "N";
               } else {
                 this.ok = "Y";
@@ -954,50 +717,36 @@ export default {
                         } else {
                           this.uprso.so_tdktersedia = "Y";
                         }
-                        axios
-                          .put("/api/listrso/" + this.listso[n].id, this.uprso)
-                          .then((res) => {
-                            axios
-                              .get("/api/listrso/" + this.up.nomor_rso)
-                              .then((res) => {
-                                this.lisallrso = res.data.data;
-                                this.done = "";
-                                this.pembanding = "";
-                                for (
-                                  let h = 0;
-                                  h < this.lisallrso.length;
-                                  h++
-                                ) {
-                                  this.done +=
-                                    this.lisallrso[h].so_tersedia +
-                                    this.lisallrso[h].so_tdktersedia;
-                                  this.pembanding += "YY";
-                                }
-                                if (this.done === this.pembanding) {
-                                  axios
-                                    .put("/api/rso/" + this.up.nomor_rso, {
-                                      status: "So",
-                                    })
-                                    .then((res) => {
-                                      this.$router.push({
-                                        name: "so",
-                                      });
-                                    });
-                                } else {
+                        axios.put("/api/listrso/" + this.listso[n].id, this.uprso).then((res) => {
+                          axios.get("/api/listrso/" + this.up.nomor_rso).then((res) => {
+                            this.lisallrso = res.data.data;
+                            this.done = "";
+                            this.pembanding = "";
+                            for (let h = 0; h < this.lisallrso.length; h++) {
+                              this.done += this.lisallrso[h].so_tersedia + this.lisallrso[h].so_tdktersedia;
+                              this.pembanding += "YY";
+                            }
+                            if (this.done === this.pembanding) {
+                              axios
+                                .put("/api/rso/" + this.up.nomor_rso, {
+                                  status: "So",
+                                })
+                                .then((res) => {
                                   this.$router.push({
                                     name: "so",
                                   });
-                                }
+                                });
+                            } else {
+                              this.$router.push({
+                                name: "so",
                               });
+                            }
                           });
+                        });
                       }
                     });
                   }
-                  swalWithBootstrapButtons.fire(
-                    "Sukses!",
-                    "Draft SO berhasil di Di simpan.",
-                    "success"
-                  );
+                  swalWithBootstrapButtons.fire("Sukses!", "Draft SO berhasil di Di simpan.", "success");
                 })
                 .catch((error) => {
                   Swal.fire({
@@ -1017,11 +766,7 @@ export default {
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal mengirim SO :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal mengirim SO :)", "error");
           }
         });
     },
@@ -1044,8 +789,7 @@ export default {
         $("#modal-lokasi").modal("show");
       } else if (this.up.distribusi === "ambil") {
         this.up.lokasi = "PT. Ekatunggal Tunas Mandiri";
-        this.up.alamat =
-          "Jl. Pahlawan No.29A, RT.003/005 Citeureup, Kab. Bogor, Jawa Barat";
+        this.up.alamat = "Jl. Pahlawan No.29A, RT.003/005 Citeureup, Kab. Bogor, Jawa Barat";
       } else if (this.up.distribusi === "default") {
         this.up.alamat = "";
         this.up.lokasi = "";
@@ -1109,34 +853,20 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates =
-        this.year +
-        "-" +
-        (this.month < 10 ? "0" : "") +
-        this.month +
-        "-" +
-        this.day;
-      this.times =
-        this.hours +
-        ":" +
-        this.minute +
-        ":" +
-        (this.seconds < 10 ? "0" : "") +
-        this.seconds;
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
       this.datetimes = this.dates + " " + this.times;
       return this.datetimes;
     },
     ceknomorso() {
-      axios
-        .get("/api/so/" + this.up.nomor_so + this.ambiluser.kode_groupso)
-        .then((res) => {
-          this.adaso = res.data.data;
-          if (this.up.nomor_so.length === 15 && this.adaso.length === 0) {
-            this.nyala = true;
-          } else {
-            this.nyala = false;
-          }
-        });
+      axios.get("/api/so/" + this.up.nomor_so + this.ambiluser.kode_groupso).then((res) => {
+        this.adaso = res.data.data;
+        if (this.up.nomor_so.length === 15 && this.adaso.length === 0) {
+          this.nyala = true;
+        } else {
+          this.nyala = false;
+        }
+      });
     },
   },
 };

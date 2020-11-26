@@ -445,6 +445,7 @@ export default {
                     alastolak: "",
                     id_ekspedisi: vso.id_ekspedisi,
                     id_user: this.ambiluser.id,
+                    tgl_sales: this.DateTime(),
                   };
                   axios.put("/api/so/" + this.listnewso[0].nomor_so, this.uploadso).then((res) => {
                     axios.get("/api/listso/" + this.$route.params.id).then((res) => {
@@ -631,6 +632,13 @@ export default {
                     .put("/api/so/" + this.$route.params.id, {
                       alastolak: "",
                       status: "Draft",
+                      tgl_sales: "",
+                      kordinator: "",
+                      tgl_kordinator: "",
+                      spv: "",
+                      tgl_spv: "",
+                      dic: "",
+                      tgl_dic: "",
                     })
                     .then((res) => {
                       axios.post("/api/history", {
@@ -908,6 +916,8 @@ export default {
             axios
               .put("/api/so/" + vso.nomor_so, {
                 status: "Acc",
+                dic: this.ambiluser.name,
+                tgl_dic: this.DateTime(),
               })
               .then((res) => {
                 axios.get("/api/listso/" + vso.nomor_so).then((res) => {

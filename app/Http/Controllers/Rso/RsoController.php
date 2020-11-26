@@ -127,7 +127,7 @@ class RsoController extends Controller
         $getrso=Rso::where('nomor_rso',$rso)->get();    
         $getlist=Listrso::where('nomor_rso',$rso)->where('status','Tersedia')->get();
         // $pdf = view('print.so',['so'=>$getso,'listso'=>$getlistso]);
-        $pdf = PDF::loadview('print.rsotersedia',['rso'=>$getrso,'list'=>$getlist])->setPaper([0, 0, 684, 396], 'potrait');
+        $pdf = PDF::loadview('print.rsotersedia',['rso'=>$getrso,'list'=>$getlist])->setPaper([0, 0, 609.45, 396.85], 'potrait');
         // return $pdf;
         return   $pdf->stream($rso);
     }
