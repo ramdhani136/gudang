@@ -42,7 +42,7 @@
     </div>
     <div class="row">
       <button v-if="item" @click="showmodal()" class="btn btn-orange mt-4 ml-3" style="height: 40px">+ Tambah Item</button>
-      <div id="total" class="mt-3 ml-auto mr-4">Total Invoice :&nbsp; {{ invoice | currency }}</div>
+      <div id="total" style="width: auto; min-width: 30%" class="mt-3 ml-auto mr-4">Total Invoice :&nbsp; {{ invoice | currency }}</div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
       <div class="row mt-1 mx-auto col-12">
@@ -59,28 +59,34 @@
               <th>Qty</th>
               <th>Sub Total</th>
               <th>Catatan</th>
+              <th>Kubikasi(M3)</th>
+              <th>Tonase(KG)</th>
               <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(lp, index) in listpr" :key="index">
-              <td style="text-align: center">{{ index + 1 }}</td>
+              <td style="text-align: center">
+                {{ index + 1 }}
+              </td>
               <td>{{ lp.kode }}</td>
               <td>{{ lp.nama }}</td>
               <td style="text-align: center">{{ lp.satuan }}</td>
               <td style="text-align: center">{{ lp.harga | currency }}</td>
               <td style="text-align: center">
-                <input @input="hitunginvoice()" v-model="diskon[index]" type="number" class="form-control" />
+                <input style="width: 120px" @input="hitunginvoice()" v-model="diskon[index]" type="number" class="form-control" />
               </td>
               <td style="text-align: center">
-                <input @input="hitunginvoice()" v-model="hitung.qty[index]" type="number" class="form-control" />
+                <input style="width: 120px" @input="hitunginvoice()" v-model="hitung.qty[index]" type="number" class="form-control" />
               </td>
               <td style="text-align: center">
-                {{ ((lp.harga - diskon[index]) * hitung.qty[index]) | currency }}
+                {{ ((parseFloat(lp.harga) - parseFloat(inhitung.diskon[index])) * parseFloat(hitung.qty[index])) | currency }}
               </td>
               <td style="text-align: center">
-                <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
+                <textarea style="width: 150px" v-model="hitung.keterangan[index]" class="form-control"></textarea>
               </td>
+              <td style="text-align: center">{{ hitung.qty[index] * lp.kubikasi }}</td>
+              <td style="text-align: center">{{ hitung.qty[index] * lp.tonase }}</td>
               <td>
                 <button @click="hapus(index)" style="text-align: center" class="btn btn-danger">Hapus</button>
               </td>
@@ -92,6 +98,10 @@
     <div class="row mt-2">
       <button class="btn btn-primary ml-3" @click="createDraft()">Simpan Draft</button>
       <button @click="kirimrso()" class="btn-success btn ml-1" :disabled="bolehkirim">Kirim Permintaan</button>
+      <div class="tonkg">
+        <b>Kubikasi : {{ kubikasi }} M3 |</b>
+        <b>Tonase : {{ tonase }} KG</b>
+      </div>
     </div>
     <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -238,10 +248,15 @@ export default {
       aktif: false,
       adarso: {},
       bolehkirim: true,
+      kubikasi: 0,
+      tonase: 0,
+      subkubikasi: 0,
+      subtonase: 0,
     };
   },
   created() {
     this.getBarang();
+    this.scroll();
   },
   computed: {
     matches() {
@@ -313,6 +328,8 @@ export default {
         }
         this.ket.satuan = this.custom.satuan;
         this.ket.nama = this.custom.nama;
+        this.ket.kubikasi = this.custom.kubikasi;
+        this.ket.kg = this.custom.kg;
         this.visible = false;
       });
     },
@@ -353,6 +370,8 @@ export default {
             kode: this.ket.kode,
             nama: this.ket.nama,
             satuan: this.ket.satuan,
+            kubikasi: this.ket.kubikasi,
+            tonase: this.ket.kg,
           };
           this.listpr.push(this.barangs);
         }
@@ -378,6 +397,8 @@ export default {
                 kode: this.ket.kode,
                 nama: this.ket.nama,
                 satuan: this.ket.satuan,
+                kubikasi: this.ket.kubikasi,
+                tonase: this.ket.kg,
               };
               this.listpr.push(this.barangs);
             } else {
@@ -669,7 +690,8 @@ export default {
       console.log(this.ket.harga);
     },
     hitunginvoice() {
-      this.subtotal = 0;
+      this.kubikasi = 0;
+      this.tonase = 0;
       this.invoice = 0;
       this.aplus = "";
       this.aband = "";
@@ -702,6 +724,15 @@ export default {
         }
         this.aplus += this.a;
         this.aband += "Y";
+        /* kubikasi dan tonase */
+
+        this.subkubikasi = parseFloat(this.inhitung.qty[i]) * parseFloat(this.listpr[i].kubikasi);
+        this.kubikasi += this.subkubikasi;
+
+        this.subtonase = parseFloat(this.inhitung.qty[i]) * parseFloat(this.listpr[i].tonase);
+        this.tonase += this.subtonase;
+
+        /* end */
       }
       if (this.aplus === this.aband && this.listpr.length > 0) {
         this.bolehkirim = false;
@@ -719,8 +750,47 @@ export default {
         }
       });
     },
+    scroll() {
+      $("#dtHorizontalVerticalExample").DataTable({
+        scrollX: true,
+        scrollY: 200,
+      });
+      $(".dataTables_length").addClass("bs-select");
+    },
   },
 };
 </script>
 
-<style></style>
+<style>
+.dtHorizontalVerticalExampleWrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+#dtHorizontalVerticalExample th,
+td {
+  white-space: nowrap;
+}
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+  bottom: 0.5em;
+}
+
+.tonkg {
+  width: auto;
+  height: auto;
+  position: absolute;
+  right: 5%;
+}
+
+.tonkg b {
+  color: rgb(177, 176, 176);
+}
+</style>

@@ -9,6 +9,31 @@
 </head>
 <body>
     @php 
+    function tgl_indo($tanggal){
+	$bulan = array (
+		1 =>   'Januari',
+		'Februari',
+		'Maret',
+		'April',
+		'Mei',
+		'Juni',
+		'Juli',
+		'Agustus',
+		'September',
+		'Oktober',
+		'November',
+		'Desember'
+	);
+	$pecahkan = explode('-', $tanggal);
+	
+	// variabel pecahkan 0 = tanggal
+	// variabel pecahkan 1 = bulan
+	// variabel pecahkan 2 = tahun
+ 
+	return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+}
+
+
     function format_uang($angka){ 
     $hasil =  number_format($angka,2, ',' , '.'); 
     return $hasil; 
@@ -29,7 +54,7 @@
                 <td style="width:20%;margin-left: 5%;"><b>Sales</b> : {{$s->user->name}}</td>
             </tr>
             <tr>
-                <td style="width:25%;"><b>Tanggal</b> : {{$s->tanggal_rso}}</td>
+                <td style="width:25%;"><b>Tanggal</b> : {{tgl_indo($s->tanggal_rso)}}</td>
                 <td style="width:35%;margin-left: 10%;"><b>Group</b> : {{$s->groupso->area}}</td>
             </tr>
         </tbody>
@@ -67,7 +92,7 @@
                     <td style="text-align:left;"></td>
                     <td style="text-align:left;">{{$p->barang->satuan}}</td>
                     <td style="text-align:left;"></td>
-                    <td style="text-align:left;">{{$p->tanggal_datang}}</td>  
+                    <td style="text-align:left;">{{tgl_indo($p->tanggal_datang)}}</td>  
                 </tr>  
                 {{$total+=$p->qty*($p->harga-$p->diskon)}};
                 @endforeach

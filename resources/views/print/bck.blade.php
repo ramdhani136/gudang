@@ -6,6 +6,31 @@
     <title>{{$bck[0]->bck}}</title>
 </head>
 <body>
+    @php
+    function tgl_indo($tanggal){
+	$bulan = array (
+		1 =>   'Januari',
+		'Februari',
+		'Maret',
+		'April',
+		'Mei',
+		'Juni',
+		'Juli',
+		'Agustus',
+		'September',
+		'Oktober',
+		'November',
+		'Desember'
+	);
+	$pecahkan = explode('-', $tanggal);
+	
+	// variabel pecahkan 0 = tanggal
+	// variabel pecahkan 1 = bulan
+	// variabel pecahkan 2 = tahun
+ 
+	return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+    }
+    @endphp
     <h1 style="text-align:center;font-size:14pt;margin-top:-20px">BUKTI CHECKER BARANG KELUAR</h1>
     <div style="width:100%;height:auto;">
         @foreach($bck as $b)
@@ -17,7 +42,7 @@
                     <td><b>Distribusi : </b>{{$b->so->distribusi}}</td>
                 </tr>
                 <tr style="width: 25%;">
-                    <td><b>Tanggal : </b>{{ $b->tanggal}}</td>
+                    <td><b>Tanggal : </b>{{tgl_indo($b->tanggal)}}</td>
                     <td><b>Customer : </b>{{$b->so->rso->customer->nama}}</td>
                     <td><b>Lokasi : </b>{{$b->so->lokasi}}</td>
                 </tr>

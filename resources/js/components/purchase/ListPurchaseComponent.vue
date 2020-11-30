@@ -312,6 +312,7 @@ export default {
                               pr: "Y",
                               accdate: this.DateTime(),
                               sisapo: this.listrso[s].qty,
+                              idx: this.listrso[s].idx,
                             };
                             axios.post("/api/listso", this.uplist);
                           }

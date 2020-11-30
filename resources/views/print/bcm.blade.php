@@ -6,6 +6,31 @@
     <title>{{$bcm[0]->bcm}}</title>
 </head>
 <body>
+@php
+    function tgl_indo($tanggal){
+	$bulan = array (
+		1 =>   'Januari',
+		'Februari',
+		'Maret',
+		'April',
+		'Mei',
+		'Juni',
+		'Juli',
+		'Agustus',
+		'September',
+		'Oktober',
+		'November',
+		'Desember'
+	);
+	$pecahkan = explode('-', $tanggal);
+	
+	// variabel pecahkan 0 = tanggal
+	// variabel pecahkan 1 = bulan
+	// variabel pecahkan 2 = tahun
+ 
+	return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+    }
+    @endphp
     <h1 style="text-align:center;font-size:14pt;margin-top:-20px">BUKTI CHECKER BARANG MASUK</h1>
     <div style="width:100%;height:auto;">
         @foreach($bcm as $b)
@@ -17,7 +42,7 @@
                     <td><b>Purchasing : </b>{{$b->po->user->name}}</td>
                 </tr>
                 <tr style="width: 25%;">
-                    <td><b>Tanggal : </b>{{ $b->tanggal}}</td>
+                    <td><b>Tanggal : </b>{{tgl_indo($b->tanggal)}}</td>
                     <td><b>Nomor PO : </b>{{$b->nomor_po}}</td>
                     <td><b>Nopol : </b>{{$b->nopol}}</td>
                 </tr>

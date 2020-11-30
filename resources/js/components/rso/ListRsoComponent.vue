@@ -47,24 +47,26 @@
         </div>
       </div>
       <button v-if="status === 'Draft'" @click="showmodal()" class="btn btn-orange float-left mt-4 ml-1">+ Tambah Item</button>
-      <div id="total" class="mt-3 ml-auto mr-4">Total Invoice :&nbsp; {{ invoice | currency }}</div>
+      <div id="total" class="mt-3 ml-auto mr-4" style="min-width: 30%">Total Invoice :&nbsp; {{ invoice | currency }}</div>
       <div id="rsoverflowso" class="row mt-2 mx-auto">
         <div class="row mt-1 mx-auto col-12">
           <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
             <thead>
               <tr>
                 <th>No</th>
-                <th style="width: 2%">Kode Barang</th>
-                <th style="width: 20%">Nama Barang</th>
+                <th>Kode Barang</th>
+                <th>Nama Barang</th>
                 <th>Satuan</th>
                 <th>Harga</th>
-                <th style="width: 20%">Diskon Harga</th>
-                <th style="width: 20%">Qty</th>
+                <th>Diskon Harga</th>
+                <th>Qty</th>
                 <th v-if="status === 'Draft'">Catatan</th>
                 <th v-if="status === 'So' || status === 'Confirmed'">Status</th>
                 <th v-if="status === 'So' || status === 'Confirmed'">Tersedia</th>
                 <th v-if="status === 'So' || status === 'Confirmed'">Tidak Tersedia</th>
                 <th v-if="status === 'So' || status === 'Confirmed'">Estimasi Kedatangan</th>
+                <th>Kubikasi</th>
+                <th>Tonase</th>
                 <th v-if="status === 'Draft'">Aksi</th>
               </tr>
             </thead>
@@ -76,13 +78,13 @@
                 <td style="text-align: center">{{ lp.satuan }}</td>
                 <td style="text-align: center">{{ lp.harga | currency }}</td>
                 <td style="text-align: center">
-                  <input style="text-align: center" :disabled="status !== 'Draft'" @input="hitunginvoice()" v-model="diskon[index]" type="number" class="form-control" />
+                  <input style="text-align: center; width: 120px" :disabled="status !== 'Draft'" @input="hitunginvoice()" v-model="diskon[index]" type="number" class="form-control" />
                 </td>
                 <td style="text-align: center">
-                  <input style="text-align: center" :disabled="status !== 'Draft'" @input="hitunginvoice()" v-model="hitung.qty[index]" type="number" class="form-control" />
+                  <input style="text-align: center; width: 120px" :disabled="status !== 'Draft'" @input="hitunginvoice()" v-model="hitung.qty[index]" type="number" class="form-control" />
                 </td>
                 <td v-if="status === 'Draft'" style="text-align: center">
-                  <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
+                  <textarea style="width: 130px" v-model="hitung.keterangan[index]" class="form-control"></textarea>
                 </td>
                 <td style="text-align: center" v-if="status === 'So' || status === 'Confirmed'">
                   {{ lp.status }}
@@ -95,8 +97,11 @@
                 </td>
                 <td style="text-align: center" v-if="status === 'So' || status === 'Confirmed'">
                   <div v-if="lp.acc_purch === 'Y'">{{ lp.tgl_datang }}</div>
-                  <button @click="aksiDetail(lp)" v-if="lp.acc_purch === 'N'" style="text-align: center" class="btn btn-primary">Lihat</button>
                 </td>
+
+                <td style="text-align: center">{{ parseFloat(hitung.qty[index]) * parseFloat(buka.kubikasi[index]) }}</td>
+                <td style="text-align: center">{{ parseFloat(hitung.qty[index]) * parseFloat(buka.tonase[index]) }}</td>
+                <button @click="aksiDetail(lp)" v-if="lp.acc_purch === 'N'" style="text-align: center" class="btn btn-primary">Lihat</button>
                 <td v-if="status === 'Draft'">
                   <button @click="hapus(index)" style="text-align: center" class="btn btn-danger">Hapus</button>
                 </td>
@@ -112,6 +117,10 @@
         <router-link v-if="status === 'Confirmed' && ambiluser.sales === 1" to="/so/new" class="btn btn-success ml-1">+ Create SO</router-link>
         <button v-if="status === 'Sent'" @click="reqedit()" class="btn-orange btn ml-3">Request Edit</button>
         <button v-if="load === false && (status === 'Confirmed' || status === 'So') && ambiluser.sales === 1" @click="showprint()" class="btn-none btn ml-1">Print</button>
+        <div class="tonkg">
+          <b>Kubikasi : {{ qtykubikasi }} M3 |</b>
+          <b>Tonase : {{ qtytonase }} KG</b>
+        </div>
       </div>
       <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -327,12 +336,20 @@ export default {
       distt: false,
       btnedit: true,
       akses: true,
+      barangs: {},
+      qtykubikasi: 0,
+      qtytonase: 0,
+      buka: {
+        kubikasi: [],
+        tonase: [],
+      },
     };
   },
   created() {
     this.getBarang();
     this.getrso();
     this.getakses();
+    this.scroll();
   },
   computed: {
     matches() {
@@ -412,8 +429,13 @@ export default {
                 }
               });
             }
+            axios.get("/api/barang/" + this.listpr[i].lkode_barang).then((res) => {
+              this.barangs = res.data.data;
+              this.buka.kubikasi.push(this.barangs[0].kubikasi);
+              this.buka.tonase.push(this.barangs[0].kg);
+              this.hitunginvoice();
+            });
           }
-          this.hitunginvoice();
         });
       });
     },
@@ -462,6 +484,8 @@ export default {
         }
         this.ket.satuan = this.custom.satuan;
         this.ket.nama = this.custom.nama;
+        this.ket.kubikasi = this.custom.kubikasi;
+        this.ket.tonase = this.custom.kg;
         this.visible = false;
       });
     },
@@ -504,6 +528,8 @@ export default {
             satuan: this.ket.satuan,
           };
           this.listpr.push(this.barangs);
+          this.buka.kubikasi.push(this.ket.kubikasi);
+          this.buka.tonase.push(this.ket.tonase);
         }
       } else {
         if (this.Filteredlist.length > 1) {
@@ -529,6 +555,8 @@ export default {
                 satuan: this.ket.satuan,
               };
               this.listpr.push(this.barangs);
+              this.buka.kubikasi.push(this.ket.kubikasi);
+              this.buka.tonase.push(this.ket.tonase);
             } else {
               Swal.fire({
                 icon: "error",
@@ -715,7 +743,7 @@ export default {
             this.load = true;
             axios
               .put("/api/rso/" + this.$route.params.id, {
-                status: "Sent",
+                status: "Draft",
                 tgl_sales: "",
                 dic: "",
                 tgl_dic: "",
@@ -850,6 +878,8 @@ export default {
     hapus(index) {
       this.listpr.splice(index, 1);
       this.hitung.qty.splice(index, 1);
+      this.buka.kubikasi.splice(index, 1);
+      this.buka.tonase.splice(index, 1);
       this.diskon.splice(index, 1);
       this.hitung.keterangan.splice(index, 1);
       this.hitunginvoice();
@@ -921,6 +951,8 @@ export default {
       /*  console.log(this.ket.harga); */
     },
     hitunginvoice() {
+      this.qtykubikasi = 0;
+      this.qtytonase = 0;
       this.subtotal = 0;
       this.invoice = 0;
       for (let i = 0; i < this.listpr.length; i++) {
@@ -947,6 +979,9 @@ export default {
         this.subtotal = (parseFloat(this.listpr[i].harga) - parseFloat(this.inhitung.diskon[i])) * parseFloat(this.inhitung.qty[i]);
         this.invoice += parseFloat(this.subtotal);
         this.cekkirim();
+
+        this.qtykubikasi += parseFloat(this.inhitung.qty[i]) * parseFloat(this.buka.kubikasi[i]);
+        this.qtytonase += parseFloat(this.inhitung.qty[i]) * parseFloat(this.buka.tonase[i]);
       }
     },
     cekinputrso() {
@@ -996,6 +1031,13 @@ export default {
     },
     showprint() {
       $("#modal-print").modal("show");
+    },
+    scroll() {
+      $("#dtHorizontalVerticalExample").DataTable({
+        scrollX: true,
+        scrollY: 200,
+      });
+      $(".dataTables_length").addClass("bs-select");
     },
   },
 };
