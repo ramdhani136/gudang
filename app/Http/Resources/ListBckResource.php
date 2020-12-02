@@ -31,6 +31,8 @@ class ListBckResource extends JsonResource
             'diskon'=>$this->diskon,
             'nomor_so'=>$this->bck->nomor_so,
             'idx'=>$this->idx,
+            'kubikasi'=>$this->barang->kubikasi,
+             'tonase'=>$this->barang->kg,
         ];
     }
 }

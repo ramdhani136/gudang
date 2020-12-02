@@ -4,37 +4,16 @@
       <div class="col-4">
         <div class="form-group">
           <label>Nomor Checker :</label>
-          <input
-            v-model="up.bck"
-            type="text"
-            class="form-control col-12"
-            :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0"
-          />
+          <input v-model="up.bck" type="text" class="form-control col-12" :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0" />
         </div>
         <div class="form-group">
           <label>Tanggal :</label>
-          <input
-            v-model="up.tanggal"
-            type="date"
-            @change="validate()"
-            :min="now()"
-            class="form-control col-12"
-            :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0"
-          />
+          <input v-model="up.tanggal" type="date" @change="validate()" :min="now()" class="form-control col-12" :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0" />
         </div>
         <div class="form-group">
           <label>Nomor Kendaraan :</label>
-          <select
-            v-model="up.id_kendaraan"
-            name="kendaraan"
-            class="form-control"
-            :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0"
-          >
-            <option
-              :value="kd.id"
-              v-for="(kd, index) in kendaraan"
-              :key="index"
-            >
+          <select v-model="up.id_kendaraan" name="kendaraan" class="form-control" :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0">
+            <option :value="kd.id" v-for="(kd, index) in kendaraan" :key="index">
               {{ kd.nopol }}
             </option>
           </select>
@@ -43,79 +22,41 @@
       <div class="col-4">
         <div class="form-group">
           <label>Nomor SO</label>
-          <input
-            v-model="up.nomor_so"
-            @click="showSo()"
-            type="text"
-            class="form-control"
-            placeholder="Pilih Sales Order"
-            :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0"
-          />
+          <input v-model="up.nomor_so" @click="showSo()" type="text" class="form-control" placeholder="Pilih Sales Order" :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0" />
         </div>
         <div class="form-group">
           <label>Customer</label>
-          <select
-            v-model="ket.customer"
-            name="customer"
-            class="col-12 form-control"
-            disabled
-          >
+          <select v-model="ket.customer" name="customer" class="col-12 form-control" disabled>
             <option :value="ket.customer">{{ ket.customer }}</option>
           </select>
         </div>
         <div class="form-group">
           <label>Distribusi</label>
-          <input
-            v-model="ket.distribusi"
-            type="text"
-            class="form-control"
-            disabled
-          />
+          <input v-model="ket.distribusi" type="text" class="form-control" disabled />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Lokasi</label>
-          <input
-            v-model="ket.lokasi"
-            type="text"
-            class="form-control"
-            disabled
-          />
+          <input v-model="ket.lokasi" type="text" class="form-control" disabled />
         </div>
         <div class="form-group">
           <label>Alamat</label>
-          <textarea
-            v-model="ket.alamat"
-            name="keterangan"
-            class="form-control col-12"
-            disabled
-          ></textarea>
+          <textarea v-model="ket.alamat" name="keterangan" class="form-control col-12" disabled></textarea>
         </div>
         <div class="form-group">
           <label>keterangan</label>
-          <textarea
-            v-model="up.keterangan"
-            name="keterangan"
-            class="form-control col-12"
-            :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0"
-          ></textarea>
+          <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12" :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0"></textarea>
         </div>
       </div>
     </div>
     <div class="row">
-      <div id="total" class="mt-3 ml-auto mr-3">
-        Total Invoice :&nbsp; {{ total | currency }}
-      </div>
+      <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ total | currency }}</div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
       <div class="row mt-1 mx-auto col-12">
         <Circle5 id="load3" v-if="load"></Circle5>
-        <table
-          id="rsthead"
-          class="table mt-2 table-striped table-bordered"
-          style="width: 100%"
-        >
+        <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
           <thead>
             <tr>
               <th>No</th>
@@ -127,6 +68,8 @@
               <th>Sisa SO</th>
               <th>Rencana Kirim</th>
               <th>Keterangan</th>
+              <th>Kubikasi</th>
+              <th>Tonase</th>
               <th v-if="statusbck === 'draft'">Aksi</th>
             </tr>
           </thead>
@@ -142,29 +85,15 @@
               </td>
               <td style="text-align: center">{{ hitung.sisaso[index] }}</td>
               <td style="text-align: center">
-                <input
-                  @input="validqty(index)"
-                  v-model="hitung.qty[index]"
-                  type="number"
-                  class="form-control"
-                  :disabled="
-                    statusbck !== 'draft' || ambiluser.distribusi === 0
-                  "
-                />
+                <input style="width: 120px" @input="validqty(index)" v-model="hitung.qty[index]" type="number" class="form-control" :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0" />
               </td>
               <td style="text-align: center">
-                <textarea
-                  v-model="hitung.keterangan[index]"
-                  class="form-control"
-                  :disabled="
-                    statusbck !== 'draft' || ambiluser.distribusi === 0
-                  "
-                ></textarea>
+                <textarea style="width: 120px" v-model="hitung.keterangan[index]" class="form-control" :disabled="statusbck !== 'draft' || ambiluser.distribusi === 0"></textarea>
               </td>
+              <td>{{ parseFloat(hitung.qty[index]) * parseFloat(listbcm.kubikasi) }}</td>
+              <td>{{ parseFloat(hitung.qty[index]) * parseFloat(listbcm.tonase) }}</td>
               <td v-if="statusbck === 'draft'" style="text-align: center">
-                <button @click="hapusitem(index)" class="btn btn-danger">
-                  Hapus
-                </button>
+                <button @click="hapusitem(index)" class="btn btn-danger">Hapus</button>
               </td>
             </tr>
           </tbody>
@@ -176,74 +105,37 @@
                     Simpan Draft
                 </button> -->
       <button @click="kembali()" class="btn btn-primary ml-3">Kembali</button>
-      <button
-        v-if="statusbck === 'open'"
-        @click="batalkan()"
-        class="btn btn-danger ml-1"
-      >
-        Batalkan BCK
-      </button>
-      <button
-        v-if="statusbck === 'open'"
-        @click="print()"
-        class="btn btn-none ml-1"
-      >
-        Print
-      </button>
+      <button v-if="statusbck === 'open'" @click="batalkan()" class="btn btn-danger ml-1">Batalkan BCK</button>
+      <button v-if="statusbck === 'open'" @click="print()" class="btn btn-none ml-1">Print</button>
+      <div class="tonkg">
+        <b>Kubikasi : {{ kubikasi }} M3 |</b>
+        <b>Tonase : {{ tonase }} KG</b>
+      </div>
     </div>
-    <div
-      class="modal fade"
-      id="modal-po"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Form SO</h5>
-            <button
-              @click="resetForm()"
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
               <label>Pilih SO</label>
-              <select
-                @change="pilihSo(aktif)"
-                v-model="aktif"
-                class="form-control"
-              >
-                <option
-                  :value="aktif"
-                  v-for="(aktif, index) in soaktif"
-                  :key="index"
-                >
+              <select @change="pilihSo(aktif)" v-model="aktif" class="form-control">
+                <option :value="aktif" v-for="(aktif, index) in soaktif" :key="index">
                   {{ aktif.nomor_so }}
                 </option>
               </select>
             </div>
             <div class="form-group">
               <label>Customer</label>
-              <input
-                v-model="ket.customer"
-                type="text"
-                class="form-control"
-                disabled
-              />
+              <input v-model="ket.customer" type="text" class="form-control" disabled />
             </div>
             <div id="overflowBody">
-              <table
-                class="table mt-2 table-striped table-bordered"
-                style="width: 100%"
-              >
+              <table class="table mt-2 table-striped table-bordered" style="width: 100%">
                 <thead id="rsthead">
                   <tr>
                     <th style="text-align: center">No</th>
@@ -266,13 +158,7 @@
                       {{ ket.tersedia[index] }}
                     </td>
                     <td style="text-align: center">
-                      <input
-                        @change="pilihlistchecker()"
-                        v-model="checker"
-                        type="checkbox"
-                        :value="ls"
-                        :disabled="ket.ltersedia[index] === 0"
-                      />
+                      <input @change="pilihlistchecker()" v-model="checker" type="checkbox" :value="ls" :disabled="ket.ltersedia[index] === 0" />
                     </td>
                   </tr>
                 </tbody>
@@ -280,51 +166,24 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              @click="resetForm()"
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" @click="checklist()" class="btn btn-primary">
-              Save changes
-            </button>
+            <button @click="resetForm()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" @click="checklist()" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>
     </div>
-    <div
-      class="modal fade"
-      id="modal-pr"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Rincian Permintaan
-            </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div id="scrollList">
-              <table
-                id="thead"
-                class="table table-striped table-bordered"
-                style="width: 100%"
-              >
+              <table id="thead" class="table table-striped table-bordered" style="width: 100%">
                 <thead>
                   <tr>
                     <th style="text-align: center">No</th>
@@ -343,13 +202,7 @@
                     <td style="text-align: center"></td>
                     <td style="text-align: center"></td>
                     <td>
-                      <button
-                        type="button"
-                        class="btn btn-danger"
-                        data-dismiss="modal"
-                      >
-                        Delete
-                      </button>
+                      <button type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
                     </td>
                   </tr>
                 </tbody>
@@ -357,18 +210,10 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
           <div class="error-actions">
-            <router-link to="/so" class="btn btn-primary btn-lg">
-              Lihat Data SO
-            </router-link>
+            <router-link to="/so" class="btn btn-primary btn-lg"> Lihat Data SO </router-link>
           </div>
         </div>
       </div>
@@ -436,6 +281,8 @@ export default {
       listbckhps: {},
       listsohps: {},
       qtybck: 0,
+      kubikasi: 0,
+      tonase: 0,
     };
   },
   created() {
@@ -460,29 +307,16 @@ export default {
               satuan: this.listbck[i].satuan,
               harga: this.listbck[i].harga,
               diskon: this.listbck[i].diskon,
+              kubikasi: this.listbck[i].kubikasi,
+              tonase: this.listbck[i].tonase,
             });
             this.hitung.qty[i] = this.listbck[i].qty;
-            axios
-              .get(
-                "/api/listso/data/" +
-                  this.up.nomor_so +
-                  "/" +
-                  this.listbck[i].kode_barang +
-                  "/" +
-                  this.listbck[i].idx
-              )
-              .then((res) => {
-                this.listsonya = res.data.data;
-                this.hitung.sisaso[i] =
-                  parseFloat(this.listsonya[0].qty) -
-                  parseFloat(this.listsonya[0].bck) +
-                  parseFloat(this.listbck[i].qty);
-                this.hitung.tersedia[i] =
-                  parseFloat(this.listsonya[0].tersedia) -
-                  parseFloat(this.listsonya[0].bck) +
-                  parseFloat(this.listbck[i].qty);
-                this.hitung.keterangan[i] = this.listbck[i].keterangan;
-              });
+            axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.listbck[i].kode_barang + "/" + this.listbck[i].idx).then((res) => {
+              this.listsonya = res.data.data;
+              this.hitung.sisaso[i] = parseFloat(this.listsonya[0].qty) - parseFloat(this.listsonya[0].bck) + parseFloat(this.listbck[i].qty);
+              this.hitung.tersedia[i] = parseFloat(this.listsonya[0].tersedia) - parseFloat(this.listsonya[0].bck) + parseFloat(this.listbck[i].qty);
+              this.hitung.keterangan[i] = this.listbck[i].keterangan;
+            });
           }
           axios.get("/api/so/data/aktif").then((res) => {
             this.validqty();
@@ -500,14 +334,7 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     validate() {
@@ -520,22 +347,14 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate() + 2;
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     bck_nomor() {
       var d = new Date();
       var month = d.getMonth() + 1;
 
-      var output =
-        "BCK-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
+      var output = "BCK-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
       return output;
     },
     showSo() {
@@ -558,11 +377,8 @@ export default {
       axios.get("/api/listso/data/listbck/" + aktif.nomor_so).then((res) => {
         this.listso = res.data.data;
         for (let i = 0; i < this.listso.length; i++) {
-          this.ket.sisaso[i] =
-            parseFloat(this.listso[i].qty) - parseFloat(this.listso[i].bck);
-          this.ket.tersedia[i] =
-            parseFloat(this.listso[i].tersedia) -
-            parseFloat(this.listso[i].bck);
+          this.ket.sisaso[i] = parseFloat(this.listso[i].qty) - parseFloat(this.listso[i].bck);
+          this.ket.tersedia[i] = parseFloat(this.listso[i].tersedia) - parseFloat(this.listso[i].bck);
         }
       });
     },
@@ -601,11 +417,7 @@ export default {
               this.aplus = "";
               this.banding = "";
               for (let i = 0; i < this.checker.length; i++) {
-                if (
-                  this.hitung.qty[i] === undefined ||
-                  this.hitung.qty[i] < 1 ||
-                  this.hitung.qty[i] === ""
-                ) {
+                if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 1 || this.hitung.qty[i] === "") {
                   this.hitung.qty[i] = 0;
                 }
                 if (this.hitung.qty[i] < 1) {
@@ -631,67 +443,42 @@ export default {
                         harga: this.checker[i].harga,
                         keterangan: this.hitung.keterangan[i],
                       };
-                      axios
-                        .post("/api/listbck", this.uploadlist)
-                        .then((res) => {
+                      axios.post("/api/listbck", this.uploadlist).then((res) => {
+                        axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.checker[i].kode_barang + "/" + this.checker[i].idx).then((res) => {
+                          this.listso = res.data.data;
+                          this.qtymasuk = parseFloat(this.listso[0].bck) + parseFloat(this.hitung.qty[i]);
+                          this.sisanya = parseFloat(this.listso[0].qty) - (parseFloat(this.listso[0].bck) + parseFloat(this.hitung.qty[i]));
+                          if (this.sisanya < 1) {
+                            this.closepo = "Y";
+                          } else {
+                            this.closepo = "N";
+                          }
                           axios
-                            .get(
-                              "/api/listso/data/" +
-                                this.up.nomor_so +
-                                "/" +
-                                this.checker[i].kode_barang +
-                                "/" +
-                                this.checker[i].idx
-                            )
+                            .put("/api/listso/" + this.listso[0].id, {
+                              bck: this.qtymasuk,
+                              closeso: this.closepo,
+                            })
                             .then((res) => {
-                              this.listso = res.data.data;
-                              this.qtymasuk =
-                                parseFloat(this.listso[0].bck) +
-                                parseFloat(this.hitung.qty[i]);
-                              this.sisanya =
-                                parseFloat(this.listso[0].qty) -
-                                (parseFloat(this.listso[0].bck) +
-                                  parseFloat(this.hitung.qty[i]));
-                              if (this.sisanya < 1) {
-                                this.closepo = "Y";
-                              } else {
-                                this.closepo = "N";
-                              }
-                              axios
-                                .put("/api/listso/" + this.listso[0].id, {
-                                  bck: this.qtymasuk,
-                                  closeso: this.closepo,
-                                })
-                                .then((res) => {
-                                  axios
-                                    .get("/api/listso/" + this.up.nomor_so)
-                                    .then((res) => {
-                                      this.listsoall = res.data.data;
-                                      console.log(this.listsoall);
-                                      this.bplus = "";
-                                      this.bban = "";
-                                      for (
-                                        let i = 0;
-                                        i < this.listsoall.length;
-                                        i++
-                                      ) {
-                                        this.bplus += this.listsoall[i].closeso;
-                                        this.bban += "Y";
-                                      }
-                                      console.log(this.bplus);
-                                      console.log(this.bban);
-                                      if (this.bplus === this.bban) {
-                                        axios.put(
-                                          "/api/so/" + this.up.nomor_so,
-                                          {
-                                            closebck: "Y",
-                                          }
-                                        );
-                                      }
-                                    });
-                                });
+                              axios.get("/api/listso/" + this.up.nomor_so).then((res) => {
+                                this.listsoall = res.data.data;
+                                console.log(this.listsoall);
+                                this.bplus = "";
+                                this.bban = "";
+                                for (let i = 0; i < this.listsoall.length; i++) {
+                                  this.bplus += this.listsoall[i].closeso;
+                                  this.bban += "Y";
+                                }
+                                console.log(this.bplus);
+                                console.log(this.bban);
+                                if (this.bplus === this.bban) {
+                                  axios.put("/api/so/" + this.up.nomor_so, {
+                                    closebck: "Y",
+                                  });
+                                }
+                              });
                             });
                         });
+                      });
                     }
                     this.$nextTick(() => {
                       axios.post("/api/history", {
@@ -712,11 +499,7 @@ export default {
                           tanggal: this.DateTime(),
                         })
                         .then((res) => {
-                          swalWithBootstrapButtons.fire(
-                            "Sukses!",
-                            "BCK berhasil di kirim.",
-                            "success"
-                          );
+                          swalWithBootstrapButtons.fire("Sukses!", "BCK berhasil di kirim.", "success");
                           this.$router.push({
                             name: "bck",
                           });
@@ -748,33 +531,27 @@ export default {
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal mengirim BCK :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal mengirim BCK :)", "error");
           }
         });
     },
     validqty(index) {
-      if (
-        parseFloat(this.hitung.qty[index]) >
-        parseFloat(this.hitung.tersedia[index])
-      ) {
+      if (parseFloat(this.hitung.qty[index]) > parseFloat(this.hitung.tersedia[index])) {
         this.hitung.qty[index] = this.hitung.tersedia[index];
       }
       this.total = 0;
+      this.kubikasi = 0;
+      this.tonase = 0;
       for (let i = 0; i < this.checker.length; i++) {
         if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === "") {
           this.hitung.jumlah[i] = 0;
         } else {
           this.hitung.jumlah[i] = this.hitung.qty[i];
         }
-        this.subtotal =
-          (parseFloat(this.checker[i].harga) -
-            parseFloat(this.checker[i].diskon)) *
-          parseFloat(this.hitung.jumlah[i]);
+        this.subtotal = (parseFloat(this.checker[i].harga) - parseFloat(this.checker[i].diskon)) * parseFloat(this.hitung.jumlah[i]);
         this.total += parseFloat(this.subtotal);
+        this.kubikasi += parseFloat(this.hitung.qty[i]) * parseFloat(this.checker[i].kubikasi);
+        this.tonase += parseFloat(this.hitung.qty[i]) * parseFloat(this.checker[i].tonase);
       }
     },
     batal() {
@@ -804,20 +581,8 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates =
-        this.year +
-        "-" +
-        (this.month < 10 ? "0" : "") +
-        this.month +
-        "-" +
-        this.day;
-      this.times =
-        this.hours +
-        ":" +
-        this.minute +
-        ":" +
-        (this.seconds < 10 ? "0" : "") +
-        this.seconds;
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
       this.datetimes = this.dates + " " + this.times;
       return this.datetimes;
     },
@@ -850,82 +615,56 @@ export default {
               })
               .then((res) => {
                 /* edit listso */
-                axios
-                  .get("/api/listbck/" + this.$route.params.bck)
-                  .then((res) => {
-                    this.listbckhps = res.data.data;
-                    for (let i = 0; i < this.listbckhps.length; i++) {
-                      this.qtybck = 0;
-                      axios
-                        .get(
-                          "/api/listso/data/" +
-                            this.up.nomor_so +
-                            "/" +
-                            this.listbckhps[i].kode_barang +
-                            "/" +
-                            this.listbckhps[i].idx
-                        )
-                        .then((res) => {
-                          this.listsohps = res.data.data;
-                          this.qtybck =
-                            parseFloat(this.listsohps[0].bck) -
-                            parseFloat(this.listbckhps[i].qty);
-                          axios.put("/api/listso/" + this.listsohps[0].id, {
-                            bck: this.qtybck,
-                            closeso: "N",
-                          });
-                        });
-                    }
-                  });
+                axios.get("/api/listbck/" + this.$route.params.bck).then((res) => {
+                  this.listbckhps = res.data.data;
+                  for (let i = 0; i < this.listbckhps.length; i++) {
+                    this.qtybck = 0;
+                    axios.get("/api/listso/data/" + this.up.nomor_so + "/" + this.listbckhps[i].kode_barang + "/" + this.listbckhps[i].idx).then((res) => {
+                      this.listsohps = res.data.data;
+                      this.qtybck = parseFloat(this.listsohps[0].bck) - parseFloat(this.listbckhps[i].qty);
+                      axios.put("/api/listso/" + this.listsohps[0].id, {
+                        bck: this.qtybck,
+                        closeso: "N",
+                      });
+                    });
+                  }
+                });
               })
               .then((res) => {
-                axios
-                  .delete("/api/bck/" + this.$route.params.bck)
-                  .then((res) => {
-                    axios
-                      .get("/api/history/" + this.$route.params.bck)
-                      .then((res) => {
-                        this.history = res.data.data;
-                        for (let i = 0; i < this.history.length; i++) {
-                          axios.delete("/api/history/" + this.history[i].id);
-                        }
-                      })
-                      .then((res) => {
-                        axios
-                          .post("/api/history", {
-                            nomor_dok: this.$route.params.bck,
-                            id_user: this.ambiluser.id,
-                            notif:
-                              "BCK " + this.$route.params.bck + " di batalkan",
-                            keterangan:
-                              "Membatalkan BCK nomor : " +
-                              this.$route.params.bck,
-                            jenis: "So",
-                            tanggal: this.DateTime(),
-                          })
-                          .then((res) => {
-                            this.load = false;
-                            swalWithBootstrapButtons.fire(
-                              "Deleted!",
-                              "Bukti Checker Keluar di batalkan.",
-                              "success"
-                            );
-                            this.$router.push({
-                              name: "bck",
-                            });
+                axios.delete("/api/bck/" + this.$route.params.bck).then((res) => {
+                  axios
+                    .get("/api/history/" + this.$route.params.bck)
+                    .then((res) => {
+                      this.history = res.data.data;
+                      for (let i = 0; i < this.history.length; i++) {
+                        axios.delete("/api/history/" + this.history[i].id);
+                      }
+                    })
+                    .then((res) => {
+                      axios
+                        .post("/api/history", {
+                          nomor_dok: this.$route.params.bck,
+                          id_user: this.ambiluser.id,
+                          notif: "BCK " + this.$route.params.bck + " di batalkan",
+                          keterangan: "Membatalkan BCK nomor : " + this.$route.params.bck,
+                          jenis: "So",
+                          tanggal: this.DateTime(),
+                        })
+                        .then((res) => {
+                          this.load = false;
+                          swalWithBootstrapButtons.fire("Deleted!", "Bukti Checker Keluar di batalkan.", "success");
+                          this.$router.push({
+                            name: "bck",
                           });
-                      });
-                  });
+                        });
+                    });
+                });
               });
           } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal menghapus BCK :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal menghapus BCK :)", "error");
           }
         });
     },
@@ -935,14 +674,43 @@ export default {
       });
     },
     print() {
-      var x = window.open(
-        "/data/bck/print/" + this.$route.params.bck,
-        "_blank"
-      );
+      var x = window.open("/data/bck/print/" + this.$route.params.bck, "_blank");
       x.focus();
     },
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+.dtHorizontalVerticalExampleWrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+#dtHorizontalVerticalExample th,
+td {
+  white-space: nowrap;
+}
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+  bottom: 0.5em;
+}
+
+.tonkg {
+  width: auto;
+  height: auto;
+  position: absolute;
+  right: 5%;
+}
+
+.tonkg b {
+  color: rgb(177, 176, 176);
+}
+</style>

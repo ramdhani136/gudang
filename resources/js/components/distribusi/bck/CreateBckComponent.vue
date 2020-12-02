@@ -64,6 +64,8 @@
               <th>Sisa SO</th>
               <th style="width: 12%">Rencana Kirim</th>
               <th>Keterangan</th>
+              <th>Kubikasi</th>
+              <th>Tonase</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -81,11 +83,13 @@
                 {{ listbcm.qty - listbcm.bck }}
               </td>
               <td style="text-align: center">
-                <input @input="validqty(index)" v-model="hitung.qty[index]" type="number" class="form-control" />
+                <input style="width: 120px" @input="validqty(index)" v-model="hitung.qty[index]" type="number" class="form-control" />
               </td>
               <td style="text-align: center">
-                <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
+                <textarea style="width: 120px" v-model="hitung.keterangan[index]" class="form-control"></textarea>
               </td>
+              <td>{{ parseFloat(hitung.qty[index]) * parseFloat(listbcm.kubikasi) }}</td>
+              <td>{{ parseFloat(hitung.qty[index]) * parseFloat(listbcm.tonase) }}</td>
               <td style="text-align: center">
                 <button @click="hapusitem(index)" class="btn btn-danger">Hapus</button>
               </td>
@@ -100,6 +104,10 @@
                 </button> -->
       <button @click="batal()" class="btn-orange btn ml-2">Batal</button>
       <button @click="submitBck()" class="btn-success btn ml-1">Simpan</button>
+      <div class="tonkg">
+        <b>Kubikasi : {{ kubikasi }} M3 |</b>
+        <b>Tonase : {{ tonase }} KG</b>
+      </div>
     </div>
     <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -303,6 +311,8 @@ export default {
         mulaitanggal: this.FirstDate(),
         sampaitanggal: this.today(),
       },
+      kubikasi: 0,
+      tonase: 0,
     };
   },
   created() {
@@ -573,6 +583,8 @@ export default {
         });
     },
     validqty(index) {
+      this.kubikasi = 0;
+      this.tonase = 0;
       this.total = 0;
       for (let i = 0; i < this.checker.length; i++) {
         if (this.hitung.qty[i] > parseFloat(this.checker[i].qty) - parseFloat(this.checker[i].bck)) {
@@ -585,6 +597,8 @@ export default {
         }
         this.subtotal = (parseFloat(this.checker[i].harga) - parseFloat(this.checker[i].diskon)) * parseFloat(this.hitung.jumlah[i]);
         this.total += parseFloat(this.subtotal);
+        this.kubikasi += parseFloat(this.checker[i].kubikasi) * parseFloat(this.hitung.qty[i]);
+        this.tonase += parseFloat(this.checker[i].tonase) * parseFloat(this.hitung.qty[i]);
       }
     },
     batal() {
@@ -742,4 +756,36 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.dtHorizontalVerticalExampleWrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+#dtHorizontalVerticalExample th,
+td {
+  white-space: nowrap;
+}
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+  bottom: 0.5em;
+}
+
+.tonkg {
+  width: auto;
+  height: auto;
+  position: absolute;
+  right: 5%;
+}
+
+.tonkg b {
+  color: rgb(177, 176, 176);
+}
+</style>
