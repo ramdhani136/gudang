@@ -761,7 +761,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .dtHorizontalVerticalExampleWrapper {
   max-width: 600px;
   margin: 0 auto;

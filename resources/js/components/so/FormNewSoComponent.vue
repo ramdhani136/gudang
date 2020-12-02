@@ -69,6 +69,8 @@
               <th>Status</th>
               <th>Sub Total</th>
               <th v-if="tampil">Estimasi</th>
+              <th>Kubikasi (M3)</th>
+              <th>Tonase (KG)</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -78,18 +80,20 @@
               <td>{{ ch.nama_barang }}</td>
               <td style="text-align: center">{{ ket.coba[index] }}</td>
               <td style="text-align: center">
-                <input @input="validasiqty" v-model="hitung.qty[index]" type="number" class="form-control" />
+                <input style="width: 120px" @input="validasiqty" v-model="hitung.qty[index]" type="number" class="form-control" />
               </td>
               <td style="text-align: center">{{ ch.satuan }}</td>
               <td style="text-align: center">{{ ch.harga | currency }}</td>
               <td style="text-align: center">{{ ch.diskon | currency }}</td>
               <td style="text-align: center">{{ lstatus }}</td>
               <td>
-                {{ ((ch.harga - ch.diskon) * hitung.qty[index]) | currency }}
+                {{ ((parseFloat(ch.harga) - parseFloat(ch.diskon)) * parseFloat(hitung.qty[index])) | currency }}
               </td>
               <td v-if="tampil" style="text-align: center">
                 {{ ch.tgl_datang }}
               </td>
+              <td style="text-align: center">{{ parseFloat(hitung.qty[index]) * parseFloat(ch.kubikasi) }}</td>
+              <td style="text-align: center">{{ parseFloat(hitung.qty[index]) * parseFloat(ch.tonase) }}</td>
               <td style="text-align: center">
                 <button @click="hapuslistSo(index)" class="btn btn-danger">Hapus</button>
               </td>
@@ -100,6 +104,10 @@
     </div>
     <div class="row mt-2">
       <button @click="submitSo()" class="btn-success btn ml-1">Kirim SO</button>
+      <div class="tonkg">
+        <b>Kubikasi : {{ kubikasi }} M3 |</b>
+        <b>Tonase : {{ tonase }} KG</b>
+      </div>
     </div>
     <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -335,6 +343,8 @@ export default {
       adaso: {},
       tampil: null,
       defaultal: "",
+      kubikasi: 0,
+      tonase: 0,
     };
   },
   created() {
@@ -617,6 +627,8 @@ export default {
     },
     validasiqty() {
       this.invoice = 0;
+      this.kubikasi = 0;
+      this.tonase = 0;
       for (let i = 0; i < this.checkrso.length; i++) {
         if (this.hitung.qty[i] > this.ket.coba[i]) {
           this.hitung.qty[i] = this.ket.coba[i];
@@ -633,6 +645,8 @@ export default {
         }
 
         this.invoice += parseFloat(this.sub) * (parseFloat(this.checkrso[i].harga) - parseFloat(this.checkrso[i].diskon));
+        this.kubikasi += parseFloat(this.hitung.qty[i]) * parseFloat(this.checkrso[i].kubikasi);
+        this.tonase += parseFloat(this.hitung.qty[i]) * parseFloat(this.checkrso[i].tonase);
       }
     },
     draftSo() {
@@ -871,6 +885,40 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.dtHorizontalVerticalExampleWrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+#dtHorizontalVerticalExample th,
+td {
+  white-space: nowrap;
+}
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+  bottom: 0.5em;
+}
+
+.tonkg {
+  width: auto;
+  height: auto;
+  position: absolute;
+  right: 5%;
+}
+
+.tonkg b {
+  color: rgb(177, 176, 176);
+}
+</style>
 
 <style>
 #rsoverflowso {

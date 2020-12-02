@@ -74,6 +74,8 @@
                 <th v-if="ket.status === 'Tidak Tersedia'">Estimasi</th>
                 <th v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'">Sudah Kirim</th>
                 <th v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'">Sisa SO</th>
+                <th>Kubikasi</th>
+                <th>Tonase</th>
                 <th v-if="ket.statusnya === 'Draft' || ket.statusnya === 'Tolak'">Aksi</th>
               </tr>
             </thead>
@@ -83,7 +85,7 @@
                 <td>{{ ch.kode_barang }}</td>
                 <td>{{ ch.nama_barang }}</td>
                 <td style="text-align: center">
-                  <input style="text-align: center" @input="validasiqty" v-model="hitung.qty[index]" type="number" class="form-control" :disabled="ket.statusnya !== 'Draft'" />
+                  <input style="text-align: center; width: 130px" @input="validasiqty" v-model="hitung.qty[index]" type="number" class="form-control" :disabled="ket.statusnya !== 'Draft'" />
                 </td>
                 <td style="text-align: center">{{ ch.satuan }}</td>
                 <td style="text-align: center">{{ ch.harga | currency }}</td>
@@ -96,7 +98,13 @@
                   {{ ch.bbk }}
                 </td>
                 <td v-if="ket.statusnya !== 'Draft' && ket.statusnya !== 'Tolak'" style="text-align: center">
-                  {{ ch.qty - ch.bbk }}
+                  {{ parseFloat(ch.qty) - parseFloat(ch.bbk) }}
+                </td>
+                <td>
+                  {{ parseFloat(hitung.qty[index]) * parseFloat(ch.kubikasi) }}
+                </td>
+                <td>
+                  {{ parseFloat(hitung.qty[index]) * parseFloat(ch.tonase) }}
                 </td>
                 <td v-if="ket.statusnya === 'Draft' || ket.statusnya === 'Tolak'" style="text-align: center">
                   <button @click="hapuslistSo(index)" class="btn btn-danger">Hapus</button>
@@ -117,6 +125,10 @@
         <button v-if="ket.statusnya === 'Sent' || ket.statusnya === 'Draft'" @click="reqbatal(vso)" class="btn-none btn ml-1 mt-2">Batalkan SO</button>
         <button v-if="ambiluser.distribusi === 1 && ket.statusnya === 'Dic'" @click="formtolak(vso)" class="btn-none btn ml-4 mt-2">Tolak SO</button>
         <button v-if="ambiluser.distribusi === 1 && ket.statusnya === 'Dic'" @click="AccDic(vso)" class="btn-success btn ml-2 mt-2">Terima SO</button>
+        <div class="tonkg">
+          <b>Kubikasi : {{ kubikasi }} M3 |</b>
+          <b>Tonase : {{ tonase }} KG</b>
+        </div>
       </div>
       <div v-if="vso.status == 'Tolak'" v-for="(vso, index) in so" :key="index" id="alastolak" class="mt-3">
         <div v-for="(lso, index) in so" :key="index">
@@ -309,6 +321,8 @@ export default {
       adaso: {},
       akses: true,
       kodegroup: "",
+      kubikasi: 0,
+      tonase: 0,
     };
   },
   created() {
@@ -351,6 +365,8 @@ export default {
             }
 
             this.invoice += parseFloat(this.sub) * (parseFloat(this.listnewso[i].harga) - parseFloat(this.listnewso[i].diskon));
+            this.kubikasi += parseFloat(this.listnewso[i].kubikasi) * parseFloat(this.hitung.qty[i]);
+            this.tonase += parseFloat(this.listnewso[i].tonase) * parseFloat(this.hitung.qty[i]);
           }
           this.load = false;
         });
@@ -504,6 +520,8 @@ export default {
                       tanggal_so: vso.tanggal_so,
                       nomor_rso: vso.nomor_rso,
                       id_user: this.ambiluser.id,
+                      tgl_sales: this.DateTime(),
+                      kode_groupso: this.ambiluser.kode_groupso,
                     };
                     axios.post("/api/so", this.uploadso).then((res) => {
                       this.ada = 0;
@@ -514,6 +532,7 @@ export default {
                           this.ada = 0;
                         }
                         this.uplist = {
+                          tanggal_datang: this.listnewso[i].tgl_datang,
                           nomor_so: vso.nomor_so + this.ambiluser.kode_groupso,
                           kode_barang: this.listnewso[i].kode_barang,
                           harga: this.listnewso[i].harga,
@@ -521,6 +540,7 @@ export default {
                           qty: this.hitung.qty[i],
                           qtyrso: 0,
                           tersedia: this.ada,
+                          statusso: this.ket.status,
                           diskon: this.listnewso[i].diskon,
                           idx: this.listnewso[i].idx,
                         };
@@ -763,6 +783,8 @@ export default {
     },
     validasiqty() {
       this.invoice = 0;
+      this.kubikasi = 0;
+      this.tonase = 0;
       for (let i = 0; i < this.listnewso.length; i++) {
         if (this.hitung.qty[i] > this.listnewso[i].qty) {
           this.hitung.qty[i] = this.listnewso[i].qty;
@@ -775,6 +797,8 @@ export default {
         }
 
         this.invoice += parseFloat(this.sub) * (parseFloat(this.listnewso[i].harga) - parseFloat(this.listnewso[i].diskon));
+        this.kubikasi += parseFloat(this.hitung.qty[i]) * parseFloat(this.listnewso[i].kubikasi);
+        this.tonase += parseFloat(this.hitung.qty[i]) * parseFloat(this.listnewso[i].tonase);
       }
     },
     hapuslistSo(index) {
@@ -1044,4 +1068,36 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.dtHorizontalVerticalExampleWrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+#dtHorizontalVerticalExample th,
+td {
+  white-space: nowrap;
+}
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+  bottom: 0.5em;
+}
+
+.tonkg {
+  width: auto;
+  height: auto;
+  position: absolute;
+  right: 5%;
+}
+
+.tonkg b {
+  color: rgb(177, 176, 176);
+}
+</style>

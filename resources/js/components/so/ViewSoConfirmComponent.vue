@@ -52,8 +52,8 @@
         </div>
       </div>
     </div>
+    <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ ket.total | currency }}</div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
-      <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ ket.total | currency }}</div>
       <div class="row mt-1 mx-auto col-12">
         <Circle5 id="load3" v-if="load"></Circle5>
         <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
@@ -65,11 +65,14 @@
               <th>Qty</th>
               <th>Satuan</th>
               <th>Harga</th>
+              <th>Diskon</th>
               <th>Sub Total</th>
               <th style="width: 10%">Status</th>
               <th v-if="lstatus === 'Tidak Tersedia'">Estimasi</th>
               <th>Sudah Kirim</th>
               <th>Sisa SO</th>
+              <th>Kubikasi</th>
+              <th>Tonase</th>
             </tr>
           </thead>
           <tbody>
@@ -80,13 +83,16 @@
               <td style="text-align: center">{{ ch.qty }}</td>
               <td style="text-align: center">{{ ch.satuan }}</td>
               <td style="text-align: center">{{ ch.harga | currency }}</td>
-              <td>{{ (ch.harga * ch.qty) | currency }}</td>
+              <td style="text-align: center">{{ ch.diskon | currency }}</td>
+              <td>{{ ((parseFloat(ch.harga) - parseFloat(ch.diskon)) * parseFloat(ch.qty)) | currency }}</td>
               <td style="text-align: center">{{ lstatus }}</td>
               <td v-if="lstatus === 'Tidak Tersedia'" style="text-align: center">
                 {{ ch.tgl_datang }}
               </td>
               <td>{{ ch.bbk }}</td>
               <td>{{ ch.qty - ch.bbk }}</td>
+              <td>{{ parseFloat(ch.qty) * parseFloat(ch.kubikasi) }}</td>
+              <td>{{ parseFloat(ch.qty) * parseFloat(ch.tonase) }}</td>
             </tr>
           </tbody>
         </table>
@@ -103,6 +109,10 @@
       <button v-if="lso.status == 'Kordinator' && ambiluser.susales === 1 && ambiluser.kode_groupso === 'GR' && groupso === 'GR'" @click="kordinconfirm(lso)" class="btn-orange btn ml-3">Terima S</button>
 
       <button v-if="lso.status == 'Kordinator' && ambiluser.susales === 1 && ambiluser.kode_groupso === 'GR' && groupso === 'GR'" @click="showModal()" class="btn-danger btn ml-1">Tolak SO</button>
+       <div class="tonkg">
+          <b>Kubikasi : {{ kubikasi }} M3 |</b>
+          <b>Tonase : {{ tonase }} KG</b>
+        </div>
     </div>
     <div v-if="vso.status == 'Tolak'" v-for="vso in so" :key="vso.nomor_so" id="alastolak">
       <div v-for="(lso, index) in so" :key="index">
@@ -164,6 +174,8 @@ export default {
       },
       lstatus: "",
       groupso: "",
+      kubikasi: 0,
+      tonase: 0,
     };
   },
   created() {
@@ -187,7 +199,9 @@ export default {
           this.listso = res.data.data;
           this.ket.tolak = 0;
           for (let i = 0; i < this.listso.length; i++) {
-            this.ket.total += parseFloat(this.listso[i].qty) * parseFloat(this.listso[i].harga);
+            this.ket.total += (parseFloat(this.listso[i].harga) - parseFloat(this.listso[i].diskon)) * parseFloat(this.listso[i].qty);
+            this.kubikasi += parseFloat(this.listso[i].kubikasi) * parseFloat(this.listso[i].qty);
+            this.tonase += parseFloat(this.listso[i].tonase) * parseFloat(this.listso[i].qty);
           }
           this.load = false;
         });
@@ -457,6 +471,42 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.dtHorizontalVerticalExampleWrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+#dtHorizontalVerticalExample th,
+td {
+  white-space: nowrap;
+}
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+  bottom: 0.5em;
+}
+
+.tonkg {
+  width: auto;
+  height: auto;
+  position: absolute;
+  right: 5%;
+}
+
+.tonkg b {
+  color: rgb(177, 176, 176);
+}
+</style>>
+  
+</style>
 
 <style>
 #alastolak {

@@ -60,6 +60,8 @@ class ListRsoResource extends JsonResource
             'pr'=>$this->pr,
             'diskon'=>$this->diskon,
             'idx'=>$this->idx,
+            'kubikasi'=>$this->barang->kubikasi,
+            'tonase'=>$this->barang->kg,
         ];
     }
 }
