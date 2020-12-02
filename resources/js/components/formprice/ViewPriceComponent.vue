@@ -58,19 +58,19 @@
               <td style="text-align: center">{{ lp.satuan }}</td>
               <td style="text-align: center">{{ lp.harga | currency }}</td>
               <td style="text-align: center">
-                <input style="font-size: 1em" type="number" class="form-control" v-model="hitung.harga[index]" :disabled="status !== 'Draft' || ambiluser.sales === 0" />
+                <input style="font-size: 1em; width: 120px" type="number" class="form-control" v-model="hitung.harga[index]" :disabled="status !== 'Draft' || ambiluser.sales === 0" />
               </td>
               <td v-if="status === 'Draft' && ambiluser.sales === 1" style="text-align: center">
                 <button @click="hapus(index)" style="text-align: center" class="btn btn-danger">Hapus</button>
               </td>
               <td v-if="(ambiluser.sales === 1 && status !== 'Draft') || ambiluser.susales === 1 || ambiluser.kordisales === 1" style="text-align: center">
-                <select @change="ubahaksi(index)" v-model="statusminta[index]" name="aksi" class="form-control" :disabled="tutup">
+                <select style="width: 120px" @change="ubahaksi(index)" v-model="statusminta[index]" name="aksi" class="form-control" :disabled="tutup">
                   <option value="Aktif">Terima</option>
                   <option value="Di Tolak">Tolak</option>
                 </select>
               </td>
               <td v-if="(ambiluser.sales === 1 && status !== 'Draft') || ambiluser.susales === 1 || ambiluser.kordisales === 1">
-                <textarea style="height: 40px" v-model="alastolak[index]" name="alasan" class="form-control" :disabled="statusminta[index] !== 'Di Tolak' || tutup"></textarea>
+                <textarea style="height: 40px; width: 200px" v-model="alastolak[index]" name="alasan" class="form-control" :disabled="statusminta[index] !== 'Di Tolak' || tutup"></textarea>
               </td>
             </tr>
           </tbody>
@@ -1172,4 +1172,25 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.dtHorizontalVerticalExampleWrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+#dtHorizontalVerticalExample th,
+td {
+  white-space: nowrap;
+}
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+  bottom: 0.5em;
+}
+</style>

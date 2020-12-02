@@ -4,112 +4,55 @@
       <div class="col-4">
         <div class="form-group">
           <label>Nomor BBK :</label>
-          <input
-            @input="cekbbk()"
-            v-model="up.bbk"
-            type="text"
-            class="form-control col-12"
-            autocomplete="disabled"
-            maxlength="16"
-            :class="{ 'is-valid': aktif, 'is-invalid': !aktif }"
-          />
+          <input @input="cekbbk()" v-model="up.bbk" type="text" class="form-control col-12" autocomplete="disabled" maxlength="16" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }" />
         </div>
         <div class="form-group">
           <label>Tanggal :</label>
-          <input
-            v-model="up.tanggal"
-            type="date"
-            @change="validate()"
-            :min="now()"
-            class="form-control col-12"
-          />
+          <input v-model="up.tanggal" type="date" @change="validate()" :min="now()" class="form-control col-12" />
         </div>
         <div class="form-group">
           <label>Nomor BCK</label>
-          <input
-            v-model="up.nomor_bck"
-            @click="showSo()"
-            type="text"
-            class="form-control"
-            placeholder="Pilih BCK"
-            autocomplete="disabled"
-          />
+          <input v-model="up.nomor_bck" @click="showSo()" type="text" class="form-control" placeholder="Pilih BCK" autocomplete="disabled" />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Nomor SO</label>
-          <input
-            v-model="ket.nomor_so"
-            type="text"
-            class="form-control"
-            disabled
-          />
+          <input v-model="ket.nomor_so" type="text" class="form-control" disabled />
         </div>
         <div class="form-group">
           <label>Customer</label>
-          <select
-            v-model="ket.customer"
-            name="customer"
-            class="col-12 form-control"
-            disabled
-          >
+          <select v-model="ket.customer" name="customer" class="col-12 form-control" disabled>
             <option :value="ket.customer">{{ ket.customer }}</option>
           </select>
         </div>
         <div class="form-group">
           <label>Distribusi</label>
-          <input
-            v-model="ket.distribusi"
-            type="text"
-            class="form-control"
-            disabled
-          />
+          <input v-model="ket.distribusi" type="text" class="form-control" disabled />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Lokasi</label>
-          <input
-            v-model="ket.lokasi"
-            type="text"
-            class="form-control"
-            disabled
-          />
+          <input v-model="ket.lokasi" type="text" class="form-control" disabled />
         </div>
         <div class="form-group">
           <label>Alamat</label>
-          <textarea
-            v-model="ket.alamat"
-            name="keterangan"
-            class="form-control col-12"
-            disabled
-          ></textarea>
+          <textarea v-model="ket.alamat" name="keterangan" class="form-control col-12" disabled></textarea>
         </div>
         <div class="form-group">
           <label>keterangan</label>
-          <textarea
-            v-model="up.keterangan"
-            name="keterangan"
-            class="form-control col-12"
-            autocomplete="disabled"
-          ></textarea>
+          <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12" autocomplete="disabled"></textarea>
         </div>
       </div>
     </div>
     <div class="row">
-      <div id="total" class="mt-3 ml-auto mr-3">
-        Total Invoice :&nbsp; {{ total | currency }}
-      </div>
+      <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ total | currency }}</div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
       <div class="row mt-1 mx-auto col-12">
         <Circle5 id="load3" v-if="load"></Circle5>
-        <table
-          id="rsthead"
-          class="table mt-2 table-striped table-bordered"
-          style="width: 100%"
-        >
+        <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
           <thead>
             <tr>
               <th>No</th>
@@ -121,6 +64,8 @@
               <th style="width: 10%">Qty BCK</th>
               <th>Qty termuat</th>
               <th>Keterangan</th>
+              <th>Kubikasi</th>
+              <th>Tonase</th>
             </tr>
           </thead>
           <tbody>
@@ -135,19 +80,13 @@
               </td>
               <td style="text-align: center">{{ listbcm.qty }}</td>
               <td style="text-align: center">
-                <input
-                  @input="validqty(index)"
-                  v-model="hitung.qty[index]"
-                  type="number"
-                  class="form-control"
-                />
+                <input style="width: 120px" @input="validqty(index)" v-model="hitung.qty[index]" type="number" class="form-control" />
               </td>
               <td style="text-align: center">
-                <textarea
-                  v-model="hitung.keterangan[index]"
-                  class="form-control"
-                ></textarea>
+                <textarea style="width: 200px" v-model="hitung.keterangan[index]" class="form-control"></textarea>
               </td>
+              <td>{{ parseFloat(hitung.qty[index]) * parseFloat(listbcm.kubikasi) }}</td>
+              <td>{{ parseFloat(hitung.qty[index]) * parseFloat(listbcm.tonase) }}</td>
             </tr>
           </tbody>
         </table>
@@ -159,62 +98,35 @@
                 </button> -->
       <button @click="batal()" class="btn-orange btn ml-2">Batal</button>
       <button @click="submitBbk()" class="btn-success btn ml-1">Simpan</button>
+      <div class="tonkg">
+        <b>Kubikasi : {{ kubikasi }} M3 |</b>
+        <b>Tonase : {{ tonase }} KG</b>
+      </div>
     </div>
-    <div
-      class="modal fade"
-      id="modal-po"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Form List Bukti Checker
-            </h5>
-            <button
-              @click="resetForm()"
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <h5 class="modal-title" id="exampleModalLabel">Form List Bukti Checker</h5>
+            <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
               <label>Pilih BCK</label>
-              <select
-                @change="pilihBck(ambil)"
-                v-model="ambil"
-                class="form-control"
-              >
-                <option
-                  :value="ambil"
-                  v-for="(ambil, index) in bckaktif"
-                  :key="index"
-                >
+              <select @change="pilihBck(ambil)" v-model="ambil" class="form-control">
+                <option :value="ambil" v-for="(ambil, index) in bckaktif" :key="index">
                   {{ ambil.bck }}
                 </option>
               </select>
             </div>
             <div class="form-group">
               <label>Customer</label>
-              <input
-                v-model="ket.customer"
-                type="text"
-                class="form-control"
-                disabled
-              />
+              <input v-model="ket.customer" type="text" class="form-control" disabled />
             </div>
             <div id="overflowBody">
-              <table
-                class="table mt-2 table-striped table-bordered"
-                style="width: 100%"
-              >
+              <table class="table mt-2 table-striped table-bordered" style="width: 100%">
                 <thead id="rsthead">
                   <tr>
                     <th style="text-align: center">No</th>
@@ -233,13 +145,7 @@
                     <td style="text-align: center">{{ ls.satuan }}</td>
                     <td style="text-align: center">{{ ls.qty }}</td>
                     <td style="text-align: center">
-                      <input
-                        @change="pilihlistchecker()"
-                        v-model="checker"
-                        type="checkbox"
-                        :value="ls"
-                        disabled
-                      />
+                      <input @change="pilihlistchecker()" v-model="checker" type="checkbox" :value="ls" disabled />
                     </td>
                   </tr>
                 </tbody>
@@ -247,51 +153,24 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              @click="resetForm()"
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" @click="checklist()" class="btn btn-primary">
-              Save changes
-            </button>
+            <button @click="resetForm()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" @click="checklist()" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>
     </div>
-    <div
-      class="modal fade"
-      id="modal-pr"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Rincian Permintaan
-            </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div id="scrollList">
-              <table
-                id="thead"
-                class="table table-striped table-bordered"
-                style="width: 100%"
-              >
+              <table id="thead" class="table table-striped table-bordered" style="width: 100%">
                 <thead>
                   <tr>
                     <th style="text-align: center">No</th>
@@ -310,13 +189,7 @@
                     <td style="text-align: center"></td>
                     <td style="text-align: center"></td>
                     <td>
-                      <button
-                        type="button"
-                        class="btn btn-danger"
-                        data-dismiss="modal"
-                      >
-                        Delete
-                      </button>
+                      <button type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
                     </td>
                   </tr>
                 </tbody>
@@ -324,18 +197,10 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
           <div class="error-actions">
-            <router-link to="/so" class="btn btn-primary btn-lg">
-              Lihat Data SO
-            </router-link>
+            <router-link to="/so" class="btn btn-primary btn-lg"> Lihat Data SO </router-link>
           </div>
         </div>
       </div>
@@ -389,6 +254,8 @@ export default {
       selesai: "",
       aktif: false,
       adabbk: {},
+      kubikasi: 0,
+      tonase: 0,
     };
   },
   created() {
@@ -408,14 +275,7 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     validate() {
@@ -427,8 +287,7 @@ export default {
       var d = new Date();
       var month = d.getMonth() + 1;
 
-      var output =
-        "BBK-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
+      var output = "BBK-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
       return output;
     },
     showSo() {
@@ -483,11 +342,7 @@ export default {
               this.aplus = "";
               this.banding = "";
               for (let i = 0; i < this.checker.length; i++) {
-                if (
-                  this.hitung.qty[i] === undefined ||
-                  this.hitung.qty[i] < 0 ||
-                  this.hitung.qty[i] === ""
-                ) {
+                if (this.hitung.qty[i] === undefined || this.hitung.qty[i] < 0 || this.hitung.qty[i] === "") {
                   this.a = "N";
                 } else {
                   this.a = "Y";
@@ -514,73 +369,45 @@ export default {
                       };
                       axios.post("/api/listbbk", this.uplistbbk).then((res) => {
                         /* edit listsi */
-                        axios
-                          .get(
-                            "/api/listso/data/" +
-                              this.checker[i].nomor_so +
-                              "/" +
-                              this.checker[i].kode_barang +
-                              "/" +
-                              this.checker[i].idx
-                          )
-                          .then((res) => {
-                            this.listso = res.data.data;
-                            this.qtybbk =
-                              parseFloat(this.listso[0].bbk) +
-                              parseFloat(this.hitung.qty[i]);
-                            this.qtybck =
-                              parseFloat(this.listso[0].bck) -
-                              parseFloat(this.checker[i].qty) +
-                              parseFloat(this.hitung.qty[i]);
-                            if (this.qtybck >= this.listso[0].qty) {
-                              this.a = "Y";
-                              this.qtybck = this.listso[0].qty;
-                            } else {
-                              this.a = "N";
-                            }
-                            axios
-                              .put("/api/listso/" + this.listso[0].id, {
-                                bbk: this.qtybbk,
-                                bck: this.qtybck,
-                                closeso: this.a,
-                              })
-                              .then((res) => {
-                                axios
-                                  .get(
-                                    "/api/listso/" + this.checker[0].nomor_so
-                                  )
-                                  .then((res) => {
-                                    this.listsonya = res.data.data;
-                                    this.selesai = "";
-                                    this.banding = "";
-                                    for (
-                                      let y = 0;
-                                      y < this.listsonya.length;
-                                      y++
-                                    ) {
-                                      this.banding += "Y";
-                                      this.selesai += this.listsonya[y].closeso;
-                                    }
-                                    if (this.selesai === this.banding) {
-                                      axios.put(
-                                        "/api/so/" + this.checker[0].nomor_so,
-                                        {
-                                          status: "Selesai",
-                                          closebck: "Y",
-                                        }
-                                      );
-                                    } else if (this.selesai !== this.banding) {
-                                      axios.put(
-                                        "/api/so/" + this.checker[0].nomor_so,
-                                        {
-                                          status: "Acc",
-                                          closebck: "N",
-                                        }
-                                      );
-                                    }
+                        axios.get("/api/listso/data/" + this.checker[i].nomor_so + "/" + this.checker[i].kode_barang + "/" + this.checker[i].idx).then((res) => {
+                          this.listso = res.data.data;
+                          this.qtybbk = parseFloat(this.listso[0].bbk) + parseFloat(this.hitung.qty[i]);
+                          this.qtybck = parseFloat(this.listso[0].bck) - parseFloat(this.checker[i].qty) + parseFloat(this.hitung.qty[i]);
+                          if (this.qtybck >= this.listso[0].qty) {
+                            this.a = "Y";
+                            this.qtybck = this.listso[0].qty;
+                          } else {
+                            this.a = "N";
+                          }
+                          axios
+                            .put("/api/listso/" + this.listso[0].id, {
+                              bbk: this.qtybbk,
+                              bck: this.qtybck,
+                              closeso: this.a,
+                            })
+                            .then((res) => {
+                              axios.get("/api/listso/" + this.checker[0].nomor_so).then((res) => {
+                                this.listsonya = res.data.data;
+                                this.selesai = "";
+                                this.banding = "";
+                                for (let y = 0; y < this.listsonya.length; y++) {
+                                  this.banding += "Y";
+                                  this.selesai += this.listsonya[y].closeso;
+                                }
+                                if (this.selesai === this.banding) {
+                                  axios.put("/api/so/" + this.checker[0].nomor_so, {
+                                    status: "Selesai",
+                                    closebck: "Y",
                                   });
+                                } else if (this.selesai !== this.banding) {
+                                  axios.put("/api/so/" + this.checker[0].nomor_so, {
+                                    status: "Acc",
+                                    closebck: "N",
+                                  });
+                                }
                               });
-                          });
+                            });
+                        });
                         /* end */
                       });
                     }
@@ -606,8 +433,7 @@ export default {
                                 nomor_dok: this.up.bbk,
                                 id_user: this.ambiluser.id,
                                 notif: "BBK dibuka!",
-                                keterangan:
-                                  "Membuat BBK nomor : " + this.up.bbk,
+                                keterangan: "Membuat BBK nomor : " + this.up.bbk,
                                 jenis: "Bbk",
                                 tanggal: this.DateTime(),
                               })
@@ -617,19 +443,13 @@ export default {
                                     nomor_dok: this.up.nomor_bck,
                                     id_user: this.ambiluser.id,
                                     notif: "BBK dibuka!",
-                                    keterangan:
-                                      "Bck selesai, membuka BBK nomor : " +
-                                      this.up.bbk,
+                                    keterangan: "Bck selesai, membuka BBK nomor : " + this.up.bbk,
                                     jenis: "Bck",
                                     tanggal: this.DateTime(),
                                   })
                                   .then((res) => {
                                     this.load = false;
-                                    swalWithBootstrapButtons.fire(
-                                      "Sukss!",
-                                      "Berhasil meyimpan BBK.",
-                                      "success"
-                                    );
+                                    swalWithBootstrapButtons.fire("Sukss!", "Berhasil meyimpan BBK.", "success");
                                     this.$router.push({
                                       name: "distribusibbk",
                                     });
@@ -667,11 +487,7 @@ export default {
             result.dismiss === Swal.DismissReason.cancel
           ) {
             this.load = false;
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal menyimpan BCK :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal menyimpan BCK :)", "error");
           }
         });
     },
@@ -679,22 +495,19 @@ export default {
       // if (parseInt(this.hitung.qty[index]) > (parseInt(this.checker[index].qty) + (parseInt(this.checker[index].qty) / 100 * 10))) {
       //     this.hitung.qty[index] = this.checker[index].qty;
       // }
+      this.kubikasi = 0;
+      this.tonase = 0;
       this.total = 0;
       for (let i = 0; i < this.checker.length; i++) {
-        if (
-          this.hitung.qty[i] === undefined ||
-          this.hitung.qty[i] === "" ||
-          this.hitung.qty[i] < 0
-        ) {
+        if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === "" || this.hitung.qty[i] < 0) {
           this.hitung.jumlah[i] = 0;
         } else {
           this.hitung.jumlah[i] = this.hitung.qty[i];
         }
-        this.subtotal =
-          (parseFloat(this.checker[i].harga) -
-            parseFloat(this.checker[i].diskon)) *
-          parseFloat(this.hitung.jumlah[i]);
+        this.subtotal = (parseFloat(this.checker[i].harga) - parseFloat(this.checker[i].diskon)) * parseFloat(this.hitung.jumlah[i]);
         this.total += parseFloat(this.subtotal);
+        this.kubikasi += parseFloat(this.hitung.qty[i]) * parseFloat(this.checker[i].kubikasi);
+        this.tonase = parseFloat(this.hitung.qty[i]) * parseFloat(this.checker[i].tonase);
       }
     },
     batal() {
@@ -718,20 +531,8 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates =
-        this.year +
-        "-" +
-        (this.month < 10 ? "0" : "") +
-        this.month +
-        "-" +
-        this.day;
-      this.times =
-        this.hours +
-        ":" +
-        this.minute +
-        ":" +
-        (this.seconds < 10 ? "0" : "") +
-        this.seconds;
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
       this.datetimes = this.dates + " " + this.times;
       return this.datetimes;
     },
@@ -749,4 +550,36 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.dtHorizontalVerticalExampleWrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+#dtHorizontalVerticalExample th,
+td {
+  white-space: nowrap;
+}
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+  bottom: 0.5em;
+}
+
+.tonkg {
+  width: auto;
+  height: auto;
+  position: absolute;
+  right: 5%;
+}
+
+.tonkg b {
+  color: rgb(177, 176, 176);
+}
+</style>
