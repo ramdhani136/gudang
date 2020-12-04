@@ -4,55 +4,110 @@
       <div class="col-4">
         <div class="form-group">
           <label>Nomor BBK :</label>
-          <input v-model="up.bbk" type="text" class="form-control col-12" disabled />
+          <input
+            v-model="up.bbk"
+            type="text"
+            class="form-control col-12"
+            disabled
+          />
         </div>
         <div class="form-group">
           <label>Tanggal :</label>
-          <input v-model="up.tanggal" type="date" @change="validate()" :min="now()" class="form-control col-12" disabled />
+          <input
+            v-model="up.tanggal"
+            type="date"
+            @change="validate()"
+            :min="now()"
+            class="form-control col-12"
+            disabled
+          />
         </div>
         <div class="form-group">
           <label>Nomor BCK</label>
-          <input v-model="up.nomor_bck" @click="showSo()" type="text" class="form-control" placeholder="Pilih Sales Order" disabled />
+          <input
+            v-model="up.nomor_bck"
+            @click="showSo()"
+            type="text"
+            class="form-control"
+            placeholder="Pilih Sales Order"
+            disabled
+          />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Nomor SO</label>
-          <input v-model="ket.nomor_so" type="text" class="form-control" disabled />
+          <input
+            v-model="ket.nomor_so"
+            type="text"
+            class="form-control"
+            disabled
+          />
         </div>
         <div class="form-group">
           <label>Customer</label>
-          <select v-model="ket.customer" name="customer" class="col-12 form-control" disabled>
+          <select
+            v-model="ket.customer"
+            name="customer"
+            class="col-12 form-control"
+            disabled
+          >
             <option :value="ket.customer">{{ ket.customer }}</option>
           </select>
         </div>
         <div class="form-group">
           <label>Distribusi</label>
-          <input v-model="ket.distribusi" type="text" class="form-control" disabled />
+          <input
+            v-model="ket.distribusi"
+            type="text"
+            class="form-control"
+            disabled
+          />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Lokasi</label>
-          <input v-model="ket.lokasi" type="text" class="form-control" disabled />
+          <input
+            v-model="ket.lokasi"
+            type="text"
+            class="form-control"
+            disabled
+          />
         </div>
         <div class="form-group">
           <label>Alamat</label>
-          <textarea v-model="ket.alamat" name="keterangan" class="form-control col-12" disabled></textarea>
+          <textarea
+            v-model="ket.alamat"
+            name="keterangan"
+            class="form-control col-12"
+            disabled
+          ></textarea>
         </div>
         <div class="form-group">
           <label>keterangan</label>
-          <textarea v-model="up.keterangan" name="keterangan" class="form-control col-12" disabled></textarea>
+          <textarea
+            v-model="up.keterangan"
+            name="keterangan"
+            class="form-control col-12"
+            disabled
+          ></textarea>
         </div>
       </div>
     </div>
     <div class="row">
-      <div id="total" class="mt-3 ml-auto mr-3">Total Invoice :&nbsp; {{ total | currency }}</div>
+      <div id="total" class="mt-3 ml-auto mr-3">
+        Total Invoice :&nbsp; {{ total | currency }}
+      </div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
       <div class="row mt-1 mx-auto col-12">
         <Circle5 id="load3" v-if="load"></Circle5>
-        <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
+        <table
+          id="rsthead"
+          class="table mt-2 table-striped table-bordered"
+          style="width: 100%"
+        >
           <thead>
             <tr>
               <th>No</th>
@@ -78,13 +133,29 @@
               <td style="text-align: center">{{ list.diskon | currency }}</td>
               <td style="text-align: center">{{ hitung.qtynya[index] }}</td>
               <td style="text-align: center">
-                <input style="width: 120px" @input="validqty(index)" v-model="inputin.qty[index]" type="number" class="form-control" disabled />
+                <input
+                  style="width: 120px"
+                  @input="validqty(index)"
+                  v-model="inputin.qty[index]"
+                  type="number"
+                  class="form-control"
+                  disabled
+                />
               </td>
               <td style="text-align: center">
-                <textarea style="width: 200px" v-model="hitung.keterangan[index]" class="form-control" disabled></textarea>
+                <textarea
+                  style="width: 200px"
+                  v-model="hitung.keterangan[index]"
+                  class="form-control"
+                  disabled
+                ></textarea>
               </td>
-              <td>{{ parseFloat(inputin.qty[index]) * parseFloat(list.kubikasi) }}</td>
-              <td>{{ parseFloat(inputin.qty[index]) * parseFloat(list.tonase) }}</td>
+              <td>
+                {{ parseFloat(inputin.qty[index]) * parseFloat(list.kubikasi) }}
+              </td>
+              <td>
+                {{ parseFloat(inputin.qty[index]) * parseFloat(list.tonase) }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -104,28 +175,59 @@
         <b>Tonase : {{ tonase }} KG</b>
       </div>
     </div>
-    <div class="modal fade" id="modal-po" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-po"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Form SO</h5>
-            <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button
+              @click="resetForm()"
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
               <label>Pilih SO</label>
-              <select @change="pilihBck(aktif)" v-model="aktif" class="form-control">
-                <option :value="aktif" v-for="(aktif, index) in bckaktif" :key="index">{{ aktif.bck }}</option>
+              <select
+                @change="pilihBck(aktif)"
+                v-model="aktif"
+                class="form-control"
+              >
+                <option
+                  :value="aktif"
+                  v-for="(aktif, index) in bckaktif"
+                  :key="index"
+                >
+                  {{ aktif.bck }}
+                </option>
               </select>
             </div>
             <div class="form-group">
               <label>Customer</label>
-              <input v-model="ket.customer" type="text" class="form-control" disabled />
+              <input
+                v-model="ket.customer"
+                type="text"
+                class="form-control"
+                disabled
+              />
             </div>
             <div id="overflowBody">
-              <table class="table mt-2 table-striped table-bordered" style="width: 100%">
+              <table
+                class="table mt-2 table-striped table-bordered"
+                style="width: 100%"
+              >
                 <thead id="rsthead">
                   <tr>
                     <th style="text-align: center">No</th>
@@ -144,7 +246,13 @@
                     <td style="text-align: center">{{ ls.satuan }}</td>
                     <td style="text-align: center">{{ ls.qty }}</td>
                     <td style="text-align: center">
-                      <input @change="pilihlistchecker()" v-model="checker" type="checkbox" :value="ls" disabled />
+                      <input
+                        @change="pilihlistchecker()"
+                        v-model="checker"
+                        type="checkbox"
+                        :value="ls"
+                        disabled
+                      />
                     </td>
                   </tr>
                 </tbody>
@@ -152,24 +260,51 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button @click="resetForm()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" @click="checklist()" class="btn btn-primary">Save changes</button>
+            <button
+              @click="resetForm()"
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" @click="checklist()" class="btn btn-primary">
+              Save changes
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-pr"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Rincian Permintaan
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div id="scrollList">
-              <table id="thead" class="table table-striped table-bordered" style="width: 100%">
+              <table
+                id="thead"
+                class="table table-striped table-bordered"
+                style="width: 100%"
+              >
                 <thead>
                   <tr>
                     <th style="text-align: center">No</th>
@@ -188,7 +323,13 @@
                     <td style="text-align: center"></td>
                     <td style="text-align: center"></td>
                     <td>
-                      <button type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        data-dismiss="modal"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -196,10 +337,18 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
           </div>
           <div class="error-actions">
-            <router-link to="/so" class="btn btn-primary btn-lg"> Lihat Data SO </router-link>
+            <router-link to="/so" class="btn btn-primary btn-lg">
+              Lihat Data SO
+            </router-link>
           </div>
         </div>
       </div>
@@ -294,16 +443,33 @@ export default {
         axios.get("/api/listbbk/" + this.bbk[0].bbk).then((res) => {
           this.listbbk = res.data.data;
           for (let k = 0; k < this.listbbk.length; k++) {
-            this.total += parseFloat(this.listbbk[k].qty) * (parseFloat(this.listbbk[k].harga) - parseFloat(this.listbbk[k].diskon));
-            this.kubikasi += parseFloat(this.listbbk[k].qty) * parseFloat(this.listbbk[k].kubikasi);
-            this.tonase += parseFloat(this.listbbk[k].qty) * parseFloat(this.listbbk[k].tonase);
+            this.total +=
+              parseFloat(this.listbbk[k].qty) *
+              (parseFloat(this.listbbk[k].harga) -
+                parseFloat(this.listbbk[k].diskon));
+            this.kubikasi +=
+              parseFloat(this.listbbk[k].qty) *
+              parseFloat(this.listbbk[k].kubikasi);
+            this.tonase +=
+              parseFloat(this.listbbk[k].qty) *
+              parseFloat(this.listbbk[k].tonase);
             this.inputin.qty[k] = this.listbbk[k].qty;
-            axios.get("/api/listbck/view/" + this.up.nomor_bck + "/" + this.listbbk[k].kode_barang + "/" + this.listbbk[k].idx).then((res) => {
-              this.viewqtybck = res.data.data;
-              this.hitung.qtynya.push(900);
-              this.hitung.qtynya.splice(this.listbbk.length, 1);
-              this.hitung.qtynya[k] = this.viewqtybck[0].qty;
-            });
+            axios
+              .get(
+                "/api/listbck/view/" +
+                  this.up.nomor_bck +
+                  "/" +
+                  this.listbbk[k].kode_barang +
+                  "/" +
+                  this.listbbk[k].idx
+              )
+              .then((res) => {
+                this.viewqtybck = res.data.data;
+                this.hitung.qtynya.push(900);
+                this.hitung.qtynya.splice(this.listbbk.length, 1);
+                this.hitung.qtynya[k] = this.viewqtybck[0].qty;
+                this.hitung.keterangan[k] = this.listbbk[k].keterangan;
+              });
           }
           this.load = false;
         });
@@ -319,7 +485,14 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
+      var output =
+        d.getFullYear() +
+        "-" +
+        (month < 10 ? "0" : "") +
+        month +
+        "-" +
+        (day < 10 ? "0" : "") +
+        day;
       return output;
     },
     validate() {
@@ -331,7 +504,8 @@ export default {
       var d = new Date();
       var month = d.getMonth() + 1;
 
-      var output = "BBK-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
+      var output =
+        "BBK-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
       return output;
     },
     showSo() {
@@ -387,49 +561,84 @@ export default {
                     status: "close",
                   })
                   .then((res) => {
-                    axios.get("/api/listrso/data/" + this.checker[i].nomor_rso + "/" + this.checker[i].kode_barang).then((res) => {
-                      this.listrso = res.data.data;
-                      for (let o = 0; o < this.listrso.length; o++) {
-                        if (parseFloat(this.hitung.qty[i]) < this.checker[i].qty) {
-                          if (this.checker[i].statusso === "tersedia") {
-                            this.qtyupdate = parseFloat(this.listrso[o].keluar_tersedia) - parseFloat(this.checker[i].qty) + parseFloat(this.hitung.qty[i]);
-                            this.uplistrso = {
-                              out_yes: this.qtyupdate,
-                              sotersedia_close: "N",
-                            };
-                            axios.put("/api/listrso/" + this.listrso[o].id, this.uplistrso).then((res) => {
-                              this.upso = {
-                                status: "Acc",
+                    axios
+                      .get(
+                        "/api/listrso/data/" +
+                          this.checker[i].nomor_rso +
+                          "/" +
+                          this.checker[i].kode_barang
+                      )
+                      .then((res) => {
+                        this.listrso = res.data.data;
+                        for (let o = 0; o < this.listrso.length; o++) {
+                          if (
+                            parseFloat(this.hitung.qty[i]) < this.checker[i].qty
+                          ) {
+                            if (this.checker[i].statusso === "tersedia") {
+                              this.qtyupdate =
+                                parseFloat(this.listrso[o].keluar_tersedia) -
+                                parseFloat(this.checker[i].qty) +
+                                parseFloat(this.hitung.qty[i]);
+                              this.uplistrso = {
+                                out_yes: this.qtyupdate,
+                                sotersedia_close: "N",
                               };
-                              axios.put("/api/so/" + this.listbck[i].nomor_so, this.upso).then((res) => {
-                                this.$router.push({
-                                  name: "distribusibbk",
+                              axios
+                                .put(
+                                  "/api/listrso/" + this.listrso[o].id,
+                                  this.uplistrso
+                                )
+                                .then((res) => {
+                                  this.upso = {
+                                    status: "Acc",
+                                  };
+                                  axios
+                                    .put(
+                                      "/api/so/" + this.listbck[i].nomor_so,
+                                      this.upso
+                                    )
+                                    .then((res) => {
+                                      this.$router.push({
+                                        name: "distribusibbk",
+                                      });
+                                    });
                                 });
-                              });
-                            });
-                          } else {
-                            this.qtyupdate = parseFloat(this.listrso[o].keluar_tdktersedia) - parseFloat(this.checker[i].qty) + parseFloat(this.hitung.qty[i]);
-                            this.uplistrso = {
-                              out_no: this.qtyupdate,
-                              sotdk_close: "N",
-                            };
-                            axios.put("/api/listrso/" + this.listrso[o].id, this.uplistrso).then((res) => {
-                              this.upso = {
-                                status: "Acc",
+                            } else {
+                              this.qtyupdate =
+                                parseFloat(this.listrso[o].keluar_tdktersedia) -
+                                parseFloat(this.checker[i].qty) +
+                                parseFloat(this.hitung.qty[i]);
+                              this.uplistrso = {
+                                out_no: this.qtyupdate,
+                                sotdk_close: "N",
                               };
-                              axios.put("/api/so/" + this.listbck[i].nomor_so, this.upso).then((res) => {
-                                this.$router.push({
-                                  name: "distribusibbk",
+                              axios
+                                .put(
+                                  "/api/listrso/" + this.listrso[o].id,
+                                  this.uplistrso
+                                )
+                                .then((res) => {
+                                  this.upso = {
+                                    status: "Acc",
+                                  };
+                                  axios
+                                    .put(
+                                      "/api/so/" + this.listbck[i].nomor_so,
+                                      this.upso
+                                    )
+                                    .then((res) => {
+                                      this.$router.push({
+                                        name: "distribusibbk",
+                                      });
+                                    });
                                 });
-                              });
-                            });
+                            }
                           }
+                          this.$router.push({
+                            name: "distribusibbk",
+                          });
                         }
-                        this.$router.push({
-                          name: "distribusibbk",
-                        });
-                      }
-                    });
+                      });
                   });
               });
             }
@@ -440,7 +649,9 @@ export default {
       }
     },
     validqty(index) {
-      if (parseFloat(this.hitung.qty[index]) > parseFloat(this.checker[index].qty)) {
+      if (
+        parseFloat(this.hitung.qty[index]) > parseFloat(this.checker[index].qty)
+      ) {
         this.hitung.qty[index] = this.checker[index].qty;
       }
       this.total = 0;
@@ -450,7 +661,10 @@ export default {
         } else {
           this.hitung.jumlah[i] = this.hitung.qty[i];
         }
-        this.subtotal = (parseFloat(this.checker[i].harga) - parseFloat(this.checker[i].diskon)) * parseFloat(this.hitung.jumlah[i]);
+        this.subtotal =
+          (parseFloat(this.checker[i].harga) -
+            parseFloat(this.checker[i].diskon)) *
+          parseFloat(this.hitung.jumlah[i]);
         this.total += parseFloat(this.subtotal);
       }
     },
@@ -465,7 +679,10 @@ export default {
       }, 5000);
     },
     print() {
-      var x = window.open("/data/bbk/print/" + this.$route.params.bbk, "_blank");
+      var x = window.open(
+        "/data/bbk/print/" + this.$route.params.bbk,
+        "_blank"
+      );
       x.focus();
     },
   },

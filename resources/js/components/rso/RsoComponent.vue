@@ -1,14 +1,29 @@
 <template>
   <div class="container">
-    <router-link v-if="ambiluser.sales === 1" to="/rso/create" class="btn btn-success my-3">+ Input RSO</router-link>
+    <router-link
+      v-if="ambiluser.sales === 1"
+      to="/rso/create"
+      class="btn btn-success my-3"
+      >+ Input RSO</router-link
+    >
     <div class="form-group ml-n4 col-1 my-3 float-right">
       <button @click="showfilter()" class="btn btn-trans">Filter</button>
     </div>
     <div class="form-group col-3 my-3 float-right">
-      <input v-model="filter.nomorrso" type="text" class="form-control" placeholder="Input Nomor RSO" />
+      <input
+        v-model="filter.nomorrso"
+        type="text"
+        class="form-control"
+        placeholder="Input Nomor RSO"
+      />
     </div>
     <div class="form-group ml-n3 col-3 my-3 float-left">
-      <select @change="statusData()" name="status" v-model="filter.status" class="form-control">
+      <select
+        @change="statusData()"
+        name="status"
+        v-model="filter.status"
+        class="form-control"
+      >
         <option v-if="ambiluser.sales === 1" value="Draft">Draft</option>
         <option value="Sent">Inventory Control</option>
         <option value="Purch">Purchasing</option>
@@ -17,7 +32,11 @@
       </select>
     </div>
     <div id="overflow" class="border-top">
-      <table id="thead" class="table table-striped table-bordered" style="width: 100%">
+      <table
+        id="thead"
+        class="table table-striped table-bordered"
+        style="width: 100%"
+      >
         <thead>
           <tr>
             <th>No</th>
@@ -32,7 +51,10 @@
           <tr v-for="(rs, index) in FilterKategori" :key="rs.nomor_rso">
             <td style="text-align: center">{{ index + 1 }}</td>
             <td style="text-align: center">
-              <router-link :to="{ name: 'formrso', params: { id: rs.nomor_rso } }" class="btn btn-none">
+              <router-link
+                :to="{ name: 'formrso', params: { id: rs.nomor_rso } }"
+                class="btn btn-none"
+              >
                 {{ rs.nomor_rso }}
               </router-link>
             </td>
@@ -40,32 +62,68 @@
             <td>{{ rs.customer }}</td>
             <td style="text-align: center">{{ rs.namauser }}</td>
             <td style="text-align: center">
-              <button @click="showhistory(rs)" class="btn btn-primary">Lihat History</button>
-              <button v-if="rs.status !== 'So' && ambiluser.sales === 1" @click="deleteRso(rs)" class="btn btn-danger">Batalkan</button>
+              <button @click="showhistory(rs)" class="btn btn-primary">
+                Lihat History
+              </button>
+              <button
+                v-if="rs.status !== 'So' && ambiluser.sales === 1"
+                @click="deleteRso(rs)"
+                class="btn btn-danger"
+              >
+                Batalkan
+              </button>
             </td>
           </tr>
         </tbody>
         <div>
-          <div v-if="filter.status == 'Draft' && tampil" id="nocontentRso">Tidak ada data yang tersimpan</div>
-          <div v-if="filter.status == 'Sent' && tampil" id="nocontentRso">Tidak ada data yang tersimpan</div>
-          <div v-if="filter.status == 'Purch' && tampil" id="nocontentRso">Tidak ada data yang tersimpan</div>
-          <div v-if="filter.status == 'Confirmed' && tampil" id="nocontentRso">Tidak ada data yang tersimpan</div>
-          <div v-if="filter.status == 'So' && tampil" id="nocontentRso">Tidak ada data yang tersimpan</div>
+          <div v-if="filter.status == 'Draft' && tampil" id="nocontentRso">
+            Tidak ada data yang tersimpan
+          </div>
+          <div v-if="filter.status == 'Sent' && tampil" id="nocontentRso">
+            Tidak ada data yang tersimpan
+          </div>
+          <div v-if="filter.status == 'Purch' && tampil" id="nocontentRso">
+            Tidak ada data yang tersimpan
+          </div>
+          <div v-if="filter.status == 'Confirmed' && tampil" id="nocontentRso">
+            Tidak ada data yang tersimpan
+          </div>
+          <div v-if="filter.status == 'So' && tampil" id="nocontentRso">
+            Tidak ada data yang tersimpan
+          </div>
         </div>
       </table>
       <Circle5 id="load" v-if="load"></Circle5>
     </div>
-    <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-form"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Rincian History RSO</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Rincian History RSO
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <table id="thead" class="table table-striped table-bordered" style="width: 100%">
+            <table
+              id="thead"
+              class="table table-striped table-bordered"
+              style="width: 100%"
+            >
               <thead>
                 <tr>
                   <th>tanggal</th>
@@ -85,17 +143,35 @@
             </table>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal fade" id="modal-filter" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-filter"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Filter Data</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -103,13 +179,32 @@
             <div class="form-group">
               <label>Customer</label>
               <div class="autocomplete"></div>
-              <div class="input" @click="toggleVisible" v-text="custom ? custom.nama : ''"></div>
-              <div class="placeholder" v-if="custom == null" v-text="ket.nama">Pilih Customer</div>
+              <div
+                class="input"
+                @click="toggleVisible"
+                v-text="custom ? custom.nama : ''"
+              ></div>
+              <div class="placeholder" v-if="custom == null" v-text="ket.nama">
+                Pilih Customer
+              </div>
               <div class="popover" v-show="visible">
-                <input type="text" @keydown.up="up" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nama customer .." />
+                <input
+                  type="text"
+                  @keydown.up="up"
+                  @keydown.down="down"
+                  @keydown.enter="selectItem"
+                  v-model="query"
+                  placeholder="Masukan nama customer .."
+                />
                 <div class="optionbr" ref="optionList">
                   <ul>
-                    <li v-for="(match, index) in matches" :key="match.kode" v-text="match.nama" :class="{ selected: selected == index }" @click="itemClicked(index)"></li>
+                    <li
+                      v-for="(match, index) in matches"
+                      :key="match.kode"
+                      v-text="match.nama"
+                      :class="{ selected: selected == index }"
+                      @click="itemClicked(index)"
+                    ></li>
                   </ul>
                 </div>
               </div>
@@ -118,34 +213,66 @@
               <label>Sales</label>
               <select v-model="filter.id_user" class="form-control">
                 <option value="">Semua Sales</option>
-                <option :value="us.id" v-for="(us, index) in user" :key="index">{{ us.name }}</option>
+                <option :value="us.id" v-for="(us, index) in user" :key="index">
+                  {{ us.name }}
+                </option>
               </select>
             </div>
             <div class="form-group">
               <label>Group</label>
-              <select v-model="filter.kode_groupso" class="form-control" disabled>
+              <select
+                v-model="filter.kode_groupso"
+                class="form-control"
+                disabled
+              >
                 <option value="" :key="index">Semua Group</option>
-                <option :value="gr.kode" v-for="(gr, index) in groupso" :key="index">{{ gr.area }}</option>
+                <option
+                  :value="gr.kode"
+                  v-for="(gr, index) in groupso"
+                  :key="index"
+                >
+                  {{ gr.area }}
+                </option>
               </select>
             </div>
             <div class="form-group">
               <label>Pilih Tanggal</label>
-              <select @change="cekjenis()" v-model="filter.jenistanggal" class="form-control">
+              <select
+                @change="cekjenis()"
+                v-model="filter.jenistanggal"
+                class="form-control"
+              >
                 <option value="Y">Bulan Berjalan</option>
                 <option value="N">Filter Tanggal</option>
               </select>
             </div>
             <div v-if="filter.jenistanggal === 'N'" class="form-group">
               <label>Mulai Tanggal</label>
-              <input v-model="filter.mulaitanggal" type="date" class="form-control" />
+              <input
+                v-model="filter.mulaitanggal"
+                type="date"
+                class="form-control"
+              />
             </div>
-            <div v-if="filter.jenistanggal === 'N' && filter.mulaitanggal !== undifined" class="form-group">
+            <div
+              v-if="
+                filter.jenistanggal === 'N' && filter.mulaitanggal !== undifined
+              "
+              class="form-group"
+            >
               <label>Sampai Tanggal</label>
-              <input v-model="filter.sampaitanggal" type="date" class="form-control" :min="filter.mulaitanggal" />
+              <input
+                v-model="filter.sampaitanggal"
+                type="date"
+                class="form-control"
+                :min="filter.mulaitanggal"
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-success" data-dismiss="modal">Save Change</button>
+            <button type="button" class="btn btn-success" data-dismiss="modal">
+              Save Change
+            </button>
           </div>
         </div>
       </div>
@@ -214,11 +341,21 @@ export default {
       var vm = this,
         lists = vm.rso;
       return _.filter(lists, function (query) {
-        var tanggal = query.tanggal_rso >= vm.filter.mulaitanggal && query.tanggal_rso <= vm.filter.sampaitanggal,
-          customer = vm.filter.kode_customer ? query.kode_customer == vm.filter.kode_customer : true,
+        var tanggal =
+            query.tanggal_rso >= vm.filter.mulaitanggal &&
+            query.tanggal_rso <= vm.filter.sampaitanggal,
+          customer = vm.filter.kode_customer
+            ? query.kode_customer == vm.filter.kode_customer
+            : true,
           sales = vm.filter.id_user ? query.id_user == vm.filter.id_user : true,
-          groupin = vm.filter.kode_groupso ? query.kode_groupso == vm.filter.kode_groupso : true,
-          nomorrso = vm.filter.nomorrso ? query.nomor_rso.toLowerCase().includes(vm.filter.nomorrso.toLowerCase()) : true,
+          groupin = vm.filter.kode_groupso
+            ? query.kode_groupso == vm.filter.kode_groupso
+            : true,
+          nomorrso = vm.filter.nomorrso
+            ? query.nomor_rso
+                .toLowerCase()
+                .includes(vm.filter.nomorrso.toLowerCase())
+            : true,
           status = vm.filter.status ? query.status == vm.filter.status : true;
         return tanggal && customer && status && sales && groupin && nomorrso;
       });
@@ -227,17 +364,21 @@ export default {
       if (this.query == "") {
         return [];
       }
-      return this.customer.filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()));
+      return this.customer.filter((item) =>
+        item.nama.toLowerCase().includes(this.query.toLowerCase())
+      );
     },
   },
   methods: {
     getRso() {
       if (this.ambiluser.sales === 1) {
-        axios.get("/api/rso/data/view/" + this.ambiluser.kode_groupso).then((res) => {
-          this.rso = res.data.data;
-          this.statusData();
-          this.load = false;
-        });
+        axios
+          .get("/api/rso/data/view/" + this.ambiluser.kode_groupso)
+          .then((res) => {
+            this.rso = res.data.data;
+            this.statusData();
+            this.load = false;
+          });
       } else {
         this.filter.id_user = "";
         this.filter.kode_groupso = "";
@@ -251,9 +392,11 @@ export default {
     auth() {
       axios.get("/api/groupso").then((res) => {
         this.groupso = res.data.data;
-        axios.get("/api/user/view/" + this.ambiluser.kode_groupso).then((res) => {
-          this.user = res.data.data;
-        });
+        axios
+          .get("/api/user/view/" + this.ambiluser.kode_groupso)
+          .then((res) => {
+            this.user = res.data.data;
+          });
       });
     },
     deleteRso(rso) {
@@ -297,7 +440,11 @@ export default {
                       this.getRso();
                     });
                     this.load = false;
-                    swalWithBootstrapButtons.fire("Deleted!", "Berhasil Menghapus RSO.", "success");
+                    swalWithBootstrapButtons.fire(
+                      "Deleted!",
+                      "Berhasil Menghapus RSO.",
+                      "success"
+                    );
                   })
                   .catch((error) => {
                     console.log(error);
@@ -316,7 +463,11 @@ export default {
             result.dismiss === Swal.DismissReason.cancel
           ) {
             this.load = false;
-            swalWithBootstrapButtons.fire("Cancelled", "Batal menghapus RSO ini :)", "error");
+            swalWithBootstrapButtons.fire(
+              "Cancelled",
+              "Batal menghapus RSO ini :)",
+              "error"
+            );
           }
         });
     },
@@ -384,7 +535,14 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
+      var output =
+        d.getFullYear() +
+        "-" +
+        (month < 10 ? "0" : "") +
+        month +
+        "-" +
+        (day < 10 ? "0" : "") +
+        day;
       return output;
     },
     validate() {
@@ -396,7 +554,8 @@ export default {
       var d = new Date();
       var month = d.getMonth() + 1;
 
-      var output = "RSO-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
+      var output =
+        "RSO-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
       return output;
     },
     statusData() {
@@ -423,7 +582,9 @@ export default {
             this.tampil = false;
           }
         } else if (this.filter.status === "Confirmed") {
-          this.confirmed = this.rso.filter((elem) => elem.status === "Confirmed");
+          this.confirmed = this.rso.filter(
+            (elem) => elem.status === "Confirmed"
+          );
           if (this.confirmed.length < 1) {
             this.tampil = true;
           } else {
@@ -450,8 +611,20 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
-      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
+      this.dates =
+        this.year +
+        "-" +
+        (this.month < 10 ? "0" : "") +
+        this.month +
+        "-" +
+        this.day;
+      this.times =
+        this.hours +
+        ":" +
+        this.minute +
+        ":" +
+        (this.seconds < 10 ? "0" : "") +
+        this.seconds;
       this.datetimes = this.dates + " " + this.times;
       return this.datetimes;
     },
@@ -466,8 +639,20 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + "01";
-      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
+      this.dates =
+        this.year +
+        "-" +
+        (this.month < 10 ? "0" : "") +
+        this.month +
+        "-" +
+        "01";
+      this.times =
+        this.hours +
+        ":" +
+        this.minute +
+        ":" +
+        (this.seconds < 10 ? "0" : "") +
+        this.seconds;
       this.datetimes = this.dates;
       return this.datetimes;
     },
@@ -482,8 +667,20 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
-      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
+      this.dates =
+        this.year +
+        "-" +
+        (this.month < 10 ? "0" : "") +
+        this.month +
+        "-" +
+        this.day;
+      this.times =
+        this.hours +
+        ":" +
+        this.minute +
+        ":" +
+        (this.seconds < 10 ? "0" : "") +
+        this.seconds;
       this.datetimes = this.dates;
       return this.datetimes;
     },

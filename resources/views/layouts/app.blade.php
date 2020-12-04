@@ -20,9 +20,9 @@
 </head>
 <body>
     <div id="app">
-        <nav class="navbar fixed-top navbar-expand-md navbar-light bg-white shadow-sm">
+        <nav class="navbar fixed-top navbar-expand-md navbar-light bg-white shadow-sm" >
             <div class="container">
-                <a class="navbar-brand m-n4" href="{{ url('/') }}">
+                <a class="navbar-brand " href="{{ url('/') }}">
                     ETM System
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
@@ -43,14 +43,14 @@
                                 <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                             </li> -->
                             @if (Route::has('register'))
-                                <!-- <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li> -->
+                                <li class="nav-item">
+                                    <a style="color: #fff;" class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                </li>
                             @endif
                         @else
 
-
-                            <!-- Halaman Acc -->
+                        <!-- 
+                            Halaman Acc
                             <li class="nav-item dropdown">
                                 <router-link to="/transaksi" id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Lainnya <span class="caret"></span>
@@ -58,13 +58,13 @@
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/atk/home" class="dropdown-item" >Permintaan ATK</router-link>
-                                    <!-- <router-link to="/barang" class="dropdown-item" >Barang</router-link>
+                                    <router-link to="/barang" class="dropdown-item" >Barang</router-link>
                                     <router-link to="/customer" class="dropdown-item" >Customer</router-link>
                                     <router-link to="/divisi" class="dropdown-item" >Divisi</router-link>
                                     <router-link to="/supplier" class="dropdown-item" >Supplier</router-link>
-                                    <router-link to="/sales" class="dropdown-item" >Sales</router-link> -->
+                                    <router-link to="/sales" class="dropdown-item" >Sales</router-link>
                                 </div>
-                            </li>
+                            </li> -->
 
 
                             <!-- Halaman Acc -->
@@ -93,7 +93,8 @@
                                 </router-link>
 
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <router-link to="/rso" class="dropdown-item" >Request Sales Order</router-link>
+                                    <router-link to="/rso" class="dropdown-item" >Request Order</router-link>
+                                    <!-- <router-link to="/fixrso" class="dropdown-item" >Request Order</router-link> -->
                                     <router-link to="/so" class="dropdown-item" >Sales Order</router-link>
                                     <router-link to="/formprice" class="dropdown-item" >Customer Price</router-link>
                                     <router-link to="/price/customer" class="dropdown-item" >History Price</router-link>
