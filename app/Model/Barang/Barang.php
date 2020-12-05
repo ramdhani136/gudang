@@ -3,6 +3,7 @@
 namespace App\Model\Barang;
 
 use App\Model\Po\Listpo;
+use App\Model\Pr\Listpr;
 use App\Model\So\Listso;
 use App\Model\Bbm\Listbbm;
 use App\Model\Bck\Listbbk;
@@ -57,5 +58,9 @@ class Barang extends Model
 
     public function kategoribarang(){
         return $this->belongsTo(Kategoribarang::class,'id_kategori','id');
+    }
+
+    public function listpr(){
+        return $this->hasMany(Listpr::class,'kode_barang','kode');
     }
 }

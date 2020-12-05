@@ -3,38 +3,70 @@
     <div class="row row-cols-2">
       <div class="col-4">
         <div class="form-group">
-          <label>Nomor PR :</label>
-          <input @input="cekpr()" v-model="upload.nomor_rso" type="text" maxlength="15" class="form-control col-12" :class="{ 'is-valid': aktif, 'is-invalid': !aktif }" />
+          <label>Nomor Permintaan :</label>
+          <input
+            @input="cekpr()"
+            v-model="upload.nomor_rso"
+            type="text"
+            maxlength="15"
+            class="form-control col-12"
+            :class="{ 'is-valid': aktif, 'is-invalid': !aktif }"
+          />
         </div>
         <div class="form-group">
           <label>Tanggal :</label>
-          <input v-model="upload.tanggal_rso" type="date" :min="now()" class="form-control col-12" />
+          <input
+            v-model="upload.tanggal_rso"
+            type="date"
+            :min="now()"
+            class="form-control col-12"
+          />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>Customer</label>
-          <select v-model="upload.kode_customer" name="customer" class="col-12 form-control" disabled>
+          <select
+            v-model="upload.kode_customer"
+            name="customer"
+            class="col-12 form-control"
+            disabled
+          >
             <option value="default">Gudang Stok</option>
           </select>
         </div>
         <div class="form-group">
           <label>Diminta</label>
-          <input type="text" class="form-control" value="Inventory Control" disabled />
+          <input
+            type="text"
+            class="form-control"
+            value="Inventory Control"
+            disabled
+          />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>keterangan</label>
-          <textarea v-model="upload.keterangan" name="keterangan" class="form-control col-12"></textarea>
+          <textarea
+            v-model="upload.keterangan"
+            name="keterangan"
+            class="form-control col-12"
+          ></textarea>
         </div>
       </div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
-      <button @click="showmodal()" class="btn btn-orange mt-2">+ Tambah Item</button>
+      <button @click="showmodal()" class="btn btn-orange mt-2">
+        + Tambah Item
+      </button>
       <div class="row mt-1 mx-auto col-12">
         <Circle5 id="load3" v-if="load"></Circle5>
-        <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
+        <table
+          id="rsthead"
+          class="table mt-2 table-striped table-bordered"
+          style="width: 100%"
+        >
           <thead>
             <tr>
               <th>No</th>
@@ -53,13 +85,26 @@
               <td>{{ lp.nama }}</td>
               <td style="text-align: center">{{ lp.satuan }}</td>
               <td style="text-align: center">
-                <input v-model="hitung.qty[index]" type="number" class="form-control" />
+                <input
+                  v-model="hitung.qty[index]"
+                  type="number"
+                  class="form-control"
+                />
               </td>
               <td style="text-align: center">
-                <textarea v-model="hitung.keterangan[index]" class="form-control"></textarea>
+                <textarea
+                  v-model="hitung.keterangan[index]"
+                  class="form-control"
+                ></textarea>
               </td>
               <td>
-                <button @click="hapus(index)" style="text-align: center" class="btn btn-danger">Hapus</button>
+                <button
+                  @click="hapus(index)"
+                  style="text-align: center"
+                  class="btn btn-danger"
+                >
+                  Hapus
+                </button>
               </td>
             </tr>
           </tbody>
@@ -67,14 +112,29 @@
       </div>
     </div>
     <div class="row mt-2">
-      <button @click="kirimpr()" class="btn-success btn ml-3">Kirim Permintaan</button>
+      <button @click="kirimpr()" class="btn-success btn ml-3">
+        Kirim Permintaan
+      </button>
     </div>
-    <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-form"
+      tabindex="-1"
+      data-backdrop="static"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Form Barang</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -82,29 +142,68 @@
             <div class="form-group">
               <label>Nama Barang</label>
               <div class="autocomplete"></div>
-              <div class="input" @click="toggleVisible" v-text="custom ? custom.nama : ''"></div>
-              <div class="placeholder" v-if="custom == null" v-text="ket.nama">Pilih Barang</div>
+              <div
+                class="input"
+                @click="toggleVisible"
+                v-text="custom ? custom.nama : ''"
+              ></div>
+              <div class="placeholder" v-if="custom == null" v-text="ket.nama">
+                Pilih Barang
+              </div>
               <div class="popover" v-show="visible">
-                <input type="text" @keydown.up="up" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nama barang .." />
+                <input
+                  type="text"
+                  @keydown.up="up"
+                  @keydown.down="down"
+                  @keydown.enter="selectItem"
+                  v-model="query"
+                  placeholder="Masukan nama barang .."
+                />
                 <div class="optionbr" ref="optionList">
                   <ul>
-                    <li v-for="(match, index) in matches" :key="match.kode" v-text="match.nama" :class="{ selected: selected == index }" @click="itemClicked(index)"></li>
+                    <li
+                      v-for="(match, index) in matches"
+                      :key="match.kode"
+                      v-text="match.nama"
+                      :class="{ selected: selected == index }"
+                      @click="itemClicked(index)"
+                    ></li>
                   </ul>
                 </div>
               </div>
             </div>
             <div class="form-group">
               <label>kode Barang</label>
-              <input v-model="ket.kode" type="text" name="qty" autocomplete="off" class="form-control" disabled />
+              <input
+                v-model="ket.kode"
+                type="text"
+                name="qty"
+                autocomplete="off"
+                class="form-control"
+                disabled
+              />
             </div>
             <div class="form-group">
               <label>Satuan</label>
-              <input v-model="ket.satuan" type="text" class="form-control" disabled />
+              <input
+                v-model="ket.satuan"
+                type="text"
+                class="form-control"
+                disabled
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button @click="tambahList()" type="button" class="btn btn-primary">Input Item</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button @click="tambahList()" type="button" class="btn btn-primary">
+              Input Item
+            </button>
           </div>
         </div>
       </div>
@@ -154,7 +253,9 @@ export default {
       if (this.query == "") {
         return [];
       }
-      return this.barang.filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()));
+      return this.barang.filter((item) =>
+        item.nama.toLowerCase().includes(this.query.toLowerCase())
+      );
     },
     Filteredlist() {
       return this.listpr.filter((elem) => {
@@ -174,14 +275,22 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
+      var output =
+        d.getFullYear() +
+        "-" +
+        (month < 10 ? "0" : "") +
+        month +
+        "-" +
+        (day < 10 ? "0" : "") +
+        day;
       return output;
     },
     pr_nomor() {
       var d = new Date();
       var month = d.getMonth() + 1;
 
-      var output = "PR-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
+      var output =
+        "IR-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
       return output;
     },
     toggleVisible() {
@@ -271,7 +380,11 @@ export default {
               this.aplus = "";
               this.aband = "";
               for (let i = 0; i < this.listpr.length; i++) {
-                if (this.hitung.qty[i] === undefined || this.hitung.qty[i] === undefined < 1 || this.hitung.qty[i] === "") {
+                if (
+                  this.hitung.qty[i] === undefined ||
+                  this.hitung.qty[i] === undefined < 1 ||
+                  this.hitung.qty[i] === ""
+                ) {
                   this.a = "N";
                 } else {
                   this.a = "Y";
@@ -311,7 +424,11 @@ export default {
                     tanggal: this.DateTime(),
                   });
                   this.load = false;
-                  swalWithBootstrapButtons.fire("Terkirim!", "PR Berhasil di kirim.", "success");
+                  swalWithBootstrapButtons.fire(
+                    "Terkirim!",
+                    "PR Berhasil di kirim.",
+                    "success"
+                  );
                   this.$router.push({
                     name: "Prcomponent",
                   });
@@ -321,7 +438,8 @@ export default {
                 Swal.fire({
                   icon: "error",
                   title: "Oops...",
-                  text: "Periksa kembali list item barang, qty tidak boleh kosong!",
+                  text:
+                    "Periksa kembali list item barang, qty tidak boleh kosong!",
                 });
               }
             } else {
@@ -337,7 +455,11 @@ export default {
             result.dismiss === Swal.DismissReason.cancel
           ) {
             this.load = false;
-            swalWithBootstrapButtons.fire("Batal", "Permintaan ini di batalkan :)", "error");
+            swalWithBootstrapButtons.fire(
+              "Batal",
+              "Permintaan ini di batalkan :)",
+              "error"
+            );
           }
         });
     },
@@ -355,8 +477,20 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
-      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
+      this.dates =
+        this.year +
+        "-" +
+        (this.month < 10 ? "0" : "") +
+        this.month +
+        "-" +
+        this.day;
+      this.times =
+        this.hours +
+        ":" +
+        this.minute +
+        ":" +
+        (this.seconds < 10 ? "0" : "") +
+        this.seconds;
       this.datetimes = this.dates + " " + this.times;
       return this.datetimes;
     },

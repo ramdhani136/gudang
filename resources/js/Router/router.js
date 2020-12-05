@@ -103,8 +103,13 @@ import lpurchaseorder from '../components/laporan/purch/lpurchaseorder.vue'
 /* ATK */
 import homeAtk from '../components/lainnya/atk/homeAtk.vue'
 
+/* PR */
 
+import DataPrComponent from '../components/pr/PrComponent.vue'
+import DataCreatePrcomponent from '../components/pr/CreatePrComponent.vue'
+import DataListPrcomponent from '../components/pr/ListPrComponent.vue'
 
+PrComponent
 
 
 const routes=[
@@ -208,7 +213,14 @@ const routes=[
     {name:'laporpo', path:'/view/laporpo', component:lpurchaseorder},
 
     /* ATK */
-    {name:'homeAtk', path:'/atk/home', component:homeAtk}
+    {name:'homeAtk', path:'/atk/home', component:homeAtk},
+
+
+    /* PR */
+
+    {name:'datapr', path:'/data/pr', component:DataPrComponent},
+    {name:'createpr', path:'/data/pr/create', component:DataCreatePrcomponent},
+    {name:'viewpr', path:'/data/pr/:nomor', component:DataListPrcomponent},
     
 ]
 

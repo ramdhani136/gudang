@@ -143,6 +143,9 @@ Route::get('listso/data/{so}/{barang}/{idx}','So\ListSoController@listsobck');
 
 Route::resource('pr','Pr\PrController');
 
+Route::resource('listpr','Pr\ListprController');
+Route::get('pr/data/open','Pr\PrController@open');
+
 Route::resource('listpo','Po\ListpoController');
 Route::get('listpo/data/aktif/{nomor}','Po\ListpoController@sisalist');
 Route::get('listpo/data/bcm/{id}','Po\ListpoController@bcm');

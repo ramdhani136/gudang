@@ -8,6 +8,7 @@ use App\Message;
 use App\Model\Groupso\Groupso;
 use App\Model\History\History;
 use App\Model\Po\Po;
+use App\Model\Pr\Pr;
 use App\Model\Rso\Rso;
 use App\Model\Sales\Custprice;
 use App\Model\So\So;
@@ -74,6 +75,10 @@ class User extends Authenticatable
 
     public function po(){
         return $this->hasMany(Po::class,'id_user','id');
+    }
+
+    public function pr(){
+        return $this->hasMany(Pr::class,'id_user','id');
     }
 
 

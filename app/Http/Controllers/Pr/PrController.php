@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Pr;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\listprResource;
 use App\Http\Resources\PrResource;
+use App\Model\Pr\Listpr;
 use App\Model\Pr\Pr;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +19,7 @@ class PrController extends Controller
      */
     public function index()
     {
-        return PrResource::collection(Pr::orderby('created_at','ASC')->get());
+        return PrResource::collection(Pr::orderby('nomor_pr','ASC')->get());
     }
 
     /**
@@ -87,5 +89,11 @@ class PrController extends Controller
     {
         Pr::where('nomor_pr',$id)->delete();
         return response('deleted',response::HTTP_OK);
+    }
+
+
+    public function open()
+    {
+        return PrResource::collection(Pr::where('status','Sent')->get());
     }
 }
