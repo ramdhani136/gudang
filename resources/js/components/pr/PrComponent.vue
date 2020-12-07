@@ -4,12 +4,7 @@
       <button @click="showfilter()" class="btn btn-trans">Filter</button>
     </div>
     <div class="form-group col-3 my-3 float-right">
-      <input
-        v-model="filter.nomor"
-        type="text"
-        class="form-control"
-        placeholder="Nomor PR"
-      />
+      <input v-model="filter.nomor" type="text" class="form-control" placeholder="Nomor PR" />
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
       <select name="status" v-model="filter.status" class="form-control">
@@ -20,16 +15,10 @@
       </select>
     </div>
     <div class="row">
-      <router-link to="/data/pr/create" class="btn btn-success my-3"
-        >+ Create PR</router-link
-      >
+      <router-link to="/data/pr/create" class="btn btn-success my-3">+ Create PR</router-link>
     </div>
     <div id="overflow" class="border-top">
-      <table
-        id="thead"
-        class="table table-striped table-bordered"
-        style="width: 100%"
-      >
+      <table id="thead" class="table table-striped table-bordered" style="width: 100%">
         <thead>
           <tr>
             <th>No</th>
@@ -56,53 +45,26 @@
             <td style="text-align: center">{{ lp.tanggal }}</td>
             <td style="text-align: center">{{ lp.user }}</td>
             <td style="text-align: center">
-              <button @click="showhistory(lp)" class="btn btn-primary">
-                Lihat Rincian
-              </button>
-              <button @click="batalkan(lp)" class="btn btn-danger">
-                Batalkan
-              </button>
-              <button
-                v-if="lp.status === 'Tolak' || lp.status === 'Draft'"
-                class="btn btn-danger"
-              >
-                Hapus
-              </button>
+              <button @click="showhistory(lp)" class="btn btn-primary">Lihat Rincian</button>
+              <button @click="batalkan(lp)" class="btn btn-danger">Batalkan</button>
+              <button v-if="lp.status === 'Tolak' || lp.status === 'Draft'" class="btn btn-danger">Hapus</button>
             </td>
           </tr>
         </tbody>
       </table>
       <Circle5 id="load" v-if="load"></Circle5>
     </div>
-    <div
-      class="modal fade"
-      id="modal-history"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-history" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Rincian History PR
-            </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <h5 class="modal-title" id="exampleModalLabel">Rincian History PR</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <table
-              id="thead"
-              class="table table-striped table-bordered"
-              style="width: 100%"
-            >
+            <table id="thead" class="table table-striped table-bordered" style="width: 100%">
               <thead>
                 <tr>
                   <th>tanggal</th>
@@ -122,61 +84,32 @@
             </table>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
     </div>
-    <div
-      class="modal fade"
-      id="modal-filter"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-filter" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Filter Data</h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
               <label>Mulai Tanggal</label>
-              <input
-                v-model="filter.mulaitanggal"
-                type="date"
-                class="form-control"
-              />
+              <input v-model="filter.mulaitanggal" type="date" class="form-control" />
             </div>
             <div class="form-group">
               <label>Sampai Tanggal</label>
-              <input
-                v-model="filter.sampaitanggal"
-                type="date"
-                class="form-control"
-                :min="filter.mulaitanggal"
-              />
+              <input v-model="filter.sampaitanggal" type="date" class="form-control" :min="filter.mulaitanggal" />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-success" data-dismiss="modal">
-              Save Change
-            </button>
+            <button type="button" class="btn btn-success" data-dismiss="modal">Save Change</button>
           </div>
         </div>
       </div>
@@ -207,6 +140,8 @@ export default {
         nomor: "",
       },
       history: {},
+      listpr: {},
+      listhapus: {},
     };
   },
   created() {
@@ -217,14 +152,8 @@ export default {
       var vm = this,
         lists = vm.pr;
       return _.filter(lists, function (query) {
-        var tanggal =
-            query.tanggal >= vm.filter.mulaitanggal &&
-            query.tanggal <= vm.filter.sampaitanggal,
-          nomorpr = vm.filter.nomor
-            ? query.nomor_pr
-                .toLowerCase()
-                .includes(vm.filter.nomor.toLowerCase())
-            : true,
+        var tanggal = query.tanggal >= vm.filter.mulaitanggal && query.tanggal <= vm.filter.sampaitanggal,
+          nomorpr = vm.filter.nomor ? query.nomor_pr.toLowerCase().includes(vm.filter.nomor.toLowerCase()) : true,
           status = vm.filter.status ? query.status == vm.filter.status : true;
         return tanggal && nomorpr && status;
       });
@@ -264,33 +193,63 @@ export default {
         })
         .then((result) => {
           if (result.isConfirmed) {
-            axios.delete("/api/pr/" + lp.nomor_pr).then((res) => {
-              axios
-                .get("/api/history/data/" + lp.nomor_pr + "/" + "Pr")
-                .then((res) => {
-                  this.history = res.data.data;
-                  for (let p = 0; p > this.history.length; p++) {
-                    axios.delete("/api/history/" + this.history[p].id);
+            this.load = true;
+            axios.get("/api/listpr/" + lp.nomor_pr).then((res) => {
+              this.listpr = res.data.data;
+              this.sisapo = 0;
+              this.openpo = 0;
+              this.statuspo = "";
+              for (let i = 0; i < this.listpr.length; i++) {
+                axios.get("/api/listso/data/kembalikanpo/" + this.listpr[i].kode_barang).then((res) => {
+                  this.listhapus = res.data.data;
+                  for (let k = 0; k < this.listhapus.length; k++) {
+                    if (this.listpr[i].qty >= this.listhapus[k].openpo) {
+                      this.sisapo = this.listhapus[k].openpo + this.listhapus[k].sisapo;
+                      this.openpo = 0;
+                      this.statuspo = "N";
+                      this.listpr[i].qty = parseInt(this.listpr[i].qty) - parseInt(this.listhapus[k].openpo);
+                    } else {
+                      this.openpo = parseInt(this.listhapus[k].openpo) - parseInt(this.listpr[i].qty);
+                      if (this.listpr[i].qty > this.listhapus[k].qty) {
+                        this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listhapus[k].open);
+                      } else {
+                        this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listpr[i].qty);
+                      }
+                      if (this.sisapo < 1) {
+                        this.statuspo = "Y";
+                      } else {
+                        this.statuspo = "N";
+                      }
+                      this.listpr[i].qty = parseInt(this.listpr[i].qty) - parseInt(this.listhapus[k].openpo);
+                      if (this.listpr[i].qty < 1) {
+                        this.listpr[i].qty = 0;
+                      }
+                    }
+                    axios.put("/api/listso/" + this.listhapus[k].id, {
+                      sisapo: this.sisapo,
+                      openpo: this.openpo,
+                      statuspo: this.statuspo,
+                    });
                   }
-                })
-                .then((res) => {
-                  this.getPr();
-                  swalWithBootstrapButtons.fire(
-                    "Deleted!",
-                    "PR berhasil di batakan.",
-                    "success"
-                  );
                 });
+              }
+              axios.delete("/api/pr/" + lp.nomor_pr).then((res) => {
+                axios.get("/api/history/" + lp.nomor_pr).then((res) => {
+                  this.history = res.data.data;
+                  for (let o = 0; 0 < this.history.length; o++) {
+                    axios.delete("/api/history/" + this.history[o].id);
+                  }
+                });
+                this.load = false;
+                swalWithBootstrapButtons.fire("Deleted!", "PR berhasil di hapus.", "success");
+                this.getPr();
+              });
             });
           } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Cancelled",
-              "Batal menghapus PR :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Cancelled", "Batal menghapus PR :)", "error");
           }
         });
     },
@@ -308,20 +267,8 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates =
-        this.year +
-        "-" +
-        (this.month < 10 ? "0" : "") +
-        this.month +
-        "-" +
-        "01";
-      this.times =
-        this.hours +
-        ":" +
-        this.minute +
-        ":" +
-        (this.seconds < 10 ? "0" : "") +
-        this.seconds;
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + "01";
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
       this.datetimes = this.dates;
       return this.datetimes;
     },
@@ -336,20 +283,8 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates =
-        this.year +
-        "-" +
-        (this.month < 10 ? "0" : "") +
-        this.month +
-        "-" +
-        this.day;
-      this.times =
-        this.hours +
-        ":" +
-        this.minute +
-        ":" +
-        (this.seconds < 10 ? "0" : "") +
-        this.seconds;
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
       this.datetimes = this.dates;
       return this.datetimes;
     },
@@ -364,20 +299,8 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates =
-        this.year +
-        "-" +
-        (this.month < 10 ? "0" : "") +
-        this.month +
-        "-" +
-        this.day;
-      this.times =
-        this.hours +
-        ":" +
-        this.minute +
-        ":" +
-        (this.seconds < 10 ? "0" : "") +
-        this.seconds;
+      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
       this.datetimes = this.dates + " " + this.times;
       return this.datetimes;
     },

@@ -1,22 +1,11 @@
 <template>
   <div class="container" @keyup.esc="resetForm()">
-    <router-link to="/prnya" class="btn btn-success my-3"
-      >+ Create PR</router-link
-    >
+    <router-link to="/prnya" class="btn btn-success my-3">+ Create PR</router-link>
     <div class="form-group col-3 my-3 float-right">
-      <input
-        v-model="search"
-        type="text"
-        class="form-control"
-        placeholder="Search"
-      />
+      <input v-model="search" type="text" class="form-control" placeholder="Search" />
     </div>
     <div id="overflow" class="border-top">
-      <table
-        id="thead"
-        class="table table-striped table-bordered"
-        style="width: 100%"
-      >
+      <table id="thead" class="table table-striped table-bordered" style="width: 100%">
         <thead>
           <tr>
             <th>No</th>
@@ -35,35 +24,19 @@
             <td style="text-align: center">{{ prlist.jumlah }}</td>
             <td style="text-align: center">{{ prlist.satuan }}</td>
             <td style="text-align: center">
-              <button @click="showmodal(prlist)" class="btn btn-primary">
-                Lihat Rincian
-              </button>
+              <button @click="showmodal(prlist)" class="btn btn-primary">Lihat Rincian</button>
             </td>
           </tr>
         </tbody>
       </table>
       <Circle5 id="load" v-if="load"></Circle5>
     </div>
-    <div
-      class="modal fade"
-      id="modal-pr"
-      tabindex="-1"
-      data-backdrop="static"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Rincian Permintaan
-            </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <h5 class="modal-title" id="exampleModalLabel">Rincian Permintaan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -71,36 +44,17 @@
             <div id="scrollList">
               <div class="form-group mr-3">
                 <label>Kode Barang</label>
-                <input
-                  v-model="ket.kode"
-                  type="text"
-                  class="form-control"
-                  disabled
-                />
+                <input v-model="ket.kode" type="text" class="form-control" disabled />
               </div>
               <div class="form-group mr-3">
                 <label>Nama Barang</label>
-                <input
-                  v-model="ket.nama"
-                  type="text"
-                  class="form-control"
-                  disabled
-                />
+                <input v-model="ket.nama" type="text" class="form-control" disabled />
               </div>
               <div class="form-group mr-3">
                 <label>Jumlah Permintaan</label>
-                <input
-                  v-model="ket.total"
-                  type="text"
-                  class="form-control"
-                  disabled
-                />
+                <input v-model="ket.total" type="text" class="form-control" disabled />
               </div>
-              <table
-                id="thead"
-                class="table table-striped table-bordered"
-                style="width: 97%"
-              >
+              <table id="thead" class="table table-striped table-bordered" style="width: 97%">
                 <thead>
                   <tr>
                     <th style="text-align: center">No</th>
@@ -119,9 +73,7 @@
                     <td style="text-align: center">{{ prl.jumlah }}</td>
                     <td style="text-align: center">{{ prl.satuan }}</td>
                     <td style="text-align: center">
-                      <button @click="tutup(prl)" class="btn btn-danger">
-                        Tutup
-                      </button>
+                      <button @click="tutup(prl)" class="btn btn-danger">Tutup</button>
                     </td>
                   </tr>
                 </tbody>
@@ -129,13 +81,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
@@ -210,14 +156,7 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output =
-        d.getFullYear() +
-        "-" +
-        (month < 10 ? "0" : "") +
-        month +
-        "-" +
-        (day < 10 ? "0" : "") +
-        day;
+      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
       return output;
     },
     validate() {
@@ -229,8 +168,7 @@ export default {
       var d = new Date();
       var month = d.getMonth() + 1;
 
-      var output =
-        "PO-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
+      var output = "PO-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
       return output;
     },
     resetForm() {
@@ -261,28 +199,18 @@ export default {
         })
         .then((result) => {
           if (result.isConfirmed) {
-            axios
-              .put("/api/listso/" + prl.id, { statuspo: "Y" })
-              .then((res) => {
-                this.getPr();
-                this.getSupplier();
-                this.getPurchasing();
-                $("#modal-pr").modal("hide");
-                swalWithBootstrapButtons.fire(
-                  "Sukses!",
-                  "Berhasil menyelesaikan permintaan item.",
-                  "success"
-                );
-              });
+            axios.put("/api/listso/" + prl.id, { statuspo: "Y" }).then((res) => {
+              this.getPr();
+              this.getSupplier();
+              this.getPurchasing();
+              $("#modal-pr").modal("hide");
+              swalWithBootstrapButtons.fire("Sukses!", "Berhasil menyelesaikan permintaan item.", "success");
+            });
           } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire(
-              "Canceled",
-              "Batal menyelesaikan permintaan :)",
-              "error"
-            );
+            swalWithBootstrapButtons.fire("Canceled", "Batal menyelesaikan permintaan :)", "error");
           }
         });
     },
