@@ -4,14 +4,23 @@
       <div class="col-4">
         <div class="form-group">
           <label>Nomor PR :</label>
-          <input @input="cekinputPr()" v-model="lpo.nomor_pr" type="text" class="form-control col-12" maxlength="15" :class="{ 'is-valid': nyala, 'is-invalid': !nyala }" />
+          <input
+            @input="cekinputPr()"
+            v-model="lpo.nomor_pr"
+            type="text"
+            class="form-control col-12"
+            maxlength="15"
+            :class="{ 'is-valid': nyala, 'is-invalid': !nyala }"
+          />
         </div>
       </div>
       <div class="col-4">
         <div class="form-group">
           <label>User</label>
           <select v-model="lpo.id_user" class="col-12 form-control" disabled>
-            <option v-for="(usr, index) in user" :key="index" :value="usr.id">{{ usr.name }}</option>
+            <option v-for="(usr, index) in user" :key="index" :value="usr.id">
+              {{ usr.name }}
+            </option>
           </select>
         </div>
       </div>
@@ -22,11 +31,21 @@
         </div>
       </div>
     </div>
-    <button style="font-size: 1em" @click="showmodal()" class="float-left ml-2 mt-4 label">Ambil Item</button>
+    <button
+      style="font-size: 1em"
+      @click="showmodal()"
+      class="float-left ml-2 mt-4 label mb-1"
+    >
+      Ambil Item
+    </button>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
       <div class="row mt-1 mx-auto col-12">
         <Circle5 id="load3" v-if="load"></Circle5>
-        <table id="rsthead" class="table mt-2 table-striped table-bordered" style="width: 100%">
+        <table
+          id="rsthead"
+          class="table mt-2 table-striped table-bordered"
+          style="width: 100%"
+        >
           <thead>
             <tr>
               <th>No</th>
@@ -46,11 +65,21 @@
               <td>{{ list.nama_barang }}</td>
               <td style="text-align: center">{{ list.qty }}</td>
               <td style="text-align: center">
-                <input @input="cekqty()" style="width: 130px" type="number" class="form-control" v-model="hitung.qty[index]" />
+                <input
+                  @input="cekqty()"
+                  style="width: 130px"
+                  type="number"
+                  class="form-control"
+                  v-model="hitung.qty[index]"
+                />
               </td>
               <td style="text-align: center">{{ list.satuan }}</td>
               <td style="text-align: center">
-                <textarea v-model="hitung.keterangan[index]" style="width: 200px" class="form-control"></textarea>
+                <textarea
+                  v-model="hitung.keterangan[index]"
+                  style="width: 200px"
+                  class="form-control"
+                ></textarea>
               </td>
               <td style="text-align: center">
                 <button @click="deletelist(index)" class="btn btn-danger">Hapus</button>
@@ -69,24 +98,48 @@
     <div class="row mt-2">
       <button @click="submitPr()" class="btn-success btn ml-4">Kirim PR</button>
     </div>
-    <div class="modal fade" id="modal-form" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-form"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Form Barang</h5>
-            <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button
+              @click="resetForm()"
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
               <label>Kode</label>
-              <input v-model="form.kode_barang" type="text" class="form-control" disabled />
+              <input
+                v-model="form.kode_barang"
+                type="text"
+                class="form-control"
+                disabled
+              />
             </div>
             <div class="form-group">
               <label>Pilih Barang</label>
-              <select @change="getList(chooseItem)" v-model="chooseItem" class="form-control">
-                <option v-for="(prl, index) in pr" :key="index" :value="prl">{{ prl.nama }}</option>
+              <select
+                @change="getList(chooseItem)"
+                v-model="chooseItem"
+                class="form-control"
+              >
+                <option v-for="(prl, index) in pr" :key="index" :value="prl">
+                  {{ prl.nama }}
+                </option>
               </select>
             </div>
             <div class="form-group">
@@ -99,13 +152,35 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button v-if="form.jumlah > 0" type="button" @click="TambahItem()" class="btn btn-primary">Input Item</button>
+            <button
+              type="button"
+              @click="resetForm()"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              v-if="form.jumlah > 0"
+              type="button"
+              @click="TambahItem()"
+              class="btn btn-primary"
+            >
+              Input Item
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal fade" id="modal-tolak" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-tolak"
+      tabindex="-1"
+      data-backdrop="static"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
@@ -121,8 +196,17 @@
             </div>
           </div>
           <div v-for="(lpo, index) in po" :key="index" class="modal-footer">
-            <button type="button" @click="resetForm()" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" @click="tolakpr(lpo)" class="btn btn-orange">Konfirmasi Tolak</button>
+            <button
+              type="button"
+              @click="resetForm()"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" @click="tolakpr(lpo)" class="btn btn-orange">
+              Konfirmasi Tolak
+            </button>
           </div>
         </div>
       </div>
@@ -202,7 +286,9 @@ export default {
       if (this.query == "") {
         return [];
       }
-      return this.supplier.filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()));
+      return this.supplier.filter((item) =>
+        item.nama.toLowerCase().includes(this.query.toLowerCase())
+      );
     },
   },
   methods: {
@@ -234,7 +320,14 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
+      var output =
+        d.getFullYear() +
+        "-" +
+        (month < 10 ? "0" : "") +
+        month +
+        "-" +
+        (day < 10 ? "0" : "") +
+        day;
       return output;
     },
     pr_nomor() {
@@ -327,7 +420,11 @@ export default {
               this.siapband = "";
               for (let i = 0; i < this.listfix.length; i++) {
                 console.log(this.hitung.qty[i]);
-                if (this.hitung.qty[i] < 1 || this.hitung.qty[i] === "" || this.hitung.qty[i] === undefined) {
+                if (
+                  this.hitung.qty[i] < 1 ||
+                  this.hitung.qty[i] === "" ||
+                  this.hitung.qty[i] === undefined
+                ) {
                   this.a = "N";
                 } else {
                   this.a = "Y";
@@ -352,55 +449,69 @@ export default {
                   this.sisapo = 0;
                   this.openpo = 0;
                   for (let i = 0; i < this.listfix.length; i++) {
-                    axios.get("/api/listso/data/antrianpo/" + this.listfix[i].kode_barang).then((res) => {
-                      this.listbagi = res.data.data;
-                      this.kasihso = 0;
-                      this.sisapembagi = 0;
-                      this.masihsisa = 0;
-                      this.sisapo = 0;
-                      this.tutupso = "";
-                      this.bandingtutup = "";
-                      this.openpo = 0;
-                      for (let k = 0; k < this.listbagi.length; k++) {
-                        /* ini sisa sonya */
-                        this.sisapembagi = parseFloat(this.listbagi[k].qty) - parseFloat(this.listbagi[k].openpo);
-                        /* end */
-                        if (this.hitung.qty[i] < this.sisapembagi) {
-                          this.kasihso = this.hitung.qty[i];
-                          this.hitung.qty[i] = 0;
-                        } else {
-                          this.kasihso = this.sisapembagi;
-                          this.hitung.qty[i] = parseFloat(this.hitung.qty[i]) - parseFloat(this.sisapembagi);
-                        }
+                    axios
+                      .get("/api/listso/data/antrianpo/" + this.listfix[i].kode_barang)
+                      .then((res) => {
+                        this.listbagi = res.data.data;
+                        this.kasihso = 0;
+                        this.sisapembagi = 0;
+                        this.masihsisa = 0;
+                        this.sisapo = 0;
+                        this.tutupso = "";
+                        this.bandingtutup = "";
+                        this.openpo = 0;
+                        for (let k = 0; k < this.listbagi.length; k++) {
+                          /* ini sisa sonya */
+                          this.sisapembagi =
+                            parseFloat(this.listbagi[k].qty) -
+                            parseFloat(this.listbagi[k].openpo);
+                          /* end */
+                          if (this.hitung.qty[i] < this.sisapembagi) {
+                            this.kasihso = this.hitung.qty[i];
+                            this.hitung.qty[i] = 0;
+                          } else {
+                            this.kasihso = this.sisapembagi;
+                            this.hitung.qty[i] =
+                              parseFloat(this.hitung.qty[i]) -
+                              parseFloat(this.sisapembagi);
+                          }
 
-                        this.sisapo = parseFloat(this.listbagi[k].sisapo) - parseFloat(this.kasihso);
-                        this.openpo = parseFloat(this.listbagi[k].openpo) + parseFloat(this.kasihso);
+                          this.sisapo =
+                            parseFloat(this.listbagi[k].sisapo) -
+                            parseFloat(this.kasihso);
+                          this.openpo =
+                            parseFloat(this.listbagi[k].openpo) +
+                            parseFloat(this.kasihso);
 
-                        if (this.sisapo === 0) {
-                          this.ubah = "Y";
-                        } else {
-                          this.ubah = "N";
+                          if (this.sisapo === 0) {
+                            this.ubah = "Y";
+                          } else {
+                            this.ubah = "N";
+                          }
+                          axios.put("/api/listso/" + this.listbagi[k].id, {
+                            sisapo: this.sisapo,
+                            openpo: this.openpo,
+                            statuspo: this.ubah,
+                          });
                         }
-                        axios.put("/api/listso/" + this.listbagi[k].id, {
-                          sisapo: this.sisapo,
-                          openpo: this.openpo,
-                          statuspo: this.ubah,
-                        });
-                      }
-                    });
+                      });
                   }
                   axios
                     .post("/api/history", {
                       nomor_dok: this.lpo.nomor_pr,
                       id_user: this.ambiluser.id,
                       notif: "Terdapat permintaan PR baru",
-                      keterangan: "Mengirim PR ke Purch Purchasing",
+                      keterangan: "Mengirim PR ke Purchasing",
                       jenis: "Pr",
                       tanggal: this.DateTime(),
                     })
                     .then((res) => {
                       this.load = false;
-                      swalWithBootstrapButtons.fire("Success!", "Form PR berhasil dikirim.", "success");
+                      swalWithBootstrapButtons.fire(
+                        "Success!",
+                        "Form PR berhasil dikirim.",
+                        "success"
+                      );
                       this.kembali();
                     });
                 });
@@ -445,8 +556,15 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
-      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
+      this.dates =
+        this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times =
+        this.hours +
+        ":" +
+        this.minute +
+        ":" +
+        (this.seconds < 10 ? "0" : "") +
+        this.seconds;
       this.datetimes = this.dates + " " + this.times;
       return this.datetimes;
     },

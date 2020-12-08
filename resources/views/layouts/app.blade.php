@@ -206,6 +206,7 @@
                                 <div class="dropdown-menu flex-center dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <router-link to="/purchase" class="dropdown-item" >Estimation Request RSO</router-link>
                                     <!-- <router-link to="/purchase/pr" class="dropdown-item" >Purchasing Request</router-link> -->
+                                    <router-link to="/data/pr" class="dropdown-item" >Purchase Request</router-link>
                                     <router-link to="/purchase/po/" class="dropdown-item" >Purchasing Order</router-link>
                                     <router-link to="/dic/incoming" class="dropdown-item" >Bukti Barang Masuk</router-link>
                                     <router-link to="/rso" class="dropdown-item" >Request Sales Order</router-link>

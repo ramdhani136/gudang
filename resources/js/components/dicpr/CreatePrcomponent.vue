@@ -37,12 +37,7 @@
         </div>
         <div class="form-group">
           <label>Diminta</label>
-          <input
-            type="text"
-            class="form-control"
-            value="Inventory Control"
-            disabled
-          />
+          <input type="text" class="form-control" value="Inventory Control" disabled />
         </div>
       </div>
       <div class="col-4">
@@ -57,9 +52,7 @@
       </div>
     </div>
     <div id="rsoverflowso" class="row mt-2 mx-auto">
-      <button @click="showmodal()" class="btn btn-orange mt-2">
-        + Tambah Item
-      </button>
+      <button @click="showmodal()" class="btn btn-orange mt-2">+ Tambah Item</button>
       <div class="row mt-1 mx-auto col-12">
         <Circle5 id="load3" v-if="load"></Circle5>
         <table
@@ -85,11 +78,7 @@
               <td>{{ lp.nama }}</td>
               <td style="text-align: center">{{ lp.satuan }}</td>
               <td style="text-align: center">
-                <input
-                  v-model="hitung.qty[index]"
-                  type="number"
-                  class="form-control"
-                />
+                <input v-model="hitung.qty[index]" type="number" class="form-control" />
               </td>
               <td style="text-align: center">
                 <textarea
@@ -112,9 +101,7 @@
       </div>
     </div>
     <div class="row mt-2">
-      <button @click="kirimpr()" class="btn-success btn ml-3">
-        Kirim Permintaan
-      </button>
+      <button @click="kirimpr()" class="btn-success btn ml-3">Kirim Permintaan</button>
     </div>
     <div
       class="modal fade"
@@ -129,12 +116,7 @@
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Form Barang</h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -185,20 +167,11 @@
             </div>
             <div class="form-group">
               <label>Satuan</label>
-              <input
-                v-model="ket.satuan"
-                type="text"
-                class="form-control"
-                disabled
-              />
+              <input v-model="ket.satuan" type="text" class="form-control" disabled />
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
               Close
             </button>
             <button @click="tambahList()" type="button" class="btn btn-primary">
@@ -289,8 +262,7 @@ export default {
       var d = new Date();
       var month = d.getMonth() + 1;
 
-      var output =
-        "IR-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
+      var output = "IR-" + d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-";
       return output;
     },
     toggleVisible() {
@@ -438,8 +410,7 @@ export default {
                 Swal.fire({
                   icon: "error",
                   title: "Oops...",
-                  text:
-                    "Periksa kembali list item barang, qty tidak boleh kosong!",
+                  text: "Periksa kembali list item barang, qty tidak boleh kosong!",
                 });
               }
             } else {
@@ -478,12 +449,7 @@ export default {
       }
       this.day = this.date.getDate();
       this.dates =
-        this.year +
-        "-" +
-        (this.month < 10 ? "0" : "") +
-        this.month +
-        "-" +
-        this.day;
+        this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
       this.times =
         this.hours +
         ":" +

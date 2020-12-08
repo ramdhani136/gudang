@@ -25,6 +25,8 @@ class PrResource extends JsonResource
             'purchase'=>$this->purchase,
             'tgl_purchase'=>$this->tgl_purchase,
             'status'=>$this->status,
+            'alasan'=>$this->alasan,
+            'reqedit'=>$this->reqedit,
         ];
     }
 }

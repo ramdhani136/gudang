@@ -96,4 +96,9 @@ class PrController extends Controller
     {
         return PrResource::collection(Pr::where('status','Sent')->get());
     }
+
+    public function listedit()
+    {
+        return PrResource::collection(Pr::where('reqedit','Y')->get());
+    }
 }

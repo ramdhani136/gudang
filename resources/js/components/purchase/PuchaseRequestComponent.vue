@@ -1,6 +1,8 @@
 <template>
   <div class="container" @keyup.esc="resetForm()">
-    <router-link to="/prnya" class="btn btn-success my-3">+ Create PR</router-link>
+    <router-link to="/data/pr/create" class="btn btn-success my-3"
+      >+ Create PR</router-link
+    >
     <div class="form-group col-3 my-3 float-right">
       <input v-model="search" type="text" class="form-control" placeholder="Search" />
     </div>
@@ -24,14 +26,23 @@
             <td style="text-align: center">{{ prlist.jumlah }}</td>
             <td style="text-align: center">{{ prlist.satuan }}</td>
             <td style="text-align: center">
-              <button @click="showmodal(prlist)" class="btn btn-primary">Lihat Rincian</button>
+              <button @click="showmodal(prlist)" class="btn btn-primary">
+                Lihat Rincian
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
       <Circle5 id="load" v-if="load"></Circle5>
     </div>
-    <div class="modal fade" id="modal-pr" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-pr"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
@@ -54,7 +65,11 @@
                 <label>Jumlah Permintaan</label>
                 <input v-model="ket.total" type="text" class="form-control" disabled />
               </div>
-              <table id="thead" class="table table-striped table-bordered" style="width: 97%">
+              <table
+                id="thead"
+                class="table table-striped table-bordered"
+                style="width: 97%"
+              >
                 <thead>
                   <tr>
                     <th style="text-align: center">No</th>
@@ -81,7 +96,9 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Close
+            </button>
           </div>
         </div>
       </div>
@@ -156,7 +173,14 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
+      var output =
+        d.getFullYear() +
+        "-" +
+        (month < 10 ? "0" : "") +
+        month +
+        "-" +
+        (day < 10 ? "0" : "") +
+        day;
       return output;
     },
     validate() {
@@ -204,13 +228,21 @@ export default {
               this.getSupplier();
               this.getPurchasing();
               $("#modal-pr").modal("hide");
-              swalWithBootstrapButtons.fire("Sukses!", "Berhasil menyelesaikan permintaan item.", "success");
+              swalWithBootstrapButtons.fire(
+                "Sukses!",
+                "Berhasil menyelesaikan permintaan item.",
+                "success"
+              );
             });
           } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
           ) {
-            swalWithBootstrapButtons.fire("Canceled", "Batal menyelesaikan permintaan :)", "error");
+            swalWithBootstrapButtons.fire(
+              "Canceled",
+              "Batal menyelesaikan permintaan :)",
+              "error"
+            );
           }
         });
     },
