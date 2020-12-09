@@ -26,6 +26,9 @@ class listprResource extends JsonResource
             'bbm'=>$this->bbm,
             'close'=>$this->close,
             'keterangan'=>$this->keterangan,
+            'tgl_estimasi'=>$this->tgl_estimasi,
+            'status'=>$this->status,
+            'alastolak'=>$this->alastolak,
         ];
     }
 }

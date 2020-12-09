@@ -61,7 +61,25 @@
               <th v-if="statuspr === 'Draft'">Total Permintaan</th>
               <th>Qty PR</th>
               <th>Satuan</th>
-              <th>Catatan</th>
+              <th
+                v-if="
+                  ((statuspr === 'Open' || statuspr === 'Selesai') &&
+                    ambiluser.inventory === 1) ||
+                  ambiluser.purch === 1
+                "
+              >
+                Status
+              </th>
+              <th
+                v-if="
+                  ((statuspr === 'Open' || statuspr === 'Selesai') &&
+                    ambiluser.inventory === 1) ||
+                  ambiluser.purch === 1
+                "
+              >
+                Estimasi / Alasan
+              </th>
+              <th>Catatan DIC</th>
               <th v-if="statuspr === 'Draft'">Aksi</th>
             </tr>
           </thead>
@@ -84,6 +102,57 @@
                 />
               </td>
               <td style="text-align: center">{{ list.satuan }}</td>
+              <td
+                v-if="
+                  ((statuspr === 'Open' || statuspr === 'Selesai') &&
+                    ambiluser.inventory === 1) ||
+                  ambiluser.purch === 1
+                "
+                style="text-align: center"
+              >
+                <select
+                  @change="cekstatus()"
+                  :disabled="
+                    (ambiluser.purch === 1 && statuspr !== 'Sent') ||
+                    ambiluser.inventory === 1
+                  "
+                  v-model="hitung.status[index]"
+                  style="width: 100px"
+                  class="form-control"
+                >
+                  <option value="Y">Terima</option>
+                  <option value="N">Tolak</option>
+                </select>
+              </td>
+              <td
+                v-if="
+                  ((statuspr === 'Open' || statuspr === 'Selesai') &&
+                    ambiluser.inventory === 1) ||
+                  ambiluser.purch === 1
+                "
+                style="text-align: center"
+              >
+                <input
+                  @input="cekstatus()"
+                  v-model="hitung.tgl_estimasi[index]"
+                  :disabled="
+                    (ambiluser.purch === 1 && statuspr !== 'Sent') ||
+                    ambiluser.inventory === 1
+                  "
+                  v-if="hitung.status[index] === 'Y'"
+                  type="date"
+                  style="width: 170px"
+                  class="form-control"
+                />
+                <textarea
+                  @input="cekstatus()"
+                  v-model="hitung.alastolak[index]"
+                  :disabled="statuspr !== 'Sent' && ambiluser.purch === 0"
+                  v-if="hitung.status[index] === 'N'"
+                  style="width: 170px"
+                  class="form-control"
+                ></textarea>
+              </td>
               <td style="text-align: center">
                 <textarea
                   :disabled="statuspr !== 'Draft'"
@@ -127,6 +196,7 @@
         Request Edit
       </button>
       <button
+        :disabled="butn"
         v-if="statuspr === 'Sent' && ambiluser.purch === 1 && edit === 'N'"
         @click="showtolak()"
         class="btn-danger btn ml-4"
@@ -134,9 +204,10 @@
         Tolak
       </button>
       <button
+        :disabled="buty"
         v-if="statuspr === 'Sent' && ambiluser.purch === 1 && edit === 'N'"
         @click="terimapr()"
-        class="btn-success btn ml-2"
+        class="btn-success btn ml-1"
       >
         Terima PR
       </button>
@@ -370,6 +441,9 @@ export default {
         qty: [],
         subqty: [],
         keterangan: [],
+        tgl_estimasi: [],
+        alastolak: [],
+        status: [],
       },
       form: {
         jumlah: "",
@@ -393,6 +467,14 @@ export default {
       alasan: "",
       edit: "N",
       statusupdate: "",
+      butn: true,
+      buty: true,
+      hasilbanding: "",
+      bandingin: "",
+      nilai: "",
+      alldone: "",
+      allband: "",
+      listprnya: {},
     };
   },
   created() {
@@ -430,10 +512,12 @@ export default {
             this.alasan = this.prini[0].alasan;
             axios.get("/api/listpr/" + this.lpo.nomor_pr).then((res) => {
               this.listfix = res.data.data;
-              console.log(this.listfix);
               for (let u = 0; u < this.listfix.length; u++) {
                 this.hitung.qty[u] = this.listfix[u].qty;
                 this.hitung.keterangan[u] = this.listfix[u].keterangan;
+                this.hitung.status[u] = this.listfix[u].status;
+                this.hitung.alastolak[u] = this.listfix[u].alastolak;
+                this.hitung.tgl_estimasi[u] = this.listfix[u].tgl_estimasi;
               }
             });
             this.load = false;
@@ -559,7 +643,6 @@ export default {
               this.siap = "";
               this.siapband = "";
               for (let i = 0; i < this.listfix.length; i++) {
-                console.log(this.hitung.qty[i]);
                 if (
                   this.hitung.qty[i] < 1 ||
                   this.hitung.qty[i] === "" ||
@@ -966,22 +1049,35 @@ export default {
               })
               .then((res) => {
                 axios
-                  .post("/api/history", {
-                    nomor_dok: this.lpo.nomor_pr,
-                    id_user: this.ambiluser.id,
-                    notif: "Pr di terima",
-                    keterangan: "PR di terima",
-                    jenis: "Pr",
-                    tanggal: this.DateTime(),
+                  .get("/api/listpr/" + this.$route.params.nomor)
+                  .then((res) => {
+                    this.listprnya = res.data.data;
+                    for (let r = 0; r < this.listprnya.length; r++) {
+                      axios.put("/api/listpr/" + this.listprnya[r].id, {
+                        status: "Y",
+                        tgl_estimasi: this.hitung.tgl_estimasi[r],
+                      });
+                    }
                   })
                   .then((res) => {
-                    this.load = false;
-                    swalWithBootstrapButtons.fire(
-                      "Sukses!",
-                      "Berhasil menerima PR.",
-                      "success"
-                    );
-                    this.kembali();
+                    axios
+                      .post("/api/history", {
+                        nomor_dok: this.lpo.nomor_pr,
+                        id_user: this.ambiluser.id,
+                        notif: "Pr di terima",
+                        keterangan: "PR di terima",
+                        jenis: "Pr",
+                        tanggal: this.DateTime(),
+                      })
+                      .then((res) => {
+                        this.load = false;
+                        swalWithBootstrapButtons.fire(
+                          "Sukses!",
+                          "Berhasil menerima PR.",
+                          "success"
+                        );
+                        this.kembali();
+                      });
                   });
               });
           } else if (
@@ -992,6 +1088,56 @@ export default {
             swalWithBootstrapButtons.fire("Cancelled", "Batal menerima PR :)", "error");
           }
         });
+    },
+    cekstatus() {
+      this.butn = true;
+      this.buty = true;
+      this.hasilbanding = "";
+      this.bandingin = "";
+      for (let i = 0; i < this.listfix.length; i++) {
+        if (this.hitung.status[i] === "Y") {
+          this.hitung.alastolak[i] = "";
+          if (
+            this.hitung.tgl_estimasi[i] === "" ||
+            this.hitung.tgl_estimasi[i] === null ||
+            this.hitung.tgl_estimasi[i] === undefined
+          ) {
+            this.nilai = "N";
+          } else {
+            this.nilai = "Y";
+          }
+        } else if (this.hitung.status[i] === "N") {
+          this.hitung.tgl_estimasi[i] = "";
+          if (
+            this.hitung.alastolak[i] === "" ||
+            this.hitung.alastolak[i] === null ||
+            this.hitung.alastolak[i] === undefined
+          ) {
+            this.nilai = "N";
+          } else {
+            this.nilai = "Y";
+          }
+        }
+        this.hasilbanding += this.nilai;
+        this.bandingin += "Y";
+      }
+      if (this.hasilbanding === this.bandingin) {
+        this.butn = false;
+        this.buty = false;
+        this.alldone = "";
+        this.allband = "";
+        for (let i = 0; i < this.listfix.length; i++) {
+          this.alldone += this.hitung.status[i];
+          this.allband += "Y";
+        }
+        if (this.alldone === this.allband) {
+          this.butn = true;
+          this.buty = false;
+        } else {
+          this.butn = false;
+          this.buty = true;
+        }
+      }
     },
   },
 };
