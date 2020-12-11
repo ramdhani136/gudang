@@ -63,7 +63,10 @@
               <th>Satuan</th>
               <th
                 v-if="
-                  ((statuspr === 'Open' || statuspr === 'Selesai') &&
+                  ((statuspr === 'Open' ||
+                    statuspr === 'Selesai' ||
+                    statuspr === 'Tolak' ||
+                    statuspr === 'Draft') &&
                     ambiluser.inventory === 1) ||
                   ambiluser.purch === 1
                 "
@@ -72,7 +75,10 @@
               </th>
               <th
                 v-if="
-                  ((statuspr === 'Open' || statuspr === 'Selesai') &&
+                  ((statuspr === 'Open' ||
+                    statuspr === 'Selesai' ||
+                    statuspr === 'Tolak' ||
+                    statuspr === 'Draft') &&
                     ambiluser.inventory === 1) ||
                   ambiluser.purch === 1
                 "
@@ -89,7 +95,7 @@
               <td>{{ list.kode_barang }}</td>
               <td>{{ list.nama_barang }}</td>
               <td v-if="statuspr === 'Draft'" style="text-align: center">
-                {{ list.qty }}
+                {{ hitung.total[index] }}
               </td>
               <td style="text-align: center">
                 <input
@@ -104,7 +110,10 @@
               <td style="text-align: center">{{ list.satuan }}</td>
               <td
                 v-if="
-                  ((statuspr === 'Open' || statuspr === 'Selesai') &&
+                  ((statuspr === 'Open' ||
+                    statuspr === 'Selesai' ||
+                    statuspr === 'Tolak' ||
+                    statuspr === 'Draft') &&
                     ambiluser.inventory === 1) ||
                   ambiluser.purch === 1
                 "
@@ -126,7 +135,10 @@
               </td>
               <td
                 v-if="
-                  ((statuspr === 'Open' || statuspr === 'Selesai') &&
+                  ((statuspr === 'Open' ||
+                    statuspr === 'Selesai' ||
+                    statuspr === 'Tolak' ||
+                    statuspr === 'Draft') &&
                     ambiluser.inventory === 1) ||
                   ambiluser.purch === 1
                 "
@@ -147,7 +159,10 @@
                 <textarea
                   @input="cekstatus()"
                   v-model="hitung.alastolak[index]"
-                  :disabled="statuspr !== 'Sent' && ambiluser.purch === 0"
+                  :disabled="
+                    (ambiluser.purch === 1 && statuspr !== 'Sent') ||
+                    ambiluser.inventory === 1
+                  "
                   v-if="hitung.status[index] === 'N'"
                   style="width: 170px"
                   class="form-control"
@@ -178,6 +193,9 @@
           class="form-control"
         ></textarea>
         <div v-if="edit === 'Y' && ambiluser.purch === 1" class="notif">{{ alasan }}</div>
+        <div v-if="statuspr === 'Tolak'" class="notif">
+          {{ alastolak }}
+        </div>
       </div>
     </div>
     <div class="row mt-2">
@@ -272,7 +290,7 @@
                 v-model="chooseItem"
                 class="form-control"
               >
-                <option v-for="(prl, index) in pr" :key="index" :value="prl">
+                <option v-for="(prl, index) in listbaru" :key="index" :value="prl">
                   {{ prl.nama }}
                 </option>
               </select>
@@ -405,6 +423,49 @@
         </div>
       </div>
     </div>
+    <div
+      class="modal fade"
+      id="modal-tolakin"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div id="modal-width" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Form Penolakan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Alasan Penolakan</label>
+              <textarea
+                :disabled="statuspr !== Sent && ambiluser.purch === 0"
+                v-model="alastolak"
+                class="form-control"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Close
+            </button>
+            <button
+              v-if="statuspr === 'Sent' && ambiluser.purch === 1"
+              @click="Kirimtolak()"
+              type="button"
+              class="btn btn-orange"
+              data-dismiss="modal"
+            >
+              Tolak Permintaan
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -444,6 +505,7 @@ export default {
         tgl_estimasi: [],
         alastolak: [],
         status: [],
+        total: [],
       },
       form: {
         jumlah: "",
@@ -475,6 +537,10 @@ export default {
       alldone: "",
       allband: "",
       listprnya: {},
+      alastolak: "",
+      listbaru: [],
+      statuspo: "",
+      listhapus: {},
     };
   },
   created() {
@@ -507,17 +573,135 @@ export default {
             this.lpo.nomor_pr = this.prini[0].nomor_pr;
             this.lpo.id_user = this.prini[0].id_user;
             this.lpo.keterangan = this.prini[0].keterangan;
+            this.alastolak = this.prini[0].alastolak;
             this.edit = this.prini[0].reqedit;
             this.statuspr = this.prini[0].status;
             this.alasan = this.prini[0].alasan;
             axios.get("/api/listpr/" + this.lpo.nomor_pr).then((res) => {
               this.listfix = res.data.data;
-              for (let u = 0; u < this.listfix.length; u++) {
-                this.hitung.qty[u] = this.listfix[u].qty;
-                this.hitung.keterangan[u] = this.listfix[u].keterangan;
-                this.hitung.status[u] = this.listfix[u].status;
-                this.hitung.alastolak[u] = this.listfix[u].alastolak;
-                this.hitung.tgl_estimasi[u] = this.listfix[u].tgl_estimasi;
+              for (let b = 0; b < this.listfix.length; b++) {
+                this.hitung.status[b] = this.listfix[b].status;
+                this.hitung.tgl_estimasi[b] = this.listfix[b].tgl_estimasi;
+                this.hitung.alastolak[b] = this.listfix[b].alastolak;
+                this.hitung.qty[b] = this.listfix[b].qty;
+                this.hitung.keterangan[b] = this.listfix[b].keterangan;
+              }
+
+              if (this.listfix.length >= this.pr.length) {
+                for (let i = 0; i < this.pr.length; i++) {
+                  for (let j = 0; j < this.listfix.length; j++) {
+                    this.hitung.status[j] = this.listfix[j].status;
+                    this.hitung.tgl_estimasi[j] = this.listfix[j].tgl_estimasi;
+                    this.hitung.alastolak[j] = this.listfix[j].alastolak;
+                    this.hitung.qty[j] = this.listfix[j].qty;
+                    const hitungajaa = this.listbaru.filter(
+                      (element) => element.kode_barang === this.pr[i].kode_barang
+                    );
+                    if (
+                      this.pr[i].kode_barang === this.listfix[j].kode_barang &&
+                      hitungajaa.length < 1
+                    ) {
+                      this.listbaru.push({
+                        kode_barang: this.pr[i].kode_barang,
+                        jumlah:
+                          parseFloat(this.pr[i].jumlah) + parseFloat(this.listfix[j].qty),
+                        nama: this.pr[i].nama,
+                        id: this.listfix[j].id,
+                        satuan: this.listfix[j].satuan,
+                      });
+                    }
+                  }
+                }
+                for (let j = 0; j < this.listfix.length; j++) {
+                  const hitungin2 = this.listbaru.filter(
+                    (element) => element.kode_barang === this.listfix[j].kode_barang
+                  );
+                  if (hitungin2.length < 1) {
+                    this.listbaru.push({
+                      kode_barang: this.listfix[j].kode_barang,
+                      jumlah: parseFloat(this.listfix[j].qty),
+                      nama: this.listfix[j].nama_barang,
+                      id: this.listfix[j].id,
+                      satuan: this.listfix[j].satuan,
+                    });
+                  }
+                }
+                for (let j = 0; j < this.pr.length; j++) {
+                  const hitungin3 = this.listbaru.filter(
+                    (element) => element.kode_barang === this.pr[j].kode_barang
+                  );
+                  if (hitungin3.length < 1) {
+                    this.listbaru.push({
+                      kode_barang: this.pr[j].kode_barang,
+                      jumlah: parseFloat(this.pr[j].jumlah),
+                      nama: this.pr[j].nama,
+                      id: "",
+                      satuan: this.pr[j].satuan,
+                    });
+                  }
+                }
+
+                for (let i = 0; i < this.listfix.length; i++) {
+                  for (let j = 0; j < this.listbaru.length; j++) {
+                    if (this.listfix[i].kode_barang === this.listbaru[j].kode_barang) {
+                      const ambilcari = this.listbaru.filter(
+                        (element) => element.kode_barang === this.listfix[i].kode_barang
+                      );
+                      this.hitung.total[i] = ambilcari[0].jumlah;
+                      this.hitung.status[i] = "Y";
+                    }
+                  }
+                }
+              } else {
+                for (let i = 0; i < this.listfix.length; i++) {
+                  for (let j = 0; j < this.pr.length; j++) {
+                    this.hitung.status[i] = this.listfix[i].status;
+                    this.hitung.tgl_estimasi[i] = this.listfix[i].tgl_estimasi;
+                    this.hitung.alastolak[i] = this.listfix[i].alastolak;
+                    this.hitung.qty[i] = this.listfix[i].qty;
+                    const hitungin = this.listbaru.filter(
+                      (element) => element.kode_barang === this.pr[j].kode_barang
+                    );
+                    if (
+                      this.listfix[i].kode_barang === this.pr[j].kode_barang &&
+                      hitungin.length < 1
+                    ) {
+                      this.listbaru.push({
+                        kode_barang: this.pr[j].kode_barang,
+                        jumlah:
+                          parseFloat(this.pr[j].jumlah) + parseFloat(this.listfix[i].qty),
+                        nama: this.pr[j].nama,
+                        id: this.listfix[i].id,
+                        satuan: this.listfix[i].satuan,
+                      });
+                    }
+                  }
+                }
+                for (let j = 0; j < this.pr.length; j++) {
+                  const hitungin2 = this.listbaru.filter(
+                    (element) => element.kode_barang === this.pr[j].kode_barang
+                  );
+                  if (hitungin2.length < 1) {
+                    this.listbaru.push({
+                      kode_barang: this.pr[j].kode_barang,
+                      jumlah: parseFloat(this.pr[j].jumlah),
+                      nama: this.pr[j].nama,
+                      id: "",
+                      satuan: this.pr[j].satuan,
+                    });
+                  }
+                }
+                for (let i = 0; i < this.listfix.length; i++) {
+                  for (let j = 0; j < this.listbaru.length; j++) {
+                    if (this.listfix[i].kode_barang === this.listbaru[j].kode_barang) {
+                      const ambilcari = this.listbaru.filter(
+                        (element) => element.kode_barang === this.listfix[i].kode_barang
+                      );
+                      this.hitung.total[i] = ambilcari[0].jumlah;
+                      this.hitung.status[i] = "Y";
+                    }
+                  }
+                }
               }
             });
             this.load = false;
@@ -527,17 +711,15 @@ export default {
     },
     getList(chooseItem) {
       this.load = true;
-      axios.get("/api/listso/data/group/" + chooseItem.kode_barang).then((res) => {
-        this.prlist = res.data.data;
-        this.form.jumlah = 0;
-        for (let i = 0; i < this.prlist.length; i++) {
-          this.form.jumlah += parseInt(this.prlist[i].jumlah);
-        }
-        this.load = false;
-        this.form.kode_barang = this.prlist[0].kode;
-        this.form.nama_barang = this.prlist[0].nama_barang;
-        this.ket.satuan = this.prlist[0].satuan;
-      });
+      const ambil = this.listbaru.filter(
+        (element) => element.kode_barang === chooseItem.kode_barang
+      );
+      console.log(ambil);
+      this.form.jumlah = ambil[0].jumlah;
+      this.form.kode_barang = ambil[0].kode_barang;
+      this.form.nama_barang = ambil[0].nama;
+      this.ket.satuan = ambil[0].satuan;
+      this.load = false;
     },
     now() {
       var d = new Date();
@@ -571,6 +753,58 @@ export default {
       this.up.alastolak = "";
       this.form = {};
       this.ket.satuan = "";
+    },
+    batalkan() {
+      this.load = true;
+      axios.get("/api/listpr/" + this.$route.params.nomor).then((res) => {
+        this.listpr = res.data.data;
+        this.sisapo = 0;
+        this.openpo = 0;
+        this.statuspo = "";
+        for (let i = 0; i < this.listpr.length; i++) {
+          axios
+            .get("/api/listso/data/kembalikanpo/" + this.listpr[i].kode_barang)
+            .then((res) => {
+              this.listhapus = res.data.data;
+              for (let k = 0; k < this.listhapus.length; k++) {
+                if (this.listpr[i].qty >= this.listhapus[k].openpo) {
+                  this.sisapo = this.listhapus[k].openpo + this.listhapus[k].sisapo;
+                  this.openpo = 0;
+                  this.statuspo = "N";
+                  this.listpr[i].qty =
+                    parseInt(this.listpr[i].qty) - parseInt(this.listhapus[k].openpo);
+                } else {
+                  this.openpo =
+                    parseInt(this.listhapus[k].openpo) - parseInt(this.listpr[i].qty);
+                  if (this.listpr[i].qty > this.listhapus[k].qty) {
+                    this.sisapo =
+                      parseInt(this.listhapus[k].sisapo) +
+                      parseInt(this.listhapus[k].open);
+                  } else {
+                    this.sisapo =
+                      parseInt(this.listhapus[k].sisapo) + parseInt(this.listpr[i].qty);
+                  }
+                  if (this.sisapo < 1) {
+                    this.statuspo = "Y";
+                  } else {
+                    this.statuspo = "N";
+                  }
+                  this.listpr[i].qty =
+                    parseInt(this.listpr[i].qty) - parseInt(this.listhapus[k].openpo);
+                  if (this.listpr[i].qty < 1) {
+                    this.listpr[i].qty = 0;
+                  }
+                }
+                axios.put("/api/listso/" + this.listhapus[k].id, {
+                  sisapo: this.sisapo,
+                  openpo: this.openpo,
+                  statuspo: this.statuspo,
+                });
+              }
+            });
+        }
+        axios.delete("/api/pr/" + this.$route.params.nomor);
+      });
     },
     TambahItem() {
       if (this.listfix.length === 0) {
@@ -607,12 +841,26 @@ export default {
           });
         }
       }
-
+      for (let i = 0; i < this.listfix.length; i++) {
+        for (let j = 0; j < this.listbaru.length; j++) {
+          if (this.listfix[i].kode_barang === this.listbaru[j].kode_barang) {
+            const ambilcari = this.listbaru.filter(
+              (element) => element.kode_barang === this.listfix[i].kode_barang
+            );
+            this.hitung.total[i] = ambilcari[0].jumlah;
+            this.hitung.status[i] = "Y";
+          }
+        }
+      }
       $("#modal-form").modal("hide");
       this.resetForm();
     },
     deletelist(index) {
       this.hitung.qty.splice(index, 1);
+      this.hitung.status.splice(index, 1);
+      this.hitung.total.splice(index, 1);
+      this.hitung.tgl_estimasi.splice(index, 1);
+      this.hitung.alastolak.splice(index, 1);
       this.hitung.keterangan.splice(index, 1);
       this.listfix.splice(index, 1);
       this.resetForm();
@@ -656,87 +904,145 @@ export default {
                 this.siapband += "Y";
               }
               if (this.siap === this.siapband) {
-                this.lpo.tgl_inventory = this.DateTime();
-                axios.post("/api/pr", this.lpo).then((res) => {
-                  for (let i = 0; i < this.listfix.length; i++) {
-                    axios.post("/api/listpr", {
-                      nomor_pr: this.lpo.nomor_pr,
-                      kode_barang: this.listfix[i].kode_barang,
-                      qty: this.hitung.qty[i],
-                      keterangan: this.hitung.keterangan[i],
-                    });
-                  }
-                  this.kasihso = 0;
-                  this.sisapembagi = 0;
-                  this.masihsisa = 0;
+                this.load = true;
+                axios.get("/api/listpr/" + this.$route.params.nomor).then((res) => {
+                  this.listpr = res.data.data;
                   this.sisapo = 0;
                   this.openpo = 0;
-                  for (let i = 0; i < this.listfix.length; i++) {
+                  this.statuspo = "";
+                  for (let i = 0; i < this.listpr.length; i++) {
                     axios
-                      .get("/api/listso/data/antrianpo/" + this.listfix[i].kode_barang)
+                      .get("/api/listso/data/kembalikanpo/" + this.listpr[i].kode_barang)
                       .then((res) => {
-                        this.listbagi = res.data.data;
-                        this.kasihso = 0;
-                        this.sisapembagi = 0;
-                        this.masihsisa = 0;
-                        this.sisapo = 0;
-                        this.tutupso = "";
-                        this.bandingtutup = "";
-                        this.openpo = 0;
-                        for (let k = 0; k < this.listbagi.length; k++) {
-                          /* ini sisa sonya */
-                          this.sisapembagi =
-                            parseFloat(this.listbagi[k].qty) -
-                            parseFloat(this.listbagi[k].openpo);
-                          /* end */
-                          if (this.hitung.qty[i] < this.sisapembagi) {
-                            this.kasihso = this.hitung.qty[i];
-                            this.hitung.qty[i] = 0;
+                        this.listhapus = res.data.data;
+                        for (let k = 0; k < this.listhapus.length; k++) {
+                          if (this.listpr[i].qty >= this.listhapus[k].openpo) {
+                            this.sisapo =
+                              this.listhapus[k].openpo + this.listhapus[k].sisapo;
+                            this.openpo = 0;
+                            this.statuspo = "N";
+                            this.listpr[i].qty =
+                              parseInt(this.listpr[i].qty) -
+                              parseInt(this.listhapus[k].openpo);
                           } else {
-                            this.kasihso = this.sisapembagi;
-                            this.hitung.qty[i] =
-                              parseFloat(this.hitung.qty[i]) -
-                              parseFloat(this.sisapembagi);
+                            this.openpo =
+                              parseInt(this.listhapus[k].openpo) -
+                              parseInt(this.listpr[i].qty);
+                            if (this.listpr[i].qty > this.listhapus[k].qty) {
+                              this.sisapo =
+                                parseInt(this.listhapus[k].sisapo) +
+                                parseInt(this.listhapus[k].open);
+                            } else {
+                              this.sisapo =
+                                parseInt(this.listhapus[k].sisapo) +
+                                parseInt(this.listpr[i].qty);
+                            }
+                            if (this.sisapo < 1) {
+                              this.statuspo = "Y";
+                            } else {
+                              this.statuspo = "N";
+                            }
+                            this.listpr[i].qty =
+                              parseInt(this.listpr[i].qty) -
+                              parseInt(this.listhapus[k].openpo);
+                            if (this.listpr[i].qty < 1) {
+                              this.listpr[i].qty = 0;
+                            }
                           }
-
-                          this.sisapo =
-                            parseFloat(this.listbagi[k].sisapo) -
-                            parseFloat(this.kasihso);
-                          this.openpo =
-                            parseFloat(this.listbagi[k].openpo) +
-                            parseFloat(this.kasihso);
-
-                          if (this.sisapo === 0) {
-                            this.ubah = "Y";
-                          } else {
-                            this.ubah = "N";
-                          }
-                          axios.put("/api/listso/" + this.listbagi[k].id, {
+                          axios.put("/api/listso/" + this.listhapus[k].id, {
                             sisapo: this.sisapo,
                             openpo: this.openpo,
-                            statuspo: this.ubah,
+                            statuspo: this.statuspo,
                           });
                         }
                       });
                   }
-                  axios
-                    .post("/api/history", {
-                      nomor_dok: this.lpo.nomor_pr,
-                      id_user: this.ambiluser.id,
-                      notif: "Terdapat permintaan PR baru",
-                      keterangan: "Mengirim PR ke Purch Purchasing",
-                      jenis: "Pr",
-                      tanggal: this.DateTime(),
-                    })
-                    .then((res) => {
-                      this.load = false;
-                      swalWithBootstrapButtons.fire(
-                        "Success!",
-                        "Form PR berhasil dikirim.",
-                        "success"
-                      );
-                      this.kembali();
+                  axios.delete("/api/pr/" + this.$route.params.nomor).then((res) => {
+                    this.lpo.tgl_inventory = this.DateTime();
+                    axios.post("/api/pr", this.lpo).then((res) => {
+                      for (let i = 0; i < this.listfix.length; i++) {
+                        axios.post("/api/listpr", {
+                          nomor_pr: this.lpo.nomor_pr,
+                          kode_barang: this.listfix[i].kode_barang,
+                          qty: this.hitung.qty[i],
+                          keterangan: this.hitung.keterangan[i],
+                        });
+                      }
+                      this.kasihso = 0;
+                      this.sisapembagi = 0;
+                      this.masihsisa = 0;
+                      this.sisapo = 0;
+                      this.openpo = 0;
+                      for (let i = 0; i < this.listfix.length; i++) {
+                        axios
+                          .get(
+                            "/api/listso/data/antrianpo/" + this.listfix[i].kode_barang
+                          )
+                          .then((res) => {
+                            this.listbagi = res.data.data;
+                            this.kasihso = 0;
+                            this.sisapembagi = 0;
+                            this.masihsisa = 0;
+                            this.sisapo = 0;
+                            this.tutupso = "";
+                            this.bandingtutup = "";
+                            this.openpo = 0;
+                            for (let k = 0; k < this.listbagi.length; k++) {
+                              /* ini sisa sonya */
+                              this.sisapembagi =
+                                parseFloat(this.listbagi[k].qty) -
+                                parseFloat(this.listbagi[k].openpo);
+                              /* end */
+                              if (this.hitung.qty[i] < this.sisapembagi) {
+                                this.kasihso = this.hitung.qty[i];
+                                this.hitung.qty[i] = 0;
+                              } else {
+                                this.kasihso = this.sisapembagi;
+                                this.hitung.qty[i] =
+                                  parseFloat(this.hitung.qty[i]) -
+                                  parseFloat(this.sisapembagi);
+                              }
+
+                              this.sisapo =
+                                parseFloat(this.listbagi[k].sisapo) -
+                                parseFloat(this.kasihso);
+                              this.openpo =
+                                parseFloat(this.listbagi[k].openpo) +
+                                parseFloat(this.kasihso);
+
+                              if (this.sisapo === 0) {
+                                this.ubah = "Y";
+                              } else {
+                                this.ubah = "N";
+                              }
+                              axios.put("/api/listso/" + this.listbagi[k].id, {
+                                sisapo: this.sisapo,
+                                openpo: this.openpo,
+                                statuspo: this.ubah,
+                              });
+                            }
+                          });
+                      }
+                      axios
+                        .post("/api/history", {
+                          nomor_dok: this.lpo.nomor_pr,
+                          id_user: this.ambiluser.id,
+                          notif: "Terdapat permintaan PR baru",
+                          keterangan: "Mengirim PR ke Purch Purchasing",
+                          jenis: "Pr",
+                          tanggal: this.DateTime(),
+                        })
+                        .then((res) => {
+                          this.load = false;
+                          swalWithBootstrapButtons.fire(
+                            "Success!",
+                            "Form PR berhasil dikirim.",
+                            "success"
+                          );
+                          this.kembali();
+                        });
                     });
+                  });
                 });
               } else {
                 this.load = false;
@@ -803,8 +1109,8 @@ export default {
     },
     cekqty() {
       for (let i = 0; i < this.listfix.length; i++) {
-        if (this.hitung.qty[i] > this.listfix[i].qty || this.hitung.qty[i] < 0) {
-          this.hitung.qty[i] = this.listfix[i].qty;
+        if (this.hitung.qty[i] > this.hitung.total[i] || this.hitung.qty[i] < 0) {
+          this.hitung.qty[i] = this.hitung.total[i];
         }
       }
     },
@@ -841,7 +1147,7 @@ export default {
               });
               this.load = false;
             } else {
-              if (this.statuspr === "Sent") {
+              if (this.statuspr === "Sent" || this.statuspr === "Tolak") {
                 this.statusupdate = "Draft";
                 this.edit = "N";
                 this.alasan = "";
@@ -856,24 +1162,45 @@ export default {
                   status: this.statusupdate,
                 })
                 .then((res) => {
-                  axios
-                    .post("/api/history", {
-                      nomor_dok: this.lpo.nomor_pr,
-                      id_user: this.ambiluser.id,
-                      notif: "request perbaikan",
-                      keterangan: "Mengirim request perbaikan",
-                      jenis: "Pr",
-                      tanggal: this.DateTime(),
-                    })
-                    .then((res) => {
-                      this.getPr();
-                      this.load = false;
-                      swalWithBootstrapButtons.fire(
-                        "Success!",
-                        "Permintaan perbaikan berhasil di kirim.",
-                        "success"
-                      );
-                    });
+                  if (this.statuspr === "Sent" || this.statuspr === "Tolak") {
+                    axios
+                      .post("/api/history", {
+                        nomor_dok: this.lpo.nomor_pr,
+                        id_user: this.ambiluser.id,
+                        notif: "request perbaikan",
+                        keterangan: "Menarik PR kembali (edit)",
+                        jenis: "Pr",
+                        tanggal: this.DateTime(),
+                      })
+                      .then((res) => {
+                        this.getPr();
+                        this.load = false;
+                        swalWithBootstrapButtons.fire(
+                          "Success!",
+                          "Permintaan perbaikan berhasil di kirim.",
+                          "success"
+                        );
+                      });
+                  } else {
+                    axios
+                      .post("/api/history", {
+                        nomor_dok: this.lpo.nomor_pr,
+                        id_user: this.ambiluser.id,
+                        notif: "request perbaikan",
+                        keterangan: "Mengirim request perbaikan",
+                        jenis: "Pr",
+                        tanggal: this.DateTime(),
+                      })
+                      .then((res) => {
+                        this.getPr();
+                        this.load = false;
+                        swalWithBootstrapButtons.fire(
+                          "Success!",
+                          "Permintaan perbaikan berhasil di kirim.",
+                          "success"
+                        );
+                      });
+                  }
                 });
             }
           } else if (
@@ -1139,6 +1466,90 @@ export default {
         }
       }
     },
+    showtolak() {
+      $("#modal-tolakin").modal("show");
+    },
+    Kirimtolak() {
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: "btn btn-success ml-2",
+          cancelButton: "btn btn-danger",
+        },
+        buttonsStyling: false,
+      });
+
+      swalWithBootstrapButtons
+        .fire({
+          title: "Apakah anda yakin?",
+          text: "Ingin menolak PR ini!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Iya, Yakin!",
+          cancelButtonText: "Tidak!",
+          reverseButtons: true,
+        })
+        .then((result) => {
+          if (result.isConfirmed) {
+            this.load = true;
+            if (
+              this.alastolak === null ||
+              this.alastolak === undefined ||
+              this.alastolak === ""
+            ) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Alasan penolakan wajib di isi!",
+              });
+            } else {
+              axios
+                .put("/api/pr/" + this.$route.params.nomor, {
+                  status: "Tolak",
+                  alastolak: this.alastolak,
+                  reqedit: "N",
+                  alasan: "",
+                })
+                .then((res) => {
+                  for (let j = 0; j < this.listfix.length; j++) {
+                    axios.put("/api/listpr/" + this.listfix[j].id, {
+                      status: this.hitung.status[j],
+                      tgl_estimasi: this.hitung.tgl_estimasi[j],
+                      alastolak: this.hitung.alastolak[j],
+                    });
+                  }
+                  axios
+                    .post("/api/history", {
+                      nomor_dok: this.lpo.nomor_pr,
+                      id_user: this.ambiluser.id,
+                      notif: "Pr di tolak",
+                      keterangan: "PR di tolak",
+                      jenis: "Pr",
+                      tanggal: this.DateTime(),
+                    })
+                    .then((res) => {
+                      this.load = false;
+                      swalWithBootstrapButtons.fire(
+                        "Sukses!",
+                        "Berhasil mengirim penolakan.",
+                        "success"
+                      );
+                      this.kembali();
+                    });
+                });
+            }
+          } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+          ) {
+            this.load = false;
+            swalWithBootstrapButtons.fire(
+              "Cancelled",
+              "Batal menolak permintaan PR :)",
+              "error"
+            );
+          }
+        });
+    },
   },
 };
 </script>
@@ -1193,7 +1604,7 @@ table.dataTable thead .sorting_desc_disabled:before {
 }
 
 .notif {
-  width: 98%;
+  width: 100%;
   padding: 1%;
   height: auto;
   border: solid 1px rgba(156, 156, 8, 0.459);

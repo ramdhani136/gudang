@@ -14,19 +14,20 @@ class PrResource extends JsonResource
      */
     public function toArray($request)
     {
-        return 
-        [
-            'nomor_pr'=>$this->nomor_pr,
-            'tanggal'=>$this->tanggal,
-            'id_user'=>$this->id_user,
-            'user'=>$this->user->name,
-            'keterangan'=>$this->keterangan,
-            'tgl_inventory'=>$this->tgl_inventory,
-            'purchase'=>$this->purchase,
-            'tgl_purchase'=>$this->tgl_purchase,
-            'status'=>$this->status,
-            'alasan'=>$this->alasan,
-            'reqedit'=>$this->reqedit,
-        ];
+        return
+            [
+                'nomor_pr' => $this->nomor_pr,
+                'tanggal' => $this->tanggal,
+                'id_user' => $this->id_user,
+                'user' => $this->user->name,
+                'keterangan' => $this->keterangan,
+                'tgl_inventory' => $this->tgl_inventory,
+                'purchase' => $this->purchase,
+                'tgl_purchase' => $this->tgl_purchase,
+                'status' => $this->status,
+                'alasan' => $this->alasan,
+                'reqedit' => $this->reqedit,
+                'alastolak' => $this->alastolak,
+            ];
     }
 }

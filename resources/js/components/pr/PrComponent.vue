@@ -21,7 +21,7 @@
         <option v-if="ambiluser.inventory === 1" value="Draft">Draft</option>
         <option value="Sent">{{ menu }}</option>
         <option value="Open">Open</option>
-        <option value="Tolak">DI tolak</option>
+        <option value="Tolak">Di Tolak</option>
         <option value="Reqedit">Request Perbaikan</option>
         <option value="Selesai">Selesai</option>
       </select>
