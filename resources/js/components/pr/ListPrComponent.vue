@@ -60,6 +60,7 @@
               <th>Nama Barang</th>
               <th v-if="statuspr === 'Draft'">Total Permintaan</th>
               <th>Qty PR</th>
+              <th v-if="statuspr === 'Open'">Open PO</th>
               <th>Satuan</th>
               <th
                 v-if="
@@ -107,6 +108,7 @@
                   v-model="hitung.qty[index]"
                 />
               </td>
+              <td v-if="statuspr === 'Open'">{{ list.po }}</td>
               <td style="text-align: center">{{ list.satuan }}</td>
               <td
                 v-if="
@@ -1323,6 +1325,7 @@ export default {
                     for (let g = 0; g < this.listpredit.length; g++) {
                       axios.put("/api/listpr/" + this.listpredit[g].id, {
                         close: "Y",
+                        accdate: "",
                       });
                     }
                   })
@@ -1398,6 +1401,7 @@ export default {
                         status: "Y",
                         close: "N",
                         tgl_estimasi: this.hitung.tgl_estimasi[r],
+                        accdate: this.DateTime(),
                       });
                     }
                   })

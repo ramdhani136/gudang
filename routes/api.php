@@ -148,6 +148,10 @@ Route::get('pr/data/open','Pr\PrController@open');
 Route::get('pr/data/listedit','Pr\PrController@listedit');
 Route::get('listpr/data/group','Pr\ListprController@group');
 Route::get('listpr/data/group/{barang}','Pr\ListprController@grouplist');
+Route::get('listpr/data/antrianpr/{barang}','Pr\ListprController@antrianpr');
+Route::get('listpr/data/kembalikanpr/{barang}','Pr\ListprController@kembalikanpr');
+Route::get('listpr/id/{id}','Pr\ListprController@id');
+
 
 Route::resource('listpo','Po\ListpoController');
 Route::get('listpo/data/aktif/{nomor}','Po\ListpoController@sisalist');

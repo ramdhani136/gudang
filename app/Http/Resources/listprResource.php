@@ -24,11 +24,13 @@ class listprResource extends JsonResource
             'qty'=>$this->qty,
             'po'=>$this->po,
             'bbm'=>$this->bbm,
+            'sisa'=>$this->sisa,
             'close'=>$this->close,
             'keterangan'=>$this->keterangan,
             'tgl_estimasi'=>$this->tgl_estimasi,
             'status'=>$this->status,
             'alastolak'=>$this->alastolak,
+            'accdate'=>$this->accdate,
         ];
     }
 }

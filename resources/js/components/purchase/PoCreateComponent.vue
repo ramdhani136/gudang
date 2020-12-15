@@ -405,6 +405,9 @@ export default {
       sisapo: 0,
       openpo: 0,
       adapo: {},
+      cekclose: {},
+      iniclose: "",
+      bandingclose: "",
     };
   },
   created() {
@@ -642,7 +645,7 @@ export default {
                     this.openpo = 0;
                     for (let i = 0; i < this.listfix.length; i++) {
                       axios
-                        .get("/api/listso/data/antrianpo/" + this.listfix[i].kode_barang)
+                        .get("/api/listpr/data/antrianpr/" + this.listfix[i].kode_barang)
                         .then((res) => {
                           this.listbagi = res.data.data;
                           this.kasihso = 0;
@@ -656,7 +659,7 @@ export default {
                             /* ini sisa sonya */
                             this.sisapembagi =
                               parseFloat(this.listbagi[k].qty) -
-                              parseFloat(this.listbagi[k].openpo);
+                              parseFloat(this.listbagi[k].po);
                             /* end */
                             if (this.hitung.qty[i] < this.sisapembagi) {
                               this.kasihso = this.hitung.qty[i];
@@ -669,22 +672,39 @@ export default {
                             }
 
                             this.sisapo =
-                              parseFloat(this.listbagi[k].sisapo) -
+                              parseFloat(this.listbagi[k].sisa) -
                               parseFloat(this.kasihso);
                             this.openpo =
-                              parseFloat(this.listbagi[k].openpo) +
-                              parseFloat(this.kasihso);
+                              parseFloat(this.listbagi[k].po) + parseFloat(this.kasihso);
 
                             if (this.sisapo === 0) {
                               this.ubah = "Y";
                             } else {
                               this.ubah = "N";
                             }
-                            axios.put("/api/listso/" + this.listbagi[k].id, {
-                              sisapo: this.sisapo,
-                              openpo: this.openpo,
-                              statuspo: this.ubah,
+                            axios.put("/api/listpr/" + this.listbagi[k].id, {
+                              sisa: this.sisapo,
+                              po: this.openpo,
+                              close: this.ubah,
                             });
+                            axios
+                              .get("/api/listpr/" + this.listbagi[k].nomor_pr)
+                              .then((res) => {
+                                this.cekclose = res.data.data;
+                                for (let t = 0; t < this.cekclose.length; t++) {
+                                  this.iniclose += this.cekclose[t].close;
+                                  this.bandingclose += "Y";
+                                }
+                                console.log(this.iniclose);
+                                console.log(this.bandingclose);
+                                if (this.iniclose === this.bandingclose) {
+                                  axios.put("/api/pr/" + this.listbagi[k].nomor_pr, {
+                                    status: "Selesai",
+                                  });
+                                }
+                                this.iniclose = "";
+                                this.bandingclose = "";
+                              });
                           }
                         });
                     }

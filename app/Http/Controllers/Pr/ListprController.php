@@ -62,9 +62,9 @@ class ListprController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function id($id)
     {
-        //
+        return listprResource::collection(Listpr::where('id',$id)->get());
     }
 
     /**
@@ -101,4 +101,13 @@ class ListprController extends Controller
     public function  grouplist($barang){
         return lgrouppr::collection(Listpr::where('status','Y')->where('close','N')->where('kode_barang',$barang)->get());
     }
+
+    public function antrianpr($barang){
+        return listprResource::collection(Listpr::where('status','Y')->where("close","N")->where('kode_barang',$barang)->orderBy('accdate','ASC')->get());
+    }
+
+    public function kembalikanpr($barang){
+        return listprResource::collection(Listpr::where('status','Y')->where('kode_barang',$barang)->orderBy('accdate','DESC')->get());
+    }
+
 }

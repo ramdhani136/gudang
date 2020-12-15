@@ -4,20 +4,33 @@
       <button @click="showfilter()" class="btn btn-trans">Filter</button>
     </div>
     <div class="form-group col-3 my-3 float-right">
-      <input v-model="filter.nomorpo" type="text" class="form-control" placeholder="Search" />
+      <input
+        v-model="filter.nomorpo"
+        type="text"
+        class="form-control"
+        placeholder="Search"
+      />
     </div>
     <div class="form-group col-3 my-3 ml-n3 float-left">
       <select name="status" v-model="filter.status" class="form-control">
-        <option v-if="ambiluser.purch === 1 || ambiluser.suppurch === 1" value="Draft">Draft</option>
-        <option v-if="ambiluser.purch === 1 || ambiluser.suppurch === 1" value="Request">Request</option>
+        <option v-if="ambiluser.purch === 1 || ambiluser.suppurch === 1" value="Draft">
+          Draft
+        </option>
+        <option v-if="ambiluser.purch === 1 || ambiluser.suppurch === 1" value="Request">
+          Request
+        </option>
         <option value="Acc">Open</option>
-        <option v-if="ambiluser.purch === 1 || ambiluser.suppurch === 1" value="Tolak">Rejected</option>
+        <option v-if="ambiluser.purch === 1 || ambiluser.suppurch === 1" value="Tolak">
+          Rejected
+        </option>
         <option value="Selesai">Selesai</option>
         <option value="Di Selesaikan">Di Selesaikan</option>
       </select>
     </div>
     <div class="row" v-if="ambiluser.purch === 1 || ambiluser.superadmin === 1">
-      <router-link to="/purchase/po/create" class="btn btn-success my-3">+ Create PO</router-link>
+      <router-link to="/purchase/po/create" class="btn btn-success my-3"
+        >+ Create PO</router-link
+      >
     </div>
     <div id="overflow" class="border-top">
       <table id="thead" class="table table-striped table-bordered" style="width: 100%">
@@ -35,7 +48,10 @@
           <tr v-for="(pl, index) in FilterKategori" :key="index">
             <td style="text-align: center">{{ index + 1 }}</td>
             <td style="text-align: center">
-              <router-link :to="{ name: 'poView', params: { nomor: pl.nomor_po } }" class="btn btn-none">
+              <router-link
+                :to="{ name: 'poView', params: { nomor: pl.nomor_po } }"
+                class="btn btn-none"
+              >
                 {{ pl.nomor_po }}
               </router-link>
             </td>
@@ -43,23 +59,79 @@
             <td>{{ pl.supplier }}</td>
             <td style="text-align: center">{{ pl.tanggal_datang }}</td>
             <td style="text-align: center">
-              <button @click="showhistory(pl)" class="btn btn-primary">Lihat Rincian</button>
-              <button @click="getHapus(pl)" v-if="(pl.status == 'Draft' || pl.status == 'Request' || pl.status == 'Tolak') && (ambiluser.superadmin === 1 || ambiluser.purch === 1)" class="btn btn-danger">Batalkan</button>
-              <button @click="requestSelesai(pl)" v-if="pl.status == 'Acc' && pl.rs === 'N' && (ambiluser.superadmin === 1 || ambiluser.purch === 1)" class="btn btn-orange">Request Selesai</button>
-              <button @click="batalselesai(pl)" v-if="pl.status == 'Acc' && pl.rs === 'Y' && (ambiluser.superadmin === 1 || ambiluser.purch === 1)" class="btn btn-none">Batal Selesai</button>
-              <button @click="infoTolak(pl)" v-if="pl.status == 'Acc' && pl.rs === 'T' && (ambiluser.superadmin === 1 || ambiluser.purch === 1)" class="btn btn-none">R. Selesai di tolak</button>
+              <button @click="showhistory(pl)" class="btn btn-primary">
+                Lihat Rincian
+              </button>
+              <button
+                @click="getHapus(pl)"
+                v-if="
+                  (pl.status == 'Draft' ||
+                    pl.status == 'Request' ||
+                    pl.status == 'Tolak') &&
+                  (ambiluser.superadmin === 1 || ambiluser.purch === 1)
+                "
+                class="btn btn-danger"
+              >
+                Batalkan
+              </button>
+              <button
+                @click="requestSelesai(pl)"
+                v-if="
+                  pl.status == 'Acc' &&
+                  pl.rs === 'N' &&
+                  (ambiluser.superadmin === 1 || ambiluser.purch === 1)
+                "
+                class="btn btn-orange"
+              >
+                Request Selesai
+              </button>
+              <button
+                @click="batalselesai(pl)"
+                v-if="
+                  pl.status == 'Acc' &&
+                  pl.rs === 'Y' &&
+                  (ambiluser.superadmin === 1 || ambiluser.purch === 1)
+                "
+                class="btn btn-none"
+              >
+                Batal Selesai
+              </button>
+              <button
+                @click="infoTolak(pl)"
+                v-if="
+                  pl.status == 'Acc' &&
+                  pl.rs === 'T' &&
+                  (ambiluser.superadmin === 1 || ambiluser.purch === 1)
+                "
+                class="btn btn-none"
+              >
+                R. Selesai di tolak
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
       <Circle5 id="load" v-if="load"></Circle5>
     </div>
-    <div class="modal fade" id="modal-selesai" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-selesai"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Form Permintaan PO Selesai</h5>
-            <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button
+              @click="resetForm()"
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -70,18 +142,35 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" @click="kirimselesai()" class="btn btn-primary">kirim permintaan</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Close
+            </button>
+            <button type="button" @click="kirimselesai()" class="btn btn-primary">
+              kirim permintaan
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal fade" id="modal-tolak" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-tolak"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Informasi Tolak Selesai PO</h5>
-            <button @click="resetForm()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button
+              @click="resetForm()"
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -92,13 +181,24 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button @click="requlang()" type="button" class="btn btn-orange">Request Ulang Selesai</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Close
+            </button>
+            <button @click="requlang()" type="button" class="btn btn-orange">
+              Request Ulang Selesai
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal fade" id="modal-history" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-history"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
@@ -108,7 +208,11 @@
             </button>
           </div>
           <div class="modal-body">
-            <table id="thead" class="table table-striped table-bordered" style="width: 100%">
+            <table
+              id="thead"
+              class="table table-striped table-bordered"
+              style="width: 100%"
+            >
               <thead>
                 <tr>
                   <th>tanggal</th>
@@ -128,12 +232,21 @@
             </table>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Close
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal fade" id="modal-filter" tabindex="-1" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="modal-filter"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div id="modal-width" class="modal-content">
           <div class="modal-header">
@@ -146,13 +259,32 @@
             <div class="form-group">
               <label>Customer</label>
               <div class="autocomplete"></div>
-              <div class="input" @click="toggleVisible" v-text="custom ? custom.nama : ''"></div>
-              <div class="placeholder" v-if="custom == null" v-text="ket.nama">Pilih Customer</div>
+              <div
+                class="input"
+                @click="toggleVisible"
+                v-text="custom ? custom.nama : ''"
+              ></div>
+              <div class="placeholder" v-if="custom == null" v-text="ket.nama">
+                Pilih Customer
+              </div>
               <div class="popover" v-show="visible">
-                <input type="text" @keydown.up="up" @keydown.down="down" @keydown.enter="selectItem" v-model="query" placeholder="Masukan nama customer .." />
+                <input
+                  type="text"
+                  @keydown.up="up"
+                  @keydown.down="down"
+                  @keydown.enter="selectItem"
+                  v-model="query"
+                  placeholder="Masukan nama customer .."
+                />
                 <div class="optionbr" ref="optionList">
                   <ul>
-                    <li v-for="(match, index) in matches" :key="match.kode" v-text="match.nama" :class="{ selected: selected == index }" @click="itemClicked(index)"></li>
+                    <li
+                      v-for="(match, index) in matches"
+                      :key="match.kode"
+                      v-text="match.nama"
+                      :class="{ selected: selected == index }"
+                      @click="itemClicked(index)"
+                    ></li>
                   </ul>
                 </div>
               </div>
@@ -161,19 +293,29 @@
               <label>Purchasing</label>
               <select v-model="filter.id_user" class="form-control">
                 <option value="">Semua Data</option>
-                <option :value="us.id" v-for="(us, index) in user" :key="index">{{ us.name }}</option>
+                <option :value="us.id" v-for="(us, index) in user" :key="index">
+                  {{ us.name }}
+                </option>
               </select>
             </div>
             <div class="form-group">
               <label>Berdasarkan Tanggal</label>
-              <select @change="cektanggal()" v-model="filter.listtanggal" class="form-control">
+              <select
+                @change="cektanggal()"
+                v-model="filter.listtanggal"
+                class="form-control"
+              >
                 <option value="po">Penerbitan PO</option>
                 <option value="rd">Rencana Datang</option>
               </select>
             </div>
             <div class="form-group">
               <label>Pilih Tanggal</label>
-              <select @change="cekjenis()" v-model="filter.jenistanggal" class="form-control">
+              <select
+                @change="cekjenis()"
+                v-model="filter.jenistanggal"
+                class="form-control"
+              >
                 <option value="Y">Bulan Berjalan</option>
                 <option value="N">Filter Tanggal</option>
               </select>
@@ -182,13 +324,28 @@
               <label>Mulai Tanggal</label>
               <input v-model="filter.mulaitanggal" type="date" class="form-control" />
             </div>
-            <div v-if="filter.jenistanggal === 'N' && filter.mulaitanggal !== undifined" class="form-group">
+            <div
+              v-if="filter.jenistanggal === 'N' && filter.mulaitanggal !== undifined"
+              class="form-group"
+            >
               <label>Sampai Tanggal</label>
-              <input v-model="filter.sampaitanggal" type="date" class="form-control" :min="filter.mulaitanggal" />
+              <input
+                v-model="filter.sampaitanggal"
+                type="date"
+                class="form-control"
+                :min="filter.mulaitanggal"
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button @click="cek()" type="button" class="btn btn-success" data-dismiss="modal">Save Change</button>
+            <button
+              @click="cek()"
+              type="button"
+              class="btn btn-success"
+              data-dismiss="modal"
+            >
+              Save Change
+            </button>
           </div>
         </div>
       </div>
@@ -257,10 +414,19 @@ export default {
         lists = vm.po;
       return _.filter(lists, function (query) {
         // var tanggal = query.tanggal_so >= vm.filter.mulaitanggal && query.tanggal_so <= vm.filter.sampaitanggal,
-        var tanggal = vm.filter.listtanggal === "po" ? query.tanggal_po >= vm.filter.mulaitanggal && query.tanggal_po <= vm.filter.sampaitanggal : query.tanggal_datang >= vm.filter.mulaitanggal && query.tanggal_datang <= vm.filter.sampaitanggal,
-          supplier = vm.filter.kode_supplier ? query.kode_supplier == vm.filter.kode_supplier : true,
+        var tanggal =
+            vm.filter.listtanggal === "po"
+              ? query.tanggal_po >= vm.filter.mulaitanggal &&
+                query.tanggal_po <= vm.filter.sampaitanggal
+              : query.tanggal_datang >= vm.filter.mulaitanggal &&
+                query.tanggal_datang <= vm.filter.sampaitanggal,
+          supplier = vm.filter.kode_supplier
+            ? query.kode_supplier == vm.filter.kode_supplier
+            : true,
           user = vm.filter.id_user ? query.id_user == vm.filter.id_user : true,
-          nomorpo = vm.filter.nomorpo ? query.nomor_po.toLowerCase().includes(vm.filter.nomorpo.toLowerCase()) : true,
+          nomorpo = vm.filter.nomorpo
+            ? query.nomor_po.toLowerCase().includes(vm.filter.nomorpo.toLowerCase())
+            : true,
           status = vm.filter.status ? query.status == vm.filter.status : true;
         return tanggal && supplier && user && nomorpo && status;
       });
@@ -269,7 +435,9 @@ export default {
       if (this.query == "") {
         return [];
       }
-      return this.supplier.filter((item) => item.nama.toLowerCase().includes(this.query.toLowerCase()));
+      return this.supplier.filter((item) =>
+        item.nama.toLowerCase().includes(this.query.toLowerCase())
+      );
     },
   },
   methods: {
@@ -302,7 +470,14 @@ export default {
       var month = d.getMonth() + 1;
       var day = d.getDate();
 
-      var output = d.getFullYear() + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
+      var output =
+        d.getFullYear() +
+        "-" +
+        (month < 10 ? "0" : "") +
+        month +
+        "-" +
+        (day < 10 ? "0" : "") +
+        day;
       return output;
     },
     validate() {
@@ -366,38 +541,50 @@ export default {
               this.openpo = 0;
               this.statuspo = "";
               for (let i = 0; i < this.listpo.length; i++) {
-                axios.get("/api/listso/data/kembalikanpo/" + this.listpo[i].kode_barang).then((res) => {
-                  this.listhapus = res.data.data;
-                  for (let k = 0; k < this.listhapus.length; k++) {
-                    if (this.listpo[i].qty >= this.listhapus[k].openpo) {
-                      this.sisapo = this.listhapus[k].openpo + this.listhapus[k].sisapo;
-                      this.openpo = 0;
-                      this.statuspo = "N";
-                      this.listpo[i].qty = parseInt(this.listpo[i].qty) - parseInt(this.listhapus[k].openpo);
-                    } else {
-                      this.openpo = parseInt(this.listhapus[k].openpo) - parseInt(this.listpo[i].qty);
-                      if (this.listpo[i].qty > this.listhapus[k].qty) {
-                        this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listhapus[k].open);
-                      } else {
-                        this.sisapo = parseInt(this.listhapus[k].sisapo) + parseInt(this.listpo[i].qty);
-                      }
-                      if (this.sisapo < 1) {
-                        this.statuspo = "Y";
-                      } else {
+                axios
+                  .get("/api/listpr/data/kembalikanpr/" + this.listpo[i].kode_barang)
+                  .then((res) => {
+                    this.listhapus = res.data.data;
+                    for (let k = 0; k < this.listhapus.length; k++) {
+                      if (this.listpo[i].qty >= this.listhapus[k].po) {
+                        this.sisapo = this.listhapus[k].po + this.listhapus[k].sisa;
+                        this.openpo = 0;
                         this.statuspo = "N";
+                        this.listpo[i].qty =
+                          parseFloat(this.listpo[i].qty) -
+                          parseFloat(this.listhapus[k].po);
+                      } else {
+                        this.openpo =
+                          parseFloat(this.listhapus[k].po) -
+                          parseFloat(this.listpo[i].qty);
+                        if (this.listpo[i].qty > this.listhapus[k].qty) {
+                          this.sisapo =
+                            parseFloat(this.listhapus[k].sisa) +
+                            parseFloat(this.listhapus[k].po);
+                        } else {
+                          this.sisapo =
+                            parseFloat(this.listhapus[k].sisa) +
+                            parseFloat(this.listpo[i].qty);
+                        }
+                        if (this.sisapo < 1) {
+                          this.statuspo = "Y";
+                        } else {
+                          this.statuspo = "N";
+                        }
+                        this.listpo[i].qty =
+                          parseFloat(this.listpo[i].qty) -
+                          parseFloat(this.listhapus[k].po);
+                        if (this.listpo[i].qty < 1) {
+                          this.listpo[i].qty = 0;
+                        }
                       }
-                      this.listpo[i].qty = parseInt(this.listpo[i].qty) - parseInt(this.listhapus[k].openpo);
-                      if (this.listpo[i].qty < 1) {
-                        this.listpo[i].qty = 0;
-                      }
+                      axios.put("/api/listpr/" + this.listhapus[k].id, {
+                        sisa: this.sisapo,
+                        po: this.openpo,
+                        close: this.statuspo,
+                      });
                     }
-                    axios.put("/api/listso/" + this.listhapus[k].id, {
-                      sisapo: this.sisapo,
-                      openpo: this.openpo,
-                      statuspo: this.statuspo,
-                    });
-                  }
-                });
+                  });
               }
               axios.delete("/api/po/" + pl.nomor_po).then((res) => {
                 axios.get("/api/history/" + pl.nomor_po).then((res) => {
@@ -407,7 +594,11 @@ export default {
                   }
                 });
                 this.load = false;
-                swalWithBootstrapButtons.fire("Deleted!", "PO berhasil di hapus.", "success");
+                swalWithBootstrapButtons.fire(
+                  "Deleted!",
+                  "PO berhasil di hapus.",
+                  "success"
+                );
                 this.getPo();
               });
             });
@@ -416,7 +607,11 @@ export default {
             result.dismiss === Swal.DismissReason.cancel
           ) {
             this.load = false;
-            swalWithBootstrapButtons.fire("Cancelled", "Batal menghapis PO ini :)", "error");
+            swalWithBootstrapButtons.fire(
+              "Cancelled",
+              "Batal menghapis PO ini :)",
+              "error"
+            );
           }
         });
     },
@@ -489,8 +684,15 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
-      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
+      this.dates =
+        this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times =
+        this.hours +
+        ":" +
+        this.minute +
+        ":" +
+        (this.seconds < 10 ? "0" : "") +
+        this.seconds;
       this.datetimes = this.dates + " " + this.times;
       return this.datetimes;
     },
@@ -508,8 +710,15 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + "01";
-      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
+      this.dates =
+        this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + "01";
+      this.times =
+        this.hours +
+        ":" +
+        this.minute +
+        ":" +
+        (this.seconds < 10 ? "0" : "") +
+        this.seconds;
       this.datetimes = this.dates;
       return this.datetimes;
     },
@@ -524,8 +733,15 @@ export default {
         this.month = 12;
       }
       this.day = this.date.getDate();
-      this.dates = this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
-      this.times = this.hours + ":" + this.minute + ":" + (this.seconds < 10 ? "0" : "") + this.seconds;
+      this.dates =
+        this.year + "-" + (this.month < 10 ? "0" : "") + this.month + "-" + this.day;
+      this.times =
+        this.hours +
+        ":" +
+        this.minute +
+        ":" +
+        (this.seconds < 10 ? "0" : "") +
+        this.seconds;
       this.datetimes = this.dates;
       return this.datetimes;
     },
