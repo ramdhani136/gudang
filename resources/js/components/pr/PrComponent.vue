@@ -26,7 +26,7 @@
         <option value="Selesai">Selesai</option>
       </select>
     </div>
-    <div class="row">
+    <div class="row" v-if="ambiluser.inventory === 1">
       <router-link to="/data/pr/create" class="btn btn-success my-3"
         >+ Create PR</router-link
       >

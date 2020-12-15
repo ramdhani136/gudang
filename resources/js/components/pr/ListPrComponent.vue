@@ -541,6 +541,7 @@ export default {
       listbaru: [],
       statuspo: "",
       listhapus: {},
+      listpredit: {},
     };
   },
   created() {
@@ -965,6 +966,7 @@ export default {
                           nomor_pr: this.lpo.nomor_pr,
                           kode_barang: this.listfix[i].kode_barang,
                           qty: this.hitung.qty[i],
+                          sisa: this.hitung.qty[i],
                           keterangan: this.hitung.keterangan[i],
                         });
                       }
@@ -1315,22 +1317,34 @@ export default {
               })
               .then((res) => {
                 axios
-                  .post("/api/history", {
-                    nomor_dok: this.lpo.nomor_pr,
-                    id_user: this.ambiluser.id,
-                    notif: "Perbaikan di terima",
-                    keterangan: "Request perbaikan di terima",
-                    jenis: "Pr",
-                    tanggal: this.DateTime(),
+                  .get("/api/listpr/" + this.$route.params.nomor)
+                  .then((res) => {
+                    this.listpredit = res.data.data;
+                    for (let g = 0; g < this.listpredit.length; g++) {
+                      axios.put("/api/listpr/" + this.listpredit[g].id, {
+                        close: "Y",
+                      });
+                    }
                   })
                   .then((res) => {
-                    this.load = false;
-                    swalWithBootstrapButtons.fire(
-                      "Sukses!",
-                      "Permintaan berhasil di terima.",
-                      "success"
-                    );
-                    this.kembali();
+                    axios
+                      .post("/api/history", {
+                        nomor_dok: this.lpo.nomor_pr,
+                        id_user: this.ambiluser.id,
+                        notif: "Perbaikan di terima",
+                        keterangan: "Request perbaikan di terima",
+                        jenis: "Pr",
+                        tanggal: this.DateTime(),
+                      })
+                      .then((res) => {
+                        this.load = false;
+                        swalWithBootstrapButtons.fire(
+                          "Sukses!",
+                          "Permintaan berhasil di terima.",
+                          "success"
+                        );
+                        this.kembali();
+                      });
                   });
               });
           } else if (
@@ -1382,6 +1396,7 @@ export default {
                     for (let r = 0; r < this.listprnya.length; r++) {
                       axios.put("/api/listpr/" + this.listprnya[r].id, {
                         status: "Y",
+                        close: "N",
                         tgl_estimasi: this.hitung.tgl_estimasi[r],
                       });
                     }

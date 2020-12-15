@@ -146,6 +146,8 @@ Route::resource('pr','Pr\PrController');
 Route::resource('listpr','Pr\ListprController');
 Route::get('pr/data/open','Pr\PrController@open');
 Route::get('pr/data/listedit','Pr\PrController@listedit');
+Route::get('listpr/data/group','Pr\ListprController@group');
+Route::get('listpr/data/group/{barang}','Pr\ListprController@grouplist');
 
 Route::resource('listpo','Po\ListpoController');
 Route::get('listpo/data/aktif/{nomor}','Po\ListpoController@sisalist');

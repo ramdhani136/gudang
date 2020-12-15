@@ -440,6 +440,7 @@ export default {
                       nomor_pr: this.lpo.nomor_pr,
                       kode_barang: this.listfix[i].kode_barang,
                       qty: this.hitung.qty[i],
+                      sisa: this.hitung.qty[i],
                       keterangan: this.hitung.keterangan[i],
                     });
                   }

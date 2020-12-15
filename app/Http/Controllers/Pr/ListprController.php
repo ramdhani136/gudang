@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Pr;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\lgrouppr;
+use App\Http\Resources\ListprGroupResource;
 use Illuminate\Http\Request;
 use App\Http\Resources\listprResource;
 use App\Model\Pr\Listpr;
@@ -88,5 +90,15 @@ class ListprController extends Controller
     {
         Listpr::where('id',$id)->delete();
         return response('deleted',response::HTTP_OK);
+    }
+
+    public function  group(){
+        $data= Listpr::groupBy('kode_barang')->where('close','N')->where('status','Y')
+        ->selectRaw('count(*) as total, kode_barang')->get();
+        return ListprGroupResource::collection($data);
+    }
+
+    public function  grouplist($barang){
+        return lgrouppr::collection(Listpr::where('status','Y')->where('close','N')->where('kode_barang',$barang)->get());
     }
 }
