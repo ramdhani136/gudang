@@ -60,7 +60,24 @@
               <th>Nama Barang</th>
               <th v-if="statuspr === 'Draft'">Total Permintaan</th>
               <th>Qty PR</th>
-              <th v-if="statuspr === 'Open' || statuspr === 'Selesai'">Open PO</th>
+              <th
+                v-if="
+                  statuspr === 'Open' ||
+                  statuspr === 'Selesai' ||
+                  statuspr === 'Di Selesaikan'
+                "
+              >
+                Open PO
+              </th>
+              <th
+                v-if="
+                  statuspr === 'Open' ||
+                  statuspr === 'Selesai' ||
+                  statuspr === 'Di Selesaikan'
+                "
+              >
+                Sisa PR
+              </th>
               <th>Satuan</th>
               <th
                 v-if="
@@ -108,7 +125,24 @@
                   v-model="hitung.qty[index]"
                 />
               </td>
-              <td v-if="statuspr === 'Open' || statuspr === 'Selesai'">{{ list.po }}</td>
+              <td
+                v-if="
+                  statuspr === 'Open' ||
+                  statuspr === 'Selesai' ||
+                  statuspr === 'Di Selesaikan'
+                "
+              >
+                {{ list.po }}
+              </td>
+              <td
+                v-if="
+                  statuspr === 'Open' ||
+                  statuspr === 'Selesai' ||
+                  statuspr === 'Di Selesaikan'
+                "
+              >
+                {{ parseFloat(hitung.qty[index]) - parseFloat(list.po) }}
+              </td>
               <td style="text-align: center">{{ list.satuan }}</td>
               <td
                 v-if="

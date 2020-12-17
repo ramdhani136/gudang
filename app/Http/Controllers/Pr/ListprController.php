@@ -110,4 +110,8 @@ class ListprController extends Controller
         return listprResource::collection(Listpr::where('status','Y')->where('kode_barang',$barang)->orderBy('accdate','DESC')->get());
     }
 
+    public function sisapr($pr){
+        return listprResource::collection(Listpr::where('status','Y')->where('close','N')->where('sisa','>',0)->where('nomor_pr',$pr)->get());
+    }
+
 }

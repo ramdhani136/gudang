@@ -24,6 +24,7 @@
         <option value="Tolak">Di Tolak</option>
         <option value="Reqedit">Request Perbaikan</option>
         <option value="Selesai">Selesai</option>
+        <option value="Di Selesaikan">Di Selesaikan</option>
       </select>
     </div>
     <div class="row" v-if="ambiluser.inventory === 1">
@@ -82,12 +83,13 @@
                 v-if="
                   ambiluser.inventory === 1 &&
                   lp.status !== 'Selesai' &&
+                  lp.status !== 'Di Selesaikan' &&
                   ket.po[index] > 0
                 "
-                @click="showedit(lp)"
+                @click="showselesai(lp)"
                 class="btn btn-orange"
               >
-                Request Selesai
+                Selesaikan
               </button>
             </td>
           </tr>
@@ -238,6 +240,66 @@
         </div>
       </div>
     </div>
+    <div
+      class="modal fade"
+      id="modal-selesai"
+      tabindex="-1"
+      data-backdrop="static"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div id="modal-width" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Form Penyelesaian PR</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="infopr">
+              Silahkan pilih sisa item yang masih ingin di buatkan PR :)
+              <br />
+              Item yang tidak di pilih akan di tutup permintaannya ..
+            </div>
+            <table style="font-size: 0.9em" class="table table-striped table-bordered">
+              <thead>
+                <tr style="text-align: center">
+                  <th style="width: 22px">No</th>
+                  <th>Kode</th>
+                  <th>Item</th>
+                  <th style="width: 25px">Qty</th>
+                  <th>Satuan</th>
+                  <th style="width: 15px">Pilih</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(ls, index) in listsisa" :key="index">
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ ls.kode_barang }}</td>
+                  <td>{{ ls.nama_barang }}</td>
+                  <td>{{ ls.sisa }}</td>
+                  <td>{{ ls.satuan }}</td>
+                  <td>
+                    <input :value="ls" v-model="listpilih" type="checkbox" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button
+              @click="kirimselesai()"
+              type="button"
+              class="btn btn-success"
+              data-dismiss="modal"
+            >
+              Selesaikan PR
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -272,6 +334,9 @@ export default {
       ket: {
         po: [],
       },
+      listsisa: {},
+      listpilih: [],
+      nomorpr: "",
     };
   },
   created() {
@@ -418,6 +483,17 @@ export default {
     showfilter() {
       $("#modal-filter").modal("show");
     },
+    showselesai(lp) {
+      this.nomorpr = lp.nomor_pr;
+      this.listpilih = [];
+      $("#modal-selesai").modal("show");
+      axios.get("/api/listpr/sisapr/" + lp.nomor_pr).then((res) => {
+        this.listsisa = res.data.data;
+        for (let i = 0; i < this.listsisa.length; i++) {
+          this.listpilih.push(this.listsisa[i]);
+        }
+      });
+    },
     FirstDate() {
       this.date = new Date();
       this.month = this.date.getMonth() + 1;
@@ -501,8 +577,138 @@ export default {
         });
       }
     },
+    kirimselesai() {
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: "btn btn-success ml-2",
+          cancelButton: "btn btn-danger",
+        },
+        buttonsStyling: false,
+      });
+
+      swalWithBootstrapButtons
+        .fire({
+          title: "Apakah anda yakin?",
+          text: "Ingin menyelesaikan PR ini!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Iya, Yakin!",
+          cancelButtonText: "Tidak!",
+          reverseButtons: true,
+        })
+        .then((result) => {
+          if (result.isConfirmed) {
+            for (let i = 0; i < this.listpilih.length; i++) {
+              axios
+                .get("/api/listso/data/kembalikanpo/" + this.listpilih[i].kode_barang)
+                .then((res) => {
+                  this.listhapus = res.data.data;
+                  for (let k = 0; k < this.listhapus.length; k++) {
+                    if (this.listpilih[i].sisa >= this.listhapus[k].openpo) {
+                      this.sisapo = this.listhapus[k].openpo + this.listhapus[k].sisapo;
+                      this.openpo = 0;
+                      this.statuspo = "N";
+                      this.listpilih[i].sisa =
+                        parseInt(this.listpilih[i].sisa) -
+                        parseInt(this.listhapus[k].openpo);
+                    } else {
+                      this.openpo =
+                        parseInt(this.listhapus[k].openpo) -
+                        parseInt(this.listpilih[i].sisa);
+                      if (this.listpilih[i].sisa > this.listhapus[k].qty) {
+                        this.sisapo =
+                          parseInt(this.listhapus[k].sisapo) +
+                          parseInt(this.listhapus[k].open);
+                      } else {
+                        this.sisapo =
+                          parseInt(this.listhapus[k].sisapo) +
+                          parseInt(this.listpilih[i].sisa);
+                      }
+                      if (this.sisapo < 1) {
+                        this.statuspo = "Y";
+                      } else {
+                        this.statuspo = "N";
+                      }
+                      this.listpilih[i].sisa =
+                        parseInt(this.listpilih[i].sisa) -
+                        parseInt(this.listhapus[k].openpo);
+                      if (this.listpilih[i].sisa < 1) {
+                        this.listpilih[i].sisa = 0;
+                      }
+                    }
+                    axios.put("/api/listso/" + this.listhapus[k].id, {
+                      sisapo: this.sisapo,
+                      openpo: this.openpo,
+                      statuspo: this.statuspo,
+                    });
+                  }
+                });
+            }
+            axios
+              .put("/api/pr/" + this.nomorpr, {
+                status: "Di Selesaikan",
+                reqedit: "N",
+                alasan: "",
+              })
+              .then((res) => {
+                axios.get("/api/listpr/" + this.nomorpr).then((res) => {
+                  this.listpr = res.data.data;
+                  for (let t = 0; t < this.listpr.length; t++) {
+                    axios.put("/api/listpr/" + this.listpr[t].id, {
+                      close: "Y",
+                    });
+                  }
+                });
+              })
+              .then((res) => {
+                axios
+                  .post("/api/history", {
+                    nomor_dok: this.nomorpr,
+                    id_user: this.ambiluser.id,
+                    notif: "PR Di Selesaikan",
+                    keterangan: "PR Di Selesaikan",
+                    jenis: "Pr",
+                    tanggal: this.DateTime(),
+                  })
+                  .then((res) => {
+                    this.getPr();
+                    this.cekstatus();
+                    this.load = false;
+                    swalWithBootstrapButtons.fire(
+                      "Sukses!",
+                      "PR berhasil di selesaikan.",
+                      "success"
+                    );
+                  });
+              });
+          } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+          ) {
+            this.load = false;
+            swalWithBootstrapButtons.fire(
+              "Cancelled",
+              "Batal menyelesaikan PR :)",
+              "error"
+            );
+          }
+        });
+    },
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+.infopr {
+  width: 100%;
+  height: auto;
+  padding: 2%;
+  border: solid 1px #ebb3b5;
+  text-align: center;
+  margin-bottom: 15px;
+  background-color: #f2dedf;
+  font-weight: bold;
+  color: #e97377;
+  letter-spacing: 0.2px;
+}
+</style>

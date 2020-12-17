@@ -151,6 +151,7 @@ Route::get('listpr/data/group/{barang}','Pr\ListprController@grouplist');
 Route::get('listpr/data/antrianpr/{barang}','Pr\ListprController@antrianpr');
 Route::get('listpr/data/kembalikanpr/{barang}','Pr\ListprController@kembalikanpr');
 Route::get('listpr/id/{id}','Pr\ListprController@id');
+Route::get('listpr/sisapr/{pr}','Pr\ListprController@sisapr');
 
 
 Route::resource('listpo','Po\ListpoController');
