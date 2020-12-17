@@ -68,7 +68,8 @@
                   (pl.status == 'Draft' ||
                     pl.status == 'Request' ||
                     pl.status == 'Tolak') &&
-                  (ambiluser.superadmin === 1 || ambiluser.purch === 1)
+                  (ambiluser.superadmin === 1 || ambiluser.purch === 1) &&
+                  load === false
                 "
                 class="btn btn-danger"
               >
@@ -402,6 +403,10 @@ export default {
       custom: null,
       itemHeight: 39,
       a: [],
+      listcek: {},
+      cekclose: {},
+      iniclose: "",
+      bandingclose: "",
     };
   },
   created() {
@@ -595,9 +600,51 @@ export default {
                         k === this.listhapus.length - 1
                       ) {
                         for (let s = 0; s < this.a.length; s++) {
-                          axios.put("/api/pr/" + this.a[s], {
-                            status: "Open",
-                          });
+                          axios
+                            .post("/api/history", {
+                              nomor_dok: this.a[s],
+                              id_user: this.ambiluser.id,
+                              notif: "Membatalkan PO nomor : " + pl.nomor_po,
+                              keterangan: "Membatalkan PO nomor : " + pl.nomor_po,
+                              jenis: "Pr",
+                              tanggal: this.DateTime(),
+                            })
+                            .then((res) => {
+                              axios
+                                .get("/api/pr/" + this.a[s])
+                                .then((res) => {
+                                  this.listcek = res.data.data;
+                                  if (
+                                    this.listcek[0].status === "Selesai" ||
+                                    this.listcek[0].status === "Di Selesaikan"
+                                  ) {
+                                    axios.post("/api/history", {
+                                      nomor_dok: this.a[s],
+                                      id_user: this.ambiluser.id,
+                                      notif: "PR di buka kembali",
+                                      keterangan: "PR di buka kembali",
+                                      jenis: "Pr",
+                                      tanggal: this.DateTime(),
+                                    });
+                                  }
+                                })
+                                .then((res) => {
+                                  axios.get("/api/listpr/" + this.a[s]).then((res) => {
+                                    this.cekclose = res.data.data;
+                                    for (let t = 0; t < this.cekclose.length; t++) {
+                                      this.iniclose += this.cekclose[t].close;
+                                      this.bandingclose += "Y";
+                                    }
+                                    if (this.iniclose !== this.bandingclose) {
+                                      axios.put("/api/pr/" + this.a[s], {
+                                        status: "Open",
+                                      });
+                                    }
+                                    this.iniclose = "";
+                                    this.bandingclose = "";
+                                  });
+                                });
+                            });
                         }
                       }
                     }
@@ -610,13 +657,13 @@ export default {
                     axios.delete("/api/history/" + this.history[o].id);
                   }
                 });
+                this.getPo();
                 this.load = false;
                 swalWithBootstrapButtons.fire(
                   "Deleted!",
                   "PO berhasil di hapus.",
                   "success"
                 );
-                this.getPo();
               });
             });
           } else if (

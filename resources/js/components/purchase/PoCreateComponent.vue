@@ -715,12 +715,31 @@ export default {
                                   this.bandingclose += "Y";
                                 }
                                 if (this.iniclose === this.bandingclose) {
-                                  axios.put("/api/pr/" + this.a[s], {
-                                    status: "Selesai",
-                                  });
+                                  axios
+                                    .put("/api/pr/" + this.a[s], {
+                                      status: "Selesai",
+                                    })
+                                    .then((res) => {
+                                      axios.post("/api/history", {
+                                        nomor_dok: this.a[s],
+                                        id_user: this.ambiluser.id,
+                                        notif: "PR Selesai",
+                                        keterangan: "PR Selesai",
+                                        jenis: "Pr",
+                                        tanggal: this.DateTime(),
+                                      });
+                                    });
                                 }
                                 this.iniclose = "";
                                 this.bandingclose = "";
+                              });
+                              axios.post("/api/history", {
+                                nomor_dok: this.a[s],
+                                id_user: this.ambiluser.id,
+                                notif: "Membuka PO nomor : " + this.lpo.nomor_po,
+                                keterangan: "Membuka PO nomor : " + this.lpo.nomor_po,
+                                jenis: "Pr",
+                                tanggal: this.DateTime(),
                               });
                             }
                           }

@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Pr;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\listprResource;
 use App\Http\Resources\PrResource;
-use App\Model\Pr\Listpr;
 use App\Model\Pr\Pr;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

@@ -68,11 +68,26 @@
                 Lihat Rincian
               </button>
               <button
-                v-if="ambiluser.inventory === 1 && lp.status !== 'Selesai'"
+                v-if="
+                  ambiluser.inventory === 1 &&
+                  lp.status !== 'Selesai' &&
+                  ket.po[index] < 1
+                "
                 @click="batalkan(lp)"
                 class="btn btn-danger"
               >
                 Batalkan
+              </button>
+              <button
+                v-if="
+                  ambiluser.inventory === 1 &&
+                  lp.status !== 'Selesai' &&
+                  ket.po[index] > 0
+                "
+                @click="showedit(lp)"
+                class="btn btn-orange"
+              >
+                Request Selesai
               </button>
             </td>
           </tr>
@@ -211,7 +226,12 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-success" data-dismiss="modal">
+            <button
+              @click="cekstatus()"
+              type="button"
+              class="btn btn-success"
+              data-dismiss="modal"
+            >
               Save Change
             </button>
           </div>
@@ -239,7 +259,7 @@ export default {
       filter: {
         mulaitanggal: this.FirstDate(),
         sampaitanggal: this.today(),
-        status: "Sent",
+        status: "Open",
         nomor: "",
       },
       history: {},
@@ -248,10 +268,15 @@ export default {
       menu: "Sent",
       edit: "N",
       listedit: {},
+      listcek: {},
+      ket: {
+        po: [],
+      },
     };
   },
   created() {
     this.getPr();
+    this.cekstatus();
   },
   computed: {
     FilteredPr() {
@@ -278,6 +303,7 @@ export default {
           this.menu = "Request PR";
         }
         this.pr = res.data.data;
+        this.cekstatus();
         this.load = false;
       });
     },
@@ -462,7 +488,18 @@ export default {
       return this.datetimes;
     },
     cekstatus() {
+      this.ket.po = [];
       this.getedit();
+      for (let i = 0; i < this.FilteredPr.length; i++) {
+        axios.get("/api/listpr/" + this.FilteredPr[i].nomor_pr).then((res) => {
+          this.listcek = res.data.data;
+          this.qtypo = 0;
+          for (let k = 0; k < this.listcek.length; k++) {
+            this.qtypo += this.listcek[k].po;
+          }
+          this.ket.po.push(this.qtypo);
+        });
+      }
     },
   },
 };

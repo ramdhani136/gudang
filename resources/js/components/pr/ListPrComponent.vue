@@ -213,7 +213,8 @@
           statuspr !== 'Draft' &&
           statuspr !== 'Selesai' &&
           ambiluser.inventory === 1 &&
-          edit === 'N'
+          edit === 'N' &&
+          tomboledit
         "
         @click="reqedit()"
         class="btn-orange btn ml-4"
@@ -549,6 +550,7 @@ export default {
       statuspo: "",
       listhapus: {},
       listpredit: {},
+      tomboledit: false,
     };
   },
   created() {
@@ -587,12 +589,19 @@ export default {
             this.alasan = this.prini[0].alasan;
             axios.get("/api/listpr/" + this.lpo.nomor_pr).then((res) => {
               this.listfix = res.data.data;
+              this.adapo = 0;
               for (let b = 0; b < this.listfix.length; b++) {
                 this.hitung.status[b] = this.listfix[b].status;
                 this.hitung.tgl_estimasi[b] = this.listfix[b].tgl_estimasi;
                 this.hitung.alastolak[b] = this.listfix[b].alastolak;
                 this.hitung.qty[b] = this.listfix[b].qty;
                 this.hitung.keterangan[b] = this.listfix[b].keterangan;
+                this.adapo += this.listfix[b].po;
+              }
+              if (this.adapo > 0) {
+                this.tomboledit = false;
+              } else {
+                this.tomboledit = true;
               }
 
               if (this.listfix.length >= this.pr.length) {
