@@ -60,7 +60,7 @@
               <th>Nama Barang</th>
               <th v-if="statuspr === 'Draft'">Total Permintaan</th>
               <th>Qty PR</th>
-              <th v-if="statuspr === 'Open'">Open PO</th>
+              <th v-if="statuspr === 'Open' || statuspr === 'Selesai'">Open PO</th>
               <th>Satuan</th>
               <th
                 v-if="
@@ -108,7 +108,7 @@
                   v-model="hitung.qty[index]"
                 />
               </td>
-              <td v-if="statuspr === 'Open'">{{ list.po }}</td>
+              <td v-if="statuspr === 'Open' || statuspr === 'Selesai'">{{ list.po }}</td>
               <td style="text-align: center">{{ list.satuan }}</td>
               <td
                 v-if="
@@ -209,7 +209,12 @@
         Kirim PR
       </button>
       <button
-        v-if="statuspr !== 'Draft' && ambiluser.inventory === 1 && edit === 'N'"
+        v-if="
+          statuspr !== 'Draft' &&
+          statuspr !== 'Selesai' &&
+          ambiluser.inventory === 1 &&
+          edit === 'N'
+        "
         @click="reqedit()"
         class="btn-orange btn ml-4"
       >
@@ -527,7 +532,7 @@ export default {
       sisapo: 0,
       openpo: 0,
       prini: {},
-      statuspr: "Reqedit",
+      statuspr: "Selesai",
       alasan: "",
       edit: "N",
       statusupdate: "",

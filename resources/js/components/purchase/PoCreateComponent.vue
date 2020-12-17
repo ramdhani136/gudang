@@ -408,6 +408,8 @@ export default {
       cekclose: {},
       iniclose: "",
       bandingclose: "",
+      a: [],
+      listurut: {},
     };
   },
   created() {
@@ -602,6 +604,7 @@ export default {
         })
         .then((result) => {
           if (result.isConfirmed) {
+            this.a = [];
             if (this.listfix.length < 1) {
               Swal.fire({
                 icon: "error",
@@ -687,24 +690,39 @@ export default {
                               po: this.openpo,
                               close: this.ubah,
                             });
-                            axios
-                              .get("/api/listpr/" + this.listbagi[k].nomor_pr)
-                              .then((res) => {
+                          }
+                        });
+                    }
+                    for (let j = 0; j < this.listfix.length; j++) {
+                      axios
+                        .get("/api/listpr/data/antrianpr/" + this.listfix[j].kode_barang)
+                        .then((res) => {
+                          this.listurut = res.data.data;
+                          for (let i = 0; i < this.listurut.length; i++) {
+                            const hitungajaa = this.a.filter(
+                              (element) => element === this.listurut[i].nomor_pr
+                            );
+                            if (hitungajaa.length < 1) {
+                              this.a.push(this.listurut[i].nomor_pr);
+                            }
+                          }
+                          if (j === this.listfix.length - 1) {
+                            for (let s = 0; s < this.a.length; s++) {
+                              axios.get("/api/listpr/" + this.a[s]).then((res) => {
                                 this.cekclose = res.data.data;
                                 for (let t = 0; t < this.cekclose.length; t++) {
                                   this.iniclose += this.cekclose[t].close;
                                   this.bandingclose += "Y";
                                 }
-                                console.log(this.iniclose);
-                                console.log(this.bandingclose);
                                 if (this.iniclose === this.bandingclose) {
-                                  axios.put("/api/pr/" + this.listbagi[k].nomor_pr, {
+                                  axios.put("/api/pr/" + this.a[s], {
                                     status: "Selesai",
                                   });
                                 }
                                 this.iniclose = "";
                                 this.bandingclose = "";
                               });
+                            }
                           }
                         });
                     }

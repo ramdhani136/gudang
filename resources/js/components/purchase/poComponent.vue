@@ -401,6 +401,7 @@ export default {
       selected: 0,
       custom: null,
       itemHeight: 39,
+      a: [],
     };
   },
   created() {
@@ -583,6 +584,22 @@ export default {
                         po: this.openpo,
                         close: this.statuspo,
                       });
+                      const hitungajaa = this.a.filter(
+                        (element) => element === this.listhapus[k].nomor_pr
+                      );
+                      if (hitungajaa.length < 1) {
+                        this.a.push(this.listhapus[k].nomor_pr);
+                      }
+                      if (
+                        i === this.listpo.length - 1 &&
+                        k === this.listhapus.length - 1
+                      ) {
+                        for (let s = 0; s < this.a.length; s++) {
+                          axios.put("/api/pr/" + this.a[s], {
+                            status: "Open",
+                          });
+                        }
+                      }
                     }
                   });
               }

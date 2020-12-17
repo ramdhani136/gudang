@@ -68,7 +68,7 @@
                 Lihat Rincian
               </button>
               <button
-                v-if="ambiluser.inventory === 1"
+                v-if="ambiluser.inventory === 1 && lp.status !== 'Selesai'"
                 @click="batalkan(lp)"
                 class="btn btn-danger"
               >
@@ -233,7 +233,6 @@ export default {
       load: true,
       pr: [],
       historyview: {},
-      statusnya: "",
       listso: {},
       openpo: 0,
       history: {},
