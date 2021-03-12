@@ -24,7 +24,7 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
-        "jspdf": "^2.1.0",
+        "jspdf": "^2.3.1",
         "jspdf-autotable": "^3.5.9",
         "laravel-echo": "^1.8.1",
         "laravel-vue-pagination": "^2.3.1",
